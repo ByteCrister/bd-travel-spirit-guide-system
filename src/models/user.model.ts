@@ -1,81 +1,36 @@
-// * models/user.model.ts
-import mongoose, { Schema, Document, Types, model } from "mongoose";
-import { models } from "mongoose";
+// ============================================
+// user.model.ts
+// Production-grade User schema with lifecycle,
+// security, and extensibility considerations.
+// ============================================
+
+import {
+  GUIDE_DOCUMENT_CATEGORY,
+  GUIDE_DOCUMENT_TYPE,
+} from "@/constants/guide.const";
+import { ACCOUNT_STATUS, USER_ROLE } from "@/constants/user.const";
+import mongoose, {
+  Schema,
+  Document,
+  Types,
+  model,
+  models,
+  Query,
+} from "mongoose";
 
 /**
  * =========================
- * CONST ENUMS
+ * SUB‑DOCUMENT INTERFACES
  * =========================
  */
 
-/** Roles supported by the platform */
-export enum USER_ROLE {
-    /** Regular user booking tours */
-    TRAVELER = "traveler",
-
-    /** Person conducting tours */
-    GUIDE = "guide",
-
-    /** Manages schedules, logistics */
-    ASSISTANT = "assistant",
-
-    /** Customer support staff */
-    SUPPORT = "support",
-
-    /** Platform administrator */
-    ADMIN = "admin",
+/** Guide document metadata (for KYC, verification, etc.) */
+export interface GuideDocument {
+  category: GUIDE_DOCUMENT_CATEGORY;
+  base64Content: string;
+  fileType: GUIDE_DOCUMENT_TYPE;
+  fileName?: string;
 }
-
-/** Account lifecycle states */
-export enum ACCOUNT_STATUS {
-    /** Account created but not yet verified */
-    PENDING = "pending",
-
-    /** Account is active and in good standing */
-    ACTIVE = "active",
-
-    /** Temporarily disabled due to violations or inactivity */
-    SUSPENDED = "suspended",
-
-    /** Permanently banned from the platform */
-    BANNED = "banned",
-}
-
-/** Organizer profile verification states */
-export enum GUIDE_STATUS {
-    /** Awaiting admin review */
-    PENDING = "pending",
-
-    /** Approved and allowed to create/manage tours */
-    APPROVED = "approved",
-
-    /** Rejected after review */
-    REJECTED = "rejected",
-}
-
-// Document categories
-export enum ORGANIZER_DOCUMENT_CATEGORY {
-    GOVERNMENT_ID = 'government_id',
-    BUSINESS_LICENSE = 'business_license',
-    PROFESSIONAL_PHOTO = 'professional_photo',
-    CERTIFICATION = 'certification',
-}
-
-// Supported file types
-export enum OrganizerDocumentType {
-    IMAGE = 'image',
-    PDF = 'pdf',
-    DOCX = 'docx',
-}
-
-export interface OrganizerDocument {
-    category: ORGANIZER_DOCUMENT_CATEGORY;
-    base64Content: string;
-    fileType: OrganizerDocumentType;
-    fileName?: string;
-}
-
-
 
 /**
  * =========================
@@ -85,77 +40,30 @@ export interface OrganizerDocument {
 
 /** Shared address schema for billing, profile, etc. */
 const AddressSchema = new Schema(
-    {
-        street: { type: String, trim: true },
-        city: { type: String, trim: true },
-        state: { type: String, trim: true },
-        country: { type: String, trim: true },
-        zip: { type: String, trim: true },
-    },
-    { _id: false }
+  {
+    street: { type: String, trim: true },
+    city: { type: String, trim: true },
+    state: { type: String, trim: true },
+    country: { type: String, trim: true },
+    zip: { type: String, trim: true },
+  },
+  { _id: false }
 );
 
 /** Payment method with billing address */
 const PaymentMethodSchema = new Schema(
-    {
-        // Prefer storing only PSP token + brand + last4 + expiry (no PAN)
-        token: { type: String, required: true }, // PSP token/id
-        cardType: { type: String, required: true },
-        last4: { type: String, required: true },
-        expiryMonth: { type: Number, required: true },
-        expiryYear: { type: Number, required: true },
-        cardHolder: { type: String, required: true },
-        billingAddress: { type: AddressSchema, required: true },
-    },
-    { _id: false }
-);
-
-/** Embedded organizer profile for guides / agencies */
-const OrganizerProfileSchema = new Schema(
-    {
-        companyName: { type: String, trim: true },
-        bio: { type: String, trim: true },
-        social: { type: String, trim: true }, // could store URL or handle
-        documents: {
-            type: [
-                {
-                    category: {
-                        type: String,
-                        enum: Object.values(ORGANIZER_DOCUMENT_CATEGORY),
-                        required: true,
-                    },
-                    base64Content: { type: String, required: true }, // full base64 string
-                    fileType: {
-                        type: String,
-                        enum: Object.values(OrganizerDocumentType),
-                        required: true,
-                    },
-                    fileName: { type: String, trim: true },
-                    uploadedAt: { type: Date, default: Date.now },
-                },
-            ],
-            validate: [
-                (val: {
-                    category: ORGANIZER_DOCUMENT_CATEGORY;
-                    base64Content: string;
-                    fileType: OrganizerDocumentType;
-                    fileName?: string;
-                    uploadedAt: Date;
-                }[]) => val.length > 0,
-                "At least one verification document is required",
-            ],
-            required: true,
-        },
-        status: {
-            type: String,
-            enum: Object.values(GUIDE_STATUS),
-            default: GUIDE_STATUS.PENDING,
-        },
-        appliedAt: Date,
-        reviewedAt: Date,
-        reviewer: { type: Schema.Types.ObjectId, ref: "User" }, // admin user who reviewed
-    },
-    { _id: false, timestamps: true } // timestamps track last update
+  {
+    // Store only PSP token + metadata (never raw PAN)
+    token: { type: String, required: true }, // PSP token/id
+    cardType: { type: String, required: true },
+    last4: { type: String, required: true },
+    expiryMonth: { type: Number, required: true },
+    expiryYear: { type: Number, required: true },
+    cardHolder: { type: String, required: true },
+    billingAddress: { type: AddressSchema, required: true },
+    isDefault: { type: Boolean, default: false }, // NEW: mark default card
+  },
+  { _id: false }
 );
 
 /**
@@ -164,88 +72,43 @@ const OrganizerProfileSchema = new Schema(
  * =========================
  */
 export interface IUser extends Document {
-    /** Full name of the user */
-    name: string;
+  name: string;
+  email: string;
+  password?: string; // optional for OAuth users
+  role: USER_ROLE;
+  avatar?: string;
+  phone?: string;
+  address?: mongoose.InferSchemaType<typeof AddressSchema>;
+  dateOfBirth?: Date;
+  isVerified: boolean;
+  accountStatus: ACCOUNT_STATUS;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
+  bookingHistory: Types.ObjectId[];
+  cart: Types.ObjectId[];
+  wishlist: Types.ObjectId[];
+  paymentMethods: mongoose.InferSchemaType<typeof PaymentMethodSchema>[];
+  preferences: {
+    language: string;
+    currency: string;
+    recommendationWeights: Record<string, number>;
+  };
+  hiddenTours: Types.ObjectId[];
+  preferredTravelDates: { start: Date; end: Date }[];
+  loginAttempts: number;
+  lastLogin?: Date;
+  lockUntil?: Date;
+  suspension?: {
+    reason: string;
+    suspendedBy: Types.ObjectId;
+    until: Date;
+    createdAt: Date;
+  };
+  deletedAt?: Date;
 
-    /** Unique email address for login and communication */
-    email: string;
-
-    /** Hashed password */
-    password?: string;
-
-    /** Role-based permissions */
-    role: USER_ROLE;
-
-    /** Profile picture URL */
-    avatar?: string;
-
-    /** Contact phone number */
-    phone?: string;
-
-    /** Optional address details */
-    address?: mongoose.InferSchemaType<typeof AddressSchema>;
-
-    /** Date of birth */
-    dateOfBirth?: Date;
-
-    /** Whether the email is verified */
-    isVerified: boolean;
-
-    /** Current account lifecycle state */
-    accountStatus: ACCOUNT_STATUS;
-
-    /** Token for password reset */
-    resetPasswordToken?: string;
-
-    /** Expiration date for password reset token */
-    resetPasswordExpires?: Date;
-
-    /** Tours already booked */
-    bookingHistory: Types.ObjectId[];
-
-    /** Tours in cart */
-    cart: Types.ObjectId[];
-
-    /** Tours user might want later */
-    wishlist: Types.ObjectId[];
-
-    /** Stored payment methods (tokenized/masked) */
-    paymentMethods: mongoose.InferSchemaType<typeof PaymentMethodSchema>[];
-
-    /** User preferences for language and currency */
-    preferences: {
-        language: string;
-        currency: string;
-    };
-
-    /** Number of failed login attempts */
-    loginAttempts: number;
-
-    /** Last login timestamp */
-    lastLogin?: Date;
-
-    lockUntil?: Date;
-
-    /** Suspension details if applicable */
-    suspension?: {
-        reason: string;
-        suspendedBy: Types.ObjectId;
-        until: Date;
-        createdAt: Date;
-    };
-
-    /** Soft-delete timestamp */
-    deletedAt?: Date;
-
-    /** Organizer-specific profile */
-    organizerProfile?: mongoose.InferSchemaType<typeof OrganizerProfileSchema>;
-
-    /** Tours created by this user (if organizer) */
-    toursCreated?: Types.ObjectId[];
-
-    // virtuals
-    isLocked?: boolean;
-    isSuspended?: boolean;
+  // virtuals
+  isLocked?: boolean;
+  isSuspended?: boolean;
 }
 
 /**
@@ -254,140 +117,163 @@ export interface IUser extends Document {
  * =========================
  */
 const UserSchema = new Schema<IUser>(
-    {
-        // Core identity
-        name: { type: String, required: true, trim: true },
-        email: { type: String, required: true, unique: true, index: true, trim: true },
-        password: { type: String, required: true },
-
-        // Role-based permissions
-        role: {
-            type: String,
-            enum: Object.values(USER_ROLE),
-            default: USER_ROLE.TRAVELER,
-            required: true,
-            index: true,
-        },
-
-        // Profile
-        avatar: String,
-        phone: String,
-        address: AddressSchema,
-        dateOfBirth: Date,
-
-        // Account status
-        isVerified: { type: Boolean, default: false },
-        accountStatus: {
-            type: String,
-            enum: Object.values(ACCOUNT_STATUS),
-            default: ACCOUNT_STATUS.PENDING,
-        },
-
-        // Password reset flow
-        resetPasswordToken: String,
-        resetPasswordExpires: Date,
-
-        // Tour interactions
-        bookingHistory: [{ type: Schema.Types.ObjectId, ref: "Tour" }],
-        cart: [{ type: Schema.Types.ObjectId, ref: "Tour" }],
-        wishlist: [{ type: Schema.Types.ObjectId, ref: "Tour" }],
-
-        // Payments
-        paymentMethods: { type: [PaymentMethodSchema], default: [] },
-
-        // User preferences
-        preferences: {
-            language: { type: String, default: "en" },
-            currency: { type: String, default: "BDT" },
-        },
-
-        // Security & activity tracking
-        loginAttempts: { type: Number, default: 0 },
-        lockUntil: { type: Date },
-        lastLogin: Date,
-
-        // Soft delete and suspension
-        deletedAt: Date,
-        suspension: {
-            reason: String,
-            suspendedBy: { type: Schema.Types.ObjectId, ref: "User" },
-            until: Date,
-            createdAt: Date,
-        },
-
-        // Organizer data
-        organizerProfile: OrganizerProfileSchema,
-        toursCreated: [{ type: Schema.Types.ObjectId, ref: "Tour" }],
+  {
+    // Core identity
+    name: { type: String, required: true, trim: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+      trim: true,
+      lowercase: true, // NEW: normalize emails
     },
-    {
-        timestamps: true,
-        versionKey: false,
-        toJSON: {
-            virtuals: true,
-            transform: (_doc, ret) => {
-                delete ret.password;
-                delete ret.resetPasswordToken;
-                delete ret.resetPasswordExpires;
-                return ret;
-            }
-        },
-        toObject: { virtuals: true }
-    }
+    password: {
+      type: String,
+      // Allow null for OAuth users
+      required: function (this: IUser) {
+        return this.role === USER_ROLE.TRAVELER;
+      },
+    },
+
+    // Role-based permissions
+    role: {
+      type: String,
+      enum: Object.values(USER_ROLE),
+      default: USER_ROLE.TRAVELER,
+      required: true,
+      index: true,
+    },
+
+    // Profile
+    avatar: { type: Schema.Types.ObjectId, ref: "Asset" },
+    phone: String,
+    address: AddressSchema,
+    dateOfBirth: Date,
+
+    // Account status
+    isVerified: { type: Boolean, default: false },
+    accountStatus: {
+      type: String,
+      enum: Object.values(ACCOUNT_STATUS),
+      default: ACCOUNT_STATUS.PENDING,
+    },
+
+    // Password reset flow
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+
+    // Tour interactions
+    bookingHistory: [{ type: Schema.Types.ObjectId, ref: "Tour" }],
+    cart: [{ type: Schema.Types.ObjectId, ref: "Tour" }],
+    wishlist: [{ type: Schema.Types.ObjectId, ref: "Tour" }],
+
+    // Payments
+    paymentMethods: { type: [PaymentMethodSchema], default: [] },
+
+    // User preferences
+    preferences: {
+      language: { type: String, default: "en" },
+      currency: { type: String, default: "BDT" },
+      recommendationWeights: {
+        type: Map,
+        of: Number,
+        default: {},
+      },
+    },
+
+    hiddenTours: [{ type: Schema.Types.ObjectId, ref: "Tour" }],
+
+    preferredTravelDates: [
+      {
+        start: { type: Date, required: true },
+        end: { type: Date, required: true },
+      },
+    ],
+
+    // Security & activity tracking
+    loginAttempts: { type: Number, default: 0 },
+    lockUntil: { type: Date },
+    lastLogin: Date,
+
+    // Soft delete and suspension
+    deletedAt: Date,
+    suspension: {
+      reason: String,
+      suspendedBy: { type: Schema.Types.ObjectId, ref: "User" },
+      until: Date,
+      createdAt: { type: Date, default: Date.now },
+    },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret) => {
+        // Strip sensitive fields
+        delete ret.password;
+        delete ret.resetPasswordToken;
+        delete ret.resetPasswordExpires;
+        return ret;
+      },
+    },
+    toObject: { virtuals: true },
+  }
 );
 
-// Concrete document type (mongoose model instances)
-export type IUserDoc = IUser & mongoose.Document;
-
-// Virtuals
-UserSchema.virtual("isLocked").get(function (this: IUserDoc) {
-    return !!(this.lockUntil && this.lockUntil.getTime() > Date.now());
+/**
+ * =========================
+ * VIRTUALS
+ * =========================
+ */
+UserSchema.virtual("isLocked").get(function (this: IUser) {
+  return !!(this.lockUntil && this.lockUntil.getTime() > Date.now());
 });
 
-UserSchema.virtual("isSuspended").get(function (this: IUserDoc) {
-    return !!(this.suspension?.until && this.suspension.until > new Date());
+UserSchema.virtual("isSuspended").get(function (this: IUser) {
+  return !!(this.suspension?.until && this.suspension.until > new Date());
 });
 
+UserSchema.virtual("isActive").get(function (this: IUser) {
+  return !this.deletedAt && this.accountStatus === ACCOUNT_STATUS.ACTIVE;
+});
+
+/**
+ * =========================
+ * QUERY MIDDLEWARE
+ * =========================
+ */
+
+// Exclude soft-deleted users by default
+UserSchema.pre<Query<IUserDoc, IUser>>(/^find/, function (next) {
+  this.where({ deletedAt: null });
+  next();
+});
 
 /**
  * =========================
  * INDEXES FOR PERFORMANCE
  * =========================
  */
-// =============================
-// TEXT INDEX (one compound index only)
-// =============================
+// Text search (only one text index allowed per collection)
 UserSchema.index({
-    name: "text",
-    email: "text",
-    phone: "text",
-    "address.street": "text",
-    "address.city": "text",
-    "address.state": "text",
-    "address.country": "text",
-    "address.zip": "text",
-    "organizerProfile.companyName": "text"
+  name: "text",
+  email: "text",
+  phone: "text",
+  "address.city": "text",
 });
 
-// =============================
-// FILTERING + SORTING INDEXES
-// =============================
-// For dropdowns, filters, and sorting
-UserSchema.index({ role: 1 });
-UserSchema.index({ accountStatus: 1 });
-UserSchema.index({ isVerified: 1 });
-UserSchema.index({ isActive: 1 });
-
-// For frequent sorting
+// Filtering + sorting
+UserSchema.index({ role: 1, accountStatus: 1, isVerified: 1 });
 UserSchema.index({ createdAt: -1 });
 UserSchema.index({ lastLogin: -1 });
-
-// Optional: range queries
 UserSchema.index({ dateOfBirth: 1 });
-
 
 /**
  * =========================
  * MODEL FACTORY
  * =========================
  */
+export type IUserDoc = IUser & mongoose.Document;
 export const UserModel = models.User || model<IUserDoc>("User", UserSchema);
