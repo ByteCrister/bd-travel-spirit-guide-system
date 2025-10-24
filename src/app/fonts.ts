@@ -1,37 +1,18 @@
 // G:\Projects\bd-travel-spirit-guide-system\src\app\fonts.ts
-import { Inter, Roboto, Open_Sans, Lato, Poppins, Montserrat } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 
+// Primary font: Plus Jakarta Sans (weights 300-800)
+export const plusJakartaSans = Plus_Jakarta_Sans({
+    variable: "--font-plus-jakarta-sans",
+    subsets: ["latin"],
+    weight: ["300", "400", "500", "600", "700", "800"],
+    display: "swap",
+});
+
+// Secondary font: Inter for logo elements
 export const inter = Inter({
     variable: "--font-inter",
-    subsets: ["latin"], // Inter has a default weight, so weight is optional
-});
-
-export const roboto = Roboto({
-    variable: "--font-roboto",
     subsets: ["latin"],
-    weight: ["400", "700"], // must specify weights
-});
-
-export const openSans = Open_Sans({
-    variable: "--font-open-sans",
-    subsets: ["latin"],
-    weight: ["400", "600", "700"], // choose the weights you need
-});
-
-export const lato = Lato({
-    variable: "--font-lato",
-    subsets: ["latin"],
-    weight: ["400", "700"], // required
-});
-
-export const poppins = Poppins({
-    variable: "--font-poppins",
-    subsets: ["latin"],
-    weight: ["400", "500", "700"], // required
-});
-
-export const montserrat = Montserrat({
-    variable: "--font-montserrat",
-    subsets: ["latin"],
-    weight: ["400", "600", "700"], // required
+    weight: ["400", "500", "600", "700"],
+    display: "swap",
 });

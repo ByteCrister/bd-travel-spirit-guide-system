@@ -1,11 +1,11 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
-import { inter, roboto, lato, poppins, montserrat } from "./fonts";
+import { plusJakartaSans, inter } from "./fonts";
 
 export const metadata: Metadata = {
-  title: "My Next.js 15 App",
-  description: "Using Next.js 15 with Tailwind and Google Fonts",
+  title: "BD Travel Spirit Guide - Professional Travel Management",
+  description: "Empowering travel experiences with professional guides and seamless tour management across Bangladesh.",
 };
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${roboto.variable} ${lato.variable} ${poppins.variable} ${montserrat.variable} antialiased`}
+        className={`${plusJakartaSans.variable} ${inter.variable} antialiased`}
       >
         {children}
       </body>
