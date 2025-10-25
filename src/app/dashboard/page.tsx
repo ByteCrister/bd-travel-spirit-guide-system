@@ -1,8 +1,6 @@
+// app/dashboard/page.tsx
+import DashboardShell from "@/components/dashboard/DashboardShell";
 
-const page = () => {
-    return (
-        <div>Dashboard</div>
-    )
+export default function DashboardPage() {
+  return <DashboardShell />;
 }
-
-export default page

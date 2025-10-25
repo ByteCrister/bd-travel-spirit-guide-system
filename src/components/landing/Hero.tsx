@@ -17,7 +17,7 @@ import {
 } from "react-icons/fa";
 import { ArrowRight, ChevronDown, Sparkles } from "lucide-react";
 
-import formatHeroStat from "@/utils/helpers/formatHeroStat";
+import formatHeroStat from "@/utils/helpers/formatHeroStat.landing";
 
 type Stat = {
   icon: React.ElementType;

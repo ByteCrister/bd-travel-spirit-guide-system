@@ -1,0 +1,13 @@
+// hooks/useDebounced.ts
+"use client";
+
+import { useEffect, useState } from "react";
+
+export default function useDebounced<T>(value: T, delay = 300) {
+    const [debounced, setDebounced] = useState<T>(value);
+    useEffect(() => {
+        const id = window.setTimeout(() => setDebounced(value), delay);
+        return () => window.clearTimeout(id);
+    }, [value, delay]);
+    return debounced;
+}

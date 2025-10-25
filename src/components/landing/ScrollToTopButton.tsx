@@ -38,6 +38,8 @@ function createSmoothScrollToTop(duration = 800) {
 export function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);
   const [hovering, setHovering] = useState(false);
+  const [mounted, setMounted] = useState(false); // track hydration
+
   const progressMv = useMotionValue(0);
   const prefersReducedMotion =
     typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -93,6 +95,8 @@ export function ScrollToTopButton() {
     const { cancel, started } = createSmoothScrollToTop(prefersReducedMotion ? 450 : 900);
     if (started) scrollCancelRef.current = cancel;
   };
+
+  if (!mounted) return null; // prevents server/client mismatch
 
   return (
     <motion.button
