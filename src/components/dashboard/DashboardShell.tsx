@@ -10,7 +10,7 @@ import NotificationsDrawer from "./NotificationsDrawer";
 import QuickActions from "./QuickActions";
 import LoadingSkeleton from "./LoadingSkeleton";
 import ErrorBanner from "./ErrorBanner";
-import useDashboardStore from "@/store/dashboard.store";
+import useDashboardStore from "@/store/useDashboardStore";
 import ActivitiesPanel from "./ActivitiesPanel";
 
 export default function DashboardShell() {

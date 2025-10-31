@@ -21,7 +21,7 @@ import {
  * - createNormalizedMap is generic and avoids implicit any.
  * - API calls use AxiosResponse<DashboardApiResponse> to keep types strict.
  */
-const ROOT_API_DIRECTORY = "/dashboard";
+const ROOT_API_DIRECTORY = "/mock/dashboard";
 
 const STORAGE_KEY = "app:dashboard:v1";
 

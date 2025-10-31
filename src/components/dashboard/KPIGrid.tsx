@@ -3,7 +3,7 @@
 
 import React from "react";
 import KPICard from "./KPICard";
-import useDashboardStore from "@/store/dashboard.store";
+import useDashboardStore from "@/store/useDashboardStore";
 
 export default function KPIGrid() {
   const { kpis } = useDashboardStore();

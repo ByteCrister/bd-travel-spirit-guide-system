@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 
-import CountUp from "react-countup";
 import {
   FaUsers,
   FaUserShield,
@@ -18,6 +17,7 @@ import {
 import { ArrowRight, ChevronDown, Sparkles } from "lucide-react";
 
 import formatHeroStat from "@/utils/helpers/formatHeroStat.landing";
+import AnimatedCount from "../global/AnimatedCount";
 
 type Stat = {
   icon: React.ElementType;
@@ -151,11 +151,9 @@ export default function Hero({ onJoinClick }: { onJoinClick: () => void }) {
             className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6"
           >
             {stats.map(({ icon: Icon, label, value, suffix, prefix }, i) => {
-              const { displayValue, suffix: s } = formatHeroStat(value, {
-                suffix,
-                prefix,
-              });
-
+              const formatted = formatHeroStat(value, { suffix, prefix });
+              const endRaw = Number(formatted.displayValue);
+              const end = Number.isFinite(endRaw) ? endRaw : 0;
               return (
                 <motion.div
                   key={label}
@@ -173,16 +171,9 @@ export default function Hero({ onJoinClick }: { onJoinClick: () => void }) {
                       </div>
 
                       <div className="text-2xl font-bold text-white mb-1">
-                        <CountUp
-                          start={0}
-                          end={displayValue}
-                          duration={2.5}
-                          decimals={displayValue % 1 !== 0 ? 1 : 0}
-                          separator=","
-                        >
-                          {({ countUpRef }) => <span ref={countUpRef} />}
-                        </CountUp>
-                        {s}
+
+                        <AnimatedCount end={end} suffix={formatted.suffix} />
+
                       </div>
 
                       <div className="text-xs font-medium text-slate-200 uppercase tracking-wider">

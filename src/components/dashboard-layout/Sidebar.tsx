@@ -7,21 +7,17 @@ import {
   FiUsers,
   FiHeadphones,
   FiFileText,
-  FiShare2,
   FiImage,
   FiGift,
-  FiSettings,
   FiMenu,
   FiX,
   FiChevronRight
 } from "react-icons/fi";
-import { FaComments, FaUsers } from "react-icons/fa";
-import { HiOutlineChartSquareBar } from 'react-icons/hi';
+import { FaComments } from "react-icons/fa";
+import { RiDashboardLine } from "react-icons/ri"
 import { NavLink } from "./NavLink";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { ShieldCheck } from "lucide-react";
-import { MdBusiness, MdTravelExplore } from 'react-icons/md';
 import { usePathname } from "next/navigation";
 interface SidebarProps {
   isMobile?: boolean;
@@ -49,7 +45,7 @@ const navigationGroups: NavGroup[] = [
     icon: FiHome,
     items: [
       { href: "/dashboard", label: "Dashboard", icon: FiHome },
-      { href: "/statistics", label: "Statistics", icon: HiOutlineChartSquareBar },
+      { href: "/dashboard/overview", label: "Company Overview", icon: RiDashboardLine },
     ],
   },
   {

@@ -3,7 +3,7 @@
 
 import React, { useCallback } from "react";
 import ChartCard from "./ChartCard";
-import useDashboardStore from "@/store/dashboard.store";
+import useDashboardStore from "@/store/useDashboardStore";
 import type { DashboardChart } from "@/types/dashboard.types";
 
 export default function ChartsGrid() {

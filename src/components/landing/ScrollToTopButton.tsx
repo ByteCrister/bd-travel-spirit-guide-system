@@ -12,7 +12,7 @@ function createSmoothScrollToTop(duration = 800) {
   let rafId: number | null = null;
   let cancelled = false;
   const start = window.scrollY || window.pageYOffset;
-  if (start === 0) return { cancel: () => {}, started: false };
+  if (start === 0) return { cancel: () => { }, started: false };
   const startTime = performance.now();
   function step(now: number) {
     if (cancelled) return;
@@ -52,6 +52,10 @@ export function ScrollToTopButton() {
   const dashArray = 100;
   const dashOffset = useTransform(spring, (p) => (1 - p) * dashArray);
   const scrollCancelRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {

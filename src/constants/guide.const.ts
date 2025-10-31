@@ -44,11 +44,16 @@ export enum GUIDE_STATUS {
   /** Rejected after review */
   REJECTED = "rejected",
 }
-export type GuideStatus = EnumValues<GUIDE_STATUS>;
+export type GuideStatus = EnumValues<typeof GUIDE_STATUS>;
 
-// =========================
-// SOCIAL PLATFORM ENUM
-// =========================
+/**
+ * Social platforms where a guide may publish or share contact links.
+ * Use these keys to normalize external contact fields, drive UI icon mapping,
+ * and validate user-provided profile links or handles.
+ *
+ * - Values are the canonical slugs stored in the database and sent to clients.
+ * - Keep this list small and stable; treat additions as backward-compatible features.
+ */
 export enum GUIDE_SOCIAL_PLATFORM {
   FACEBOOK = "facebook",
   WHATSAPP = "whatsapp",
@@ -56,4 +61,26 @@ export enum GUIDE_SOCIAL_PLATFORM {
   TWITTER = "twitter",
   INSTAGRAM = "instagram",
 }
-export type GuideSocialPlatform = EnumValues<GUIDE_SOCIAL_PLATFORM>;
+export type GuideSocialPlatform = EnumValues<typeof GUIDE_SOCIAL_PLATFORM>;
+
+/**
+ * Subscription lifecycle states for recurring payments and access control.
+ * These states drive billing workflows, feature gating, and UI status badges.
+ *
+ * - ACTIVE: Payments are up to date; subscriber has full access.
+ * - PAST_DUE: Recent invoice failed; notify user and retry payments.
+ * - CANCELLED: User or system terminated future renewals; access may remain until end of paid period.
+ * - FAILED: Final failure after retry attempts; requires user action to recover.
+ * - EXPIRED: Subscription reached its natural end and is no longer renewable without a new purchase.
+ *
+ * Use these values when evaluating access permissions, scheduling renewal reminders,
+ * and recording billing events in audit logs.
+ */
+export enum SUBSCRIPTION_STATUS {
+  ACTIVE = "active",
+  PAST_DUE = "past_due",
+  CANCELLED = "cancelled",
+  FAILED = "failed",
+  EXPIRED = "expired",
+}
+export type SubscriptionStatus = `${SUBSCRIPTION_STATUS}`;
