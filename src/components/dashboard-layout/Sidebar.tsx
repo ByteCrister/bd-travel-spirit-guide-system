@@ -52,9 +52,9 @@ const navigationGroups: NavGroup[] = [
     title: "Operations",
     icon: FiFileText,
     items: [
-      { href: "/tours", label: "Tours", icon: FiFileText },
-      { href: "/reports", label: "Reports", icon: FiFileText },
-      { href: "/reviews", label: "Reviews", icon: FaComments },
+      { href: "/operations/tours", label: "Tours", icon: FiFileText },
+      { href: "/operations/reports", label: "Reports", icon: FiFileText },
+      { href: "/operations/reviews", label: "Reviews", icon: FaComments },
     ],
   },
   {

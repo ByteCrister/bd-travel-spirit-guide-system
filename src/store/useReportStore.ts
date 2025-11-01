@@ -19,7 +19,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { produce } from "immer";
+import { produce, enableMapSet } from "immer";
 import {
     ReportsStoreState,
     ReportsQueryParams,
@@ -38,6 +38,8 @@ const URL_AFTER_API = `/mock/operations/reports`;
 const DEFAULT_LIMITS = [10, 20, 50];
 const DEFAULT_LIMIT = 10;
 const CACHE_TTL_MS = Number(process.env.NEXT_PUBLIC_GUIDE_CACHE_TTL ?? 60000);
+
+enableMapSet();
 
 // Stable serialization order for cache keys.
 function stableSerializeParams(p: ReportsQueryParams): string {
@@ -243,24 +245,21 @@ export const useReportsStore = create<ReportsStoreState>()(
                 const params = { ...state.params, page: page ?? state.params.page ?? 1 };
                 const key = makeCacheKey(params);
 
-                // Ensure entry
+                // Ensure cache entry
                 let entry = state.cache[key];
                 if (!entry) {
                     entry = createCacheEntry(params);
-                    set(
-                        produce((s: ReportsStoreState) => {
-                            s.cache[key] = entry;
-                        })
-                    );
+                    set(produce((s: ReportsStoreState) => {
+                        s.cache[key] = entry;
+                    }));
                 }
 
-                // If this page already loaded and still within TTL, return cached slice
                 const pageToFetch = params.page ?? 1;
                 const limit = params.limit ?? state.defaultLimit;
                 const now = Date.now();
 
+                // Return cached page if still valid
                 if (entry.pagesLoaded.has(pageToFetch) && now - entry.lastFetchedAt < entry.ttlMs) {
-                    // Construct response from cache
                     const start = (pageToFetch - 1) * limit;
                     const docs = entry.docs.slice(start, start + limit);
                     return {
@@ -273,65 +272,42 @@ export const useReportsStore = create<ReportsStoreState>()(
                 }
 
                 // Start loading
-                set(
-                    produce((s: ReportsStoreState) => {
-                        s.loading = { type: "loading", context: "list" };
-                        s.cache[key] = { ...s.cache[key], error: null };
-                    })
-                );
+                set(produce((s: ReportsStoreState) => {
+                    s.loading = { type: "loading", context: "list" };
+                    s.cache[key]!.error = null;
+                }));
 
                 try {
                     const resp = await fetchListFromApi(params);
-                    // Merge incremental behavior:
-                    // If limit increased and we have existing docs, we should append only missing pages.
-                    const fetchedDocs = resp.docs;
-                    set(
-                        produce((s: ReportsStoreState) => {
-                            const entryRef = s.cache[key] ?? createCacheEntry(params);
-                            // If this is the first fetch, replace docs
-                            if ((entryRef.docs.length === 0 && entryRef.pagesLoaded.size === 0) || pageToFetch === 1) {
-                                // Place fetched page in correct offset
-                                const target = [...entryRef.docs];
-                                const start = (pageToFetch - 1) * limit;
-                                // Ensure array length
-                                while (target.length < start) target.push(...Array(start - target.length).fill(undefined));
-                                for (let i = 0; i < fetchedDocs.length; i++) {
-                                    target[start + i] = fetchedDocs[i];
-                                }
-                                entryRef.docs = target.filter(Boolean) as ReportListItem[];
-                            } else {
-                                // Append/merge page defensively
-                                const start = (pageToFetch - 1) * limit;
-                                const target = [...entryRef.docs];
-                                while (target.length < start) target.push(...Array(start - target.length).fill(undefined));
-                                for (let i = 0; i < fetchedDocs.length; i++) {
-                                    target[start + i] = fetchedDocs[i];
-                                }
-                                entryRef.docs = target.filter(Boolean) as ReportListItem[];
-                            }
-                            entryRef.total = resp.total;
-                            entryRef.pagesLoaded.add(pageToFetch);
-                            entryRef.lastFetchedAt = Date.now();
-                            entryRef.isStale = false;
-                            entryRef.error = null;
-                            s.loading = { type: "success" };
-                            s.cache[key] = entryRef;
-                        })
-                    );
+
+                    set(produce((s: ReportsStoreState) => {
+                        const entryRef = s.cache[key]!;
+                        const start = (pageToFetch - 1) * limit;
+
+                        // Replace/insert fetched docs
+                        entryRef.docs.splice(start, resp.docs.length, ...resp.docs);
+
+                        entryRef.total = resp.total;
+                        entryRef.pagesLoaded.add(pageToFetch);
+                        entryRef.lastFetchedAt = Date.now();
+                        entryRef.isStale = false;
+                        entryRef.error = null;
+                        s.loading = { type: "success" };
+                    }));
+
 
                     return resp;
                 } catch (err) {
                     const message = extractErrorMessage(err);
-                    set(
-                        produce((s: ReportsStoreState) => {
-                            s.loading = { type: "error", message };
-                            const e = s.cache[key];
-                            if (e) e.error = message;
-                        })
-                    );
+                    set(produce((s: ReportsStoreState) => {
+                        s.loading = { type: "error", message };
+                        s.cache[key]?.pagesLoaded.add(pageToFetch); // Optional: mark as attempted
+                        s.cache[key]!.error = message;
+                    }));
                     throw new Error(message);
                 }
             },
+
 
             fetchReportDetail: async (reportId: string) => {
                 const state = get();
@@ -552,26 +528,21 @@ export const useReportsStore = create<ReportsStoreState>()(
             },
 
             toggleSelect: (reportId) =>
-                set(
-                    produce((s: ReportsStoreState) => {
-                        if (s.selectedIds.has(reportId)) s.selectedIds.delete(reportId);
-                        else s.selectedIds.add(reportId);
-                    })
-                ),
+                set(produce((s) => {
+                    if (s.selectedIds.has(reportId)) s.selectedIds.delete(reportId);
+                    else s.selectedIds.add(reportId);
+                })),
 
             clearSelection: () =>
-                set(
-                    produce((s: ReportsStoreState) => {
-                        s.selectedIds = new Set<string>();
-                    })
-                ),
+                set(produce((s) => {
+                    s.selectedIds.clear();
+                })),
 
-            selectAllOnPage: (reportIds) =>
-                set(
-                    produce((s: ReportsStoreState) => {
-                        reportIds.forEach((id) => s.selectedIds.add(id));
-                    })
-                ),
+            selectAllOnPage: (reportIds: string[]) =>
+                set(produce((s) => {
+                    reportIds.forEach((id) => s.selectedIds.add(id));
+                })),
+
 
             hydrateCacheEntry: (entry) =>
                 set(
