@@ -33,11 +33,11 @@ function seedMockOverview(): GuideOverview {
     const social: { platform: GuideSocialPlatform; url: string }[] = [
         {
             platform: GUIDE_SOCIAL_PLATFORM.FACEBOOK,
-            url: `https://facebook.com/${faker.internet.userName()}`,
+            url: `https://facebook.com/${faker.internet.username()}`,
         },
         {
             platform: GUIDE_SOCIAL_PLATFORM.INSTAGRAM,
-            url: `https://instagram.com/${faker.internet.userName()}`,
+            url: `https://instagram.com/${faker.internet.username()}`,
         },
     ];
 

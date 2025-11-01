@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { IconType } from "react-icons";
 import { cn } from "@/lib/utils";
+import { plusJakartaSans } from "@/app/fonts";
 
 interface NavLinkProps {
   href: string;
@@ -14,9 +15,28 @@ interface NavLinkProps {
   onClick?: () => void;
 }
 
+function useIsActive(href: string, pathname: string | null | undefined) {
+  if (!pathname) return false;
+
+  const normalizedHref = href.endsWith("/") && href !== "/" ? href.replace(/\/+$/, "") : href;
+  const normalizedPath = pathname.endsWith("/") && pathname !== "/" ? pathname.replace(/\/+$/, "") : pathname;
+
+  if (normalizedPath === normalizedHref) return true;
+
+  if (normalizedHref === "/") return false;
+
+  const segmentCount = normalizedHref.split("/").filter(Boolean).length;
+
+  if (segmentCount >= 2 && normalizedPath.startsWith(normalizedHref + "/")) {
+    return true;
+  }
+
+  return false;
+}
+
 export function NavLink({ href, icon: Icon, label, isCollapsed = false, onClick }: NavLinkProps) {
   const pathname = usePathname();
-  const isActive = pathname === href || pathname.startsWith(href + "/");
+  const isActive = useIsActive(href, pathname);
 
   return (
     <Link
@@ -27,7 +47,8 @@ export function NavLink({ href, icon: Icon, label, isCollapsed = false, onClick 
     >
       <motion.div
         className={cn(
-          "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-sans font-medium transition-all duration-200",
+          "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+          plusJakartaSans.variable,
           "group cursor-pointer",
           isActive
             ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 shadow-sm border border-blue-200/50 dark:border-blue-800/50"
@@ -52,8 +73,6 @@ export function NavLink({ href, icon: Icon, label, isCollapsed = false, onClick 
                 : "text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
             )}
           />
-
-          {/* Icon glow effect */}
           {isActive && (
             <motion.div
               className="absolute inset-0 rounded-full bg-blue-500/15 blur-md"
@@ -64,24 +83,20 @@ export function NavLink({ href, icon: Icon, label, isCollapsed = false, onClick 
           )}
         </motion.div>
 
-        {/* Label with smooth text color animation */}
+        {/* Label */}
         {!isCollapsed && (
           <motion.span
             initial={{ opacity: 0, x: -10 }}
             animate={{
               opacity: 1,
               x: 0,
-              color: isActive
-                ? "rgb(37, 99, 235)" // blue-600
-                : "rgb(100, 116, 139)", // slate-500
+              color: isActive ? "rgb(37, 99, 235)" : "rgb(100, 116, 139)",
             }}
             exit={{ opacity: 0, x: -10 }}
             transition={{ duration: 0.2 }}
             className="truncate"
             whileHover={{
-              color: isActive
-                ? "rgb(37, 99, 235)" // stay blue if active
-                : "rgb(37, 99, 235)", // transition to blue on hover
+              color: "rgb(37, 99, 235)",
             }}
           >
             {label}
@@ -89,7 +104,7 @@ export function NavLink({ href, icon: Icon, label, isCollapsed = false, onClick 
         )}
 
         {/* Active indicator */}
-        {isActive && (
+        {isActive ? (
           <motion.div
             className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-blue-500 to-indigo-600 shadow-sm"
             layoutId="activeIndicator"
@@ -97,10 +112,7 @@ export function NavLink({ href, icon: Icon, label, isCollapsed = false, onClick 
             animate={{ scaleY: 1, opacity: 1 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           />
-        )}
-
-        {/* Hover indicator */}
-        {!isActive && (
+        ) : (
           <motion.div
             className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-slate-400/40"
             initial={{ scaleY: 0, opacity: 0 }}
