@@ -7,9 +7,9 @@ import { DashboardLayout } from "@/components/dashboard-layout/DashboardLayout";
 const ADMIN_ROUTES = [
   "/dashboard",
   "/dashboard/overview",
-  "/tours",
-  "/reports",
-  "/reviews",
+  "/operations/tours",
+  "/operations/reports",
+  "/operations/reviews",
   "/faqs",
   "/employees",
   "/customer-support",
