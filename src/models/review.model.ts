@@ -27,7 +27,7 @@ const ReviewReplySchema = new Schema<IReviewReply>(
     {
         employee: {
             type: Schema.Types.ObjectId,
-            ref: "Employee",
+            ref: "employees",
             required: true,
             index: true,
         },
@@ -76,27 +76,6 @@ export interface IReview extends Document {
 
     // Instance methods
     incrementHelpful(): Promise<number>;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// SOFT-DELETE PLUGIN: Adds `deletedAt` and filters queries automatically
-////////////////////////////////////////////////////////////////////////////////
-
-function softDeletePlugin(schema: Schema) {
-    // Add deletedAt field
-    schema.add({ deletedAt: { type: Date, default: null, index: true } });
-
-    // Pre-find middleware excludes soft-deleted documents
-    schema.pre<Query<IReview[], IReview>>(
-        /^find/,
-        function (
-            this: Query<IReview[], IReview>,
-            next: CallbackWithoutResultAndOptionalError
-        ) {
-            this.where({ deletedAt: null });
-            next();
-        }
-    );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,6 +145,27 @@ const ReviewSchema = new Schema<IReview>(
         toObject: { virtuals: true },
     }
 );
+
+////////////////////////////////////////////////////////////////////////////////
+// SOFT-DELETE PLUGIN: Adds `deletedAt` and filters queries automatically
+////////////////////////////////////////////////////////////////////////////////
+
+function softDeletePlugin(schema: Schema) {
+    // Add deletedAt field
+    schema.add({ deletedAt: { type: Date, default: null, index: true } });
+
+    // Pre-find middleware excludes soft-deleted documents
+    schema.pre<Query<IReview[], IReview>>(
+        /^find/,
+        function (
+            this: Query<IReview[], IReview>,
+            next: CallbackWithoutResultAndOptionalError
+        ) {
+            this.where({ deletedAt: null });
+            next();
+        }
+    );
+}
 
 // Apply soft-delete behavior
 ReviewSchema.plugin(softDeletePlugin);

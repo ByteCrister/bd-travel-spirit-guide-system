@@ -14,6 +14,8 @@ const config: Config = {
         lato: ["var(--font-lato)"],
         poppins: ["var(--font-poppins)"],
         montserrat: ["var(--font-montserrat)"],
+        sans: ["var(--font-plus-jakarta-sans)", "system-ui", "sans-serif"],
+        brand: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
     },
   },

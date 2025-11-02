@@ -14,7 +14,7 @@ const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
         <DashboardProvider>
             {children}
             <Toaster
-                position="top-right"
+                position="bottom-right"
                 richColors
                 duration={5000}
             />
