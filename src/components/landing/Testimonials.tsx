@@ -135,7 +135,7 @@ export default function Testimonials() {
                     </h2>
 
                     <p className="text-xl text-slate-600 leading-relaxed">
-                        Real experiences from Guides and Assistances using BD Travel Spirit Guide.
+                        Real experiences from Guides and assistance&apos;s using BD Travel Spirit Guide.
                     </p>
                 </motion.div>
 

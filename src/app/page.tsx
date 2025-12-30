@@ -1,8 +1,11 @@
 import HomePage from "@/components/landing/HomePage"
+import fetchLandingData from "@/lib/mock/fetchLandingData";
 
-const page = () => {
+const page = async () => {
+    const pageData = await fetchLandingData(); // Same fetch as metadata
+
     return (
-        <HomePage />
+        <HomePage pageData={pageData} />
     )
 }
 

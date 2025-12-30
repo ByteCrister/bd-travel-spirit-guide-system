@@ -14,7 +14,9 @@ const GlobalProvider = ({ children }: GlobalProviderProps) => {
     return (
         <QueryClientProvider client={queryClient}>
             <AuthWrapper>
-                <DashboardProvider>{children}</DashboardProvider>
+                <DashboardProvider>
+                    {children}
+                </DashboardProvider>
             </AuthWrapper>
         </QueryClientProvider>
     )
