@@ -2,7 +2,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { plusJakartaSans, inter } from "./fonts";
-import GlobalProvider from "@/components/provider/GlobalProvider";
+import GlobalProvider from "@/components/wrappers/GlobalProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "BD Travel Spirit Guide - Professional Travel Management",
@@ -19,8 +20,16 @@ export default function RootLayout({
       <body
         className={`${plusJakartaSans.variable} ${inter.variable} antialiased`}
       >
-         <GlobalProvider>
+        <GlobalProvider>
+          {/* App content */}
           {children}
+
+          {/* Global toast notifications */}
+          <Toaster
+            position="bottom-right"
+            richColors
+            duration={5000}
+          />
         </GlobalProvider>
       </body>
     </html>

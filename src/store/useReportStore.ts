@@ -31,8 +31,8 @@ import {
     ReportDetailResponse,
     ReportActionResponse,
 } from "@/types/reports.types";
-import api from "@/utils/api/axios";
-import { extractErrorMessage } from "@/utils/api/extractErrorMessage";
+import api from "@/utils/axios/axios";
+import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 
 const URL_AFTER_API = `/mock/operations/reports`;
 const DEFAULT_LIMITS = [10, 20, 50];

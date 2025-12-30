@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiLogOut, FiAlertTriangle, FiX } from "react-icons/fi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react"; // Import the shadcn loader
 
 interface LogoutConfirmationProps {
   isOpen: boolean;
@@ -25,12 +26,12 @@ const mockAdmin = {
   role: "Administrator",
 };
 
-export function LogoutConfirmation({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
+export function LogoutConfirmation({
+  isOpen,
+  onClose,
+  onConfirm,
   isLoggingOut = false,
-  admin = mockAdmin 
+  admin = mockAdmin
 }: LogoutConfirmationProps) {
   const getInitials = (name: string) => {
     return name
@@ -67,12 +68,12 @@ export function LogoutConfirmation({
             <div className="relative bg-gradient-to-r from-red-500 to-red-600 p-6 text-white">
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-colors"
                 disabled={isLoggingOut}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <FiX className="h-4 w-4" />
               </button>
-              
+
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-white/20 rounded-full">
                   <FiAlertTriangle className="h-6 w-6" />
@@ -98,7 +99,7 @@ export function LogoutConfirmation({
                   <p className="text-sm text-slate-600 dark:text-slate-400">{admin.email}</p>
                 </div>
               </div>
-              
+
               <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
                 You will be signed out of your account and redirected to the login page. Any unsaved changes will be lost.
               </p>
@@ -109,24 +110,20 @@ export function LogoutConfirmation({
                   variant="outline"
                   onClick={onClose}
                   disabled={isLoggingOut}
-                  className="flex-1 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
+                  className="flex-1 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={onConfirm}
                   disabled={isLoggingOut}
-                  className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
+                  className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-90 disabled:cursor-not-allowed"
                 >
                   {isLoggingOut ? (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="flex items-center gap-2"
-                    >
-                      <FiLogOut className="h-4 w-4" />
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Signing Out...
-                    </motion.div>
+                    </>
                   ) : (
                     <>
                       <FiLogOut className="h-4 w-4 mr-2" />

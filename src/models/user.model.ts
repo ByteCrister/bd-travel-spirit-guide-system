@@ -2,8 +2,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 import validator from 'validator';
-import { USER_ROLE, UserRole } from "@/constants/user.const";
 import { defineModel } from "@/lib/helpers/defineModel";
+import { USER_ROLE, UserRole } from "@/constants/user.const";
 
 const passwordRegex = /^(?=.{6,}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).+$/
 
@@ -54,7 +54,7 @@ const UserSchema = new Schema<IUserDoc, IUserModel>(
                     'Password must be at least 6 characters and include uppercase, lowercase, number, and special character'
             }
         },
-        role: { type: String, enum: Object.values(USER_ROLE), required: true, default: "traveler" },
+        role: { type: String, enum: Object.values(USER_ROLE), required: true, default: USER_ROLE.TRAVELER },
     },
     {
         timestamps: true,

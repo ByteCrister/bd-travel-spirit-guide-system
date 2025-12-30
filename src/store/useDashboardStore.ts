@@ -3,7 +3,7 @@ import { AxiosResponse } from "axios";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import api from "@/utils/api/axios";
+import api from "@/utils/axios/axios";
 import {
     CacheMeta,
     DashboardActivity,

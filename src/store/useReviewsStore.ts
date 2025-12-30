@@ -24,7 +24,7 @@ import {
     ApiError,
 } from "@/types/reviews.types";
 
-import api from "@/utils/api/axios";
+import api from "@/utils/axios/axios";
 import { IndexRange, rangeForPage, subtractRanges } from "@/utils/helpers/reviews.cacheSlices";
 
 /* -------------------------

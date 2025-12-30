@@ -9,25 +9,30 @@ import { Textarea } from "../ui/textarea";
 import { Separator } from "../ui/separator";
 import { FaChartLine, FaUsersCog, FaUserShield, FaGoogle } from "react-icons/fa";
 import { ForgotFormState, JoinFormState } from "./HomePage";
+import { Loader2 } from "lucide-react"; // Import shadcn loader
 
 export default function JoinForgotSection({
+  isSubmitting,
   activeForm,
   setActiveForm,
   join,
   setJoin,
   joinErrors,
   onJoinSubmit,
+  onGoogleSubmit,
   forgot,
   setForgot,
   forgotErrors,
   onForgotSubmit,
 }: {
+  isSubmitting: boolean;
   activeForm: "join" | "forgot";
   setActiveForm: (f: "join" | "forgot") => void;
   join: JoinFormState;
   setJoin: React.Dispatch<React.SetStateAction<JoinFormState>>;
   joinErrors: Record<string, string>;
   onJoinSubmit: (e: React.FormEvent) => void;
+  onGoogleSubmit: () => Promise<void>;
   forgot: ForgotFormState;
   setForgot: React.Dispatch<React.SetStateAction<ForgotFormState>>;
   forgotErrors: Record<string, string>;
@@ -68,11 +73,12 @@ export default function JoinForgotSection({
           <button
             type="button"
             onClick={() => setActiveForm("join")}
+            disabled={isSubmitting}
             className={[
               "px-4 py-2 text-sm font-semibold rounded-lg transition-all",
               isJoin
                 ? "bg-white text-emerald-800 shadow-sm ring-1 ring-emerald-200"
-                : "text-emerald-700 hover:bg-white/70",
+                : "text-emerald-700 hover:bg-white/70 disabled:hover:bg-emerald-50/60",
             ].join(" ")}
           >
             Join
@@ -80,11 +86,12 @@ export default function JoinForgotSection({
           <button
             type="button"
             onClick={() => setActiveForm("forgot")}
+            disabled={isSubmitting}
             className={[
               "px-4 py-2 text-sm font-semibold rounded-lg transition-all",
               !isJoin
                 ? "bg-white text-emerald-800 shadow-sm ring-1 ring-emerald-200"
-                : "text-emerald-700 hover:bg-white/70",
+                : "text-emerald-700 hover:bg-white/70 disabled:hover:bg-emerald-50/60",
             ].join(" ")}
           >
             Forgot password
@@ -116,6 +123,9 @@ export default function JoinForgotSection({
                       ].join(" ")}
                     />
                     {isJoin ? "Create account" : "Account recovery"}
+                    {isSubmitting && (
+                      <Loader2 className="h-3 w-3 animate-spin ml-1" />
+                    )}
                   </span>
                 </div>
               </CardHeader>
@@ -145,11 +155,12 @@ export default function JoinForgotSection({
                             setJoin((s) => ({ ...s, email: e.target.value }))
                           }
                           placeholder="you@example.com"
+                          disabled={isSubmitting}
                           aria-invalid={!!joinErrors.email}
                           aria-describedby={
                             joinErrors.email ? "join-email-error" : undefined
                           }
-                          className="focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow"
+                          className="focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow disabled:opacity-70"
                         />
                         <p className="text-xs text-slate-500">
                           If the email is registered, you will be logged in and redirected to the dashboard page.
@@ -172,13 +183,14 @@ export default function JoinForgotSection({
                             setJoin((s) => ({ ...s, password: e.target.value }))
                           }
                           placeholder="••••••••"
+                          disabled={isSubmitting}
                           aria-invalid={!!joinErrors.password}
                           aria-describedby={
                             joinErrors.password
                               ? "join-password-error"
                               : undefined
                           }
-                          className="focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow"
+                          className="focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow disabled:opacity-70"
                         />
                         <div className="flex items-center justify-between">
                           <p className="text-xs text-slate-500">
@@ -207,8 +219,9 @@ export default function JoinForgotSection({
                         </div>
                         <Button
                           type="button"
-                          className="w-full flex items-center justify-center gap-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition-colors"
-                          onClick={() => { }}
+                          disabled={isSubmitting}
+                          className="w-full flex items-center justify-center gap-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition-colors disabled:opacity-70"
+                          onClick={onGoogleSubmit}
                         >
                           <FaGoogle className="h-5 w-5" />
                           Sign in with Google
@@ -216,17 +229,37 @@ export default function JoinForgotSection({
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-col gap-4">
                         <Button
                           type="submit"
-                          className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 text-white shadow-md hover:shadow-emerald-500/30 transition-all"
+                          disabled={isSubmitting}
+                          className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700 text-white shadow-md hover:shadow-emerald-500/30 transition-all disabled:opacity-90 disabled:cursor-not-allowed"
                         >
-                          Join now
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            "Join now"
+                          )}
                         </Button>
+
+                        {/* Loader under submit button */}
+                        {isSubmitting && (
+                          <div className="flex justify-center">
+                            <div className="flex items-center gap-2 text-sm text-emerald-700">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <span>Submitting your request...</span>
+                            </div>
+                          </div>
+                        )}
+
                         <button
                           type="button"
                           onClick={() => setActiveForm("forgot")}
-                          className="text-emerald-700 underline underline-offset-4 hover:text-emerald-800 transition-colors"
+                          disabled={isSubmitting}
+                          className="text-emerald-700 underline underline-offset-4 hover:text-emerald-800 transition-colors text-sm disabled:opacity-70 disabled:cursor-not-allowed w-fit"
                         >
                           Forgot password?
                         </button>
@@ -255,11 +288,12 @@ export default function JoinForgotSection({
                             setForgot((s) => ({ ...s, email: e.target.value }))
                           }
                           placeholder="you@example.com"
+                          disabled={isSubmitting}
                           aria-invalid={!!forgotErrors.email}
                           aria-describedby={
                             forgotErrors.email ? "forgot-email-error" : undefined
                           }
-                          className="focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow"
+                          className="focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow disabled:opacity-70"
                         />
                         <p className="text-xs text-slate-500">
                           We&apos;ll contact you at this address after verification.
@@ -284,11 +318,12 @@ export default function JoinForgotSection({
                             setForgot((s) => ({ ...s, reason: e.target.value }))
                           }
                           placeholder="Tell us briefly why you need a password reset..."
+                          disabled={isSubmitting}
                           aria-invalid={!!forgotErrors.reason}
                           aria-describedby={
                             forgotErrors.reason ? "forgot-reason-error" : undefined
                           }
-                          className="min-h-[100px] focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow"
+                          className="min-h-[100px] focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow disabled:opacity-70"
                         />
                         <p className="text-xs text-slate-500">
                           Provide enough detail to help us verify your request.
@@ -304,17 +339,37 @@ export default function JoinForgotSection({
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-col gap-4">
                         <Button
                           type="submit"
-                          className="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-700 hover:from-emerald-800 hover:via-teal-800 hover:to-cyan-800 text-white shadow-md hover:shadow-emerald-500/30 transition-all"
+                          disabled={isSubmitting}
+                          className="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-700 hover:from-emerald-800 hover:via-teal-800 hover:to-cyan-800 text-white shadow-md hover:shadow-emerald-500/30 transition-all disabled:opacity-90 disabled:cursor-not-allowed"
                         >
-                          Request reset
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            "Request reset"
+                          )}
                         </Button>
+
+                        {/* Loader under submit button */}
+                        {isSubmitting && (
+                          <div className="flex justify-center">
+                            <div className="flex items-center gap-2 text-sm text-cyan-700">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <span>Sending your reset request...</span>
+                            </div>
+                          </div>
+                        )}
+
                         <button
                           type="button"
                           onClick={() => setActiveForm("join")}
-                          className="text-emerald-700 underline underline-offset-4 hover:text-emerald-800 transition-colors"
+                          disabled={isSubmitting}
+                          className="text-emerald-700 underline underline-offset-4 hover:text-emerald-800 transition-colors text-sm disabled:opacity-70 disabled:cursor-not-allowed w-fit"
                         >
                           Return to join form
                         </button>
@@ -380,6 +435,12 @@ export default function JoinForgotSection({
                 <p className="text-sm text-emerald-700/80">
                   Role-based access and audit trails keep your operations secure.
                 </p>
+                {isSubmitting && (
+                  <div className="mt-2 flex items-center gap-2 text-xs text-emerald-700">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span>Processing your request securely...</span>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

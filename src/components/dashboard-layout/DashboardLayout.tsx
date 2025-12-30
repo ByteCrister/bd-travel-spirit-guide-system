@@ -8,7 +8,7 @@ import { ViewProfile } from "./ViewProfile";
 import { Settings } from "./Settings";
 import { LogoutConfirmation } from "./LogoutConfirmation";
 import { cn } from "@/lib/utils";
-import LoadingDashboard from "../global/LoadingDashboard";
+import { signOut } from "next-auth/react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -17,7 +17,6 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   // Sidebar collapse state (shared)
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -36,7 +35,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   useEffect(() => {
     checkMobile();
-    setIsLoading(false);
 
     let timeoutId: NodeJS.Timeout;
     const handleResize = () => {
@@ -54,15 +52,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), []);
   const toggleMenuClick = useCallback(() => setIsMobileMenuOpen((prev) => !prev), []);
 
-  const handleLogoutClick = useCallback(() => setShowLogoutConfirm(true), []);
-  const handleLogoutConfirm = useCallback(async () => {
-    setIsLoggingOut(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log("Logging out...");
-    setIsLoggingOut(false);
-    setShowLogoutConfirm(false);
-  }, []);
-  const handleLogoutCancel = useCallback(() => setShowLogoutConfirm(false), []);
 
   useEffect(() => {
     if (isMobile && isMobileMenuOpen) {
@@ -75,11 +64,24 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     };
   }, [isMobile, isMobileMenuOpen]);
 
-  if (isLoading) {
-    return (
-      <LoadingDashboard />
-    );
-  }
+  const handleLogoutClick = useCallback(() => setShowLogoutConfirm(true), []);
+
+  const handleLogoutConfirm = async () => {
+    setIsLoggingOut(true);
+    try {
+      // NextAuth sign out
+      await signOut({ callbackUrl: "/" });
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 300);
+    } catch (err) {
+      console.error("Logout error:", err);
+      setIsLoggingOut(false);
+    }
+  };
+
+  const handleLogoutCancel = useCallback(() => setShowLogoutConfirm(false), []);
+
 
   // Dynamic left offset for desktop
   const desktopLeft = isCollapsed ? "lg:left-20" : "lg:left-72"; // 80px vs 288px

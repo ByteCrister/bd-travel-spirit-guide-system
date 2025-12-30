@@ -7,14 +7,18 @@ import { DashboardLayout } from "@/components/dashboard-layout/DashboardLayout";
 const ADMIN_ROUTES = [
   "/dashboard",
   "/dashboard/overview",
+
   "/operations/tours",
   "/operations/reports",
   "/operations/reviews",
-  "/faqs",
-  "/employees",
-  "/customer-support",
-  "/advertising",
-  "/notifications",
+
+  "/users/employees",
+
+  "/support/faqs",
+  "/support/travelers",
+
+  "/social/advertising",
+  "/social/notifications",
 ];
 
 interface DashboardProviderProps {

@@ -14,8 +14,8 @@ import {
     GuideSocialEntry,
     createEmptyEditableGuide,
 } from "@/types/overview.types";
-import api from "@/utils/api/axios";
-import { extractErrorMessage } from "@/utils/api/extractErrorMessage";
+import api from "@/utils/axios/axios";
+import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import { v4 as uuidv4 } from "uuid";
 
 const URL_AFTER_API = "/mock/dashboard/overview";
