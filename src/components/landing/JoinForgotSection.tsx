@@ -1,23 +1,14 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Separator } from "../ui/separator";
-
-import { FaChartLine, FaUsersCog, FaUserShield } from "react-icons/fa";
-import { AdminRole, ForgotFormState, JoinFormState } from "./HomePage";
+import { FaChartLine, FaUsersCog, FaUserShield, FaGoogle } from "react-icons/fa";
+import { ForgotFormState, JoinFormState } from "./HomePage";
 
 export default function JoinForgotSection({
   activeForm,
@@ -161,8 +152,7 @@ export default function JoinForgotSection({
                           className="focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow"
                         />
                         <p className="text-xs text-slate-500">
-                          We’ll send a verification email to confirm your
-                          account.
+                          If the email is registered, you will be logged in and redirected to the dashboard page.
                         </p>
                         {joinErrors.email && (
                           <p id="join-email-error" className="text-red-600 text-sm">
@@ -194,7 +184,6 @@ export default function JoinForgotSection({
                           <p className="text-xs text-slate-500">
                             At least 8 characters for security.
                           </p>
-                          {/* Optional strength hint */}
                           <span className="text-xs font-semibold text-emerald-700">
                             Secure
                           </span>
@@ -209,29 +198,21 @@ export default function JoinForgotSection({
                         )}
                       </div>
 
-                      {/* Role */}
-                      <div className="space-y-2">
-                        <Label>Role</Label>
-                        <Select
-                          value={join.role}
-                          onValueChange={(v: AdminRole) =>
-                            setJoin((s) => ({ ...s, role: v }))
-                          }
+                      {/* Google Sign In Button */}
+                      <div className="space-y-3">
+                        <div className="relative flex items-center">
+                          <div className="flex-grow border-t border-slate-300"></div>
+                          <span className="mx-4 text-sm text-slate-500">or continue with</span>
+                          <div className="flex-grow border-t border-slate-300"></div>
+                        </div>
+                        <Button
+                          type="button"
+                          className="w-full flex items-center justify-center gap-3 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition-colors"
+                          onClick={() => { }}
                         >
-                          <SelectTrigger
-                            aria-invalid={!!joinErrors.role}
-                            className="focus:ring-emerald-500/70 focus:border-emerald-500 transition-shadow"
-                          >
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Guide">Guide</SelectItem>
-                            <SelectItem value="Assistance">Assistance</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {joinErrors.role && (
-                          <p className="text-red-600 text-sm">{joinErrors.role}</p>
-                        )}
+                          <FaGoogle className="h-5 w-5" />
+                          Sign in with Google
+                        </Button>
                       </div>
 
                       {/* Actions */}
@@ -281,7 +262,7 @@ export default function JoinForgotSection({
                           className="focus-visible:ring-emerald-500/70 focus-visible:border-emerald-500 transition-shadow"
                         />
                         <p className="text-xs text-slate-500">
-                          We’ll contact you at this address after verification.
+                          We&apos;ll contact you at this address after verification.
                         </p>
                         {forgotErrors.email && (
                           <p
@@ -289,33 +270,6 @@ export default function JoinForgotSection({
                             className="text-red-600 text-sm"
                           >
                             {forgotErrors.email}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Role */}
-                      <div className="space-y-2">
-                        <Label>Role</Label>
-                        <Select
-                          value={forgot.role}
-                          onValueChange={(v: AdminRole) =>
-                            setForgot((s) => ({ ...s, role: v }))
-                          }
-                        >
-                          <SelectTrigger
-                            aria-invalid={!!forgotErrors.role}
-                            className="focus:ring-emerald-500/70 focus:border-emerald-500 transition-shadow"
-                          >
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Guide">Guide</SelectItem>
-                            <SelectItem value="Assistance">Assistance</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {forgotErrors.role && (
-                          <p className="text-red-600 text-sm">
-                            {forgotErrors.role}
                           </p>
                         )}
                       </div>
@@ -386,7 +340,7 @@ export default function JoinForgotSection({
               </h3>
               <p className="text-slate-700">
                 Admin access lets Guides and Assistances collaborate with clear
-                roles, secure permissions, and data‑driven insights.
+                roles, secure permissions, and data-driven insights.
               </p>
 
               <Separator className="bg-gradient-to-r from-emerald-200 via-teal-200 to-cyan-200" />
@@ -405,7 +359,7 @@ export default function JoinForgotSection({
                     <FaUsersCog className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <span className="text-slate-700">
-                    Task delegation and collaboration flow built‑in.
+                    Task delegation and collaboration flow built-in.
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -424,7 +378,7 @@ export default function JoinForgotSection({
                   Your data is handled with care.
                 </p>
                 <p className="text-sm text-emerald-700/80">
-                  Role‑based access and audit trails keep your operations secure.
+                  Role-based access and audit trails keep your operations secure.
                 </p>
               </div>
             </div>

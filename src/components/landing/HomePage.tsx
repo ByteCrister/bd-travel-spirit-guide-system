@@ -18,12 +18,10 @@ export type AdminRole = USER_ROLE.GUIDE | USER_ROLE.ASSISTANT;
 export type JoinFormState = {
     email: string;
     password: string;
-    role: AdminRole | "";
 };
 
 export type ForgotFormState = {
     email: string;
-    role: AdminRole | "";
     reason: string;
 };
 
@@ -34,13 +32,11 @@ export default function HomePage() {
     const [join, setJoin] = useState<JoinFormState>({
         email: "",
         password: "",
-        role: "",
     });
     const [joinErrors, setJoinErrors] = useState<Record<string, string>>({});
 
     const [forgot, setForgot] = useState<ForgotFormState>({
         email: "",
-        role: "",
         reason: "",
     });
     const [forgotErrors, setForgotErrors] = useState<Record<string, string>>({});
@@ -56,7 +52,6 @@ export default function HomePage() {
         if (!join.email || !emailRegex.test(join.email)) e.email = "Enter a valid email.";
         if (!join.password || join.password.length < 8)
             e.password = "Password must be at least 8 characters.";
-        if (!join.role) e.role = "Select a role.";
         setJoinErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -64,7 +59,6 @@ export default function HomePage() {
     const validateForgot = () => {
         const e: Record<string, string> = {};
         if (!forgot.email || !emailRegex.test(forgot.email)) e.email = "Enter a valid email.";
-        if (!forgot.role) e.role = "Select a role.";
         if (!forgot.reason || forgot.reason.trim().length < 12)
             e.reason = "Provide a brief explanation (min 12 characters).";
         setForgotErrors(e);
@@ -76,7 +70,7 @@ export default function HomePage() {
         if (!validateJoin()) return;
         // TODO: Integrate with backend (API route /auth/join).
         // For now, simulate success:
-        alert(`Welcome ${join.role}! Check your email for verification.`);
+        alert(`Welcome ${join.email}! Check your email for verification.`);
     };
 
     const handleForgotSubmit = (ev: React.FormEvent) => {

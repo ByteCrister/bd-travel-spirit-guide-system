@@ -1,37 +1,32 @@
-// Utility type to extract enum values
-type EnumValues<T> = T[keyof T];
-
+// constants/asset.const.ts
 export enum STORAGE_PROVIDER {
     S3 = "s3",
     GCS = "gcs",
     LOCAL = "local",
     CLOUDINARY = "cloudinary",
 }
-export type StorageProvider = EnumValues<typeof STORAGE_PROVIDER>;
-// "s3" | "gcs" | "local" | "cloudinary"
+export type StorageProvider = `${STORAGE_PROVIDER}`;
 
 export enum VISIBILITY {
     PRIVATE = "private",
     UNLISTED = "unlisted",
     PUBLIC = "public",
 }
-export type Visibility = EnumValues<typeof VISIBILITY>;
-// "private" | "unlisted" | "public"
+export type Visibility = `${VISIBILITY}`;
 
 export enum MODERATION_STATUS {
     PENDING = "pending",
     APPROVED = "approved",
     REJECTED = "rejected",
 }
-export type ModerationStatus = EnumValues<typeof MODERATION_STATUS>;
-// "pending" | "approved" | "rejected"
+export type ModerationStatus = `${MODERATION_STATUS}`;
 
 export enum ASSET_TYPE {
     IMAGE = "image",
     VIDEO = "video",
     DOCUMENT = "document",
     AUDIO = "audio",
-    OTHER = "other",
+    PDF = "pdf",
+    OTHER = "other"
 }
-export type AssetType = EnumValues<typeof ASSET_TYPE>;
-// "image" | "video" | "document" | "audio" | "other"
+export type AssetType = `${ASSET_TYPE}`;

@@ -1,8 +1,8 @@
-import LoadingBdTravel from "@/components/global/LoadingBDTravel"
+import LoadingDashboard from "@/components/global/LoadingDashboard"
 
 const loading = () => {
   return (
-    <LoadingBdTravel />
+    <LoadingDashboard />
   )
 }
 

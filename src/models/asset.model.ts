@@ -1,39 +1,66 @@
-import { ASSET_TYPE, AssetType, MODERATION_STATUS, ModerationStatus, STORAGE_PROVIDER, StorageProvider, VISIBILITY, Visibility } from "@/constants/asset.const";
-import { Schema, model, models, Document, Types } from "mongoose";
+// models/asset.model.ts
+import {
+    ASSET_TYPE,
+    AssetType,
+    STORAGE_PROVIDER,
+    StorageProvider,
+    VISIBILITY,
+    Visibility,
+} from "@/constants/asset.const";
+import { defineModel } from "@/lib/helpers/defineModel";
+import { Types, Schema, Document, Model, Query, ClientSession } from "mongoose";
+import type { UpdateResult } from "mongodb";
 
+/**
+ * Query helpers interface for typed .notDeleted()
+ */
+interface AssetQueryHelpers {
+    notDeleted(this: Query<IAsset[], IAsset, AssetQueryHelpers>): Query<IAsset[], IAsset, AssetQueryHelpers>;
+}
 
+/**
+ * Asset document interface (includes instance helpers)
+ */
 export interface IAsset extends Document {
     storageProvider: StorageProvider;
-    objectKey: string;       // e.g., bucket/key or provider ID
-    publicUrl: string;       // https URL to the file
-    contentType: string;     // MIME type (image/jpeg, application/pdf, video/mp4, etc.)
-    fileSize: number;        // in bytes
-    checksum: string;        // sha256 for deduplication
+    objectKey: string;
+    publicUrl: string;
+    contentType: string;
+    fileSize: number;
+    checksum: string;
 
-    // Classification
     assetType: AssetType;
 
-    // Optional metadata
     title?: string;
     description?: string;
     tags?: string[];
 
-    // Ownership & access
-    uploadedBy: Types.ObjectId;
     visibility: Visibility;
 
-    // Moderation
-    moderationStatus: ModerationStatus;
-    reviewedAt?: Date;
-    reviewedBy?: Types.ObjectId;
-
-    // Lifecycle
-    deletedAt?: Date;
+    deletedAt?: Date | null;
     createdAt: Date;
     updatedAt: Date;
+
+    // Instance helpers
+    softDelete(): Promise<IAsset>;
+    restore(): Promise<IAsset>;
 }
 
-const AssetSchema = new Schema<IAsset>(
+/**
+ * Extended model interface (statics)
+ */
+export interface IAssetModel extends Model<IAsset, AssetQueryHelpers> {
+    softDeleteById(id: Types.ObjectId | string, session?: ClientSession): Promise<IAsset | null>;
+    restoreById(id: Types.ObjectId | string, session?: ClientSession): Promise<IAsset | null>;
+    softDeleteMany(filter: Record<string, unknown>, session?: ClientSession): Promise<{ matchedCount: number; modifiedCount: number }>;
+    restoreMany(filter: Record<string, unknown>, session?: ClientSession): Promise<{ matchedCount: number; modifiedCount: number }>;
+    findNotDeleted(filter?: Record<string, unknown>): Query<IAsset[], IAsset, AssetQueryHelpers>;
+    findDeleted(filter?: Record<string, unknown>): Query<IAsset[], IAsset, AssetQueryHelpers>;
+}
+
+export type AssetRef = Types.ObjectId | Pick<IAsset, "publicUrl">;
+
+const AssetSchema = new Schema<IAsset, IAssetModel, Record<string, never>, AssetQueryHelpers>(
     {
         storageProvider: {
             type: String,
@@ -66,30 +93,95 @@ const AssetSchema = new Schema<IAsset>(
         description: { type: String, trim: true, maxlength: 500 },
         tags: [{ type: String, lowercase: true, trim: true }],
 
-        uploadedBy: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
         visibility: { type: String, enum: Object.values(VISIBILITY), default: VISIBILITY.PRIVATE, index: true },
 
-        moderationStatus: {
-            type: String,
-            enum: Object.values(MODERATION_STATUS),
-            default: MODERATION_STATUS.PENDING,
-            index: true,
-        },
-        reviewedAt: Date,
-        reviewedBy: { type: Schema.Types.ObjectId, ref: "User" },
-
-        deletedAt: Date,
+        deletedAt: { type: Date, default: null },
     },
     { timestamps: true, versionKey: false }
 );
 
-// Deduplication index
-AssetSchema.index(
-    { checksum: 1 },
-    { unique: true, partialFilterExpression: { deletedAt: { $eq: null } } }
-);
+// Deduplication index (only for non-deleted docs)
+AssetSchema.index({ checksum: 1 }, { unique: true, partialFilterExpression: { deletedAt: { $eq: null } } });
 
 // Text search on metadata
 AssetSchema.index({ title: "text", description: "text", tags: "text" });
 
-export const AssetModel = models.Asset || model<IAsset>("Asset", AssetSchema);
+/**
+ * Query helper: exclude soft-deleted documents
+ */
+AssetSchema.query.notDeleted = function (this: Query<IAsset[], IAsset, AssetQueryHelpers>) {
+    return this.where({ deletedAt: null });
+};
+
+/**
+ * Instance methods
+ */
+AssetSchema.methods.softDelete = async function (this: IAsset): Promise<IAsset> {
+    if (this.deletedAt) return this;
+    this.deletedAt = new Date();
+    await this.save();
+    return this;
+};
+
+AssetSchema.methods.restore = async function (this: IAsset): Promise<IAsset> {
+    if (!this.deletedAt) return this;
+    this.deletedAt = null;
+    await this.save();
+    return this;
+};
+
+/**
+ * Static methods
+ */
+AssetSchema.statics.softDeleteById = async function (this: IAssetModel, id: Types.ObjectId | string, session?: ClientSession) {
+    const now = new Date();
+    const res = await this.findOneAndUpdate(
+        { _id: id, deletedAt: { $eq: null } },
+        { $set: { deletedAt: now } },
+        { new: true, session }
+    ).exec();
+    return res;
+};
+
+AssetSchema.statics.restoreById = async function (this: IAssetModel, id: Types.ObjectId | string, session?: ClientSession) {
+    const res = await this.findOneAndUpdate(
+        { _id: id, deletedAt: { $ne: null } },
+        { $set: { deletedAt: null } },
+        { new: true, session }
+    ).exec();
+    return res;
+};
+
+AssetSchema.statics.softDeleteMany = async function (this: IAssetModel, filter: Record<string, unknown>, session?: ClientSession) {
+    const now = new Date();
+    const res: UpdateResult = await this.updateMany(
+        { ...filter, deletedAt: { $eq: null } },
+        { $set: { deletedAt: now } },
+        { session }
+    ).exec();
+
+    return { matchedCount: res.matchedCount ?? 0, modifiedCount: res.modifiedCount ?? 0 };
+};
+
+AssetSchema.statics.restoreMany = async function (this: IAssetModel, filter: Record<string, unknown>, session?: ClientSession) {
+    const res: UpdateResult = await this.updateMany({ ...filter, deletedAt: { $ne: null } }, { $set: { deletedAt: null } }, { session }).exec();
+    const matchedCount = res.matchedCount ?? 0;
+    const modifiedCount = res.modifiedCount ?? 0;
+    return { matchedCount, modifiedCount };
+};
+
+AssetSchema.statics.findNotDeleted = function (this: IAssetModel, filter: Record<string, unknown> = {}) {
+    return this.find({ ...filter, deletedAt: { $eq: null } }) as Query<IAsset[], IAsset, AssetQueryHelpers>;
+};
+
+AssetSchema.statics.findDeleted = function (this: IAssetModel, filter: Record<string, unknown> = {}) {
+    return this.find({ ...filter, deletedAt: { $ne: null } }) as Query<IAsset[], IAsset, AssetQueryHelpers>;
+};
+
+/**
+ * Export model (cast to extended model interface)
+ *
+ * `defineModel` is expected to return a Mongoose Model. Cast to IAssetModel for TypeScript.
+ */
+export const AssetModel = defineModel("Asset", AssetSchema) as unknown as IAssetModel;
+export default AssetModel;
