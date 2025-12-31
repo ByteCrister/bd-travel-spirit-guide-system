@@ -6,7 +6,7 @@ import { motion, Variants } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { useGuideOverviewStore } from "@/store/useGuideOverviewStore";
+import { useGuideOverviewStore } from "@/store/guide-overview.store";
 import OverviewHeader from "./OverviewHeader";
 import StatsCards from "./StatsCards";
 import EditableField from "./EditableField";

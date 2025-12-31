@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Building2, Crown, AlertTriangle } from "lucide-react";
 import { GUIDE_STATUS, GuideStatus } from "@/constants/guide.const";
-import { useGuideOverviewStore } from "@/store/useGuideOverviewStore";
+import { useGuideOverviewStore } from "@/store/guide-overview.store";
 import { toast } from "sonner";
 
 type Props = {

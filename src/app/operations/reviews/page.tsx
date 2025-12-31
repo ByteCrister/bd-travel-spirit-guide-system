@@ -1,4 +1,4 @@
-import ReviewsAdminShell from "@/components/operations-reviews/ReviewsAdminShell"
+import ReviewsAdminShell from "@/components/operations/reviews/ReviewsAdminShell"
 
 const ReviewPage = () => {
     return (

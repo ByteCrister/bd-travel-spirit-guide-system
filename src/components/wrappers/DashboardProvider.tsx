@@ -2,6 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { DashboardLayout } from "@/components/dashboard-layout/DashboardLayout";
+// import { useCurrentUserStore } from "@/store/current-user.store";
+// import LoadingDashboard from "../global/LoadingDashboard";
 
 // Define the admin routes that should use the dashboard layout
 const ADMIN_ROUTES = [
@@ -27,12 +29,15 @@ interface DashboardProviderProps {
 
 export function DashboardProvider({ children }: DashboardProviderProps) {
   const pathname = usePathname();
+  // const { baseMeta } = useCurrentUserStore()
 
   // Check if the current route should use the dashboard layout
   const shouldUseDashboardLayout =
     ADMIN_ROUTES.some(
       (route) => pathname === route || pathname.startsWith(route + "/")
     ) || /^\/companies\/[^/]+$/.test(pathname); // matches /companies/[companyId]
+
+  // if (baseMeta.loading) return <LoadingDashboard />
 
   if (shouldUseDashboardLayout) {
     return <DashboardLayout>{children}</DashboardLayout>;

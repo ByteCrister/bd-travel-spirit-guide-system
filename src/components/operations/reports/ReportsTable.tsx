@@ -26,7 +26,7 @@ import {
     MdMoreVert
 } from "react-icons/md";
 import { HiDocumentText, HiFilter, HiSparkles } from "react-icons/hi";
-import { useReportsStore } from "@/store/useReportStore";
+import { useReportsStore } from "@/store/report.store";
 import { PulseLoader } from "./PulseLoader";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

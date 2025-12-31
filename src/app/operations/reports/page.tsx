@@ -1,4 +1,4 @@
-import { ReportsPage } from "@/components/operations-reports/ReportsPage"
+import { ReportsPage } from "@/components/operations/reports/ReportsPage"
 
 const page = () => {
     return (

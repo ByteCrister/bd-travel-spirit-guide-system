@@ -20,7 +20,7 @@ import {
 import { HiSparkles } from "react-icons/hi";
 import { ReportActions } from "./ReportActions";
 import { ReportDetailsPanel } from "./ReportDetailsPanel";
-import { useReportsStore } from "@/store/useReportStore";
+import { useReportsStore } from "@/store/report.store";
 import { formatDateTime } from "@/utils/helpers/format.reports";
 
 export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {

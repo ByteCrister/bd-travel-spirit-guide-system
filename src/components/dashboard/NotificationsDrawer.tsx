@@ -5,7 +5,7 @@ import React, { useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { FiBell, FiCheck, FiAlertCircle } from "react-icons/fi";
 import NotificationItem from "./NotificationItem";
-import useDashboardStore from "@/store/useDashboardStore";
+import useDashboardStore from "@/store/dashboard.store";
 
 export default function NotificationsDrawer() {
   const {notificationsById, notificationIds, markNotificationRead, fetchNotifications} = useDashboardStore();

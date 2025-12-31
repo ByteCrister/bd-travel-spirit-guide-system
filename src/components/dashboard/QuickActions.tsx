@@ -1,7 +1,7 @@
 // components/dashboard/QuickActions.tsx
 "use client";
 
-import useDashboardStore from "@/store/useDashboardStore";
+import useDashboardStore from "@/store/dashboard.store";
 import React from "react";
 import { motion } from "framer-motion";
 import { FiZap, FiSettings } from "react-icons/fi";

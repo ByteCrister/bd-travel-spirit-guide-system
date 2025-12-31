@@ -5,7 +5,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { FiSearch, FiBell, FiRefreshCw, FiCalendar, FiTrendingUp } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { DashboardTimeRange } from "@/types/dashboard.types";
-import useDashboardStore from "@/store/useDashboardStore";
+import useDashboardStore from "@/store/dashboard.store";
 
 const TIME_RANGES: { label: string; value: DashboardTimeRange; icon: React.ReactNode }[] = [
   { label: "Last 24 hours", value: DashboardTimeRange.LAST_24_HOURS, icon: <FiTrendingUp className="w-4 h-4" /> },

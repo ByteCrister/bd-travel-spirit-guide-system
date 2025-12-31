@@ -20,7 +20,7 @@ import {
     ChevronRight,
     Zap
 } from "lucide-react";
-import { useGuideOverviewStore } from "@/store/useGuideOverviewStore";
+import { useGuideOverviewStore } from "@/store/guide-overview.store";
 import { cn } from "@/lib/utils";
 import { SUBSCRIPTION_STATUS } from "@/constants/guide.const";
 

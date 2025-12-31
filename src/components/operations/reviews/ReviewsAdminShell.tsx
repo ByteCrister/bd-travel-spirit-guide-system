@@ -1,7 +1,7 @@
 "use client";
 
 import { JSX, useEffect, useMemo, useRef, useState } from "react";
-import { useReviewsStore } from "@/store/useReviewsStore";
+import { useReviewsStore } from "@/store/reviews.store";
 import ReviewsToolbar from "./ReviewsToolbar";
 import ReviewsTable from "./ReviewsTable";
 import ReviewsPagination from "./ReviewsPagination";

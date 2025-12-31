@@ -5,7 +5,7 @@ import React, { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { FiZap, FiLoader } from "react-icons/fi";
 import type { DashboardQuickAction } from "@/types/dashboard.types";
-import useDashboardStore from "@/store/useDashboardStore";
+import useDashboardStore from "@/store/dashboard.store";
 
 export default function QuickActionButton({ action }: { action: DashboardQuickAction }) {
   const {performQuickAction, fetchDashboard} = useDashboardStore();

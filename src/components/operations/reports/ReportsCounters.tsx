@@ -9,7 +9,7 @@ import type { ReportListItem } from "@/types/reports.types";
 import { Card } from "@/components/ui/card";
 import { MdReport, MdPriorityHigh } from "react-icons/md";
 import { HiCheckCircle, HiClock, HiExclamationCircle, HiXCircle } from "react-icons/hi";
-import { useReportsStore } from "@/store/useReportStore";
+import { useReportsStore } from "@/store/report.store";
 import { PulseLoader } from "./PulseLoader";
 import { cn } from "@/lib/utils";
 

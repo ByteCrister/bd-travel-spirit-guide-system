@@ -15,7 +15,7 @@ import {
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { MdAssignmentInd, MdCheckCircle, MdRestore, MdDeleteForever, MdMoreHoriz } from "react-icons/md";
-import { useReportsStore } from "@/store/useReportStore";
+import { useReportsStore } from "@/store/report.store";
 import { PulseLoader } from "./PulseLoader";
 
 export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {

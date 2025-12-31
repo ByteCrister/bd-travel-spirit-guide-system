@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
-import { useReviewsStore } from "@/store/useReviewsStore";
+import { useReviewsStore } from "@/store/reviews.store";
 import type {
     ReviewDetailDTO,
     ObjectIdStr,

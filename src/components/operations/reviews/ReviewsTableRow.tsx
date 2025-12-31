@@ -22,7 +22,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import ReviewDetailAccordion from "./ReviewDetailAccordion";
 import ConfirmDialog from "./primitives/ConfirmDialog";
-import { useReviewsStore } from "@/store/useReviewsStore";
+import { useReviewsStore } from "@/store/reviews.store";
 import type { ApiError, ReviewListItemDTO } from "@/types/reviews.types";
 import { formatFullDate, formatRelativeDate, isApiError, ratingToStars, statusBadgeProps, truncate } from "@/utils/helpers/reviews.uiHelpers";
 import { toast } from "sonner";

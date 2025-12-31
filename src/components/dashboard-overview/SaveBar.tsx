@@ -4,7 +4,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useGuideOverviewStore } from "@/store/useGuideOverviewStore";
+import { useGuideOverviewStore } from "@/store/guide-overview.store";
 import { Save, X, Loader2, Circle } from "lucide-react";
 import { toast } from "sonner";
 

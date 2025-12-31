@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { useGuideOverviewStore } from "@/store/useGuideOverviewStore";
+import { useGuideOverviewStore } from "@/store/guide-overview.store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Mail, Phone, User, Shield, CheckCircle, Sparkles } from "lucide-react";

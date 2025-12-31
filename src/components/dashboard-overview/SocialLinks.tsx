@@ -4,7 +4,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { useGuideOverviewStore } from "@/store/useGuideOverviewStore";
+import { useGuideOverviewStore } from "@/store/guide-overview.store";
 import { EditableGuideOverview, GuideSocialEntry } from "@/types/overview.types";
 import { GUIDE_SOCIAL_PLATFORM } from "@/constants/guide.const";
 import {

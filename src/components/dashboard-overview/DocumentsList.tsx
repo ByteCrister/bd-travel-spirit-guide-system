@@ -15,7 +15,7 @@ import {
     Archive,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useGuideOverviewStore } from "@/store/useGuideOverviewStore";
+import { useGuideOverviewStore } from "@/store/guide-overview.store";
 import { cn } from "@/lib/utils";
 import { v4 as uuidv4 } from "uuid";
 import {

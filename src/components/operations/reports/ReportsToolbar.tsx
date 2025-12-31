@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useReportsStore } from "@/store/useReportStore";
+import { useReportsStore } from "@/store/report.store";
 import { ReportPriority, ReportReason, ReportStatus } from "@/constants/report.const";
 import { cn } from "@/lib/utils";
 import {

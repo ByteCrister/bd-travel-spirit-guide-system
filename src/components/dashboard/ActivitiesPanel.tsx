@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { FiActivity, FiClock, FiRefreshCw } from "react-icons/fi";
 import ActivityItem from "./ActivityItem";
 import LoadingSkeleton from "./LoadingSkeleton";
-import useDashboardStore from "@/store/useDashboardStore";
+import useDashboardStore from "@/store/dashboard.store";
 
 export default function ActivitiesPanel() {
   const { activitiesById, activityIds, fetchActivitiesPage, fetchActivitiesState: fetchState } = useDashboardStore();
