@@ -30,6 +30,8 @@ import {
   DIVISION,
   DISTRICT,
   ACCOMMODATION_TYPE,
+  Division,
+  District,
 } from "@/constants/tour.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import { HydratedDocument, Query } from "mongoose";
@@ -165,10 +167,6 @@ interface IActivity {
 }
 
 interface IDestinationBlock {
-  city?: string;
-  district?: string;
-  country: string;
-  region?: string;
   description?: string;
   highlights?: string[];
   attractions?: IAttraction[];
@@ -191,8 +189,8 @@ export interface ITour extends Document {
 
   // =============== BANGLADESH-SPECIFIC FIELDS ===============
   tourType: TravelType;
-  division: DIVISION;
-  district: DISTRICT;
+  division: Division;
+  district: District;
   accommodationType?: ACCOMMODATION_TYPE[];
   guideIncluded: boolean;
   transportIncluded: boolean;
@@ -415,10 +413,6 @@ const TourSchema = new Schema<ITour>(
     destinations: [
       new Schema<IDestinationBlock>(
         {
-          city: { type: String, trim: true },
-          district: { type: String, trim: true },
-          country: { type: String, required: true, trim: true },
-          region: { type: String, trim: true },
           description: { type: String, trim: true },
           highlights: [{ type: String, trim: true }],
           attractions: [

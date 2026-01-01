@@ -61,10 +61,6 @@ export interface ActivityDTO {
 }
 
 export interface DestinationBlockDTO {
-    city?: string;
-    district?: string;
-    country: string;
-    region?: string;
     description?: string;
     highlights?: string[];
     attractions?: AttractionDTO[];
@@ -78,11 +74,11 @@ export interface ItineraryEntryDTO {
     day: number;
     title?: string;
     description?: string;
-    mealsProvided?: MealsProvided[];
+    mealsProvided?: MealsProvided[];//
     accommodation?: string;
     activities?: string[];
     travelDistance?: string;
-    travelMode?: TransportMode;
+    travelMode?: TransportMode;//
     estimatedTime?: string;
     imageIds?: string[];
     importantNotes?: string[];
@@ -445,82 +441,82 @@ export type TourTableColumn =
  */
 export interface CreateTourDTO {
     // =============== IDENTITY & BASIC INFO ===============
-    title: string;
-    summary: string;
+    title: string;//
+    summary: string;//
     heroImage?: string; // Asset ID
     gallery?: string[]; // Asset IDs
     seo?: {
         metaTitle?: string;
         metaDescription?: string;
-    };
+    };//
 
     // =============== BANGLADESH-SPECIFIC FIELDS ===============
-    tourType: TravelType;
-    division: Division;
-    district: District;
-    accommodationType?: AccommodationType[];
-    guideIncluded?: boolean; // Default: true
-    transportIncluded?: boolean; // Default: true
+    tourType: TravelType;//
+    division: Division;//
+    district: District;//
+    accommodationType?: AccommodationType[];//
+    guideIncluded?: boolean; // Default: true//
+    transportIncluded?: boolean; // Default: true//
     emergencyContacts?: {
         policeNumber?: string;
         ambulanceNumber?: string;
         fireServiceNumber?: string;
         localEmergency?: string;
-    };
+    };//
 
     // =============== CONTENT & ITINERARY ===============
-    destinations?: DestinationBlockDTO[];
-    itinerary?: ItineraryEntryDTO[];
-    inclusions?: InclusionDTO[];
-    exclusions?: ExclusionDTO[];
-    difficulty: DifficultyLevel;
-    bestSeason: Season[];
-    audience?: AudienceType[];
-    categories?: ContentCategory[];
+    destinations?: DestinationBlockDTO[];//
+    itinerary?: ItineraryEntryDTO[];//
+    inclusions?: InclusionDTO[];//
+    exclusions?: ExclusionDTO[];//
+    difficulty: DifficultyLevel;//
+    bestSeason: Season[];//
+    audience?: AudienceType[];//
+    categories?: ContentCategory[];//
     translations?: TranslationBlockDTO;
 
     // =============== LOGISTICS ===============
     mainLocation?: {
         address?: AddressDTO;
         coordinates?: GeoPointDTO;
-    };
-    transportModes?: TransportMode[];
+    };//
+    transportModes?: TransportMode[];//
     pickupOptions?: {
         city?: string;
         price?: number;
         currency?: Currency;
-    }[];
-    meetingPoint?: string;
-    packingList?: PackingListItemDTO[];
+    }[];//
+    meetingPoint?: string;//
+    packingList?: PackingListItemDTO[];//
 
     // =============== PRICING & COMMERCE ===============
-    basePrice: PriceDTO;
-    discounts?: DiscountDTO[];
+    basePrice: PriceDTO;//
+    discounts?: DiscountDTO[];//
     duration?: {
         days: number;
         nights?: number;
-    };
+    };//
     operatingWindows?: OperatingWindowDTO[];
-    departures?: Omit<DepartureDTO, 'id' | 'seatsBooked'>[]; // seatsBooked starts at 0
-    paymentMethods: PaymentMethod[];
+    departures?: Omit<DepartureDTO, 'id' | 'seatsBooked'>[]; // seatsBooked starts at 0 //
+    paymentMethods: PaymentMethod[];//
 
     // =============== COMPLIANCE & ACCESSIBILITY ===============
-    licenseRequired?: boolean;
-    ageSuitability: AgeSuitability;
+    licenseRequired?: boolean;//
+    ageSuitability: AgeSuitability;//
     accessibility?: {
         wheelchair?: boolean;
         familyFriendly?: boolean;
         petFriendly?: boolean;
         notes?: string;
-    };
+    };//
 
     // =============== POLICIES ===============
-    cancellationPolicy?: CancellationPolicyDTO;
-    refundPolicy?: RefundPolicyDTO;
-    terms?: string;
+    cancellationPolicy?: CancellationPolicyDTO;//
+    refundPolicy?: RefundPolicyDTO;//
+    terms?: string;//
 
     // =============== TAGS & METADATA ===============
-    tags?: string[];
+    tags?: string[];//
 }
 
 // =============== MODULAR UPDATE PAYLOAD TYPES ===============

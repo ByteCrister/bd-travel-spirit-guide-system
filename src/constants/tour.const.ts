@@ -1,5 +1,8 @@
 // types/tour.const.ts
 
+import { BangladeshDistricts } from "@/data/bangladesh-districts";
+import { BangladeshDivisions } from "@/data/bangladesh-division";
+
 /**
  * Target audience classification for tour packages
  * Used for marketing segmentation and tour recommendations
@@ -252,28 +255,20 @@ export enum ACCOMMODATION_TYPE {
 
 export type AccommodationType = `${ACCOMMODATION_TYPE}`;
 
-// ! laiter these enums will be filled on enums model and use on the required fileds
-// Add these to constants/tour.const.ts:
-export enum DIVISION {
-  DHAKA = "dhaka",
-  CHATTOGRAM = "chattogram",
-  RAJSHAHI = "rajshahi",
-  KHULNA = "khulna",
-  BARISHAL = "barishal",
-  SYLHET = "sylhet",
-  RANGPUR = "rangpur",
-  MYMENSINGH = "mymensingh"
-}
-export type Division = `${DIVISION}`;
+// export enum BangladeshDivisions {
+//   DHAKA = "dhaka",
+//   CHATTOGRAM = "chattogram",
+// .............
+
+// }
+export const DIVISION = BangladeshDivisions;
+export type Division = `${BangladeshDivisions}`;
 
 
-export enum DISTRICT {
-  // Add common tour districts
-  COX_BAZAR = "cox_bazar",
-  SAINT_MARTIN = "saint_martin",
-  BANDARBAN = "bandarban",
-  RANGAMATI = "rangamati",
-  SUNAMGANJ = "sunamganj",
-  SYLHET_DISTRICT = "sylhet"
-}
-export type District = `${DISTRICT}`;
+// export enum BangladeshDistricts {
+//   COX_BAZAR = "cox_bazar",
+//   SAINT_MARTIN = "saint_martin",
+// ............
+// }
+export const DISTRICT = BangladeshDistricts
+export type District = `${BangladeshDistricts}`;
