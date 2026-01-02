@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useFormikContext } from "formik";
 import {
     Popover,
@@ -44,6 +44,7 @@ import {
     DIVISION,
     DISTRICT,
 } from "@/constants/tour.const";
+import { getDistrictsByDivision } from "@/utils/helpers/conversions.tour";
 
 const MotionDiv = motion.div;
 
@@ -74,21 +75,29 @@ export default function BangladeshFieldsStep() {
     const [openDivision, setOpenDivision] = useState<boolean>(false);
     const [openDistrict, setOpenDistrict] = useState<boolean>(false);
 
-    const [filteredDistricts, setFilteredDistricts] = useState<string[]>(
-        Object.values(DISTRICT)
-    );
+    const filteredDistricts = useMemo(() => {
+        if (!values.division) return [];
+        return getDistrictsByDivision(values.division);
+    }, [values.division]);
 
     useEffect(() => {
-        if (values.division) {
-            setFilteredDistricts(Object.values(DISTRICT));
-        } else {
-            setFilteredDistricts(Object.values(DISTRICT));
+        if (
+            values.district &&
+            !filteredDistricts.includes(values.district)
+        ) {
+            setFieldValue("district", "");
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [filteredDistricts, values.district, setFieldValue]);
+
 
     const findLabel = (value: string, options: string[]): string => {
         return options.find((option) => option === value) || "";
+    };
+
+    const handleDivisionChange = (division: string) => {
+        setFieldValue("division", division);
+        setOpenDivision(false);
+        // District will be reset by the useEffect above
     };
 
     return (
@@ -234,8 +243,7 @@ export default function BangladeshFieldsStep() {
                                                             key={division}
                                                             value={division}
                                                             onSelect={() => {
-                                                                setFieldValue("division", division);
-                                                                setOpenDivision(false);
+                                                                handleDivisionChange(division);
                                                             }}
                                                         >
                                                             <Check
@@ -344,34 +352,34 @@ export default function BangladeshFieldsStep() {
                     <CardContent>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                             {Object.values(ACCOMMODATION_TYPE).map((type) => (
-                               <MotionDiv
-                        key={type}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={cn(
-                            "border rounded-lg p-4 transition-all",
-                            values.accommodationType?.includes(type)
-                                ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 shadow-sm"
-                                : "border-gray-200 dark:border-gray-700"
-                        )}
-                    >
-                        <div className="flex items-center space-x-3">
-                            <Checkbox
-                                checked={values.accommodationType?.includes(type)}
-                                onCheckedChange={(checked) => {
-                                    const current = values.accommodationType || [];
-                                    const next = checked
-                                        ? [...current, type]
-                                        : current.filter((t) => t !== type);
-                                    setFieldValue("accommodationType", next);
-                                }}
-                                className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
-                            />
-                            <Label className="text-sm font-medium cursor-pointer">
-                                {type}
-                            </Label>
-                        </div>
-                    </MotionDiv>
+                                <MotionDiv
+                                    key={type}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className={cn(
+                                        "border rounded-lg p-4 transition-all",
+                                        values.accommodationType?.includes(type)
+                                            ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 shadow-sm"
+                                            : "border-gray-200 dark:border-gray-700"
+                                    )}
+                                >
+                                    <div className="flex items-center space-x-3">
+                                        <Checkbox
+                                            checked={values.accommodationType?.includes(type)}
+                                            onCheckedChange={(checked) => {
+                                                const current = values.accommodationType || [];
+                                                const next = checked
+                                                    ? [...current, type]
+                                                    : current.filter((t) => t !== type);
+                                                setFieldValue("accommodationType", next);
+                                            }}
+                                            className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                                        />
+                                        <Label className="text-sm font-medium cursor-pointer">
+                                            {type}
+                                        </Label>
+                                    </div>
+                                </MotionDiv>
                             ))}
                         </div>
                     </CardContent>
@@ -401,7 +409,6 @@ export default function BangladeshFieldsStep() {
                                         ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 shadow-sm"
                                         : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                                 )}
-                                onClick={() => setFieldValue("guideIncluded", !values.guideIncluded)}
                             >
                                 <div className="flex items-center space-x-3">
                                     <Checkbox
@@ -425,7 +432,6 @@ export default function BangladeshFieldsStep() {
                                         ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 shadow-sm"
                                         : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                                 )}
-                                onClick={() => setFieldValue("transportIncluded", !values.transportIncluded)}
                             >
                                 <div className="flex items-center space-x-3">
                                     <Checkbox

@@ -20,6 +20,7 @@ import {
 import { GetTourFaqsResponse, TourFAQDTO } from "@/types/faqs.types";
 import api from "@/utils/axios/axios";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
+import { TOUR_STATUS } from "@/constants/tour.const";
 
 const URL_AFTER_API = "/mock/operations/tours";
 
@@ -386,7 +387,7 @@ export const useCompanyDashboardStore = create<CompanyDashboardState>()(
           const tours = Array.isArray(cache.items) ? cache.items : [];
 
           const publishedTours = tours.filter(
-            (t) => t.status === "published"
+            (t) => t.status === TOUR_STATUS.SUBMITTED
           );
 
           const ratings = publishedTours

@@ -26,7 +26,7 @@ import {
 import Grid from "@mui/material/Grid";
 import { motion, AnimatePresence } from "framer-motion";
 import { CreateTourDTO } from "@/types/tour.types";
-import { TRANSPORT_MODE, CURRENCY } from "@/constants/tour.const";
+import { TRANSPORT_MODE, CURRENCY, DISTRICT } from "@/constants/tour.const";
 import { useState } from "react";
 import {
   MapPin,
@@ -40,9 +40,9 @@ import {
   AlertCircle,
   Truck,
   Building2,
-  Globe,
 } from "lucide-react";
 import { MapPickerDialog } from "@/components/global/MapPickerDialog";
+import { ComboBox } from "@/components/ui/combobox";
 
 export default function LogisticsStep() {
   const { values, setFieldValue } =
@@ -62,7 +62,7 @@ export default function LogisticsStep() {
       setFieldValue("mainLocation.coordinates.lng", lng);
     }
   };
-  
+
 
   // Check if current coordinates are valid
   const currentCoordsValid = validateCoordinates(
@@ -262,23 +262,21 @@ export default function LogisticsStep() {
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="District"
-                    value={values.mainLocation?.address?.district || ""}
-                    onChange={(e) =>
-                      setFieldValue(
-                        "mainLocation.address.district",
-                        e.target.value
-                      )
-                    }
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 1.5,
-                      },
-                    }}
-                  />
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium">District</label>
+
+                    <ComboBox
+                      value={values.mainLocation?.address?.district || ""}
+                      placeholder="Select District"
+                      options={Object.values(DISTRICT).map((district) => ({
+                        label: district,
+                        value: district,
+                      }))}
+                      onChange={(value) =>
+                        setFieldValue("mainLocation.address.district", value)
+                      }
+                    />
+                  </div>
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
@@ -293,32 +291,6 @@ export default function LogisticsStep() {
                         e.target.value
                       )
                     }
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 1.5,
-                      },
-                    }}
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Country"
-                    required
-                    value={values.mainLocation?.address?.country || "Bangladesh"}
-                    onChange={(e) =>
-                      setFieldValue(
-                        "mainLocation.address.country",
-                        e.target.value
-                      )
-                    }
-                    InputProps={{
-                      startAdornment: (
-                        <Globe className="w-4 h-4 text-primary mr-1" />
-                      ),
-                    }}
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 1.5,
@@ -694,82 +666,82 @@ export default function LogisticsStep() {
                                 exit="exit"
                                 layout
                               >
-                                  <TableCell>
-                                    <TextField
-                                      size="small"
-                                      fullWidth
-                                      value={opt.city}
+                                <TableCell>
+                                  <TextField
+                                    size="small"
+                                    fullWidth
+                                    value={opt.city}
+                                    onChange={(e) =>
+                                      setFieldValue(
+                                        `pickupOptions[${i}].city`,
+                                        e.target.value
+                                      )
+                                    }
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: 1.5,
+                                      },
+                                    }}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <TextField
+                                    size="small"
+                                    type="number"
+                                    fullWidth
+                                    value={opt.price}
+                                    onChange={(e) =>
+                                      setFieldValue(
+                                        `pickupOptions[${i}].price`,
+                                        Number(e.target.value)
+                                      )
+                                    }
+                                    sx={{
+                                      "& .MuiOutlinedInput-root": {
+                                        borderRadius: 1.5,
+                                      },
+                                    }}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <FormControl fullWidth size="small">
+                                    <Select
+                                      value={opt.currency}
                                       onChange={(e) =>
                                         setFieldValue(
-                                          `pickupOptions[${i}].city`,
+                                          `pickupOptions[${i}].currency`,
                                           e.target.value
                                         )
                                       }
                                       sx={{
-                                        "& .MuiOutlinedInput-root": {
-                                          borderRadius: 1.5,
-                                        },
-                                      }}
-                                    />
-                                  </TableCell>
-                                  <TableCell>
-                                    <TextField
-                                      size="small"
-                                      type="number"
-                                      fullWidth
-                                      value={opt.price}
-                                      onChange={(e) =>
-                                        setFieldValue(
-                                          `pickupOptions[${i}].price`,
-                                          Number(e.target.value)
-                                        )
-                                      }
-                                      sx={{
-                                        "& .MuiOutlinedInput-root": {
-                                          borderRadius: 1.5,
-                                        },
-                                      }}
-                                    />
-                                  </TableCell>
-                                  <TableCell>
-                                    <FormControl fullWidth size="small">
-                                      <Select
-                                        value={opt.currency}
-                                        onChange={(e) =>
-                                          setFieldValue(
-                                            `pickupOptions[${i}].currency`,
-                                            e.target.value
-                                          )
-                                        }
-                                        sx={{
-                                          borderRadius: 1.5,
-                                        }}
-                                      >
-                                        {Object.values(CURRENCY).map((c) => (
-                                          <MenuItem key={c} value={c}>
-                                            {c}
-                                          </MenuItem>
-                                        ))}
-                                      </Select>
-                                    </FormControl>
-                                  </TableCell>
-                                  <TableCell align="right">
-                                    <IconButton
-                                      size="small"
-                                      color="error"
-                                      onClick={() => remove(i)}
-                                      sx={{
                                         borderRadius: 1.5,
-                                        "&:hover": {
-                                          backgroundColor: "error.light",
-                                          color: "error.dark",
-                                        },
                                       }}
                                     >
-                                      <Trash2 className="w-4 h-4" />
-                                    </IconButton>
-                                  </TableCell>
-                                </TableRow>
+                                      {Object.values(CURRENCY).map((c) => (
+                                        <MenuItem key={c} value={c}>
+                                          {c}
+                                        </MenuItem>
+                                      ))}
+                                    </Select>
+                                  </FormControl>
+                                </TableCell>
+                                <TableCell align="right">
+                                  <IconButton
+                                    size="small"
+                                    color="error"
+                                    onClick={() => remove(i)}
+                                    sx={{
+                                      borderRadius: 1.5,
+                                      "&:hover": {
+                                        backgroundColor: "error.light",
+                                        color: "error.dark",
+                                      },
+                                    }}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </IconButton>
+                                </TableCell>
+                              </TableRow>
                             ))}
                           </AnimatePresence>
                         </TableBody>

@@ -1,279 +1,468 @@
-import { NextResponse } from "next/server";
-import { faker } from "@faker-js/faker";
-import { TourDetailDTO } from "@/types/tour.types";
+// app/api/mock/tours/[tourId]/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { faker } from '@faker-js/faker';
+import { TourDetailDTO } from '@/types/tour.types';
 import {
     TOUR_STATUS,
     TRAVEL_TYPE,
+    DIFFICULTY_LEVEL,
     AUDIENCE_TYPE,
     CONTENT_CATEGORY,
-    SEASON,
-    TRANSPORT_MODE,
+    DIVISION,
+    DISTRICT,
     PAYMENT_METHOD,
-    DIFFICULTY_LEVEL,
-} from "@/constants/tour.const";
+    CURRENCY,
+    TRANSPORT_MODE,
+    SEASON,
+    ACCOMMODATION_TYPE,
+    AGE_SUITABILITY,
+    MODERATION_STATUS
+} from '@/constants/tour.const';
 
-// --- Helpers ---
-function generateImageUrls(prefix: string, count = 3, width = 800, height = 600): string[] {
-    return Array.from({ length: count }, () => {
-        const seed = faker.number.int({ min: 1, max: 1000 });
-        return `https://picsum.photos/seed/${prefix}-${seed}/${width}/${height}`;
-    });
-}
-function randomEnum<T>(arr: T[]): T {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
-function randomSubset<T>(arr: T[], count: number): T[] {
-    return faker.helpers.shuffle(arr).slice(0, count);
-}
-function generateGeoPoint() {
-    return {
-        type: "Point" as const,
-        coordinates: [faker.location.longitude(), faker.location.latitude()] as [number, number],
-    };
-}
-function generateMeetingPoint() {
-    return {
-        title: faker.lorem.words(2),
-        description: faker.lorem.sentence(),
-        location: {
-            address: faker.location.streetAddress(),
-            coordinates: generateGeoPoint(),
-        },
-        time: faker.date.future().toISOString(),
-    };
-}
-function generateRoadMapPoint() {
-    const seed = faker.number.int({ min: 1, max: 1000 });
-    return {
-        title: faker.lorem.words(2),
-        description: faker.lorem.sentence(),
-        imageUrl: `https://picsum.photos/seed/roadmap-${seed}/800/600`,
-        location: {
-            address: faker.location.streetAddress(),
-            coordinates: generateGeoPoint(),
-        },
-    };
-}
-function generateItineraryEntry(day: number) {
-    return {
-        day,
-        title: faker.lorem.words(3),
-        description: faker.lorem.sentences(),
-        mealsProvided: faker.helpers.arrayElements(
-            ["Breakfast", "Lunch", "Dinner"],
-            faker.number.int({ min: 0, max: 3 })
-        ),
-        accommodation: faker.company.name(),
-        activities: [faker.word.noun()],
-        imageUrls: generateImageUrls(`itinerary-${day}`, 3),
-    };
-}
-function generateFAQ(id: string) {
-    return {
-        id,
-        question: faker.lorem.sentence(),
-        answer: faker.lorem.sentence(),
-        isAnswered: true,
-        order: faker.number.int({ min: 1, max: 10 }),
-    };
+interface MockApiResponse {
+    success: boolean;
+    data?: TourDetailDTO;
+    error?: string;
+    message?: string;
 }
 
-// Realistic face generator
-function generateHost() {
-    const gender = faker.helpers.arrayElement(["men", "women"]);
-    const id = faker.number.int({ min: 1, max: 99 }); // avatar index for pravatar
-    const name = faker.person.fullName();
-    return {
-        name,
-        bio: faker.lorem.sentences(),
-        avatarUrl: `https://randomuser.me/api/portraits/${gender}/${id}.jpg`,
-        languagesSpoken: faker.helpers.arrayElements(["English", "Spanish", "French"], 1),
-        rating: faker.number.float({ min: 3, max: 5, fractionDigits: 1 }),
-    };
-}
+// Cache for consistent mock data across requests
+const mockToursCache = new Map<string, TourDetailDTO>();
+
+// Seed faker for consistent results
+faker.seed(12345);
 
 export async function GET(
-    req: Request,
-    { params }: { params: { companyId: string; tourId: string } }
+    request: NextRequest,
+    { params }: { params: Promise<{ tourId: string }> }
 ) {
-    const startDate = faker.date.future();
-    const endDate = faker.date.soon({
-        days: faker.number.int({ min: 3, max: 14 }),
-        refDate: startDate,
-    });
+    try {
+        const tourId = (await params).tourId;
 
-    const maxGroupSize = faker.number.int({ min: 10, max: 50 });
-    const bookingCount = faker.number.int({ min: 0, max: maxGroupSize });
+        // Check if we have cached this tour
+        if (mockToursCache.has(tourId)) {
+            const cachedTour = mockToursCache.get(tourId)!;
+            return NextResponse.json<MockApiResponse>({
+                success: true,
+                data: cachedTour
+            });
+        }
 
-    // --- Scenic tour images ---
-    const heroSeed = faker.number.int({ min: 1, max: 1000 });
-    const gallerySeeds = Array.from({ length: 3 }, () =>
-        faker.number.int({ min: 1, max: 1000 })
+        // Generate consistent mock data based on tourId
+        const seed = parseInt(tourId.replace(/\D/g, '')) || 0;
+        faker.seed(seed);
+
+        // Generate mock tour
+        const tourDetail = generateMockTourDetail(tourId);
+
+        // Cache the tour
+        mockToursCache.set(tourId, tourDetail);
+
+        // Add delay to simulate network latency
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        return NextResponse.json<MockApiResponse>({
+            success: true,
+            data: tourDetail
+        });
+
+    } catch (error) {
+        console.error('Error generating mock tour:', error);
+        return NextResponse.json<MockApiResponse>({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to generate mock tour data'
+        }, { status: 500 });
+    }
+}
+
+// Helper function to generate a complete mock tour
+function generateMockTourDetail(tourId: string): TourDetailDTO {
+    const companyId = faker.string.uuid();
+    const authorId = faker.string.uuid();
+    const createdAt = faker.date.past({ years: 1 });
+    const updatedAt = faker.date.recent({ days: 30 });
+    const publishedAt = faker.date.between({ from: createdAt, to: updatedAt });
+
+    const status = faker.helpers.arrayElement(Object.values(TOUR_STATUS));
+    const tourType = faker.helpers.arrayElement(Object.values(TRAVEL_TYPE));
+    const division = faker.helpers.arrayElement(Object.values(DIVISION));
+    const district = faker.helpers.arrayElement(Object.values(DISTRICT));
+    const difficulty = faker.helpers.arrayElement(Object.values(DIFFICULTY_LEVEL));
+    const ageSuitability = faker.helpers.arrayElement(Object.values(AGE_SUITABILITY));
+    const currency = faker.helpers.arrayElement(Object.values(CURRENCY));
+    const moderationStatus = faker.helpers.arrayElement(Object.values(MODERATION_STATUS));
+
+    // Generate random categories (1-3)
+    const categories = faker.helpers.arrayElements(
+        Object.values(CONTENT_CATEGORY),
+        faker.number.int({ min: 1, max: 3 })
     );
 
-    const tour: TourDetailDTO = {
-        id: (await params).tourId,
+    // Generate random audience types (1-4)
+    const audience = faker.helpers.arrayElements(
+        Object.values(AUDIENCE_TYPE),
+        faker.number.int({ min: 1, max: 4 })
+    );
+
+    // Generate random seasons (1-3)
+    const bestSeason = faker.helpers.arrayElements(
+        Object.values(SEASON),
+        faker.number.int({ min: 1, max: 3 })
+    );
+
+    // Generate random transport modes (1-3)
+    const transportModes = faker.helpers.arrayElements(
+        Object.values(TRANSPORT_MODE),
+        faker.number.int({ min: 1, max: 3 })
+    );
+
+    // Generate random payment methods (2-4)
+    const paymentMethods = faker.helpers.arrayElements(
+        Object.values(PAYMENT_METHOD),
+        faker.number.int({ min: 2, max: 4 })
+    );
+
+    // Generate random accommodation types (1-3)
+    const accommodationType = faker.helpers.arrayElements(
+        Object.values(ACCOMMODATION_TYPE),
+        faker.number.int({ min: 1, max: 3 })
+    );
+
+    // Generate base price
+    const basePriceAmount = faker.number.int({ min: 5000, max: 50000 });
+    const basePrice = {
+        amount: basePriceAmount,
+        currency
+    };
+
+    // Generate discounts (0-2)
+    const discounts = Array.from({ length: faker.number.int({ min: 0, max: 2 }) }).map(() => ({
+        type: faker.helpers.arrayElement(['seasonal', 'early_bird', 'group', 'promo'] as const),
+        value: faker.number.int({ min: 5, max: 25 }),
+        code: faker.string.alphanumeric(8).toUpperCase(),
+        validFrom: faker.date.past({ years: 1 }).toISOString(),
+        validUntil: faker.date.future({ years: 1 }).toISOString()
+    }));
+
+    // Generate duration
+    const duration = {
+        days: faker.number.int({ min: 1, max: 14 }),
+        nights: faker.number.int({ min: 0, max: 13 })
+    };
+
+    // Generate destinations (2-5)
+    const destinations = Array.from({ length: faker.number.int({ min: 2, max: 5 }) }).map(() => ({
+        description: faker.lorem.paragraphs(2),
+        highlights: Array.from({ length: faker.number.int({ min: 3, max: 7 }) }).map(() =>
+            faker.lorem.sentence()
+        ),
+        attractions: Array.from({ length: faker.number.int({ min: 2, max: 5 }) }).map(() => ({
+            title: faker.lorem.words(3),
+            description: faker.lorem.sentence(),
+            bestFor: faker.lorem.words(2),
+            insiderTip: faker.lorem.sentence(),
+            address: faker.location.streetAddress(),
+            openingHours: '9:00 AM - 6:00 PM',
+            imageIds: Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map(() =>
+                faker.image.urlLoremFlickr({ category: 'landscape' })
+            ),
+            coordinates: {
+                lat: faker.location.latitude(),
+                lng: faker.location.longitude()
+            }
+        })),
+        activities: Array.from({ length: faker.number.int({ min: 1, max: 4 }) }).map(() => ({
+            title: faker.lorem.words(3),
+            url: faker.internet.url(),
+            provider: faker.company.name(),
+            duration: `${faker.number.int({ min: 1, max: 6 })} hours`,
+            price: {
+                amount: faker.number.int({ min: 500, max: 5000 }),
+                currency
+            },
+            rating: faker.number.float({ min: 3, max: 5, fractionDigits: 1 })
+        })),
+        imageIds: Array.from({ length: faker.number.int({ min: 3, max: 8 }) }).map(() =>
+            faker.image.urlLoremFlickr({ category: 'landscape' })
+        ),
+        coordinates: {
+            lat: faker.location.latitude(),
+            lng: faker.location.longitude()
+        }
+    }));
+
+    // Generate itinerary (based on duration)
+    const itinerary = Array.from({ length: duration.days }).map((_, day) => ({
+        day: day + 1,
         title: faker.lorem.words(4),
-        slug: faker.lorem.slug(),
-        status: randomEnum(Object.values(TOUR_STATUS)),
-        owner: faker.company.name(),
+        description: faker.lorem.paragraphs(2),
+        mealsProvided: faker.helpers.arrayElements(['Breakfast', 'Lunch', 'Dinner'] as const, {
+            min: 1,
+            max: 3
+        }),
+        accommodation: faker.helpers.arrayElement(['Hotel', 'Resort', 'Homestay', 'Camping']),
+        activities: Array.from({ length: faker.number.int({ min: 2, max: 5 }) }).map(() =>
+            faker.lorem.words(3)
+        ),
+        travelDistance: `${faker.number.int({ min: 50, max: 300 })} km`,
+        travelMode: faker.helpers.arrayElement(Object.values(TRANSPORT_MODE)),
+        estimatedTime: `${faker.number.int({ min: 2, max: 8 })} hours`,
+        importantNotes: Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map(() =>
+            faker.lorem.sentence()
+        )
+    }));
 
-        // Marketing
-        highlights: [faker.lorem.words(2), faker.lorem.words(2)],
-        description: faker.lorem.paragraph(),
+    // Generate inclusions (5-10)
+    const inclusions = Array.from({ length: faker.number.int({ min: 5, max: 10 }) }).map(() => ({
+        label: faker.lorem.words(3),
+        description: faker.lorem.sentence()
+    }));
 
-        // Includes / Info
-        includes: [{ label: "Hotel pickup", included: true }],
-        importantInfo: [faker.lorem.sentence()],
+    // Generate exclusions (3-6)
+    const exclusions = Array.from({ length: faker.number.int({ min: 3, max: 6 }) }).map(() => ({
+        label: faker.lorem.words(3),
+        description: faker.lorem.sentence()
+    }));
 
-        // Logistics
-        meetingPoints: Array.from({ length: 2 }, generateMeetingPoint),
-        activities: [faker.word.noun(), faker.word.noun()],
-        tags: [faker.word.noun(), faker.word.noun()],
-        travelTypes: randomSubset(Object.values(TRAVEL_TYPE), 2),
-        difficulty: randomEnum(Object.values(DIFFICULTY_LEVEL)),
-        category: faker.helpers.arrayElement(["Adventure", "Cultural", "Leisure"]),
-        subCategory: faker.helpers.arrayElement(["Hiking", "City Tour", "Safari"]),
+    // Generate departures (3-10)
+    const departures = Array.from({ length: faker.number.int({ min: 3, max: 10 }) }).map(() => ({
+        id: faker.string.uuid(),
+        date: faker.date.future({ years: 1, refDate: new Date() }).toISOString(),
+        seatsTotal: faker.number.int({ min: 10, max: 50 }),
+        seatsBooked: faker.number.int({ min: 0, max: 45 }),
+        meetingPoint: faker.location.streetAddress(),
+        meetingCoordinates: {
+            lat: faker.location.latitude(),
+            lng: faker.location.longitude()
+        }
+    })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-        // 🆕 New domain fields
-        audience: randomSubset(Object.values(AUDIENCE_TYPE), 2),
-        categories: randomSubset(Object.values(CONTENT_CATEGORY), 2),
-        bestSeason: randomSubset(Object.values(SEASON), 2),
-        transportModes: randomSubset(Object.values(TRANSPORT_MODE), 2),
-        pickupOptions: [
-            { city: faker.location.city(), price: 20, currency: "USD" },
-            { city: faker.location.city(), price: 50, currency: "USD" },
-        ],
+    // Generate operating windows (1-3)
+    const operatingWindows = Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map(() => {
+        const startDate = faker.date.future({ years: 1 });
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + faker.number.int({ min: 30, max: 90 }));
+
+        return {
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+            seatsTotal: faker.number.int({ min: 20, max: 100 }),
+            seatsBooked: faker.number.int({ min: 0, max: 80 })
+        };
+    });
+
+    // Generate packing list (5-15 items)
+    const packingList = Array.from({ length: faker.number.int({ min: 5, max: 15 }) }).map(() => ({
+        item: faker.commerce.productName(),
+        required: faker.datatype.boolean(),
+        notes: faker.datatype.boolean() ? faker.lorem.sentence() : undefined
+    }));
+
+    // Generate pickup options (2-5 cities)
+    const pickupOptions = Array.from({ length: faker.number.int({ min: 2, max: 5 }) }).map(() => ({
+        city: faker.location.city(),
+        price: faker.number.int({ min: 500, max: 3000 }),
+        currency
+    }));
+
+    // Calculate computed fields
+    const totalSeats = departures.reduce((sum, dep) => sum + dep.seatsTotal, 0);
+    const bookedSeats = departures.reduce((sum, dep) => sum + dep.seatsBooked, 0);
+    const availableSeats = totalSeats - bookedSeats;
+    const occupancyPercentage = totalSeats > 0 ? (bookedSeats / totalSeats) * 100 : 0;
+
+    const hasActiveDiscount = discounts.some(discount => {
+        const now = new Date();
+        const validFrom = new Date(discount.validFrom!);
+        const validUntil = new Date(discount.validUntil!);
+        return now >= validFrom && now <= validUntil;
+    });
+
+    const nextDeparture = departures[0]?.date;
+    const isUpcoming = nextDeparture ? new Date(nextDeparture) > new Date() : false;
+    const isExpired = status === TOUR_STATUS.COMPLETED || status === TOUR_STATUS.TERMINATED || status === TOUR_STATUS.ARCHIVED;
+
+    const activeDiscount = discounts.find(discount => {
+        const now = new Date();
+        const validFrom = new Date(discount.validFrom!);
+        const validUntil = new Date(discount.validUntil!);
+        return now >= validFrom && now <= validUntil;
+    });
+
+    const discountedAmount = activeDiscount
+        ? basePriceAmount * (1 - (activeDiscount.value / 100))
+        : undefined;
+
+    // Generate hero image and gallery
+    const heroImage = faker.image.urlLoremFlickr({ category: 'travel' });
+    const gallery = Array.from({ length: faker.number.int({ min: 5, max: 12 }) }).map(() =>
+        faker.image.urlLoremFlickr({ category: 'landscape' })
+    );
+
+    // Generate tags (3-8)
+    const tags = Array.from({ length: faker.number.int({ min: 3, max: 8 }) }).map(() =>
+        faker.lorem.word()
+    );
+
+    // Generate rating
+    const ratingAverage = faker.number.float({ min: 3.5, max: 5, fractionDigits: 1 });
+    const ratingCount = faker.number.int({ min: 10, max: 200 });
+
+    return {
+        // =============== IDENTITY & BASIC INFO ===============
+        id: tourId,
+        title: faker.lorem.words(4),
+        slug: faker.helpers.slugify(faker.lorem.words(4)).toLowerCase(),
+        status,
+        summary: faker.lorem.paragraphs(2),
+        heroImage,
+        gallery,
+        seo: {
+            metaTitle: faker.lorem.words(6),
+            metaDescription: faker.lorem.sentence()
+        },
+
+        // =============== BANGLADESH-SPECIFIC FIELDS ===============
+        tourType,
+        division,
+        district,
+        accommodationType,
+        guideIncluded: faker.datatype.boolean(),
+        transportIncluded: faker.datatype.boolean(),
+        emergencyContacts: {
+            policeNumber: '999',
+            ambulanceNumber: '16263',
+            fireServiceNumber: '102',
+            localEmergency: faker.phone.number()
+        },
+
+        // =============== CONTENT & ITINERARY ===============
+        destinations,
+        itinerary,
+        inclusions,
+        exclusions,
+        difficulty,
+        bestSeason,
+        audience,
+        categories,
+        translations: {
+            bn: {
+                title: faker.lorem.words(4),
+                summary: faker.lorem.paragraph(),
+                description: faker.lorem.paragraphs(3)
+            },
+            en: {
+                title: faker.lorem.words(4),
+                summary: faker.lorem.paragraph(),
+                description: faker.lorem.paragraphs(3)
+            }
+        },
+
+        // =============== LOGISTICS ===============
         mainLocation: {
             address: {
                 line1: faker.location.streetAddress(),
-                line2: faker.location.streetAddress(),
+                line2: faker.location.secondaryAddress(),
                 city: faker.location.city(),
-                district: faker.location.state(),
+                district: faker.location.county(),
                 region: faker.location.state(),
-                country: "Bangladesh",
-                postalCode: faker.location.zipCode(),
+                postalCode: faker.location.zipCode()
             },
-            coordinates: generateGeoPoint(),
+            coordinates: {
+                lat: faker.location.latitude(),
+                lng: faker.location.longitude()
+            }
+        },
+        transportModes,
+        pickupOptions,
+        meetingPoint: faker.location.streetAddress(),
+        packingList,
+
+        // =============== PRICING & COMMERCE ===============
+        basePrice,
+        discounts,
+        duration,
+        operatingWindows,
+        departures,
+        paymentMethods,
+
+        // =============== COMPLIANCE & ACCESSIBILITY ===============
+        licenseRequired: faker.datatype.boolean(),
+        ageSuitability,
+        accessibility: {
+            wheelchair: faker.datatype.boolean(),
+            familyFriendly: faker.datatype.boolean(),
+            petFriendly: faker.datatype.boolean(),
+            notes: faker.datatype.boolean() ? faker.lorem.sentence() : undefined
         },
 
-        // Pricing & Discounts
-        priceOptions: [
-            { name: "Standard", amount: 200, currency: "USD" },
-            { name: "Premium", amount: 400, currency: "USD" },
-        ],
-        discounts: [{ code: "SUMMER23", percentage: 10, description: "Summer special" }],
-        priceSummary: { minAmount: 200, maxAmount: 400, currency: "USD" },
-
-        // Schedule & Booking
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        durationDays: Math.ceil(
-            (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-        ),
-        bookingDeadline: faker.date.soon({ days: 7 }).toISOString(),
-        maxGroupSize,
-        repeatCount: 1,
-        booking: {
-            userIds: Array.from({ length: bookingCount }, () =>
-                faker.database.mongodbObjectId()
-            ),
-            count: bookingCount,
-            isFull: bookingCount >= maxGroupSize,
-            remaining: maxGroupSize - bookingCount,
-        },
-
-        // Policies
+        // =============== POLICIES ===============
         cancellationPolicy: {
-            freeCancellationUntil: faker.date.soon().toISOString(),
-            refundPercentage: 80,
-            notes: "Up to 1 day before start",
+            refundable: faker.datatype.boolean(),
+            rules: [
+                { daysBefore: 30, refundPercent: 100 },
+                { daysBefore: 15, refundPercent: 50 },
+                { daysBefore: 7, refundPercent: 25 },
+                { daysBefore: 1, refundPercent: 0 }
+            ]
         },
         refundPolicy: {
-            method: randomSubset(Object.values(PAYMENT_METHOD), 2),
-            processingDays: faker.number.int({ min: 1, max: 7 }),
+            method: paymentMethods.slice(0, 2),
+            processingDays: faker.number.int({ min: 3, max: 14 })
         },
-        ageRestriction: { minAge: 18, maxAge: 60 },
+        terms: faker.lorem.paragraphs(3),
 
-        // Engagement & Analytics
-        wishlistCount: faker.number.int({ min: 0, max: 5000 }),
-        popularityScore: faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+        // =============== ENGAGEMENT & RATINGS ===============
+        ratings: {
+            average: ratingAverage,
+            count: ratingCount
+        },
+        wishlistCount: faker.number.int({ min: 5, max: 100 }),
         featured: faker.datatype.boolean(),
-        trendingUntil: faker.date.future().toISOString(),
-        viewCount: faker.number.int({ min: 100, max: 10000 }),
-        likeCount: faker.number.int({ min: 10, max: 5000 }),
-        shareCount: faker.number.int({ min: 5, max: 2000 }),
-        terms: faker.lorem.paragraph(),
 
-        // Relations
-        reviewCount: faker.number.int({ min: 0, max: 200 }),
-        reportCount: faker.number.int({ min: 0, max: 20 }),
-        averageRating: faker.number.float({ min: 3, max: 5, fractionDigits: 1 }),
+        // =============== MODERATION ===============
+        moderationStatus,
+        rejectionReason: moderationStatus === MODERATION_STATUS.DENIED
+            ? faker.lorem.sentence()
+            : undefined,
+        completedAt: status === TOUR_STATUS.COMPLETED
+            ? faker.date.past({ years: 1 }).toISOString()
+            : undefined,
+        reApprovalRequestedAt: faker.datatype.boolean()
+            ? faker.date.recent({ days: 30 }).toISOString()
+            : undefined,
 
-        // 🖼️ Real images instead of fake IDs
-        heroImageUrl: `https://picsum.photos/seed/hero-${heroSeed}/1200/800`,
-        galleryImageUrls: gallerySeeds.map(
-            (s) => `https://picsum.photos/seed/gallery-${s}/800/600`
-        ),
+        // =============== SYSTEM FIELDS ===============
+        companyId,
+        authorId,
+        tags,
+        publishedAt: publishedAt.toISOString(),
+        viewCount: faker.number.int({ min: 100, max: 5000 }),
+        likeCount: faker.number.int({ min: 10, max: 500 }),
+        shareCount: faker.number.int({ min: 5, max: 200 }),
+        createdAt: createdAt.toISOString(),
+        updatedAt: updatedAt.toISOString(),
+        deletedAt: status === TOUR_STATUS.ARCHIVED
+            ? faker.date.recent({ days: 10 }).toISOString()
+            : undefined,
 
-        videoUrls: [faker.internet.url()],
-        virtualTourUrl: faker.internet.url(),
-
-        roadMap: Array.from({ length: 3 }, generateRoadMapPoint),
-        itinerary: Array.from({ length: 3 }, (_, i) => generateItineraryEntry(i + 1)),
-
-        packingList: [
-            { item: "Backpack", required: true },
-            { item: "Sunscreen", required: false, notes: "Optional but recommended" },
-        ],
-        faqs: Array.from({ length: 3 }, () =>
-            generateFAQ(faker.database.mongodbObjectId())
-        ),
-
-        host: generateHost(),
-        healthAndSafety: [{ title: "COVID-19", description: "Masks recommended" }],
-        accessibilityFeatures: ["Wheelchair accessible"],
-        accessibilityRating: 4,
-        emergencyContact: {
-            phone: faker.phone.number(),
-            email: faker.internet.email(),
+        // =============== COMPUTED/UI-ONLY FIELDS ===============
+        priceSummary: {
+            minAmount: basePriceAmount,
+            maxAmount: basePriceAmount,
+            currency,
+            discountedAmount
         },
-        weatherTips: ["Raincoat recommended", "Sunscreen required"],
-        seasonalHighlights: [
-            {
-                season: "Summer",
-                description: "Ideal for hiking",
-                imageUrl: `https://picsum.photos/seed/summer-${faker.number.int({
-                    min: 1,
-                    max: 1000,
-                })}/800/600`,
-            },
-        ],
-
-        translations: [
-            {
-                language: "en",
-                title: faker.lorem.words(4),
-                summary: faker.lorem.sentence(),
-                content: [
-                    { type: "paragraph", text: faker.lorem.paragraph() },
-                    { type: "link", text: "Learn more", href: faker.internet.url() },
-                ],
-            },
-            {
-                language: "bn",
-                title: "বাংলায় ট্যুর শিরোনাম",
-                summary: "বাংলা সারসংক্ষেপ",
-                content: [{ type: "paragraph", text: "এটি একটি বাংলা বর্ণনা।" }],
-            },
-        ],
-
-        seoTitle: faker.lorem.sentence(),
-        seoDescription: faker.lorem.sentence(),
-        createdAt: faker.date.past().toISOString(),
-        updatedAt: faker.date.recent().toISOString(),
-        serverNow: new Date().toISOString(),
+        bookingSummary: {
+            totalSeats,
+            bookedSeats,
+            availableSeats,
+            isFull: availableSeats <= 0,
+            occupancyPercentage
+        },
+        nextDeparture,
+        isUpcoming,
+        isExpired,
+        hasActiveDiscount
     };
-
-    return NextResponse.json({ data: tour });
 }

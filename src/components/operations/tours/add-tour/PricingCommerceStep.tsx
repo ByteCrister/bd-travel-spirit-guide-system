@@ -698,8 +698,8 @@ export default function PricingCommerceStep() {
                                                         ))}
                                                     </AnimatePresence>
                                                 </TableBody>
-                                        </Table>
-                                    </TableContainer>
+                                            </Table>
+                                        </TableContainer>
 
                                         <Button
                                             startIcon={<Plus className="w-4 h-4" />}
@@ -965,8 +965,8 @@ export default function PricingCommerceStep() {
                                                         ))}
                                                     </AnimatePresence>
                                                 </TableBody>
-                                        </Table>
-                                    </TableContainer>
+                                            </Table>
+                                        </TableContainer>
 
                                         <Button
                                             startIcon={<Plus className="w-4 h-4" />}

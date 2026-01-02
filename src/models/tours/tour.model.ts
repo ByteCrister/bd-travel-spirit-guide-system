@@ -38,6 +38,7 @@ import { HydratedDocument, Query } from "mongoose";
 import { FilterQuery } from "mongoose";
 import { ClientSession } from "mongoose";
 import { Schema, Types, Document, Model, UpdateQuery } from "mongoose";
+import { HydratedEmployeeDocument } from "../employees/employees.model";
 
 // =============== PRICE & DISCOUNT TYPES ===============
 export type IPrice = {
@@ -96,7 +97,6 @@ export type IAddress = {
   city?: string;
   district?: string;
   region?: string;
-  country: string;
   postalCode?: string;
 };
 
@@ -146,7 +146,7 @@ export type IAddressTranslationBlock = {
 };
 
 // =============== DESTINATION TYPES ===============
-interface IAttraction {
+export interface IAttraction {
   title: string;
   description?: string;
   bestFor?: string;
@@ -166,7 +166,7 @@ interface IActivity {
   rating?: number;
 }
 
-interface IDestinationBlock {
+export interface IDestinationBlock {
   description?: string;
   highlights?: string[];
   attractions?: IAttraction[];
@@ -194,14 +194,14 @@ export interface ITour extends Document {
   accommodationType?: ACCOMMODATION_TYPE[];
   guideIncluded: boolean;
   transportIncluded: boolean;
-  
+
   // Local emergency contacts
   emergencyContacts?: {
     policeNumber?: string;
     ambulanceNumber?: string;
     fireServiceNumber?: string;
-    localEmergency?: string;
   };
+  localEmergency?: string;
 
   // =============== CONTENT & ITINERARY ===============
   destinations?: IDestinationBlock[];
@@ -215,7 +215,6 @@ export interface ITour extends Document {
     travelDistance?: string;
     travelMode?: TransportMode;
     estimatedTime?: string;
-    images?: Types.ObjectId[];
     importantNotes?: string[];
   }[];
   inclusions?: IInclusion[];
@@ -344,6 +343,10 @@ export interface ITourModel extends Model<ITour> {
   findPendingApproval(session?: ClientSession): Promise<ITour[]>;
   findRejected(session?: ClientSession): Promise<ITour[]>;
   findApproved(session?: ClientSession): Promise<ITour[]>;
+  findOneWithDeleted(
+    query: FilterQuery<ITour>,
+    session?: ClientSession
+  ): Query<HydratedEmployeeDocument | null, ITour>;
 
   // Status update helpers
   publishById(
@@ -404,8 +407,8 @@ const TourSchema = new Schema<ITour>(
     transportIncluded: { type: Boolean, default: true, required: true },
     emergencyContacts: {
       policeNumber: { type: String, trim: true, default: "999" },
-      ambulanceNumber: { type: String, trim: true, default: "199" },
-      fireServiceNumber: { type: String, trim: true, default: "199" },
+      ambulanceNumber: { type: String, trim: true, default: "16263 " },
+      fireServiceNumber: { type: String, trim: true, default: "102" },
       localEmergency: { type: String, trim: true },
     },
 
@@ -465,7 +468,6 @@ const TourSchema = new Schema<ITour>(
         travelDistance: { type: String, trim: true },
         travelMode: { type: String, enum: Object.values(TRANSPORT_MODE) },
         estimatedTime: { type: String, trim: true },
-        images: [{ type: Schema.Types.ObjectId, ref: "Asset" }],
         importantNotes: [{ type: String, trim: true }],
       },
     ],
@@ -502,7 +504,6 @@ const TourSchema = new Schema<ITour>(
         city: { type: String, trim: true },
         district: { type: String, trim: true },
         region: { type: String, trim: true },
-        country: { type: String, trim: true },
         postalCode: { type: String, trim: true },
       },
       coordinates: { lat: Number, lng: Number },
@@ -691,7 +692,8 @@ TourSchema.statics.rejectById = async function (
     throw new Error("Tour not found");
   }
 
-  tour.moderationStatus = MODERATION_STATUS.REJECTED as ModerationStatus;
+  tour.moderationStatus = MODERATION_STATUS.DENIED;
+  tour.status = TOUR_STATUS.TERMINATED;
   tour.rejectionReason = options.reason;
   tour.updatedAt = new Date();
 
@@ -709,7 +711,8 @@ TourSchema.statics.approveById = async function (
     throw new Error("Tour not found");
   }
 
-  tour.moderationStatus = MODERATION_STATUS.APPROVED as ModerationStatus;
+  tour.moderationStatus = MODERATION_STATUS.APPROVED;
+  tour.status = TOUR_STATUS.ACTIVE;
   tour.rejectionReason = undefined;
   tour.updatedAt = new Date();
 
@@ -728,20 +731,21 @@ TourSchema.statics.requestReapproval = async function (
     throw new Error("Tour not found");
   }
 
-  tour.moderationStatus = MODERATION_STATUS.PENDING as ModerationStatus;
+  tour.moderationStatus = MODERATION_STATUS.PENDING;
+  tour.status = TOUR_STATUS.SUBMITTED;
   tour.reApprovalRequestedAt = new Date();
   tour.rejectionReason = undefined;
 
   return tour.save({ session });
 };
 
-// Find active tours (not deleted)
+// Find active tours (not deleted and status = ACTIVE)
 TourSchema.statics.findActive = function (
   session?: ClientSession
 ): Promise<ITour[]> {
   return this.find({
     deletedAt: null,
-    status: { $ne: MODERATION_STATUS.SUSPENDED as ModerationStatus },
+    status: TOUR_STATUS.ACTIVE, // Only active tours
   })
     .session(session ?? null)
     .sort({ createdAt: -1 });
@@ -761,7 +765,7 @@ TourSchema.statics.findPendingApproval = function (
   session?: ClientSession
 ): Promise<ITour[]> {
   return this.find({
-    moderationStatus: MODERATION_STATUS.PENDING as ModerationStatus,
+    moderationStatus: MODERATION_STATUS.PENDING,
     deletedAt: null,
   })
     .session(session ?? null)
@@ -773,7 +777,7 @@ TourSchema.statics.findRejected = function (
   session?: ClientSession
 ): Promise<ITour[]> {
   return this.find({
-    moderationStatus: MODERATION_STATUS.REJECTED as ModerationStatus,
+    moderationStatus: MODERATION_STATUS.DENIED,
     deletedAt: null,
   })
     .session(session ?? null)
@@ -783,11 +787,18 @@ TourSchema.statics.findRejected = function (
 // Find approved tours
 TourSchema.statics.findApproved = async function (session?: ClientSession): Promise<ITour[]> {
   return this.find({
-    moderationStatus: MODERATION_STATUS.APPROVED as ModerationStatus,
+    moderationStatus: MODERATION_STATUS.APPROVED,
     deletedAt: null
   })
     .session(session ?? null)
     .sort({ createdAt: -1 });
+};
+
+TourSchema.statics.findOneWithDeleted = function (
+  query: FilterQuery<ITour>,
+  session?: ClientSession
+) {
+  return this.findOne({ ...query, deletedAt: { $exists: true } }).session(session ?? null);
 };
 
 // =============== SCHEMA HOOKS ===============
@@ -836,10 +847,11 @@ TourSchema.pre(/^find/, function (
 TourSchema.index({ status: 1, publishedAt: -1 });
 TourSchema.index({ moderationStatus: 1 });
 TourSchema.index({ slug: 1 });
-TourSchema.index({ "destinations.city": 1, "destinations.country": 1 });
+TourSchema.index({ "destinations.city": 1 });
 TourSchema.index({ categories: 1 });
 TourSchema.index({ audience: 1 });
 TourSchema.index({ featured: 1 });
+
 // Additional indexes for performance
 TourSchema.index({ deletedAt: 1, status: 1 });
 TourSchema.index({ companyId: 1, status: 1 });

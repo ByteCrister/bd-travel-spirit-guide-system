@@ -80,7 +80,6 @@ export interface ItineraryEntryDTO {
     travelDistance?: string;
     travelMode?: TransportMode;//
     estimatedTime?: string;
-    imageIds?: string[];
     importantNotes?: string[];
 }
 
@@ -108,7 +107,6 @@ export interface AddressDTO {
     city?: string;
     district?: string;
     region?: string;
-    country: string;
     postalCode?: string;
 }
 
@@ -295,8 +293,6 @@ export interface TourDetailDTO {
     isUpcoming?: boolean;
     isExpired?: boolean;
     hasActiveDiscount?: boolean;
-    heroImageUrl?: string; // Full URL from Asset ID
-    galleryUrls?: string[]; // Full URLs from Asset IDs
 }
 
 /* =============== LIGHTWEIGHT LIST DTO =============== */
@@ -449,6 +445,8 @@ export interface CreateTourDTO {
         metaTitle?: string;
         metaDescription?: string;
     };//
+
+    status?: TourStatus;
 
     // =============== BANGLADESH-SPECIFIC FIELDS ===============
     tourType: TravelType;//
@@ -666,14 +664,17 @@ export interface UpdateDepartureDTO {
     meetingCoordinates?: GeoPointDTO;
 }
 
-// =============== MODERATION ACTION PAYLOADS ===============
+export interface UpdateHeroImageDTO {
+    heroImage: string;
+}
 
-/**
- * Payload for requesting re-approval
- */
-export interface RequestReapprovalDTO {
-    // Can include explanation of changes made
-    explanation?: string;
+export interface UpdateGalleryImgDTO {
+    gallery: string[];
+}
+
+export interface UpdateDestinationImgDTO {
+    desIdx: number;
+    imageIds: string[];
 }
 
 // =============== UTILITY UPDATE TYPES ===============

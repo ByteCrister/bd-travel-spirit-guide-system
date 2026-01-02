@@ -16,6 +16,8 @@ import { OperatingWindowDTO } from '@/types/tour.types';
 import * as Yup from 'yup';
 
 export const BD_PHONE_REGEX = /^(\+8801|01)[3-9][0-9]{8}$/;
+export const BD_PHONE_OR_EMERGENCY_REGEX =
+    /^((\+8801|01)[3-9][0-9]{8}|999|102|16263)$/;
 
 export const BangladeshGeoPointSchema = Yup.object({
     lat: Yup.number()
@@ -31,10 +33,23 @@ export const BangladeshGeoPointSchema = Yup.object({
 });
 
 export const PriceSchema = Yup.object({
-    amount: Yup.number()
-        .typeError('Amount must be a number')
+    amount: Yup.string()
+        .transform((value) => {
+            if (!value) return value;
+
+            // Remove leading zeros before digits, but keep "0.x"
+            const cleaned = value
+                .replace(/^0+(?=\d)/, "")
+                .replace(/^\.*/, "0."); // handle ".5" -> "0.5"
+
+            return cleaned === "" ? "0" : cleaned;
+        })
         .required('Amount is required')
-        .min(0, 'Amount cannot be negative'),
+        .matches(
+            /^(0|[1-9]\d*)(\.\d{1,2})?$/,
+            'Amount must be a valid non-negative number'
+        ),
+
     currency: Yup.string()
         .oneOf(Object.values(CURRENCY), 'Invalid currency')
         .required(),
@@ -91,13 +106,13 @@ export const Step1BangladeshSchema = Yup.object().shape({
     emergencyContacts: Yup.object()
         .shape({
             policeNumber: Yup.string()
-                .matches(BD_PHONE_REGEX, 'Enter a valid Bangladesh mobile number')
+                .matches(BD_PHONE_OR_EMERGENCY_REGEX, 'Enter a valid Bangladesh mobile number')
                 .optional(),
             ambulanceNumber: Yup.string()
-                .matches(BD_PHONE_REGEX, 'Enter a valid Bangladesh mobile number')
+                .matches(BD_PHONE_OR_EMERGENCY_REGEX, 'Enter a valid Bangladesh mobile number')
                 .optional(),
             fireServiceNumber: Yup.string()
-                .matches(BD_PHONE_REGEX, 'Enter a valid Bangladesh mobile number')
+                .matches(BD_PHONE_OR_EMERGENCY_REGEX, 'Enter a valid Bangladesh mobile number')
                 .optional(),
             localEmergency: Yup.string().optional(),
         })
@@ -222,7 +237,23 @@ export const Step3LogisticsSchema = Yup.object().shape({
 export const Step4PricingSchema = Yup.object().shape({
     basePrice: Yup.object()
         .shape({
-            amount: Yup.number().required('Amount is required').min(0, 'Amount must be positive'),
+            amount: Yup.string()
+                .transform((value) => {
+                    if (!value) return value;
+
+                    // Remove leading zeros before digits, but keep "0.x"
+                    const cleaned = value
+                        .replace(/^0+(?=\d)/, "")
+                        .replace(/^\.*/, "0."); // handle ".5" -> "0.5"
+
+                    return cleaned === "" ? "0" : cleaned;
+                })
+                .required('Amount is required')
+                .matches(
+                    /^(0|[1-9]\d*)(\.\d{1,2})?$/,
+                    'Amount must be a valid non-negative number'
+                ),
+
             currency: Yup.string()
                 .oneOf(Object.values(CURRENCY))
                 .required('Currency is required'),

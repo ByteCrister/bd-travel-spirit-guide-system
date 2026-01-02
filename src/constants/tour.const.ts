@@ -29,11 +29,12 @@ export type AudienceType = `${AUDIENCE_TYPE}`;
  * Publishing status of the tour
  */
 export enum TOUR_STATUS {
-  DRAFT = "draft",
-  PUBLISHED = "published",
-  ARCHIVED = "archived",
-  COMPLETED = "completed",
-  PENDING_REAPPROVAL = "pending_reapproval",
+  DRAFT = "draft", // Admin-created draft, not submitted
+  SUBMITTED = "submitted", // Submitted to super admin for approval
+  ACTIVE = "active", // Admin considers ready; super admin may approve
+  COMPLETED = "completed", // Tour finished
+  TERMINATED = "terminated", // Admin terminated
+  ARCHIVED = "archived", // Soft-deleted or archived
 }
 export type TourStatus = `${TOUR_STATUS}`;
 
@@ -42,17 +43,10 @@ export type TourStatus = `${TOUR_STATUS}`;
  * Tracks approval lifecycle for user-generated content
  */
 export enum MODERATION_STATUS {
-  /** Awaiting administrator review */
-  PENDING = "pending",
-  /** Content approved for public viewing */
-  APPROVED = "approved",
-  /** Content rejected for policy violations */
-  REJECTED = "rejected",
-
-  SUSPENDED = "suspended",
-
-  TERMINATED = "terminated",
-
+  PENDING = "pending", // Waiting for super admin approval
+  APPROVED = "approved", // Super admin approved for active tour
+  DENIED = "denied", // Super admin rejected with reason
+  SUSPENDED = "suspended", // Super admin paused or suspended running tour
 }
 export type ModerationStatus = `${MODERATION_STATUS}`;
 

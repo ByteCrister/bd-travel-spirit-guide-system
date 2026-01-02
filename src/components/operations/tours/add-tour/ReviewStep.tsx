@@ -15,7 +15,6 @@ import {
     Navigation,
     Clock,
     Shield,
-    AlertCircle,
     Users,
     Bed,
     Mountain,
@@ -51,7 +50,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
 import { CreateTourDTO } from "@/types/tour.types";
 import {
     DestinationBlockDTO,
@@ -150,7 +148,6 @@ const formatAddress = (address?: AddressDTO): string => {
         address.city,
         address.district,
         address.region,
-        address.country,
         address.postalCode
     ].filter(Boolean);
     return parts.join(", ") || "Address not specified";
@@ -1442,62 +1439,6 @@ export default function ReviewStep() {
                                 </div>
                             </div>
                         </motion.div>
-                    </motion.div>
-
-                    {/* Fixed Bottom Action Bar */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 }}
-                        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg"
-                    >
-                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                    {completionPercentage === 100 ? (
-                                        <CheckCircle className="h-5 w-5 text-emerald-500" />
-                                    ) : (
-                                        <AlertCircle className="h-5 w-5 text-amber-500" />
-                                    )}
-                                    <span className="text-sm font-medium text-gray-700">
-                                        {completionPercentage === 100 ? "All sections validated" : `${completionPercentage}% complete`}
-                                    </span>
-                                </div>
-                                <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
-                                    <MapPin className="h-4 w-4" />
-                                    <span>{values.division} • {values.district}</span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <div className="text-right">
-                                    <div className="text-lg font-bold text-gray-900">
-                                        {formatCurrency(values.basePrice.amount, values.basePrice.currency)}
-                                    </div>
-                                    <div className="text-xs text-gray-500">Total base price</div>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="outline"
-                                        className="border-gray-300"
-                                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                                    >
-                                        Review Again
-                                    </Button>
-                                    <Button
-                                        className={`px-8 py-2.5 font-medium ${completionPercentage === 100
-                                            ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                                            : "bg-amber-500 text-white hover:bg-amber-600"
-                                            }`}
-                                        type="submit"
-                                        disabled={completionPercentage < 100}
-                                    >
-                                        {completionPercentage === 100 ? "Submit Tour" : "Complete Required Fields"}
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
                     </motion.div>
 
                     {/* Spacer for fixed bottom bar */}

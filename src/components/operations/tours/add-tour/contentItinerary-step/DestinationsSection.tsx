@@ -1,6 +1,6 @@
 "use client";
 
-import { Field, FieldArray, getIn, useFormikContext } from "formik";
+import { FieldArray, getIn, useFormikContext } from "formik";
 import {
     TextField,
     Box,
@@ -757,7 +757,7 @@ export default function DestinationsSection() {
                                                                                                     <TextField
                                                                                                         fullWidth
                                                                                                         label="Price Amount"
-                                                                                                        type="number"
+                                                                                                        type="decimal"
                                                                                                         size="small"
                                                                                                         value={activity.price?.amount || ""}
                                                                                                         onChange={(e) => {

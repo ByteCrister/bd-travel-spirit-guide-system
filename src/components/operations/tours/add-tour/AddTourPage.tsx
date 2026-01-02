@@ -1,7 +1,7 @@
 // /operations/tours/add-tour/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Formik, Form, FormikHelpers, FormikErrors } from 'formik';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -15,7 +15,8 @@ import {
     TRAVEL_TYPE,
     AGE_SUITABILITY,
     DIVISION,
-    DISTRICT
+    DISTRICT,
+    TOUR_STATUS
 } from '@/constants/tour.const';
 
 // Import form steps
@@ -30,6 +31,14 @@ import ComplianceAccessibilityStep from './ComplianceAccessibilityStep';
 import PoliciesStep from './PoliciesStep';
 import ReviewStep from './ReviewStep';
 import Image from 'next/image';
+import { Breadcrumbs } from '@/components/global/Breadcrumbs';
+import { Loader2, SaveAll, Send } from 'lucide-react';
+
+const items = [
+    { label: "Home", href: "/" },
+    { label: "Tours", href: "/operations/tours" },
+    { label: "Add Tour", href: "/operations/tours/add-tour" }
+];
 
 const defaultTestData: CreateTourDTO = {
     // =============== IDENTITY & BASIC INFO ===============
@@ -38,11 +47,11 @@ const defaultTestData: CreateTourDTO = {
     heroImage: undefined, // Asset ID as string, not undefined
     gallery: [],
     seo: {
-      metaTitle: '',
-      metaDescription: '',
+        metaTitle: '',
+        metaDescription: '',
     },
     tags: [],
-  
+
     // =============== BANGLADESH-SPECIFIC FIELDS ===============
     tourType: TRAVEL_TYPE.COUPLES,
     division: DIVISION.DHAKA,
@@ -51,12 +60,12 @@ const defaultTestData: CreateTourDTO = {
     guideIncluded: true,
     transportIncluded: true,
     emergencyContacts: {
-      policeNumber: '',
-      ambulanceNumber: '',
-      fireServiceNumber: '',
-      localEmergency: '',
+        policeNumber: '999',
+        ambulanceNumber: '16263',
+        fireServiceNumber: '102',
+        localEmergency: '',
     },
-  
+
     // =============== CONTENT & ITINERARY ===============
     destinations: [],
     itinerary: [],
@@ -67,73 +76,72 @@ const defaultTestData: CreateTourDTO = {
     audience: [],
     categories: [],
     translations: {},
-  
+
     // =============== LOGISTICS ===============
     mainLocation: {
-      address: {
-        line1: '',
-        line2: '',
-        city: '',
-        district: '',
-        region: '',
-        country: 'Bangladesh',
-        postalCode: '',
-      },
-      coordinates: { lat: 23.8103, lng: 90.4125 }
+        address: {
+            line1: '',
+            line2: '',
+            city: '',
+            district: '',
+            region: '',
+            postalCode: '',
+        },
+        coordinates: { lat: 23.8103, lng: 90.4125 }
     },
     transportModes: [],
     pickupOptions: [],
     meetingPoint: '',
     packingList: [],
-  
+
     // =============== PRICING & COMMERCE ===============
     basePrice: {
-      amount: 0,
-      currency: CURRENCY.BDT,
+        amount: 0,
+        currency: CURRENCY.BDT,
     },
     discounts: [],
     duration: {
-      days: 1,
-      nights: 0,
+        days: 1,
+        nights: 0,
     },
     operatingWindows: [],
     departures: [],
     paymentMethods: [PAYMENT_METHOD.BANK_TRANSFER],
-  
+
     // =============== COMPLIANCE & ACCESSIBILITY ===============
     licenseRequired: false,
     ageSuitability: AGE_SUITABILITY.ALL,
     accessibility: {
-      wheelchair: false,
-      familyFriendly: false,
-      petFriendly: false,
-      notes: '',
+        wheelchair: false,
+        familyFriendly: false,
+        petFriendly: false,
+        notes: '',
     },
-  
+
     // =============== POLICIES ===============
     cancellationPolicy: {
-      refundable: true,
-      rules: [
-        {
-          daysBefore: 7,
-          refundPercent: 100,
-        },
-        {
-          daysBefore: 3,
-          refundPercent: 50,
-        },
-        {
-          daysBefore: 1,
-          refundPercent: 0,
-        },
-      ],
+        refundable: true,
+        rules: [
+            {
+                daysBefore: 7,
+                refundPercent: 100,
+            },
+            {
+                daysBefore: 3,
+                refundPercent: 50,
+            },
+            {
+                daysBefore: 1,
+                refundPercent: 0,
+            },
+        ],
     },
     refundPolicy: {
-      method: [PAYMENT_METHOD.BANK_TRANSFER],
-      processingDays: 7,
+        method: [PAYMENT_METHOD.BANK_TRANSFER],
+        processingDays: 7,
     },
     terms: '',
-  };
+};
 
 const getFirstErrorMessage = <T,>(
     errors: FormikErrors<T>
@@ -201,9 +209,9 @@ const steps = [
 //     guideIncluded: true,
 //     transportIncluded: true,
 //     emergencyContacts: {
-//         policeNumber: '',
-//         ambulanceNumber: '',
-//         fireServiceNumber: '',
+//         policeNumber: '999',
+//         ambulanceNumber: '16263',
+//         fireServiceNumber: '102',
 //         localEmergency: '',
 //     },
 //     destinations: [],
@@ -250,9 +258,10 @@ const steps = [
 const initialValues: CreateTourDTO = defaultTestData
 
 export default function AddTourPage() {
-    const [activeStep, setActiveStep] = useState(6)
+    const [activeStep, setActiveStep] = useState(0)
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const submitTypeRef = useRef<TOUR_STATUS.DRAFT | TOUR_STATUS.SUBMITTED>(TOUR_STATUS.SUBMITTED);
     const router = useRouter();
 
     const currentValidationSchema = validationSchemas[activeStep];
@@ -285,6 +294,8 @@ export default function AddTourPage() {
         setIsSubmitting(true);
         setSubmitError(null);
 
+        const isDraft = submitTypeRef.current === TOUR_STATUS.DRAFT;
+
         try {
             const processedValues = {
                 ...values,
@@ -292,6 +303,7 @@ export default function AddTourPage() {
                     ...dep,
                     date: new Date(dep.date).toISOString(),
                 })),
+                status: isDraft ? 'draft' : 'published',
                 operatingWindows: values.operatingWindows?.map(win => ({
                     ...win,
                     startDate: new Date(win.startDate).toISOString(),
@@ -364,6 +376,8 @@ export default function AddTourPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
+                    <Breadcrumbs items={items} />
+
                     {/* Header Section */}
                     <div className="mb-8">
                         <motion.div
@@ -530,7 +544,7 @@ export default function AddTourPage() {
                                 validateOnChange={false}
                                 validateOnBlur={true}
                             >
-                                {({ validateForm, isSubmitting: formikSubmitting }) => (
+                                {({ validateForm, isSubmitting: formikSubmitting, submitForm }) => (
                                     <Form>
                                         <div className="p-6 lg:p-8 bg-gradient-to-br from-white to-slate-50">
                                             <AnimatePresence mode="wait">
@@ -583,22 +597,71 @@ export default function AddTourPage() {
                                                             Next →
                                                         </motion.button>
                                                     ) : (
-                                                        <motion.button
-                                                            type="submit"
-                                                            whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                                                            whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                                                            disabled={isSubmitting || formikSubmitting}
-                                                            className={`
-                                                                flex items-center gap-2 px-8 py-3 rounded-xl font-semibold
-                                                                shadow-lg transition-all duration-200
-                                                                ${isSubmitting || formikSubmitting
-                                                                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                                                                    : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40'
-                                                                }
-                                                            `}
-                                                        >
-                                                            {isSubmitting ? '⏳ Creating Tour...' : '💾 Create Tour'}
-                                                        </motion.button>
+                                                        <>
+                                                            {/* Save as Draft Button */}
+                                                            <motion.button
+                                                                type="button"
+                                                                whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                                                                whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                                                                disabled={isSubmitting || formikSubmitting}
+                                                                onClick={() => {
+                                                                    submitTypeRef.current = TOUR_STATUS.DRAFT;
+                                                                    submitForm();
+                                                                }}
+                                                                className={`
+                                                                    flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold
+                                                                    shadow-lg transition-all duration-200
+                                                                    ${isSubmitting || formikSubmitting
+                                                                        ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
+                                                                        : 'bg-gradient-to-r from-slate-600 to-slate-700 text-white hover:from-slate-700 hover:to-slate-800 shadow-slate-500/25 hover:shadow-xl hover:shadow-slate-500/30'
+                                                                    }
+                                                                `}
+                                                            >
+                                                                {isSubmitting || formikSubmitting ? (
+                                                                    <>
+                                                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                                                        <span>Saving...</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <SaveAll className="h-5 w-5" />
+                                                                        <span>Save as Draft</span>
+                                                                    </>
+                                                                )}
+                                                            </motion.button>
+
+                                                            {/* Publish Tour Button */}
+                                                            <motion.button
+                                                                type="button"
+                                                                whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                                                                whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                                                                disabled={isSubmitting || formikSubmitting}
+                                                                onClick={() => {
+                                                                    submitTypeRef.current = TOUR_STATUS.SUBMITTED;
+                                                                    submitForm();
+                                                                }}
+                                                                className={`
+                                                                    flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-semibold
+                                                                    shadow-lg transition-all duration-200
+                                                                    ${isSubmitting || formikSubmitting
+                                                                        ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
+                                                                        : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40'
+                                                                    }
+                                                                `}
+                                                            >
+                                                                {isSubmitting || formikSubmitting ? (
+                                                                    <>
+                                                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                                                        <span>Publishing...</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <Send className="h-5 w-5" />
+                                                                        <span>Publish Tour</span>
+                                                                    </>
+                                                                )}
+                                                            </motion.button>
+                                                        </>
                                                     )}
                                                 </div>
                                             </div>
