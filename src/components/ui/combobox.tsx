@@ -29,6 +29,7 @@ interface ComboBoxProps {
     value?: string;
     placeholder?: string;
     onChange: (value: string) => void;
+    disabled?: boolean;
 }
 
 export function ComboBox({
@@ -36,6 +37,7 @@ export function ComboBox({
     value,
     placeholder = "Select option",
     onChange,
+    disabled = false,
 }: ComboBoxProps) {
     const [open, setOpen] = React.useState(false);
 
@@ -47,6 +49,7 @@ export function ComboBox({
                 <Button
                     variant="outline"
                     role="combobox"
+                    disabled={disabled}
                     className="w-full justify-between"
                 >
                     {selected ? selected.label : placeholder}

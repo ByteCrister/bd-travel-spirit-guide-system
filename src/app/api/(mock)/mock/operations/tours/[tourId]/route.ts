@@ -16,7 +16,9 @@ import {
     SEASON,
     ACCOMMODATION_TYPE,
     AGE_SUITABILITY,
-    MODERATION_STATUS
+    MODERATION_STATUS,
+    TOUR_DISCOUNT,
+    MEALS_PROVIDED
 } from '@/constants/tour.const';
 
 interface MockApiResponse {
@@ -137,7 +139,7 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
 
     // Generate discounts (0-2)
     const discounts = Array.from({ length: faker.number.int({ min: 0, max: 2 }) }).map(() => ({
-        type: faker.helpers.arrayElement(['seasonal', 'early_bird', 'group', 'promo'] as const),
+        type: faker.helpers.arrayElement(Object.values(TOUR_DISCOUNT)),
         value: faker.number.int({ min: 5, max: 25 }),
         code: faker.string.alphanumeric(8).toUpperCase(),
         validFrom: faker.date.past({ years: 1 }).toISOString(),
@@ -169,7 +171,8 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
             coordinates: {
                 lat: faker.location.latitude(),
                 lng: faker.location.longitude()
-            }
+            },
+            
         })),
         activities: Array.from({ length: faker.number.int({ min: 1, max: 4 }) }).map(() => ({
             title: faker.lorem.words(3),
@@ -196,11 +199,11 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         day: day + 1,
         title: faker.lorem.words(4),
         description: faker.lorem.paragraphs(2),
-        mealsProvided: faker.helpers.arrayElements(['Breakfast', 'Lunch', 'Dinner'] as const, {
+        mealsProvided: faker.helpers.arrayElements(Object.values(MEALS_PROVIDED), {
             min: 1,
             max: 3
         }),
-        accommodation: faker.helpers.arrayElement(['Hotel', 'Resort', 'Homestay', 'Camping']),
+        accommodation: faker.helpers.arrayElement(Object.values(ACCOMMODATION_TYPE)),
         activities: Array.from({ length: faker.number.int({ min: 2, max: 5 }) }).map(() =>
             faker.lorem.words(3)
         ),
@@ -308,6 +311,75 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
     const ratingAverage = faker.number.float({ min: 3.5, max: 5, fractionDigits: 1 });
     const ratingCount = faker.number.int({ min: 10, max: 200 });
 
+    // Generate translations
+    const translations = {
+        bn: {
+            title: faker.lorem.words(4),
+            summary: faker.lorem.paragraph(),
+            description: faker.lorem.paragraphs(3)
+        },
+        en: {
+            title: faker.lorem.words(4),
+            summary: faker.lorem.paragraph(),
+            description: faker.lorem.paragraphs(3)
+        }
+    };
+
+    // Generate cancellation policy rules
+    const cancellationRules = [
+        { daysBefore: 30, refundPercent: 100 },
+        { daysBefore: 15, refundPercent: 50 },
+        { daysBefore: 7, refundPercent: 25 },
+        { daysBefore: 1, refundPercent: 0 }
+    ];
+
+    // Generate accessibility object
+    const accessibility = {
+        wheelchair: faker.datatype.boolean(),
+        familyFriendly: faker.datatype.boolean(),
+        petFriendly: faker.datatype.boolean(),
+        notes: faker.datatype.boolean() ? faker.lorem.sentence() : undefined
+    };
+
+    // Generate emergency contacts
+    const emergencyContacts = {
+        policeNumber: '999',
+        ambulanceNumber: '16263',
+        fireServiceNumber: '102',
+        localEmergency: faker.phone.number()
+    };
+
+    // Generate main location address
+    const mainLocation = {
+        address: {
+            line1: faker.location.streetAddress(),
+            line2: faker.location.secondaryAddress(),
+            city: faker.location.city(),
+            district: faker.location.county(),
+            region: faker.location.state(),
+            postalCode: faker.location.zipCode()
+        },
+        coordinates: {
+            lat: faker.location.latitude(),
+            lng: faker.location.longitude()
+        }
+    };
+
+    // Generate SEO data
+    const seo = {
+        metaTitle: faker.lorem.words(6),
+        metaDescription: faker.lorem.sentence()
+    };
+
+    // Generate refund policy
+    const refundPolicy = {
+        method: paymentMethods.slice(0, 2),
+        processingDays: faker.number.int({ min: 3, max: 14 })
+    };
+
+    // Generate terms
+    const terms = faker.lorem.paragraphs(3);
+
     return {
         // =============== IDENTITY & BASIC INFO ===============
         id: tourId,
@@ -317,10 +389,7 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         summary: faker.lorem.paragraphs(2),
         heroImage,
         gallery,
-        seo: {
-            metaTitle: faker.lorem.words(6),
-            metaDescription: faker.lorem.sentence()
-        },
+        seo,
 
         // =============== BANGLADESH-SPECIFIC FIELDS ===============
         tourType,
@@ -329,12 +398,7 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         accommodationType,
         guideIncluded: faker.datatype.boolean(),
         transportIncluded: faker.datatype.boolean(),
-        emergencyContacts: {
-            policeNumber: '999',
-            ambulanceNumber: '16263',
-            fireServiceNumber: '102',
-            localEmergency: faker.phone.number()
-        },
+        emergencyContacts,
 
         // =============== CONTENT & ITINERARY ===============
         destinations,
@@ -345,34 +409,10 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         bestSeason,
         audience,
         categories,
-        translations: {
-            bn: {
-                title: faker.lorem.words(4),
-                summary: faker.lorem.paragraph(),
-                description: faker.lorem.paragraphs(3)
-            },
-            en: {
-                title: faker.lorem.words(4),
-                summary: faker.lorem.paragraph(),
-                description: faker.lorem.paragraphs(3)
-            }
-        },
+        translations,
 
         // =============== LOGISTICS ===============
-        mainLocation: {
-            address: {
-                line1: faker.location.streetAddress(),
-                line2: faker.location.secondaryAddress(),
-                city: faker.location.city(),
-                district: faker.location.county(),
-                region: faker.location.state(),
-                postalCode: faker.location.zipCode()
-            },
-            coordinates: {
-                lat: faker.location.latitude(),
-                lng: faker.location.longitude()
-            }
-        },
+        mainLocation,
         transportModes,
         pickupOptions,
         meetingPoint: faker.location.streetAddress(),
@@ -389,28 +429,15 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         // =============== COMPLIANCE & ACCESSIBILITY ===============
         licenseRequired: faker.datatype.boolean(),
         ageSuitability,
-        accessibility: {
-            wheelchair: faker.datatype.boolean(),
-            familyFriendly: faker.datatype.boolean(),
-            petFriendly: faker.datatype.boolean(),
-            notes: faker.datatype.boolean() ? faker.lorem.sentence() : undefined
-        },
+        accessibility,
 
         // =============== POLICIES ===============
         cancellationPolicy: {
             refundable: faker.datatype.boolean(),
-            rules: [
-                { daysBefore: 30, refundPercent: 100 },
-                { daysBefore: 15, refundPercent: 50 },
-                { daysBefore: 7, refundPercent: 25 },
-                { daysBefore: 1, refundPercent: 0 }
-            ]
+            rules: cancellationRules
         },
-        refundPolicy: {
-            method: paymentMethods.slice(0, 2),
-            processingDays: faker.number.int({ min: 3, max: 14 })
-        },
-        terms: faker.lorem.paragraphs(3),
+        refundPolicy,
+        terms,
 
         // =============== ENGAGEMENT & RATINGS ===============
         ratings: {

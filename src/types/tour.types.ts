@@ -608,7 +608,7 @@ export interface UpdateTourPricingDTO {
         nights?: number;
     };
     operatingWindows?: OperatingWindowDTO[];
-    departures?: (Omit<DepartureDTO, 'seatsBooked'> & { seatsBooked?: number })[];
+    departures?: Omit<DepartureDTO, 'id' | 'seatsBooked'>[];
     paymentMethods?: PaymentMethod[];
 }
 

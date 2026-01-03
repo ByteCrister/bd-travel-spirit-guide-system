@@ -109,18 +109,25 @@ export type DifficultyLevel = `${DIFFICULTY_LEVEL}`;
 
 /**
  * Seasonal classifications for tour operations
- * Determines optimal travel times and availability
+ * English-only identifiers and values
  */
 export enum SEASON {
-  /** Hot and dry season (typically March-June) */
+  /** Hot and dry season */
   SUMMER = "summer",
-  /** Cool and dry season (typically November-February) */
-  WINTER = "winter",
-  /** Rainy season (typically June-October) */
+  /** Rainy monsoon season */
   MONSOON = "monsoon",
+  /** Autumn after monsoon */
+  AUTUMN = "autumn",
+  /** Late autumn / dry transition */
+  LATE_AUTUMN = "late_autumn",
+  /** Winter cool season */
+  WINTER = "winter",
+  /** Spring season */
+  SPRING = "spring",
   /** Suitable for travel throughout the year */
   YEAR_ROUND = "year_round",
 }
+
 export type Season = `${SEASON}`;
 
 /**

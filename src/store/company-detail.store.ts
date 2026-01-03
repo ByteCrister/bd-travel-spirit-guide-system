@@ -166,8 +166,8 @@ const defaultTourParams = {
   filters: undefined,
 };
 
-const tourDetailLoadingKey = (id: string) => `tourDetail:${id}`;
-const tourDetailErrorKey = (id: string) => `tourDetailError:${id}`;
+export const tourDetailLoadingKey = (id: string) => `tourDetail:${id}`;
+export const tourDetailErrorKey = (id: string) => `tourDetailError:${id}`;
 
 const tourListLoadingKey = (
   tourId: string,
@@ -558,7 +558,7 @@ export const useCompanyDashboardStore = create<CompanyDashboardState>()(
             error: { ...s.error, [errorKey]: undefined },
           }));
 
-          const url = `${URL_AFTER_API}/tours/${tourId}`;
+          const url = `${URL_AFTER_API}/${tourId}`;
           const reqKey = makeRequestKey("GET", url);
 
           if (!force && inFlightRequests.has(reqKey))
