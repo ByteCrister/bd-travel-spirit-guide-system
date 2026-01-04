@@ -15,12 +15,12 @@ import {
     AddDepartureDTO,
     UpdateDepartureDTO,
     UpdateDepartureSeatsDTO,
-    RequestReapprovalDTO,
+    // RequestReapprovalDTO,
     TourDetailDTO,
 } from "@/types/tour.types";
 import { useCompanyDashboardStore } from "@/store/company-detail.store";
 import { showToast } from "@/components/global/showToast";
-import { TourStatus } from "@/constants/tour.const";
+import { TOUR_STATUS, TourStatus } from "@/constants/tour.const";
 
 const BASE_URL = "/mock/operations/tours";
 
@@ -31,20 +31,21 @@ const updateStoreAfterSuccess = (tourId: string, tourData: TourDetailDTO) => {
 };
 
 // =============== CREATE TOUR ===============
-export const createTourApi = async (data: CreateTourDTO): Promise<TourDetailDTO> => {
+export const createTourApi = async (data: CreateTourDTO, status: TOUR_STATUS.SUBMITTED | TOUR_STATUS.DRAFT): Promise<TourDetailDTO> => {
     try {
-        const response = await api.post<{ data: TourDetailDTO }>(`${BASE_URL}`, data);
+        const response = await api.post<{ data: TourDetailDTO }>(
+            `${BASE_URL}?status=${status}`,
+            data
+        );
 
         // Update store
         const store = useCompanyDashboardStore.getState();
         store.updateTourLocal(response.data.data.id, response.data.data);
         store.invalidateCache?.('tours');
 
-        showToast.success("Tour created successfully!");
         return response.data.data;
     } catch (error: unknown) {
         const message = extractErrorMessage(error);
-        showToast.error(`Failed to create tour: ${message}`);
         throw new Error(message);
     }
 };
@@ -374,25 +375,25 @@ export const submitTourForApprovalApi = async (
     }
 };
 
-export const requestTourReapprovalApi = async (
-    tourId: string,
-    data?: RequestReapprovalDTO
-): Promise<TourDetailDTO> => {
-    try {
-        const response = await api.post<{ data: TourDetailDTO }>(
-            `${BASE_URL}/tours/${tourId}/request-reapproval`,
-            data
-        );
+// export const requestTourReapprovalApi = async (
+//     tourId: string,
+//     data?: RequestReapprovalDTO
+// ): Promise<TourDetailDTO> => {
+//     try {
+//         const response = await api.post<{ data: TourDetailDTO }>(
+//             `${BASE_URL}/tours/${tourId}/request-reapproval`,
+//             data
+//         );
 
-        updateStoreAfterSuccess(tourId, response.data.data);
-        showToast.success("Re-approval requested successfully!");
-        return response.data.data;
-    } catch (error: unknown) {
-        const message = extractErrorMessage(error);
-        showToast.error(`Failed to request re-approval: ${message}`);
-        throw new Error(message);
-    }
-};
+//         updateStoreAfterSuccess(tourId, response.data.data);
+//         showToast.success("Re-approval requested successfully!");
+//         return response.data.data;
+//     } catch (error: unknown) {
+//         const message = extractErrorMessage(error);
+//         showToast.error(`Failed to request re-approval: ${message}`);
+//         throw new Error(message);
+//     }
+// };
 
 export const publishTourApi = async (
     tourId: string

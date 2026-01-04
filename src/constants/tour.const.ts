@@ -71,7 +71,7 @@ export type TravelType = `${TRAVEL_TYPE}`;
  * Primary content categories for tour classification
  * Determines tour discovery in category-based browsing
  */
-export enum CONTENT_CATEGORY {
+export enum TOUR_CATEGORIES {
   /** Coastal and beach destination tours */
   BEACHES = "beaches",
   /** Historical sites, museums, and cultural experiences */
@@ -91,7 +91,29 @@ export enum CONTENT_CATEGORY {
   /** Cruise-based travel packages */
   CRUISE = "cruise",
 }
-export type ContentCategory = `${CONTENT_CATEGORY}`;
+export type TourCategories = `${TOUR_CATEGORIES}`;
+
+// export enum TOUR_CATEGORIES {
+//   /** Coastal and beach destination tours */
+//   BEACHES = "beaches",
+//   /** Historical sites, museums, and cultural experiences */
+//   CULTURE_HISTORY = "culture_history",
+//   /** Culinary tours, food tasting, and beverage experiences */
+//   FOOD_DRINK = "food_drink",
+//   /** Outdoor activities in natural environments */
+//   NATURE = "nature",
+//   /** Wildlife safaris and animal watching experiences */
+//   WILDLIFE = "wildlife",
+//   /** Urban exploration and metropolitan tours */
+//   CITY = "city",
+//   /** Spiritual and pilgrimage destinations */
+//   RELIGIOUS = "religious",
+//   /** UNESCO sites and heritage location tours */
+//   HERITAGE = "heritage",
+//   /** Cruise-based travel packages */
+//   CRUISE = "cruise",
+// }
+// export type TourCategories = `${TOUR_CATEGORIES}`;
 
 /**
  * Physical challenge level ratings for tours

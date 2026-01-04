@@ -2,7 +2,7 @@ import {
     ACCOMMODATION_TYPE,
     AGE_SUITABILITY,
     AUDIENCE_TYPE,
-    CONTENT_CATEGORY,
+    TOUR_CATEGORIES,
     CURRENCY,
     DIFFICULTY_LEVEL,
     MEALS_PROVIDED,
@@ -172,7 +172,7 @@ export const Step2ContentSchema = Yup.object().shape({
         .min(1, 'At least one season must be selected'),
 
     audience: Yup.array().of(Yup.string().oneOf(Object.values(AUDIENCE_TYPE))).optional(),
-    categories: Yup.array().of(Yup.string().oneOf(Object.values(CONTENT_CATEGORY))).optional(),
+    categories: Yup.array().of(Yup.string().oneOf(Object.values(TOUR_CATEGORIES))).optional(),
 
     translations: Yup.object()
         .shape({

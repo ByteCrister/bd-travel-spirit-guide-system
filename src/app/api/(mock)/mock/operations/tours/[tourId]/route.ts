@@ -7,7 +7,7 @@ import {
     TRAVEL_TYPE,
     DIFFICULTY_LEVEL,
     AUDIENCE_TYPE,
-    CONTENT_CATEGORY,
+    TOUR_CATEGORIES,
     DIVISION,
     DISTRICT,
     PAYMENT_METHOD,
@@ -96,7 +96,7 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
 
     // Generate random categories (1-3)
     const categories = faker.helpers.arrayElements(
-        Object.values(CONTENT_CATEGORY),
+        Object.values(TOUR_CATEGORIES),
         faker.number.int({ min: 1, max: 3 })
     );
 

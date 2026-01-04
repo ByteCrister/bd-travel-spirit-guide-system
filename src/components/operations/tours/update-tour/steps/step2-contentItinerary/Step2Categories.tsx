@@ -1,6 +1,6 @@
 "use client";
 
-import { CONTENT_CATEGORY, ContentCategory } from '@/constants/tour.const';
+import { TOUR_CATEGORIES, TourCategories } from '@/constants/tour.const';
 import { useFormikContext } from 'formik';
 import { UpdateTourContentItineraryDTO } from '@/types/tour.types';
 import { Label } from '@/components/ui/label';
@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number; color?: string; strokeWidth?: number }>;
 
-// Category configuration with icons matching CONTENT_CATEGORY enum
+// Category configuration with icons matching TOUR_CATEGORIES enum
 const CATEGORY_CONFIG: Record<string, {
     label: string;
     icon: IconType;
@@ -34,7 +34,7 @@ const CATEGORY_CONFIG: Record<string, {
     textColor: string;
     description: string;
 }> = {
-    [CONTENT_CATEGORY.BEACHES]: {
+    [TOUR_CATEGORIES.BEACHES]: {
         label: 'Beaches',
         icon: Palmtree,
         color: 'bg-cyan-500',
@@ -43,7 +43,7 @@ const CATEGORY_CONFIG: Record<string, {
         textColor: 'text-cyan-700 dark:text-cyan-400',
         description: 'Coastal destinations'
     },
-    [CONTENT_CATEGORY.CULTURE_HISTORY]: {
+    [TOUR_CATEGORIES.CULTURE_HISTORY]: {
         label: 'Culture & History',
         icon: Landmark,
         color: 'bg-amber-500',
@@ -52,7 +52,7 @@ const CATEGORY_CONFIG: Record<string, {
         textColor: 'text-amber-700 dark:text-amber-400',
         description: 'Historical sites & museums'
     },
-    [CONTENT_CATEGORY.FOOD_DRINK]: {
+    [TOUR_CATEGORIES.FOOD_DRINK]: {
         label: 'Food & Drink',
         icon: UtensilsCrossed,
         color: 'bg-orange-500',
@@ -61,7 +61,7 @@ const CATEGORY_CONFIG: Record<string, {
         textColor: 'text-orange-700 dark:text-orange-400',
         description: 'Culinary experiences'
     },
-    [CONTENT_CATEGORY.NATURE]: {
+    [TOUR_CATEGORIES.NATURE]: {
         label: 'Nature',
         icon: Trees,
         color: 'bg-green-500',
@@ -70,7 +70,7 @@ const CATEGORY_CONFIG: Record<string, {
         textColor: 'text-green-700 dark:text-green-400',
         description: 'Outdoor activities'
     },
-    [CONTENT_CATEGORY.WILDLIFE]: {
+    [TOUR_CATEGORIES.WILDLIFE]: {
         label: 'Wildlife',
         icon: Squirrel,
         color: 'bg-emerald-500',
@@ -79,7 +79,7 @@ const CATEGORY_CONFIG: Record<string, {
         textColor: 'text-emerald-700 dark:text-emerald-400',
         description: 'Safari & animal watching'
     },
-    [CONTENT_CATEGORY.CITY]: {
+    [TOUR_CATEGORIES.CITY]: {
         label: 'City',
         icon: Building2,
         color: 'bg-slate-500',
@@ -88,7 +88,7 @@ const CATEGORY_CONFIG: Record<string, {
         textColor: 'text-slate-700 dark:text-slate-400',
         description: 'Urban exploration'
     },
-    [CONTENT_CATEGORY.RELIGIOUS]: {
+    [TOUR_CATEGORIES.RELIGIOUS]: {
         label: 'Religious',
         icon: Church,
         color: 'bg-purple-500',
@@ -97,7 +97,7 @@ const CATEGORY_CONFIG: Record<string, {
         textColor: 'text-purple-700 dark:text-purple-400',
         description: 'Spiritual destinations'
     },
-    [CONTENT_CATEGORY.HERITAGE]: {
+    [TOUR_CATEGORIES.HERITAGE]: {
         label: 'Heritage',
         icon: Castle,
         color: 'bg-rose-500',
@@ -106,7 +106,7 @@ const CATEGORY_CONFIG: Record<string, {
         textColor: 'text-rose-700 dark:text-rose-400',
         description: 'UNESCO & heritage sites'
     },
-    [CONTENT_CATEGORY.CRUISE]: {
+    [TOUR_CATEGORIES.CRUISE]: {
         label: 'Cruise',
         icon: Ship,
         color: 'bg-blue-500',
@@ -120,7 +120,7 @@ const CATEGORY_CONFIG: Record<string, {
 const Step2Categories = () => {
     const { values, setFieldValue, touched, errors } = useFormikContext<UpdateTourContentItineraryDTO>();
 
-    const toggleCategory = (category: ContentCategory) => {
+    const toggleCategory = (category: TourCategories) => {
         const currentCategories = values.categories || [];
 
         if (currentCategories.includes(category)) {
@@ -136,7 +136,7 @@ const Step2Categories = () => {
 
     const selectedCategories = values.categories || [];
     const hasError = touched.categories && errors.categories;
-    const categoryOptions = Object.values(CONTENT_CATEGORY);
+    const categoryOptions = Object.values(TOUR_CATEGORIES);
 
     return (
         <Card className={cn(

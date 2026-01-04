@@ -5,7 +5,7 @@ import {
     TravelType,
     DifficultyLevel,
     AudienceType,
-    ContentCategory,
+    TourCategories,
     TourStatus,
     ModerationStatus,
     AgeSuitability,
@@ -210,7 +210,7 @@ export interface TourDetailDTO {
     difficulty: DifficultyLevel;
     bestSeason: Season[];
     audience?: AudienceType[];
-    categories?: ContentCategory[];
+    categories?: TourCategories[];
     translations?: TranslationBlockDTO;
 
     // =============== LOGISTICS ===============
@@ -365,7 +365,7 @@ export interface TourFilterOptions {
     tourType?: TravelType[];
     difficulty?: DifficultyLevel[];
     audience?: AudienceType[];
-    categories?: ContentCategory[];
+    categories?: TourCategories[];
     minPrice?: number;
     maxPrice?: number;
     currency?: Currency;
@@ -470,7 +470,7 @@ export interface CreateTourDTO {
     difficulty: DifficultyLevel;//
     bestSeason: Season[];//
     audience?: AudienceType[];//
-    categories?: ContentCategory[];//
+    categories?: TourCategories[];//
     translations?: TranslationBlockDTO;
 
     // =============== LOGISTICS ===============
@@ -575,7 +575,7 @@ export interface UpdateTourContentItineraryDTO {
     difficulty?: DifficultyLevel;
     bestSeason?: Season[];
     audience?: AudienceType[];
-    categories?: ContentCategory[];
+    categories?: TourCategories[];
     translations?: TranslationBlockDTO;
 }
 

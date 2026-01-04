@@ -1,7 +1,7 @@
 // models/tour.model.ts
 import {
   AUDIENCE_TYPE,
-  CONTENT_CATEGORY,
+  TOUR_CATEGORIES,
   TOUR_STATUS,
   DIFFICULTY_LEVEL,
   SEASON,
@@ -9,7 +9,7 @@ import {
   PAYMENT_METHOD,
   TourStatus,
   AudienceType,
-  ContentCategory,
+  TourCategories,
   Season,
   TransportMode,
   PaymentMethod,
@@ -32,6 +32,7 @@ import {
   ACCOMMODATION_TYPE,
   Division,
   District,
+  AccommodationType,
 } from "@/constants/tour.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import { HydratedDocument, Query } from "mongoose";
@@ -191,7 +192,7 @@ export interface ITour extends Document {
   tourType: TravelType;
   division: Division;
   district: District;
-  accommodationType?: ACCOMMODATION_TYPE[];
+  accommodationType?: AccommodationType[];
   guideIncluded: boolean;
   transportIncluded: boolean;
 
@@ -222,7 +223,7 @@ export interface ITour extends Document {
   difficulty: DifficultyLevel;
   bestSeason: Season[];
   audience?: AudienceType[];
-  categories?: ContentCategory[];
+  categories?: TourCategories[];
   translations?: IAddressTranslationBlock;
 
   // =============== LOGISTICS ===============
@@ -480,7 +481,7 @@ const TourSchema = new Schema<ITour>(
     difficulty: { type: String, enum: Object.values(DIFFICULTY_LEVEL), required: true },
     bestSeason: [{ type: String, enum: Object.values(SEASON), required: true }],
     audience: [{ type: String, enum: Object.values(AUDIENCE_TYPE) }],
-    categories: [{ type: String, enum: Object.values(CONTENT_CATEGORY) }],
+    categories: [{ type: String, enum: Object.values(TOUR_CATEGORIES) }],
 
     // =============== TRANSLATIONS ===============
     translations: {

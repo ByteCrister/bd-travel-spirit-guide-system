@@ -33,6 +33,9 @@ import ReviewStep from './ReviewStep';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/global/Breadcrumbs';
 import { Loader2, SaveAll, Send } from 'lucide-react';
+import { GuideTestData } from '@/data/tour-1';
+import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
+import { createTourApi } from '@/utils/api/tour.api';
 
 const items = [
     { label: "Home", href: "/" },
@@ -255,7 +258,8 @@ const steps = [
 //     },
 //     terms: '',
 // };
-const initialValues: CreateTourDTO = defaultTestData
+// const initialValues: CreateTourDTO = defaultTestData
+const initialValues: CreateTourDTO = GuideTestData
 
 export default function AddTourPage() {
     const [activeStep, setActiveStep] = useState(0)
@@ -303,7 +307,7 @@ export default function AddTourPage() {
                     ...dep,
                     date: new Date(dep.date).toISOString(),
                 })),
-                status: isDraft ? 'draft' : 'published',
+                status: isDraft ? TOUR_STATUS.DRAFT : TOUR_STATUS.SUBMITTED,
                 operatingWindows: values.operatingWindows?.map(win => ({
                     ...win,
                     startDate: new Date(win.startDate).toISOString(),
@@ -316,27 +320,14 @@ export default function AddTourPage() {
                 })),
             };
 
-            const response = await fetch('/api/tours', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(processedValues),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to create tour');
-            }
-
-            const result = await response.json();
+            const result = await createTourApi(processedValues, isDraft ? TOUR_STATUS.DRAFT : TOUR_STATUS.SUBMITTED)
 
             showToast.success('Tour created successfully!');
             router.push(`/operations/tours/${result.id}`);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Error creating tour:', error);
             setSubmitError(error instanceof Error ? error.message : 'Failed to create tour');
-            showToast.error('Failed to create tour');
+            showToast.error('Failed to create tour', extractErrorMessage(error));
         } finally {
             setIsSubmitting(false);
             actions.setSubmitting(false);

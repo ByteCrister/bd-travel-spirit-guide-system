@@ -20,7 +20,7 @@ import {
     DIVISION,
     DISTRICT,
     AUDIENCE_TYPE,
-    CONTENT_CATEGORY,
+    TOUR_CATEGORIES,
     MODERATION_STATUS,
     CURRENCY,
     Division,
@@ -28,7 +28,7 @@ import {
     TravelType,
     DifficultyLevel,
     AudienceType,
-    ContentCategory,
+    TourCategories,
     Currency,
     TourStatus,
     ModerationStatus,
@@ -54,7 +54,7 @@ export const Filters: React.FC = () => {
     const [tourType, setTourType] = useState<TravelType[]>(safeGetArray(initialFilters?.tourType));
     const [difficulty, setDifficulty] = useState<DifficultyLevel[]>(safeGetArray(initialFilters?.difficulty));
     const [audience, setAudience] = useState<AudienceType[]>(safeGetArray(initialFilters?.audience));
-    const [categories, setCategories] = useState<ContentCategory[]>(safeGetArray(initialFilters?.categories));
+    const [categories, setCategories] = useState<TourCategories[]>(safeGetArray(initialFilters?.categories));
     const [minPrice, setMinPrice] = useState<string>("");
     const [maxPrice, setMaxPrice] = useState<string>("");
     const [currency, setCurrency] = useState<Currency | "">(initialFilters?.currency || "");
@@ -202,7 +202,7 @@ export const Filters: React.FC = () => {
         label: value,
     }));
 
-    const categoryOptions: MultiSelectOption<ContentCategory>[] = Object.values(CONTENT_CATEGORY).map(value => ({
+    const categoryOptions: MultiSelectOption<TourCategories>[] = Object.values(TOUR_CATEGORIES).map(value => ({
         value,
         label: value,
     }));

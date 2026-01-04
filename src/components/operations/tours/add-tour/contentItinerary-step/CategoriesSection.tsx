@@ -12,7 +12,7 @@ import Grid from "@mui/material/Grid";
 import { motion } from "framer-motion";
 import { CreateTourDTO } from "@/types/tour.types";
 import {
-    CONTENT_CATEGORY,
+    TOUR_CATEGORIES,
 } from "@/constants/tour.const";
 import {
     Tag
@@ -67,7 +67,7 @@ export default function CategoriesSection() {
                 }}
             >
                 <FormGroup row sx={{ gap: 1 }}>
-                    {Object.values(CONTENT_CATEGORY).map((category) => (
+                    {Object.values(TOUR_CATEGORIES).map((category) => (
                         <Chip
                             key={category}
                             label={category.replace("_", " ")}
