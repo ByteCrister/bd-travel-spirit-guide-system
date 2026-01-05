@@ -13,7 +13,7 @@ import {
   District,
   AccommodationType,
 } from '@/constants/tour.const';
-import { Step1BangladeshSchema } from '@/utils/validators/add-tour.validator';
+import { Step1BangladeshSchema } from '@/utils/validators/tour/add-tour.validator';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import { ComboBox } from '@/components/ui/combobox';
 import { getDistrictsByDivision } from '@/utils/helpers/conversions.tour';

@@ -16,7 +16,7 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UpdateTourBasicInfoDTO } from '@/types/tour.types';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
-import { Step0BasicInfoSchema } from '@/utils/validators/add-tour.validator';
+import { Step0BasicInfoSchema } from '@/utils/validators/tour/add-tour.validator';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { FileText, Tag, Search, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { ValidationError } from 'yup';

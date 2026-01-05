@@ -30,7 +30,6 @@ import {
     Target,
     BarChart,
     BookOpen,
-    Camera,
     Globe2,
     Languages,
     Accessibility as AccessibilityIcon,
@@ -44,7 +43,6 @@ import {
     ChevronRight,
     ShieldCheck,
     MapPinned,
-    Image,
     Thermometer,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -650,8 +648,6 @@ export default function ReviewStep() {
         const requiredFields = [
             'title',
             'summary',
-            'heroImage',
-            'gallery',
             'tourType',
             'division',
             'district',
@@ -703,25 +699,6 @@ export default function ReviewStep() {
                     status: values.summary ? "success" : "error",
                     required: true,
                     tooltip: "Required: 50-500 characters"
-                },
-                {
-                    label: "Hero Image",
-                    value: values.heroImage ? "Uploaded" : "Not set",
-                    icon: Camera,
-                    type: 'text',
-                    status: values.heroImage ? "success" : "error",
-                    required: true,
-                    tooltip: "Required: Main tour image"
-                },
-                {
-                    label: "Gallery Images",
-                    value: values.gallery ? `${values.gallery.length} images` : "No images",
-                    icon: Image,
-                    type: 'count',
-                    count: values.gallery?.length,
-                    status: values.gallery?.length ? "success" : "error",
-                    required: true,
-                    tooltip: "Required: At least one gallery image"
                 },
                 {
                     label: "SEO Settings",

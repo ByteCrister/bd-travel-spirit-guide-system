@@ -2,15 +2,13 @@
 import { NextRequest } from "next/server";
 import { Types } from "mongoose";
 import TourModel, { IDestinationBlock, ITour } from "@/models/tours/tour.model";
-import { uploadAssets } from "@/lib/cloudinary/upload.cloudinary";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import { TOUR_STATUS, MODERATION_STATUS } from "@/constants/tour.const";
 import ConnectDB from "@/config/db";
-import { validationSchemas } from "@/utils/validators/add-tour.validator";
+import { validationSchemas } from "@/utils/validators/tour/add-tour.validator";
 import { combineSchemas } from "@/types/validator.yup";
 import { ValidationError } from "yup";
-import { ASSET_TYPE } from "@/constants/asset.const";
 import { CreateTourDTO } from "@/types/tour.types";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import EmployeeModel from "@/models/employees/employees.model";
@@ -18,10 +16,8 @@ import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { slugify } from "@/lib/helpers/slugify";
 
 // 🔹 Helper function to map destinations & attractions
-function mapDestinationsWithImages(
+function mapDestinations(
     destinations: CreateTourDTO["destinations"],
-    uploadedAssetIds: Types.ObjectId[],
-    assetIndexRef: { current: number }
 ): IDestinationBlock[] {
     return destinations?.map((dest) => {
         const mappedDest: IDestinationBlock = {
@@ -31,9 +27,9 @@ function mapDestinationsWithImages(
             activities: dest.activities?.map(act => ({ ...act })) || [],
             attractions: dest.attractions?.map((attr) => ({
                 ...attr,
-                images: attr.imageIds?.map(() => uploadedAssetIds[assetIndexRef.current++]) || [],
+                images: [],
             })) || [],
-            images: dest.imageIds?.map(() => uploadedAssetIds[assetIndexRef.current++]) || [],
+            images: [],
         };
         return mappedDest;
     }) || [];
@@ -42,11 +38,6 @@ function mapDestinationsWithImages(
 export const POST = withErrorHandler(async (request: NextRequest) => {
     // 1️⃣ Parse request body
     const body = (await request.json()) as CreateTourDTO;
-    const statusParam = request.nextUrl.searchParams.get("status");
-
-    if (statusParam !== (TOUR_STATUS.DRAFT || TOUR_STATUS.SUBMITTED)) {
-        throw new ApiError("Invalid status", 400);
-    }
 
     // 2️⃣ Validate request body
     const fullValidationSchema = combineSchemas(validationSchemas);
@@ -77,24 +68,9 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
 
     // 6️⃣ Upload images & create tour in transaction
     const createdTour = await withTransaction<ITour>(async session => {
-        // Collect all images
-        const imagesToUpload: { base64: string; name?: string; assetType?: string }[] = [];
-
-        if (body.heroImage) imagesToUpload.push({ base64: body.heroImage, name: "hero-image", assetType: ASSET_TYPE.IMAGE });
-        body.gallery?.forEach((b64, i) => imagesToUpload.push({ base64: b64, name: `gallery-${i + 1}`, assetType: ASSET_TYPE.IMAGE }));
-        body.destinations?.forEach((dest, destIndex) => {
-            dest.imageIds?.forEach((b64, idx) => imagesToUpload.push({ base64: b64, name: `destination-${destIndex + 1}-image-${idx + 1}`, assetType: ASSET_TYPE.IMAGE }));
-            dest.attractions?.forEach((attr, attrIndex) => {
-                attr.imageIds?.forEach((b64, idx) => imagesToUpload.push({ base64: b64, name: `destination-${destIndex + 1}-attraction-${attrIndex + 1}-image-${idx + 1}`, assetType: ASSET_TYPE.IMAGE }));
-            });
-        });
-
-        // Upload all images
-        const uploadedAssetIds = await uploadAssets(imagesToUpload, session);
-        const assetIndexRef = { current: 0 };
 
         // Map destinations
-        const mappedDestinations = mapDestinationsWithImages(body.destinations, uploadedAssetIds, assetIndexRef);
+        const mappedDestinations = mapDestinations(body.destinations);
 
         // Prepare tour data
         const tourData: Partial<ITour> = {
@@ -103,10 +79,10 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
             title: body.title,
             slug: slugify(body.title),
             summary: body.summary,
-            heroImage: body.heroImage ? uploadedAssetIds[assetIndexRef.current++] : undefined,
-            gallery: body.gallery?.map(() => uploadedAssetIds[assetIndexRef.current++]),
+            heroImage: undefined,
+            gallery: [],
             seo: body.seo,
-            status: body.status || TOUR_STATUS.DRAFT,
+            status: TOUR_STATUS.DRAFT,
             tourType: body.tourType,
             division: body.division,
             district: body.district,

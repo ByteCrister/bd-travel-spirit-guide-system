@@ -847,7 +847,6 @@ TourSchema.pre(/^find/, function (
 
 TourSchema.index({ status: 1, publishedAt: -1 });
 TourSchema.index({ moderationStatus: 1 });
-TourSchema.index({ slug: 1 });
 TourSchema.index({ "destinations.city": 1 });
 TourSchema.index({ categories: 1 });
 TourSchema.index({ audience: 1 });

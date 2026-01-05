@@ -28,7 +28,7 @@ import { Separator } from '@/components/ui/separator';
 import {
   UpdateTourContentItineraryDTO,
 } from '@/types/tour.types';
-import { Step2ContentSchema } from '@/utils/validators/add-tour.validator';
+import { Step2ContentSchema } from '@/utils/validators/tour/add-tour.validator';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import Step2Destinations from './step2-contentItinerary/Step2Destinations';
 import Step2Itinerary from './step2-contentItinerary/Step2Itinerary';

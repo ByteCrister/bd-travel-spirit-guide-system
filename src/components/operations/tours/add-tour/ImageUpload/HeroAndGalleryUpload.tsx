@@ -23,17 +23,12 @@ interface HeroAndGalleryUploadProps {
   galleryError?: string;
 }
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
   "image/png",
-  "image/gif",
   "image/webp",
-  "image/bmp",
-  "image/svg+xml",
-  "image/tiff",
-  "image/avif",
 ];
 
 export default function HeroAndGalleryUpload({ heroImageError, galleryError }: HeroAndGalleryUploadProps) {
@@ -48,22 +43,30 @@ export default function HeroAndGalleryUpload({ heroImageError, galleryError }: H
     fieldName: "heroImage" | "gallery",
     isMultiple = false
   ) => {
-    const fileList = Array.from(files);
+    const fileArray = Array.from(files);
 
-    // Gallery max images check
-    if (fieldName === "gallery" && values.gallery && values.gallery.length + fileList.length > 10) {
+    // HERO IMAGE: allow only 1
+    if (fieldName === "heroImage" && fileArray.length > 1) {
+      showToast.warning("Only one hero image is allowed");
+    }
+
+    // GALLERY: max 10 images
+    if (
+      fieldName === "gallery" &&
+      (values.gallery?.length || 0) + fileArray.length > 10
+    ) {
       showToast.warning("Maximum 10 images allowed in gallery");
       return;
     }
 
-    // Validate file types and sizes
-    const validFiles = fileList.filter(file => {
+    // Validate files
+    const validFiles = fileArray.filter((file) => {
       if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        showToast.warning(`File ${file.name} is not a supported image type`);
+        showToast.warning(`Unsupported image type: ${file.name}`);
         return false;
       }
       if (file.size > MAX_FILE_SIZE) {
-        showToast.warning(`File ${file.name} exceeds 2MB limit`);
+        showToast.warning(`File too large (max 5MB): ${file.name}`);
         return false;
       }
       return true;
@@ -75,36 +78,55 @@ export default function HeroAndGalleryUpload({ heroImageError, galleryError }: H
 
     try {
       const base64Images = await Promise.all(
-        validFiles.map(file =>
+        validFiles.map((file) =>
           fileToBase64(file, {
             compressImages: true,
             maxWidth: 1920,
             quality: 0.8,
             maxFileBytes: MAX_FILE_SIZE,
-            allowedExtensions: ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "tiff", "avif"],
+            allowedExtensions: [
+              "jpg",
+              "jpeg",
+              "png",
+              "webp",
+            ],
           })
         )
       );
 
-      if (fieldName === "heroImage" && base64Images[0]) {
-        setFieldValue("heroImage", base64Images[0]);
-        setFieldTouched("heroImage", true);
-      } else if (fieldName === "gallery") {
-        const updatedGallery = [...(values.gallery || []), ...base64Images];
+      /* ---------------- HERO IMAGE ---------------- */
+      if (fieldName === "heroImage") {
+        const heroImage = base64Images[0]; // always single
+        if (heroImage) {
+          setFieldValue("heroImage", heroImage);
+          setFieldTouched("heroImage", true);
+        }
+      }
+
+      /* ---------------- GALLERY ---------------- */
+      if (fieldName === "gallery" && isMultiple) {
+        const updatedGallery = [
+          ...(values.gallery || []),
+          ...base64Images,
+        ].slice(0, 10); // hard safety cap
+
         setFieldValue("gallery", updatedGallery);
         setFieldTouched("gallery", true);
       }
 
-      showToast.success(`Successfully uploaded ${validFiles.length} image(s)`);
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      showToast.error("Failed to upload images. Please try again.");
+      showToast.success(
+        `Uploaded ${base64Images.length} image${base64Images.length > 1 ? "s" : ""}`
+      );
+    } catch (err) {
+      console.error("Image upload error:", err);
+      showToast.error("Image upload failed");
     } finally {
       setUploading(false);
       if (heroInputRef.current) heroInputRef.current.value = "";
       if (galleryInputRef.current) galleryInputRef.current.value = "";
     }
   };
+
 
   const removeGalleryImage = (index: number) => {
     const updatedGallery = [...(values.gallery || [])];
@@ -130,7 +152,7 @@ export default function HeroAndGalleryUpload({ heroImageError, galleryError }: H
         Images
       </Typography>
       <Typography variant="body2" color="text.secondary" paragraph>
-        Upload a hero image and gallery images (max 2MB each, up to 10 images in gallery)
+        Upload a hero image and gallery images (max 5MB each, up to 10 images in gallery)
       </Typography>
 
       <Grid container spacing={3}>

@@ -6,10 +6,6 @@ import {
     Grid,
     Box,
     Typography,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     IconButton,
     Paper,
     Button,
@@ -23,7 +19,6 @@ import {
     FormGroup,
     FormControlLabel,
     Checkbox,
-    Divider,
     Alert,
     FormHelperText,
 } from "@mui/material";
@@ -53,10 +48,6 @@ export default function PoliciesStep() {
 
     const isFieldTouched = (fieldPath: string): boolean => {
         return getIn(touched, fieldPath) as boolean;
-    };
-
-    const handleCheckboxChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFieldValue(field, event.target.checked);
     };
 
     // Animation variants

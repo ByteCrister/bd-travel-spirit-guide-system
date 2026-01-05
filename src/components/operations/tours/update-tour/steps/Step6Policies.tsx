@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UpdateTourPoliciesDTO, CancellationRuleDTO } from '@/types/tour.types';
 import { PAYMENT_METHOD, PaymentMethod } from '@/constants/tour.const';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
-import { Step6PolicySchema } from '@/utils/validators/add-tour.validator';
+import { Step6PolicySchema } from '@/utils/validators/tour/add-tour.validator';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck,

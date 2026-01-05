@@ -20,9 +20,11 @@ import {
 } from "@/types/tour.types";
 import { useCompanyDashboardStore } from "@/store/company-detail.store";
 import { showToast } from "@/components/global/showToast";
-import { TOUR_STATUS, TourStatus } from "@/constants/tour.const";
+import { TourStatus } from "@/constants/tour.const";
+import { ApiResponse } from "@/types/api.types";
 
-const BASE_URL = "/mock/operations/tours";
+// const BASE_URL = "/mock/operations/tours";
+const BASE_URL = "/operations/tours/v1";
 
 // Helper function to update store after successful API call
 const updateStoreAfterSuccess = (tourId: string, tourData: TourDetailDTO) => {
@@ -31,19 +33,23 @@ const updateStoreAfterSuccess = (tourId: string, tourData: TourDetailDTO) => {
 };
 
 // =============== CREATE TOUR ===============
-export const createTourApi = async (data: CreateTourDTO, status: TOUR_STATUS.SUBMITTED | TOUR_STATUS.DRAFT): Promise<TourDetailDTO> => {
+export const createTourApi = async (data: CreateTourDTO): Promise<TourDetailDTO> => {
     try {
-        const response = await api.post<{ data: TourDetailDTO }>(
-            `${BASE_URL}?status=${status}`,
+        const res = await api.post<ApiResponse<TourDetailDTO>>(
+            `${BASE_URL}`,
             data
         );
 
+        if (!res.data || !res.data.data) {
+            throw new Error("Invalid response body")
+        }
+
         // Update store
         const store = useCompanyDashboardStore.getState();
-        store.updateTourLocal(response.data.data.id, response.data.data);
+        store.updateTourLocal(res.data.data.id, res.data.data);
         store.invalidateCache?.('tours');
 
-        return response.data.data;
+        return res.data.data;
     } catch (error: unknown) {
         const message = extractErrorMessage(error);
         throw new Error(message);

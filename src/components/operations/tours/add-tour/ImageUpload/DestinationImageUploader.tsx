@@ -8,6 +8,7 @@ import { X, Upload, Image as ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { IMAGE_EXTENSIONS } from "@/utils/helpers/file-conversion";
+import Image from "next/image";
 
 interface DestinationImageUploaderProps {
   imageIds: string[];
@@ -43,8 +44,8 @@ export default function DestinationImageUploader({
     for (const file of Array.from(files)) {
       try {
         // Check file extension
-        const extension = file.name.split(".").pop()?.toLowerCase() || "";
-        if (!allowedExtensions.includes(extension)) {
+        const extension = file.name.split(".").pop()?.toLowerCase() || "" ;
+        if (!allowedExtensions.includes(extension as "jpg" | "jpeg" | "png" | "gif" | "webp" | "bmp")) {
           toast.warning(`Skipped ${file.name}: Only ${allowedExtensions.join(", ")} files are allowed.`);
           continue;
         }
@@ -144,12 +145,16 @@ export default function DestinationImageUploader({
             <Card key={index} className="relative group">
               <CardContent className="p-2">
                 <div className="aspect-square relative overflow-hidden rounded-md bg-muted">
-                  <img
-                    src={image}
+                  <Image
+                    src={image || "/placeholder-image.svg"}
                     alt={`Destination image ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 200px"
                     onError={(e) => {
-                      e.currentTarget.src = "/placeholder-image.svg";
+                      // Next/Image workaround for runtime errors
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/placeholder-image.svg";
                     }}
                   />
                   <Button

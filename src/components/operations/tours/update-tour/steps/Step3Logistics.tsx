@@ -12,7 +12,7 @@ import {
 } from '@/types/tour.types';
 import { TRANSPORT_MODE, CURRENCY, TransportMode, Currency } from '@/constants/tour.const';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
-import { Step3LogisticsSchema } from '@/utils/validators/add-tour.validator';
+import { Step3LogisticsSchema } from '@/utils/validators/tour/add-tour.validator';
 import { getSortedDistricts, getDisplayName } from '@/utils/helpers/conversions.tour';
 
 // Shadcn Components

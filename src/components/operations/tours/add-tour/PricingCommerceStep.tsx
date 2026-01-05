@@ -434,6 +434,34 @@ export default function PricingCommerceStep() {
                                                                 />
                                                             </Grid>
 
+                                                            <Grid size={{ xs: 12, sm: 2 }}>
+                                                                <DatePicker
+                                                                    label="Valid Until"
+                                                                    value={
+                                                                        discount.validUntil
+                                                                            ? new Date(discount.validUntil)
+                                                                            : null
+                                                                    }
+                                                                    onChange={(date) =>
+                                                                        setFieldValue(
+                                                                            `discounts[${index}].validUntil`,
+                                                                            date
+                                                                        )
+                                                                    }
+                                                                    slotProps={{
+                                                                        textField: {
+                                                                            size: "small",
+                                                                            fullWidth: true,
+                                                                            sx: {
+                                                                                "& .MuiOutlinedInput-root": {
+                                                                                    borderRadius: 1.5,
+                                                                                },
+                                                                            },
+                                                                        },
+                                                                    }}
+                                                                />
+                                                            </Grid>
+
                                                             <Grid size={{ xs: 12, sm: 1 }}>
                                                                 <IconButton
                                                                     onClick={() => remove(index)}

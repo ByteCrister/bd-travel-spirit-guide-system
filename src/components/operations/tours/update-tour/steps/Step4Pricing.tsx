@@ -17,7 +17,7 @@ import {
 } from '@/types/tour.types';
 import { CURRENCY, TOUR_DISCOUNT, PAYMENT_METHOD, Currency, TourDiscount, PaymentMethod } from '@/constants/tour.const';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
-import { Step4PricingSchema } from '@/utils/validators/add-tour.validator';
+import { Step4PricingSchema } from '@/utils/validators/tour/add-tour.validator';
 
 // Shadcn Components
 import {

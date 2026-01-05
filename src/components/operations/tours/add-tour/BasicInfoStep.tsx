@@ -3,11 +3,11 @@
 import { Field, FieldArray, useFormikContext } from "formik";
 import { CreateTourDTO } from "@/types/tour.types";
 import { useState } from "react";
-import HeroAndGalleryUpload from "./ImageUpload/HeroAndGalleryUpload";
+// import HeroAndGalleryUpload from "./ImageUpload/HeroAndGalleryUpload";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiPlus, FiTag, FiSearch } from "react-icons/fi";
 import { HiOutlineTag } from "react-icons/hi";
-import { 
+import {
   Card,
   CardContent,
   CardDescription,
@@ -90,13 +90,13 @@ export default function BasicInfoStep() {
         </div>
 
         {/* Image Upload Section */}
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <Label className="text-sm font-medium">Tour Images</Label>
           <HeroAndGalleryUpload
             heroImageError={touched.heroImage ? (errors.heroImage as string) : undefined}
             galleryError={touched.gallery ? (errors.gallery as string) : undefined}
           />
-        </div>
+        </div> */}
 
         {/* SEO Section */}
         <Card className="border border-gray-200">

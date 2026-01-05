@@ -29,15 +29,16 @@ import {
     Trash2,
     ChevronDown,
     Map,
-    Image as ImageIcon,
+    // Image as ImageIcon,
     Activity,
     CheckCircle2,
     Sparkles,
     Building2,
 } from "lucide-react";
-import DestinationImageUploader from "../ImageUpload/DestinationImageUploader";
+// import DestinationImageUploader from "../ImageUpload/DestinationImageUploader";
 import { useState } from "react";
 import { MapPickerDialog } from "@/components/global/MapPickerDialog";
+// import UploadAttractionImage from "../ImageUpload/UploadAttractionImage";
 
 export default function DestinationsSection() {
     const { values, errors, touched, setFieldValue } =
@@ -517,6 +518,38 @@ export default function DestinationsSection() {
                                                                                                     />
                                                                                                 </Grid>
 
+                                                                                                {/* Attraction Images */}
+                                                                                                {/* <Grid size={12}>
+                                                                                                    <Paper
+                                                                                                        elevation={0}
+                                                                                                        sx={{
+                                                                                                            p: 2,
+                                                                                                            borderRadius: 2,
+                                                                                                            border: "1px solid",
+                                                                                                            borderColor: "divider",
+                                                                                                            background: "rgba(255,255,255,0.5)",
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
+                                                                                                            <ImageIcon className="w-4 h-4 text-primary" />
+                                                                                                            <Typography variant="subtitle2" fontWeight="600">
+                                                                                                                Attraction Images (Max 5 images)
+                                                                                                            </Typography>
+                                                                                                        </Box>
+                                                                                                        <UploadAttractionImage
+                                                                                                            imageIds={attr.imageIds || []}
+                                                                                                            onImagesChange={(newImages) =>
+                                                                                                                setFieldValue(
+                                                                                                                    `destinations[${index}].attractions[${attrIndex}].imageIds`,
+                                                                                                                    newImages
+                                                                                                                )
+                                                                                                            }
+                                                                                                            maxImages={5}
+                                                                                                            maxSizeMB={5}
+                                                                                                        />
+                                                                                                    </Paper>
+                                                                                                </Grid> */}
+
                                                                                                 {/* Attraction Coordinates */}
                                                                                                 <Grid size={6}>
                                                                                                     <TextField
@@ -844,8 +877,8 @@ export default function DestinationsSection() {
                                                         </Paper>
                                                     </Grid>
 
-                                                    {/* Images */}
-                                                    <Grid size={12}>
+                                                    {/*Destination Images */}
+                                                    {/* <Grid size={12}>
                                                         <Paper
                                                             elevation={0}
                                                             sx={{
@@ -871,7 +904,7 @@ export default function DestinationsSection() {
                                                                 maxSizeMB={5}
                                                             />
                                                         </Paper>
-                                                    </Grid>
+                                                    </Grid> */}
 
                                                     {/* Destination Coordinates */}
                                                     <Grid size={12}>

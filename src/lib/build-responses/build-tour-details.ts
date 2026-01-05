@@ -4,6 +4,9 @@ import TourModel, { IAttraction, IDestinationBlock, ITour } from "@/models/tours
 import { PopulatedAssetLean } from "@/types/populated-asset.types";
 import { TourDetailDTO } from "@/types/tour.types";
 import { ClientSession, Types } from "mongoose";
+import "@/models/assets/asset.model";
+import AssetModel from "@/models/assets/asset.model";
+import AssetFileModel from "@/models/assets/asset-file.model";
 
 type ObjectId = Types.ObjectId;
 
@@ -23,7 +26,7 @@ type TourLeanPopulated =
         | "destinations"
     > & {
         _id: ObjectId;
-        heroImage: PopulatedAssetLean;
+        heroImage: PopulatedAssetLean | null;
         gallery: PopulatedAssetLean[];
         destinations: IDestinationBlockLean[]
     };
@@ -44,25 +47,30 @@ export async function buildTourDetailDTO(
         .populate({
             path: "heroImage",
             select: "file deletedAt",
-            populate: { path: "file", select: "publicUrl" },
+            model: AssetModel,
+            populate: { path: "file", select: "publicUrl", model: AssetFileModel },
             ...(withDeleted ? {} : { match: { deletedAt: null } }),
+            options: { lean: true } // optional
         })
         .populate({
             path: "gallery",
             select: "file deletedAt",
-            populate: { path: "file", select: "publicUrl" },
+            model: AssetModel,
+            populate: { path: "file", select: "publicUrl", model: AssetFileModel },
             ...(withDeleted ? {} : { match: { deletedAt: null } }),
         })
         .populate({
             path: "destinations.images",
             select: "file deletedAt",
-            populate: { path: "file", select: "publicUrl" },
+            model: AssetModel,
+            populate: { path: "file", select: "publicUrl", model: AssetFileModel },
             ...(withDeleted ? {} : { match: { deletedAt: null } }),
         })
         .populate({
             path: "destinations.attractions.images",
             select: "file deletedAt",
-            populate: { path: "file", select: "publicUrl" },
+            model: AssetModel,
+            populate: { path: "file", select: "publicUrl", model: AssetFileModel },
             ...(withDeleted ? {} : { match: { deletedAt: null } }),
         })
         .lean()
@@ -85,7 +93,7 @@ export async function buildTourDetailDTO(
         slug: tour.slug,
         status: tour.status,
         summary: tour.summary,
-        heroImage: tour.heroImage?.file?.publicUrl.toString(),
+        heroImage: tour.heroImage?.file?.publicUrl.toString() ?? undefined,
         gallery: tour.gallery?.map((asset) => asset?.file?.publicUrl ?? "") || [],
         seo: tour.seo,
 
@@ -175,9 +183,9 @@ function transformDestinations(destinations: IDestinationBlockLean[] | undefined
         ...dest,
         attractions: (dest.attractions ?? []).map(att => ({
             ...att,
-            imageIds: att.images.map(attImgs => attImgs?.file?.publicUrl ?? "")??[]
+            imageIds: att.images.map(attImgs => attImgs?.file?.publicUrl ?? "") ?? []
         })),
-        imageIds: dest.images.map(desImgs => desImgs?.file?.publicUrl ?? "")??[]
+        imageIds: dest.images.map(desImgs => desImgs?.file?.publicUrl ?? "") ?? []
     }));
 }
 
