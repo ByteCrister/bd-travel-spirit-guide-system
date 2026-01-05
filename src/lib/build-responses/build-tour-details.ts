@@ -1,26 +1,19 @@
 // src/lib/build-responses/build-tour-details.ts
 import { TOUR_STATUS } from "@/constants/tour.const";
 import TourModel, { IAttraction, IDestinationBlock, ITour } from "@/models/tours/tour.model";
+import { PopulatedAssetLean } from "@/types/populated-asset.types";
 import { TourDetailDTO } from "@/types/tour.types";
 import { ClientSession, Types } from "mongoose";
 
 type ObjectId = Types.ObjectId;
 
-interface IAssetFileLean {
-    _id: ObjectId;
-    publicUrl: string;
-}
-
-interface IAssetLean {
-    file: IAssetFileLean
-}
 
 type IDestinationBlockLean =
     Omit<IDestinationBlock, "attractions" | "images"> & {
         attractions: (Omit<IAttraction, "images"> & {
-            images: IAssetLean[];
+            images: PopulatedAssetLean[];
         })[];
-        images: IAssetLean[];
+        images: PopulatedAssetLean[];
     };
 
 type TourLeanPopulated =
@@ -30,8 +23,8 @@ type TourLeanPopulated =
         | "destinations"
     > & {
         _id: ObjectId;
-        heroImage: IAssetLean;
-        gallery: IAssetLean[];
+        heroImage: PopulatedAssetLean;
+        gallery: PopulatedAssetLean[];
         destinations: IDestinationBlockLean[]
     };
 
@@ -92,8 +85,8 @@ export async function buildTourDetailDTO(
         slug: tour.slug,
         status: tour.status,
         summary: tour.summary,
-        heroImage: tour.heroImage?.file.publicUrl.toString(),
-        gallery: tour.gallery?.map((asset) => asset.file.publicUrl) || [],
+        heroImage: tour.heroImage?.file?.publicUrl.toString(),
+        gallery: tour.gallery?.map((asset) => asset?.file?.publicUrl ?? "") || [],
         seo: tour.seo,
 
         // =============== BANGLADESH-SPECIFIC FIELDS ===============
@@ -182,9 +175,9 @@ function transformDestinations(destinations: IDestinationBlockLean[] | undefined
         ...dest,
         attractions: (dest.attractions ?? []).map(att => ({
             ...att,
-            imageIds: att.images.map(attImgs => attImgs.file.publicUrl)
+            imageIds: att.images.map(attImgs => attImgs?.file?.publicUrl ?? "")??[]
         })),
-        imageIds: dest.images.map(desImgs => desImgs.file.publicUrl)
+        imageIds: dest.images.map(desImgs => desImgs?.file?.publicUrl ?? "")??[]
     }));
 }
 

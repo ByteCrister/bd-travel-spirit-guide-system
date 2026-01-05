@@ -6,6 +6,7 @@ import { AuditLog } from "@/types/current-user.types";
 import { ContactInfoDTO, DocumentDTO, EmployeeDetailDTO, PayrollRecordDTO, SalaryHistoryDTO, UserSummaryDTO } from "@/types/employee.types";
 import { UserRole } from "@/constants/user.const";
 import { ClientSession } from "mongoose";
+import { PopulatedAssetLean } from "@/types/populated-asset.types";
 
 
 type ObjectId = Types.ObjectId;
@@ -17,18 +18,9 @@ interface IUserLean {
     role: UserRole
 }
 
-interface IAssetFileLean {
-    _id: ObjectId;
-    publicUrl: string;
-}
-
-interface IAssetLean {
-    file: IAssetFileLean
-}
-
 interface IEmployeeDocumentLean {
     type: string;
-    asset: IAssetLean;
+    asset: PopulatedAssetLean;
     uploadedAt: Date;
 }
 
@@ -40,7 +32,7 @@ type EmployeeLeanPopulated =
     > & {
         _id: ObjectId;
         user: IUserLean;
-        avatar?: IAssetLean;
+        avatar?: PopulatedAssetLean;
         documents: IEmployeeDocumentLean[];
     };
 
@@ -92,7 +84,7 @@ export async function buildEmployeeDTO(
     }
 
     for (const doc of employee.documents || []) {
-        if (doc.asset?.file._id && doc.asset.file.publicUrl) {
+        if (doc.asset?.file?._id && doc.asset.file.publicUrl) {
             assetMap.set(doc.asset.file._id.toString(), doc.asset.file.publicUrl);
         }
     }
@@ -101,10 +93,10 @@ export async function buildEmployeeDTO(
     /* Documents DTO (skip missing asset) */
     /* ---------------------------------- */
     const documents: DocumentDTO[] = (employee.documents || [])
-        .filter((d) => d.asset?.file._id && assetMap.has(d.asset.file._id.toString()))
+        .filter((d) => d.asset?.file?._id && assetMap.has(d.asset.file._id.toString()))
         .map((doc) => ({
             type: doc.type,
-            url: assetMap.get(doc.asset.file._id.toString())!,
+            url: assetMap.get((doc.asset?.file?._id as Types.ObjectId).toString())!,
             uploadedAt: doc.uploadedAt.toISOString(),
         }));
 
@@ -171,7 +163,7 @@ export async function buildEmployeeDTO(
     /* ---------------------------------- */
     /* User summary                       */
     /* ---------------------------------- */
-    const avatarUrl = employee.avatar?.file._id
+    const avatarUrl = employee.avatar?.file?._id
         ? assetMap.get(employee.avatar.file._id.toString())
         : undefined;
 
