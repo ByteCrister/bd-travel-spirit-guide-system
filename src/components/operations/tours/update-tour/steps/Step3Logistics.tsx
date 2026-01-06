@@ -4,7 +4,6 @@ import { useFormik } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 import {
   UpdateTourLogisticsDTO,
@@ -57,17 +56,7 @@ import {
   Users,
   Loader2,
   Check,
-  X,
-  Navigation,
-  Building2,
-  Globe,
-  Route,
-  ShoppingBag,
-  Sparkles,
-  CheckCircle2,
-  XCircle,
-  Info,
-  AlertTriangle
+  X
 } from 'lucide-react';
 
 interface Step3LogisticsProps {

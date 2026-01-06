@@ -7,13 +7,10 @@ import {
     UpdateTourPricingDTO,
     UpdateTourComplianceDTO,
     UpdateTourPoliciesDTO,
-    UpdateTourHeroImageDTO,
-    UpdateTourGalleryDTO,
-    UpdateDestinationImgDTO,
 } from '@/types/tour.types';
 
 class TourUpdateService {
-    private baseUrl = '/api/tours';
+    private baseUrl = '/api/operations/tours/v1';
 
     // Modular update methods
     async updateBasicInfo(tourId: string, data: UpdateTourBasicInfoDTO) {
@@ -72,34 +69,6 @@ class TourUpdateService {
 
     async updatePolicies(tourId: string, data: UpdateTourPoliciesDTO) {
         const response = await fetch(`${this.baseUrl}/${tourId}/policies`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
-    }
-
-    // Image-specific updates
-    async updateHeroImage(tourId: string, data: UpdateTourHeroImageDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/hero-image`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
-    }
-
-    async updateGallery(tourId: string, data: UpdateTourGalleryDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/gallery`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
-    }
-
-    async updateDestinationImages(tourId: string, data: UpdateDestinationImgDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/destination-images`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),

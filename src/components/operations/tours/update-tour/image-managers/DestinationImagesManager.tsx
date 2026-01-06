@@ -25,6 +25,14 @@ import { showToast } from '@/components/global/showToast';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
 import { DestinationBlockDTO, TourDetailDTO } from '@/types/tour.types';
 
+const getDestinationUrl = (tourId: string) => {
+  return `/operations/tours/v1/${tourId}/destinations/images-bulk`
+}
+
+const getAttractionUrl = (tourId: string) => {
+  return `/operations/tours/v1/${tourId}/destinations/attractions/images-bulk`
+}
+
 type SelectedFile = { file: File; preview: string };
 
 type ImageDraft = {
@@ -143,7 +151,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
     mutationFn: async (desIdx: number) => {
       const draft = destDrafts[desIdx];
       const base64 = await Promise.all(draft.toAdd.map(f => fileToBase64(f.file, { compressImages: true, maxWidth: 1600, quality: 0.8, maxFileBytes: 5 * 1024 * 1024, allowedExtensions: IMAGE_EXTENSIONS })));
-      return api.patch(`/tours/${tourId}/destinations/images/bulk`, { destinationIndex: desIdx, deleteImageIds: [...draft.toDelete], newImages: base64 });
+      return api.patch(getDestinationUrl(tourId), { destinationIndex: desIdx, deleteImageIds: [...draft.toDelete], newImages: base64 });
     },
     onSuccess: (_, desIdx) => {
       const draft = destDrafts[desIdx];
@@ -166,7 +174,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
     mutationFn: async ({ desIdx, attrIdx }: { desIdx: number; attrIdx: number }) => {
       const draft = attrDrafts[desIdx][attrIdx];
       const base64 = await Promise.all(draft.toAdd.map(f => fileToBase64(f.file, { compressImages: true, maxWidth: 1600, quality: 0.8, maxFileBytes: 5 * 1024 * 1024, allowedExtensions: IMAGE_EXTENSIONS })));
-      return api.patch(`/tours/${tourId}/destinations/attractions/images/bulk`, { destinationIndex: desIdx, attractionIndex: attrIdx, deleteImageIds: [...draft.toDelete], newImages: base64 });
+      return api.patch(getAttractionUrl(tourId), { destinationIndex: desIdx, attractionIndex: attrIdx, deleteImageIds: [...draft.toDelete], newImages: base64 });
     },
     onSuccess: (_, { desIdx, attrIdx }) => {
       const draft = attrDrafts[desIdx][attrIdx];

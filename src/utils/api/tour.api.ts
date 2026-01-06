@@ -57,25 +57,6 @@ export const createTourApi = async (data: CreateTourDTO): Promise<TourDetailDTO>
 };
 
 // =============== IMAGE UPDATE FUNCTIONS ===============
-export const updateTourHeroImageApi = async (
-    tourId: string,
-    data: UpdateTourHeroImageDTO
-): Promise<TourDetailDTO> => {
-    try {
-        const response = await api.patch<{ data: TourDetailDTO }>(
-            `${BASE_URL}/tours/${tourId}/hero-image`,
-            data
-        );
-
-        updateStoreAfterSuccess(tourId, response.data.data);
-        showToast.success("Hero image updated successfully!");
-        return response.data.data;
-    } catch (error: unknown) {
-        const message = extractErrorMessage(error);
-        showToast.error(`Failed to update hero image: ${message}`);
-        throw new Error(message);
-    }
-};
 
 export const updateTourGalleryApi = async (
     tourId: string,
@@ -83,16 +64,14 @@ export const updateTourGalleryApi = async (
 ): Promise<TourDetailDTO> => {
     try {
         const response = await api.patch<{ data: TourDetailDTO }>(
-            `${BASE_URL}/tours/${tourId}/gallery`,
+            `${BASE_URL}/${tourId}/gallery`,
             data
         );
 
         updateStoreAfterSuccess(tourId, response.data.data);
-        showToast.success("Gallery updated successfully!");
         return response.data.data;
     } catch (error: unknown) {
         const message = extractErrorMessage(error);
-        showToast.error(`Failed to update gallery: ${message}`);
         throw new Error(message);
     }
 };

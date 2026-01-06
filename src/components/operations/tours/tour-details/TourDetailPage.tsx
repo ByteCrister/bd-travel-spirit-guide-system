@@ -2,12 +2,10 @@
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useCompanyDashboardStore } from "@/store/company-detail.store";
-import { TourDetailDTO } from "@/types/tour.types";
+import { tourDetailErrorKey, tourDetailLoadingKey, useCompanyDashboardStore } from "@/store/company-detail.store";
 import { AlertCircle, ArrowLeft, Edit, Shield, LayoutDashboard, MapPin, Calendar, Package, DollarSign, FileCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import TourBasicInfo from "./TourBasicInfo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BangladeshInfo from "./BangladeshInfo";
@@ -31,39 +29,25 @@ interface TourDetailPageProps {
 export default function TourDetailPage({ tourId }: TourDetailPageProps) {
 
     const router = useRouter();
-    const { fetchTourDetail, loading, error } = useCompanyDashboardStore()
-    const [isLoading, setIsLoading] = useState(true)
-    const [tour, setTour] = useState<TourDetailDTO | null>(null)
+    const { fetchTourDetail, tourDetails, loading, error } = useCompanyDashboardStore()
+    const tour = tourDetails[tourId]
+
 
     useEffect(() => {
-        const loadTour = async () => {
-            try {
-                setIsLoading(true)
-                const tourData = await fetchTourDetail(tourId)
-                setTour(tourData)
-            } catch (err) {
-                console.error('Failed to load tour:', err)
-            } finally {
-                setIsLoading(false)
-            }
-        }
-
-        loadTour()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        fetchTourDetail(tourId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tourId])
 
-    const loadingKey = `tourDetail:${tourId}`
-    const errorKey = `tourDetailError:${tourId}`
-    const isLoadingState = loading[loadingKey] || isLoading
-    const errorState = error[errorKey]
+    const loadingKey = tourDetailLoadingKey(tourId)
+    const errorKey = tourDetailErrorKey(tourId)
 
-    if (!isLoadingState) {
+    if (loading[loadingKey]) {
         return (
-          <TourDetailLoading />
+            <TourDetailLoading />
         )
     }
 
-    if (errorState || !tour) {
+    if (error[errorKey] || !tour) {
         return (
             <div className="container mx-auto p-6 max-w-7xl">
                 <motion.div
@@ -75,7 +59,7 @@ export default function TourDetailPage({ tourId }: TourDetailPageProps) {
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Error Loading Tour</AlertTitle>
                         <AlertDescription>
-                            {errorState || 'Tour not found'}
+                            {error[errorKey] || 'Tour not found'}
                         </AlertDescription>
                     </Alert>
                     <Button onClick={() => router.back()} className="mt-4">
@@ -97,9 +81,9 @@ export default function TourDetailPage({ tourId }: TourDetailPageProps) {
                 className="flex items-center justify-between mb-8"
             >
                 <div className="flex items-center gap-4">
-                    <Button 
-                        variant="outline" 
-                        size="icon" 
+                    <Button
+                        variant="outline"
+                        size="icon"
                         onClick={() => router.back()}
                         className="rounded-lg hover:bg-accent transition-colors"
                     >
@@ -113,7 +97,7 @@ export default function TourDetailPage({ tourId }: TourDetailPageProps) {
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button 
+                    <Button
                         variant="outline"
                         onClick={() => router.push(`/operations/tours/${tourId}/update-tour`)}
                         className="rounded-lg"

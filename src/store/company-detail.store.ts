@@ -22,7 +22,8 @@ import api from "@/utils/axios/axios";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import { TOUR_STATUS } from "@/constants/tour.const";
 
-const URL_AFTER_API = "/mock/operations/tours";
+// const URL_AFTER_API = "/mock/operations/tours";
+const URL_AFTER_API = "/operations/tours/v1";
 
 // --------------------
 // Types

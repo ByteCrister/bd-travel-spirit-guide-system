@@ -136,7 +136,7 @@ const generateTourListItem = (id: string): TourListItemDTO => {
         featured: faker.datatype.boolean(),
 
         publishedAt:
-            status === "published"
+            status === "submitted"
                 ? faker.date.past().toISOString()
                 : undefined,
 

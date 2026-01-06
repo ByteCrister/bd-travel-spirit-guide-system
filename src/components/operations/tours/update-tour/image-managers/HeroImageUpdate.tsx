@@ -19,6 +19,8 @@ import api from '@/utils/axios/axios';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
 import { TourDetailDTO } from '@/types/tour.types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ApiResponse } from '@/types/api.types';
+
 
 interface HeroImageUpdateProps {
   tourId: string;
@@ -26,10 +28,15 @@ interface HeroImageUpdateProps {
   updateData: (updates: Partial<TourDetailDTO>) => void;
 }
 
+const getApiUrl = (tourId: string) => {
+  return `/operations/tours/v1/${tourId}/hero-image`
+}
+
 export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }: HeroImageUpdateProps) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
 
   const [pendingImage, setPendingImage] = useState<{
     file: File;
@@ -43,12 +50,12 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (isRemoving) {
-        const { data } = await api.patch(`/tours/${tourId}/hero-image`, {
+        const { data } = await api.patch(getApiUrl(tourId), {
           heroImage: null,
         });
         return data;
       } else if (pendingImage?.base64) {
-        const { data } = await api.patch<{ data: string }>(`/tours/${tourId}/hero-image`, {
+        const { data } = await api.patch<ApiResponse<{ data: string }>>(getApiUrl(tourId), {
           heroImage: pendingImage.base64,
         });
         return data;
@@ -204,7 +211,7 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
         URL.revokeObjectURL(pendingImage.previewUrl);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const displayImage = pendingImage?.previewUrl || currentHeroImage;

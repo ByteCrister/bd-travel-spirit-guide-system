@@ -437,21 +437,22 @@ export type TourTableColumn =
  */
 export interface CreateTourDTO {
     // =============== IDENTITY & BASIC INFO ===============
-    title: string;//
-    summary: string;//
+    title: string;
+    summary: string;
     heroImage?: string; // Asset ID
     gallery?: string[]; // Asset IDs
     seo?: {
         metaTitle?: string;
         metaDescription?: string;
-    };//
+    };
+    tags?: string[];
 
     status?: TourStatus;
 
     // =============== BANGLADESH-SPECIFIC FIELDS ===============
-    tourType: TravelType;//
-    division: Division;//
-    district: District;//
+    tourType: TravelType;
+    division: Division;
+    district: District;
     accommodationType?: AccommodationType[];//
     guideIncluded?: boolean; // Default: true//
     transportIncluded?: boolean; // Default: true//
@@ -463,14 +464,14 @@ export interface CreateTourDTO {
     };//
 
     // =============== CONTENT & ITINERARY ===============
-    destinations?: DestinationBlockDTO[];//
-    itinerary?: ItineraryEntryDTO[];//
-    inclusions?: InclusionDTO[];//
-    exclusions?: ExclusionDTO[];//
-    difficulty: DifficultyLevel;//
-    bestSeason: Season[];//
-    audience?: AudienceType[];//
-    categories?: TourCategories[];//
+    destinations?: DestinationBlockDTO[];
+    itinerary?: ItineraryEntryDTO[];
+    inclusions?: InclusionDTO[];
+    exclusions?: ExclusionDTO[];
+    difficulty: DifficultyLevel;
+    bestSeason: Season[];
+    audience?: AudienceType[];
+    categories?: TourCategories[];
     translations?: TranslationBlockDTO;
 
     // =============== LOGISTICS ===============
@@ -478,29 +479,29 @@ export interface CreateTourDTO {
         address?: AddressDTO;
         coordinates?: GeoPointDTO;
     };//
-    transportModes?: TransportMode[];//
+    transportModes?: TransportMode[];
     pickupOptions?: {
         city?: string;
         price?: number;
         currency?: Currency;
-    }[];//
-    meetingPoint?: string;//
-    packingList?: PackingListItemDTO[];//
+    }[];
+    meetingPoint?: string;
+    packingList?: PackingListItemDTO[];
 
     // =============== PRICING & COMMERCE ===============
-    basePrice: PriceDTO;//
-    discounts?: DiscountDTO[];//
+    basePrice: PriceDTO;
+    discounts?: DiscountDTO[];
     duration?: {
         days: number;
         nights?: number;
-    };//
+    };
     operatingWindows?: OperatingWindowDTO[];
     departures?: Omit<DepartureDTO, 'id' | 'seatsBooked'>[]; // seatsBooked starts at 0 //
-    paymentMethods: PaymentMethod[];//
+    paymentMethods: PaymentMethod[];
 
     // =============== COMPLIANCE & ACCESSIBILITY ===============
-    licenseRequired?: boolean;//
-    ageSuitability: AgeSuitability;//
+    licenseRequired?: boolean;
+    ageSuitability: AgeSuitability;
     accessibility?: {
         wheelchair?: boolean;
         familyFriendly?: boolean;
@@ -509,12 +510,9 @@ export interface CreateTourDTO {
     };//
 
     // =============== POLICIES ===============
-    cancellationPolicy?: CancellationPolicyDTO;//
-    refundPolicy?: RefundPolicyDTO;//
-    terms?: string;//
-
-    // =============== TAGS & METADATA ===============
-    tags?: string[];//
+    cancellationPolicy?: CancellationPolicyDTO;
+    refundPolicy?: RefundPolicyDTO;
+    terms?: string;
 }
 
 // =============== MODULAR UPDATE PAYLOAD TYPES ===============
@@ -531,6 +529,25 @@ export interface UpdateTourHeroImageDTO {
  */
 export interface UpdateTourGalleryDTO {
     gallery?: string[]; // Asset IDs, replaces entire gallery
+}
+
+/**
+ * Update destination images
+ */
+export interface UpdateDestinationImgDTO {
+    destinationIndex: number;
+    deleteImageIds: string[];
+    newImages: string[];
+}
+
+/**
+ * Update destination-> attractions -> images 
+ */
+export interface UpdateDestinationAttrImgDTO {
+    destinationIndex: number;
+    attractionIndex: number;
+    deleteImageIds: string[];
+    newImages: string[];
 }
 
 /**
@@ -662,19 +679,6 @@ export interface UpdateDepartureDTO {
     seatsTotal?: number;
     meetingPoint?: string;
     meetingCoordinates?: GeoPointDTO;
-}
-
-export interface UpdateHeroImageDTO {
-    heroImage: string;
-}
-
-export interface UpdateGalleryImgDTO {
-    gallery: string[];
-}
-
-export interface UpdateDestinationImgDTO {
-    desIdx: number;
-    imageIds: string[];
 }
 
 // =============== UTILITY UPDATE TYPES ===============

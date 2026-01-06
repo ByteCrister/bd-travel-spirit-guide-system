@@ -1,5 +1,7 @@
 // next.config.ts
-const nextConfig = {
+import { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   reactStrictMode: false,
   images: {
     remotePatterns: [
@@ -8,13 +10,7 @@ const nextConfig = {
       { protocol: "https", hostname: "cdn.jsdelivr.net" },
       { protocol: "https", hostname: "res.cloudinary.com" },
     ],
-  },
-  api: {
-    bodyParser: {
-      sizeLimit: "50mb", // Increase the request body limit (default is 1mb)
-    },
-    externalResolver: true, // optional
-  },
+  }
 };
 
 export default nextConfig;

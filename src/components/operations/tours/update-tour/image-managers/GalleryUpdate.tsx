@@ -22,11 +22,16 @@ import { showToast } from '@/components/global/showToast';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
 import { TourDetailDTO } from '@/types/tour.types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ApiResponse } from '@/types/api.types';
 
 interface GalleryUpdateProps {
   tourId: string;
   currentGallery: string[];
   updateData: (updates: Partial<TourDetailDTO>) => void;
+}
+
+const getApiUrl = (tourId: string) => {
+  return `/operations/tours/v1/${tourId}/gallery`
 }
 
 export default function GalleryUpdate({ tourId, currentGallery, updateData }: GalleryUpdateProps) {
@@ -35,6 +40,7 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
   const [localGallery, setLocalGallery] = useState<string[]>(currentGallery);
   const [isGalleryModified, setIsGalleryModified] = useState(false);
 
+
   React.useEffect(() => {
     setLocalGallery(currentGallery);
     setIsGalleryModified(false);
@@ -42,13 +48,13 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
 
   const updateMutation = useMutation({
     mutationFn: async (galleryBase64: string[]) => {
-      const response = await api.patch<{ data: string[] }>(`/tours/${tourId}/gallery`, {
+      const response = await api.patch<ApiResponse<string[]>>(getApiUrl(tourId), {
         gallery: galleryBase64,
       });
       return response.data;
     },
     onSuccess: (data) => {
-      updateData({ gallery: data.data });
+      updateData({ gallery: data?.data });
       queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
       showToast.success('Gallery updated successfully');
       setIsGalleryModified(false);
@@ -77,7 +83,7 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
             compressImages: true,
             maxWidth: 1920,
             quality: 0.8,
-            maxFileBytes: 10 * 1024 * 1024,
+            maxFileBytes: 5 * 1024 * 1024,
           })
         )
       );
@@ -415,7 +421,7 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
             </p>
             <p className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-              Maximum file size: 10MB per image
+              Maximum file size: 5MB per image
             </p>
             <p className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>

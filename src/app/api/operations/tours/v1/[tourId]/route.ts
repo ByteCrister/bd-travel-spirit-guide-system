@@ -5,6 +5,7 @@ import { buildTourDetailDTO } from '@/lib/build-responses/build-tour-details';
 import ConnectDB from '@/config/db';
 import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import { withTransaction } from '@/lib/helpers/withTransaction';
+import { decodeId } from '@/utils/helpers/mongodb-id-conversions';
 
 /**
  * GET Full Tour details 
@@ -13,7 +14,11 @@ export const GET = withErrorHandler(async (
     request: NextRequest,
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
-    const tourId = (await params).tourId;
+    const tourId = decodeId(decodeURIComponent((await params).tourId));
+
+    if (!tourId) {
+        throw new ApiError("Invalid tour ID", 400);
+    }
 
     if (!mongoose.Types.ObjectId.isValid(tourId)) {
         throw new ApiError("Invalid tour ID format", 400);
