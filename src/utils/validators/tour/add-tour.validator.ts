@@ -74,13 +74,21 @@ export const ActivitySchema = Yup.object({
 });
 
 export const AttractionSchema = Yup.object({
+    id: Yup.string().optional(),
     title: Yup.string().required(),
     description: Yup.string().optional(),
     bestFor: Yup.string().optional(),
     insiderTip: Yup.string().optional(),
     address: Yup.string().optional(),
     openingHours: Yup.string().optional(),
-    imageIds: Yup.array().of(Yup.string()).optional(),
+    imageIds: Yup.array()
+        .of(
+            Yup.object({
+                id: Yup.string().required(),
+                url: Yup.string().url().required(),
+            })
+        )
+        .optional(),
     coordinates: BangladeshGeoPointSchema.optional(),
 });
 
@@ -154,11 +162,19 @@ export const Step2ContentSchema = Yup.object().shape({
     destinations: Yup.array()
         .of(
             Yup.object({
+                id: Yup.string().optional(),
                 description: Yup.string().optional(),
                 highlights: Yup.array().of(Yup.string()).optional(),
                 attractions: Yup.array().of(AttractionSchema).optional(),
                 activities: Yup.array().of(ActivitySchema).optional(),
-                imageIds: Yup.array().of(Yup.string()).optional(),
+                imageIds: Yup.array()
+                    .of(
+                        Yup.object({
+                            id: Yup.string().required(),
+                            url: Yup.string().url().required(),
+                        })
+                    )
+                    .optional(),
                 coordinates: BangladeshGeoPointSchema.optional(),
             })
         )

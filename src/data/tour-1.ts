@@ -2,33 +2,28 @@ import { AGE_SUITABILITY, AUDIENCE_TYPE, DIFFICULTY_LEVEL, DISTRICT, DIVISION, P
 import { CreateTourDTO } from "@/types/tour.types";
 
 export const GuideTestData: CreateTourDTO = {
-    // =============== IDENTITY & BASIC INFO ===============
-    title: 'Historical & Cultural Tour in Bhola, Barishal',
-    summary: `Dive deep into Bangladesh's rich history and vibrant culture in the Barishal region.`,
-    heroImage: undefined, // Asset ID as string, not undefined
-    gallery: [],
-    seo: {
-        metaTitle: `Tour Package to Bhola - Experience Barishal`,
-        metaDescription: `Book your 8-day tour to Bhola with local guides and authentic experiences in Barishal region.`,
+    "title": "Historical & Cultural Tour in Bhola, Barishal",
+    "summary": "Dive deep into Bangladesh's rich history and vibrant culture in the Barishal region.",
+    "heroImage": undefined,
+    "gallery": [],
+    "seo": {
+        "metaTitle": "Tour Package to Bhola - Experience Barishal",
+        "metaDescription": "Book your 8-day tour to Bhola with local guides and authentic experiences in Barishal region."
     },
-    tags: ["bhola", "barishal", "culture_history", "8_days", "bdt", "nature"],
-
-    // =============== BANGLADESH-SPECIFIC FIELDS ===============
-    tourType: TRAVEL_TYPE.CULTURE_HISTORY,
-    division: DIVISION.BARISHAL,
-    district: DISTRICT.BHOLA,
-    accommodationType: ["cottage"],
-    guideIncluded: false,
-    transportIncluded: true,
-    emergencyContacts: {
-        policeNumber: '999',
-        ambulanceNumber: '16263',
-        fireServiceNumber: '102',
-        localEmergency: '01310235914',
+    "tags": ["bhola", "barishal", "culture_history", "8_days", "bdt", "nature"],
+    "tourType": TRAVEL_TYPE.CULTURE_HISTORY,
+    "division": DIVISION.BARISHAL,
+    "district": DISTRICT.BHOLA,
+    "accommodationType": ["cottage"],
+    "guideIncluded": false,
+    "transportIncluded": true,
+    "emergencyContacts": {
+        "policeNumber": "999",
+        "ambulanceNumber": "16263",
+        "fireServiceNumber": "102",
+        "localEmergency": "01310235914"
     },
-
-    // =============== CONTENT & ITINERARY ===============
-    destinations: [
+    "destinations": [
         {
             "description": "Bhola এর প্রধান আকর্ষণ ও গোপন রত্নগুলি অন্বেষণ করুন।",
             "highlights": [
@@ -45,8 +40,7 @@ export const GuideTestData: CreateTourDTO = {
                     "insiderTip": "সকালের দিকে যাওয়ার চেষ্টা করুন ভিড় এড়ানোর জন্য।",
                     "address": "প্রধান সড়ক, স্থানীয় এলাকা",
                     "openingHours": "সকাল ৯টা - সন্ধ্যা ৬টা",
-                    "imageIds": [
-                    ],
+                    "imageIds": [],
                     "coordinates": {
                         "lat": 24.914359,
                         "lng": 90.273882
@@ -59,8 +53,7 @@ export const GuideTestData: CreateTourDTO = {
                     "insiderTip": "সকালের দিকে যাওয়ার চেষ্টা করুন ভিড় এড়ানোর জন্য।",
                     "address": "প্রধান সড়ক, স্থানীয় এলাকা",
                     "openingHours": "সকাল ৯টা - সন্ধ্যা ৬টা",
-                    "imageIds": [
-                    ],
+                    "imageIds": [],
                     "coordinates": {
                         "lat": 22.586546,
                         "lng": 89.535167
@@ -73,8 +66,7 @@ export const GuideTestData: CreateTourDTO = {
                     "insiderTip": "সকালের দিকে যাওয়ার চেষ্টা করুন ভিড় এড়ানোর জন্য।",
                     "address": "প্রধান সড়ক, স্থানীয় এলাকা",
                     "openingHours": "সকাল ৯টা - সন্ধ্যা ৬টা",
-                    "imageIds": [
-                    ],
+                    "imageIds": [],
                     "coordinates": {
                         "lat": 24.330516,
                         "lng": 88.351695
@@ -116,30 +108,21 @@ export const GuideTestData: CreateTourDTO = {
                     "rating": 4.6
                 }
             ],
-            "imageIds": [
-
-            ],
+            "imageIds": [],
             "coordinates": {
                 "lat": 24.523852,
                 "lng": 90.466178
             }
         }
     ],
-    itinerary: [
+    "itinerary": [
         {
             "day": 1,
             "title": "দিন 1: আগমন ও অভিযোজন",
             "description": "দিন 1 স্থানীয় আকর্ষণ ও সাংস্কৃতিক অভিজ্ঞতায় পূর্ণ।",
-            "mealsProvided": [
-                "Lunch",
-                "Dinner"
-            ],
+            "mealsProvided": ["Lunch", "Dinner"],
             "accommodation": "ডিলাক্স হোটেল",
-            "activities": [
-                "হোটেল চেক-ইন",
-                "স্থানীয় এলাকার পরিচিতি",
-                "বিকেলের বিশ্রাম"
-            ],
+            "activities": ["হোটেল চেক-ইন", "স্থানীয় এলাকার পরিচিতি", "বিকেলের বিশ্রাম"],
             "travelDistance": "103 কিমি",
             "travelMode": "train",
             "estimatedTime": "6 ঘণ্টা",
@@ -152,10 +135,7 @@ export const GuideTestData: CreateTourDTO = {
             "day": 2,
             "title": "দিন 2: অঞ্চল অন্বেষণ",
             "description": "দিন 2 স্থানীয় আকর্ষণ ও সাংস্কৃতিক অভিজ্ঞতায় পূর্ণ।",
-            "mealsProvided": [
-                "Dinner",
-                "Breakfast"
-            ],
+            "mealsProvided": ["Dinner", "Breakfast"],
             "accommodation": "ডিলাক্স হোটেল",
             "activities": [
                 "স্থানীয় রেস্তোরাঁয়ে মধ্যাহ্নভোজ",
@@ -174,11 +154,7 @@ export const GuideTestData: CreateTourDTO = {
             "day": 3,
             "title": "দিন 3: অঞ্চল অন্বেষণ",
             "description": "দিন 3 স্থানীয় আকর্ষণ ও সাংস্কৃতিক অভিজ্ঞতায় পূর্ণ।",
-            "mealsProvided": [
-                "Dinner",
-                "Lunch",
-                "Breakfast"
-            ],
+            "mealsProvided": ["Dinner", "Lunch", "Breakfast"],
             "accommodation": "স্ট্যান্ডার্ড হোটেল",
             "activities": [
                 "বিকেলের অবসর সময়",
@@ -198,9 +174,7 @@ export const GuideTestData: CreateTourDTO = {
             "day": 4,
             "title": "দিন 4: অঞ্চল অন্বেষণ",
             "description": "দিন 4 স্থানীয় আকর্ষণ ও সাংস্কৃতিক অভিজ্ঞতায় পূর্ণ।",
-            "mealsProvided": [
-                "Lunch"
-            ],
+            "mealsProvided": ["Lunch"],
             "accommodation": "স্ট্যান্ডার্ড হোটেল",
             "activities": [
                 "সাংস্কৃতিক কার্যকলাপ অধিবেশন",
@@ -219,10 +193,7 @@ export const GuideTestData: CreateTourDTO = {
             "day": 5,
             "title": "দিন 5: অঞ্চল অন্বেষণ",
             "description": "দিন 5 স্থানীয় আকর্ষণ ও সাংস্কৃতিক অভিজ্ঞতায় পূর্ণ।",
-            "mealsProvided": [
-                "Breakfast",
-                "Lunch"
-            ],
+            "mealsProvided": ["Breakfast", "Lunch"],
             "accommodation": "স্ট্যান্ডার্ড হোটেল",
             "activities": [
                 "স্থানীয় রেস্তোরাঁয়ে মধ্যাহ্নভোজ",
@@ -241,10 +212,7 @@ export const GuideTestData: CreateTourDTO = {
             "day": 6,
             "title": "দিন 6: অঞ্চল অন্বেষণ",
             "description": "দিন 6 স্থানীয় আকর্ষণ ও সাংস্কৃতিক অভিজ্ঞতায় পূর্ণ।",
-            "mealsProvided": [
-                "Breakfast",
-                "Dinner"
-            ],
+            "mealsProvided": ["Breakfast", "Dinner"],
             "accommodation": "স্ট্যান্ডার্ড হোটেল",
             "activities": [
                 "সাংস্কৃতিক কার্যকলাপ অধিবেশন",
@@ -263,11 +231,7 @@ export const GuideTestData: CreateTourDTO = {
             "day": 7,
             "title": "দিন 7: অঞ্চল অন্বেষণ",
             "description": "দিন 7 স্থানীয় আকর্ষণ ও সাংস্কৃতিক অভিজ্ঞতায় পূর্ণ।",
-            "mealsProvided": [
-                "Dinner",
-                "Breakfast",
-                "Lunch"
-            ],
+            "mealsProvided": ["Dinner", "Breakfast", "Lunch"],
             "accommodation": "স্ট্যান্ডার্ড হোটেল",
             "activities": [
                 "সাংস্কৃতিক কার্যকলাপ অধিবেশন",
@@ -287,17 +251,9 @@ export const GuideTestData: CreateTourDTO = {
             "day": 8,
             "title": "দিন 8: বিদায় ও প্রত্যাবর্তন",
             "description": "দিন 8 স্থানীয় আকর্ষণ ও সাংস্কৃতিক অভিজ্ঞতায় পূর্ণ।",
-            "mealsProvided": [
-                "Dinner",
-                "Lunch",
-                "Breakfast"
-            ],
+            "mealsProvided": ["Dinner", "Lunch", "Breakfast"],
             "accommodation": "ডিলাক্স হোটেল",
-            "activities": [
-                "সকালের নাস্তা",
-                "চেক-আউট",
-                "বাড়ির পথে যাত্রা"
-            ],
+            "activities": ["সকালের নাস্তা", "চেক-আউট", "বাড়ির পথে যাত্রা"],
             "travelDistance": "175 কিমি",
             "travelMode": "domestic_flight",
             "estimatedTime": "8 ঘণ্টা",
@@ -307,7 +263,7 @@ export const GuideTestData: CreateTourDTO = {
             ]
         }
     ],
-    inclusions: [
+    "inclusions": [
         {
             "label": "পরিবহন",
             "description": "সমস্ত অভ্যন্তরীণ পরিবহন"
@@ -333,7 +289,7 @@ export const GuideTestData: CreateTourDTO = {
             "description": "ইটিনারি অনুযায়ী নির্দিষ্ট"
         }
     ],
-    exclusions: [
+    "exclusions": [
         {
             "label": "ঐচ্ছিক কার্যকলাপ",
             "description": "ইটিনারিতে উল্লিখিত নয়"
@@ -343,23 +299,11 @@ export const GuideTestData: CreateTourDTO = {
             "description": "চিকিৎসা ও ট্রিপ বাতিলকরণ"
         }
     ],
-    difficulty: DIFFICULTY_LEVEL.EASY,
-    bestSeason: [
-        SEASON.WINTER,
-        SEASON.YEAR_ROUND,
-    ],
-    audience: [
-        AUDIENCE_TYPE.FAMILIES,
-        AUDIENCE_TYPE.GROUPS,
-        AUDIENCE_TYPE.BUSINESS,
-        AUDIENCE_TYPE.SENIORS,
-    ],
-    categories: [
-        TOUR_CATEGORIES.CRUISE,
-        TOUR_CATEGORIES.FOOD_DRINK,
-        TOUR_CATEGORIES.CITY,
-    ],
-    translations: {
+    "difficulty": DIFFICULTY_LEVEL.EASY,
+    "bestSeason": [SEASON.WINTER, SEASON.YEAR_ROUND],
+    "audience": [AUDIENCE_TYPE.FAMILIES, AUDIENCE_TYPE.GROUPS, AUDIENCE_TYPE.BUSINESS, AUDIENCE_TYPE.SENIORS],
+    "categories": [TOUR_CATEGORIES.CRUISE, TOUR_CATEGORIES.FOOD_DRINK, TOUR_CATEGORIES.CITY],
+    "translations": {
         "bn": {
             "title": "বাংলাদেশের অদেখা রূপ - 10",
             "summary": "বাংলাদেশের হৃদয় স্পর্শ করে এমন স্মরণীয় ভ্রমণ",
@@ -371,9 +315,7 @@ export const GuideTestData: CreateTourDTO = {
             "description": "A comprehensive tour package to Bhola in Barishal region."
         }
     },
-
-    // =============== LOGISTICS ===============
-    mainLocation: {
+    "mainLocation": {
         "address": {
             "line1": "414 মেইন রোড",
             "line2": "শান্ত এলাকা",
@@ -387,16 +329,16 @@ export const GuideTestData: CreateTourDTO = {
             "lng": 90.492074
         }
     },
-    transportModes: [TRANSPORT_MODE.TRAIN, TRANSPORT_MODE.RIDE_SHARE],
-    pickupOptions: [
+    "transportModes": [TRANSPORT_MODE.TRAIN, TRANSPORT_MODE.RIDE_SHARE],
+    "pickupOptions": [
         {
             "city": "Barishal",
             "price": 1712,
             "currency": "BDT"
         }
     ],
-    meetingPoint: `প্রধান হোটেল লবি বা বিমানবন্দর আগমন গেট`,
-    packingList: [
+    "meetingPoint": "প্রধান হোটেল লবি বা বিমানবন্দর আগমন গেট",
+    "packingList": [
         {
             "item": "পাসপোর্ট ও নথিপত্র",
             "required": true,
@@ -418,33 +360,31 @@ export const GuideTestData: CreateTourDTO = {
             "notes": "ফটোগ্রাফির জন্য ঐচ্ছিক"
         }
     ],
-
-    // =============== PRICING & COMMERCE ===============
-    basePrice: {
+    "basePrice": {
         "amount": 7386,
         "currency": "BDT"
     },
-    discounts: [
+    "discounts": [
         {
             "type": "promo",
             "value": 10,
             "code": "SAVE41",
-            "validFrom": "2026-01-02",
+            "validFrom": "2026-01-20",
             "validUntil": "2026-03-28"
         }
     ],
-    duration: {
-        days: 8,
-        nights: 7,
+    "duration": {
+        "days": 8,
+        "nights": 7
     },
-    operatingWindows: [
+    "operatingWindows": [
         {
             "startDate": "2026-02-01",
             "endDate": "2026-07-01",
-            "seatsTotal": 117,
+            "seatsTotal": 117
         }
     ],
-    departures: [
+    "departures": [
         {
             "date": "2026-03-12",
             "seatsTotal": 15,
@@ -482,43 +422,35 @@ export const GuideTestData: CreateTourDTO = {
             }
         }
     ],
-    paymentMethods: [
-        PAYMENT_METHOD.BANK_TRANSFER,
-        PAYMENT_METHOD.BKASH,
-        PAYMENT_METHOD.STRIPE,
-    ],
-
-    // =============== COMPLIANCE & ACCESSIBILITY ===============
-    licenseRequired: true,
-    ageSuitability: AGE_SUITABILITY.ALL,
-    accessibility: {
-        wheelchair: false,
-        familyFriendly: false,
-        petFriendly: false,
-        notes: `নির্দিষ্ট অ্যাক্সেসিবিলিটি প্রয়োজনের জন্য যোগাযোগ করুন`,
+    "paymentMethods": [PAYMENT_METHOD.BANK_TRANSFER, PAYMENT_METHOD.BKASH, PAYMENT_METHOD.STRIPE],
+    "licenseRequired": true,
+    "ageSuitability": AGE_SUITABILITY.ALL,
+    "accessibility": {
+        "wheelchair": false,
+        "familyFriendly": false,
+        "petFriendly": false,
+        "notes": "নির্দিষ্ট অ্যাক্সেসিবিলিটি প্রয়োজনের জন্য যোগাযোগ করুন"
     },
-
-    // =============== POLICIES ===============
-    cancellationPolicy: {
-        refundable: true,
-        rules: [
+    "cancellationPolicy": {
+        "refundable": true,
+        "rules": [
             {
-                daysBefore: 7,
-                refundPercent: 100,
+                "daysBefore": 7,
+                "refundPercent": 100
             },
             {
-                daysBefore: 3,
-                refundPercent: 50,
+                "daysBefore": 3,
+                "refundPercent": 50
             },
             {
-                daysBefore: 1,
-                refundPercent: 0,
-            },
-        ],
+                "daysBefore": 0,
+                "refundPercent": 0
+            }
+        ]
     },
-    refundPolicy: {
-        method: [PAYMENT_METHOD.NAGAD],
-        processingDays: 13,
+    "refundPolicy": {
+        "method": [PAYMENT_METHOD.NAGAD],
+        "processingDays": 13
     },
-    terms: `এই ট্যুর বুকিংয়ের মাধ্যমে, আপনি আমাদের শর্তাবলী ও শর্তাদি মেনে নেন। সব মূল্য নির্দিষ্ট না হলে কর সহ।`,
+    "terms": "এই ট্যুর বুকিংয়ের মাধ্যমে, আপনি আমাদের শর্তাবলী ও শর্তাদি মেনে নেন। সব মূল্য নির্দিষ্ট না হলে কর সহ।"
 };

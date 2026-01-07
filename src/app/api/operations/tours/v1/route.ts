@@ -1,4 +1,4 @@
-// app/api/tours/route.ts
+// app/api/operations/tours/v1/route.ts
 import { NextRequest } from "next/server";
 import { Types, FilterQuery } from "mongoose";
 import TourModel, { IDestinationBlock, ITour, IAttraction } from "@/models/tours/tour.model";
@@ -40,26 +40,6 @@ type TourLeanPopulated =
         gallery: PopulatedAssetLean[];
         destinations: IDestinationBlockLean[]
     };
-
-// POST Helper function to map destinations & attractions
-function mapDestinations(
-    destinations: CreateTourDTO["destinations"],
-): IDestinationBlock[] {
-    return destinations?.map((dest) => {
-        const mappedDest: IDestinationBlock = {
-            description: dest.description,
-            highlights: dest.highlights,
-            coordinates: dest.coordinates,
-            activities: dest.activities?.map(act => ({ ...act })) || [],
-            attractions: dest.attractions?.map((attr) => ({
-                ...attr,
-                images: [],
-            })) || [],
-            images: [],
-        };
-        return mappedDest;
-    }) || [];
-}
 
 /**
  * GET api/operations/tours/v1
@@ -253,6 +233,26 @@ export const GET = withErrorHandler(async (req: NextRequest) => {
     }
 });
 
+// POST Helper function to map destinations & attractions
+function mapDestinations(
+    destinations: CreateTourDTO["destinations"],
+): IDestinationBlock[] {
+    return destinations?.map((dest) => {
+        const mappedDest: IDestinationBlock = {
+            description: dest.description,
+            highlights: dest.highlights,
+            coordinates: dest.coordinates,
+            activities: dest.activities?.map(act => ({ ...act })) || [],
+            attractions: dest.attractions?.map((attr) => ({
+                ...attr,
+                images: [],
+            })) || [],
+            images: [],
+        };
+        return mappedDest;
+    }) || [];
+}
+
 export const POST = withErrorHandler(async (request: NextRequest) => {
     // 1️⃣ Parse request body
     const body = (await request.json()) as CreateTourDTO;
@@ -347,10 +347,11 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
             tags: body.tags,
         };
 
-        const [tour] = await TourModel.create([tourData], { session });
+        const tour = new TourModel(tourData)
+        await tour.save({ session });
 
         // 7️⃣ Build response
-        const detailDto = await buildTourDetailDTO(tour._id as Types.ObjectId, true, session);
+        const detailDto = await buildTourDetailDTO(tour._id as Types.ObjectId, false, session);
 
         if (!detailDto)
             throw new ApiError(

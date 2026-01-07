@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { uploadAssets } from "@/lib/cloudinary/upload.cloudinary";
 import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
 import { Base64Asset } from "@/lib/cloudinary/upload.cloudinary";
@@ -11,6 +11,7 @@ import TourModel from "@/models/tours/tour.model";
 import { ASSET_TYPE } from "@/constants/asset.const";
 import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 
 /**
  * PATCH /api/tours/[tourId]/attraction-images
@@ -21,7 +22,6 @@ export const PATCH = withErrorHandler(async (
     request: NextRequest,
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
-
     const tourId = decodeId(decodeURIComponent((await params).tourId));
 
     // Validate tour ID
@@ -32,13 +32,22 @@ export const PATCH = withErrorHandler(async (
     // Parse request body
     const body = (await request.json()) as UpdateDestinationAttrImgDTO;
 
-    // Validate destination and attraction indexes
-    if (body.destinationIndex === undefined || body.destinationIndex < 0) {
-        throw new ApiError("Destination index is required", 400);
+    // Validate required fields
+    if (!body.destinationId) {
+        throw new ApiError("Destination ID is required", 400);
     }
 
-    if (body.attractionIndex === undefined || body.attractionIndex < 0) {
-        throw new ApiError("Attraction index is required", 400);
+    if (!body.attractionId) {
+        throw new ApiError("Attraction ID is required", 400);
+    }
+
+    // Validate IDs are valid MongoDB ObjectIds
+    if (!mongoose.Types.ObjectId.isValid(body.destinationId)) {
+        throw new ApiError("Invalid destination ID format", 400);
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(body.attractionId)) {
+        throw new ApiError("Invalid attraction ID format", 400);
     }
 
     // Validate at least one operation is requested
@@ -49,9 +58,21 @@ export const PATCH = withErrorHandler(async (
         throw new ApiError("No changes requested", 400);
     }
 
-    // Run in transaction
-    const result = await withTransaction(async (session) => {
+    // Validate deleteImageIds are valid ObjectIds
+    if (body.deleteImageIds) {
+        const invalidDeleteIds = body.deleteImageIds.filter(
+            id => !mongoose.Types.ObjectId.isValid(id)
+        );
+        if (invalidDeleteIds.length > 0) {
+            throw new ApiError(
+                `Invalid image ID format: ${invalidDeleteIds.join(", ")}`,
+                400
+            );
+        }
+    }
 
+    // Run in transaction
+    const detailsDto = await withTransaction(async (session) => {
         const tour = await TourModel.findOne({
             _id: tourId,
             deletedAt: null,
@@ -78,19 +99,24 @@ export const PATCH = withErrorHandler(async (
             throw new ApiError("Tour is deleted", 410);
         }
 
-        // Validate destination index exists
-        if (!tour.destinations || body.destinationIndex >= tour.destinations.length) {
+        // Find destination by ID
+        const destination = tour?.destinations?.find(
+            (dest) => dest?._id?.toString() === body.destinationId
+        );
+
+        if (!destination) {
             throw new ApiError("Destination not found", 404);
         }
 
-        const destination = tour.destinations[body.destinationIndex];
+        // Find attraction by ID
+        const attraction = destination?.attractions?.find(
+            (attr) => attr?._id?.toString() === body.attractionId
+        );
 
-        // Validate attraction index exists
-        if (!destination.attractions || body.attractionIndex >= destination.attractions.length) {
+        if (!attraction) {
             throw new ApiError("Attraction not found", 404);
         }
 
-        const attraction = destination.attractions[body.attractionIndex];
         const currentImageIds = attraction.images || [];
 
         // Step 1: Delete specified images
@@ -126,7 +152,7 @@ export const PATCH = withErrorHandler(async (
             // Convert base64 strings to Base64Asset format
             const newAssets: Base64Asset[] = body.newImages.map((base64, index) => ({
                 base64,
-                name: `attraction-${body.destinationIndex}-${body.attractionIndex}-image-${Date.now()}-${index}`,
+                name: `attraction-${attraction._id}-image-${Date.now()}-${index}`,
                 assetType: ASSET_TYPE.IMAGE,
             }));
 
@@ -151,16 +177,20 @@ export const PATCH = withErrorHandler(async (
         // Save the tour
         await tour.save({ session });
 
-        return {
-            destinationIndex: body.destinationIndex,
-            attractionIndex: body.attractionIndex,
-            imageCount: attraction.images?.length || 0,
-            message: "Attraction images updated successfully",
-        };
+        return await buildTourDetailDTO(tour._id as Types.ObjectId, false, session);
     });
 
+    // Find the updated attraction in the DTO to return
+    const updatedDestination = detailsDto?.destinations?.find(
+        (dest) => dest.id === body.destinationId
+    );
+
+    const updatedAttraction = updatedDestination?.attractions?.find(
+        (attr) => attr.id === body.attractionId
+    );
+
     return {
-        data: result,
+        data: updatedAttraction?.imageIds,
         status: 200,
     };
 });

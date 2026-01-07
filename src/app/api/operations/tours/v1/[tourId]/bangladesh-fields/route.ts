@@ -33,7 +33,7 @@ export const PATCH = withErrorHandler(async (
     );
 
     // Process update within a transaction
-    const updatedTour = await withTransaction(async (session) => {
+    const result = await withTransaction(async (session) => {
 
         const tour = await TourModel.findOne({
             _id: tourId,
@@ -113,12 +113,20 @@ export const PATCH = withErrorHandler(async (
             throw new ApiError('Failed to update tour', 500);
         }
 
-        return updatedTour;
+        return {
+            tourType: updatedTour.tourType,
+            division: updatedTour.division,
+            district: updatedTour.district,
+            accommodationType: updatedTour.accommodationType,
+            guideIncluded: updatedTour.guideIncluded,
+            transportIncluded: updatedTour.transportIncluded,
+            emergencyContacts: updatedTour.emergencyContacts,
+        };
     });
 
     // Return successful response
     return {
-        data: updatedTour,
+        data: result,
         status: 200
     };
 });

@@ -12,6 +12,7 @@ import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 
 // helper that preserves key-value coupling
 function setIfDefined<K extends keyof ITour>(
@@ -19,55 +20,11 @@ function setIfDefined<K extends keyof ITour>(
     source: Partial<Record<K, ITour[K]>>,
     key: K
 ) {
-    const value = source[key];
-    if (value !== undefined) {
-        target[key] = value;
+    if (source[key] !== undefined) {
+        target[key] = source[key];
     }
 }
 
-// Collect asset IDs from a Tour document
-function collectImageAssetIdsFromTour(tour: ITour): Set<string> {
-    const ids = new Set<string>();
-
-    tour?.destinations?.forEach((dest) => {
-        dest.images?.forEach((id: Types.ObjectId) => {
-            ids.add(id.toString());
-        });
-
-        dest.attractions?.forEach((attr) => {
-            attr.images?.forEach((id: Types.ObjectId) => {
-                ids.add(id.toString());
-            });
-        });
-    });
-
-    return ids;
-}
-
-// Collect asset IDs from incoming payload
-function collectImageAssetIdsFromPayload(
-    data: UpdateTourContentItineraryDTO
-): Set<string> {
-    const ids = new Set<string>();
-
-    data?.destinations?.forEach((dest) => {
-        dest.imageIds?.forEach((id: string) => {
-            if (Types.ObjectId.isValid(id)) ids.add(id);
-        });
-
-        dest.attractions?.forEach((attr) => {
-            attr.imageIds?.forEach((id: string) => {
-                if (Types.ObjectId.isValid(id)) ids.add(id);
-            });
-        });
-    });
-
-    return ids;
-}
-
-/**
- * Update Step-2 Content Itinerary
- */
 export const PATCH = withErrorHandler(
     async (
         request: NextRequest,
@@ -75,12 +32,10 @@ export const PATCH = withErrorHandler(
     ) => {
         const tourId = decodeId(decodeURIComponent((await params).tourId));
 
-        // Validate tour ID
         if (!tourId || !Types.ObjectId.isValid(tourId)) {
             throw new ApiError("Invalid tour ID", 400);
         }
 
-        // Parse and validate request body
         const body = await request.json();
         const validatedData =
             validateTourUpdateSchema<UpdateTourContentItineraryDTO>(
@@ -88,12 +43,9 @@ export const PATCH = withErrorHandler(
                 body
             );
 
-        // Connect to database
         await ConnectDB();
 
-        // Execute within transaction
         const result = await withTransaction(async (session) => {
-            // Find existing tour
             const existingTour = await TourModel.findOne({
                 _id: tourId,
                 deletedAt: null,
@@ -103,39 +55,85 @@ export const PATCH = withErrorHandler(
                 throw new ApiError("Tour not found", 404);
             }
 
-            if (existingTour.status === TOUR_STATUS.TERMINATED) {
-                throw new ApiError("Tour is terminated and cannot be modified", 409);
+            if (
+                existingTour.status === TOUR_STATUS.TERMINATED ||
+                existingTour.status === TOUR_STATUS.ARCHIVED ||
+                existingTour.status === TOUR_STATUS.ACTIVE
+            ) {
+                throw new ApiError("Tour cannot be modified in current state", 409);
             }
 
-            if (existingTour.status === TOUR_STATUS.ARCHIVED) {
-                throw new ApiError("Tour is archived and cannot be modified", 409);
+            /**
+             * 1️⃣ Detect REMOVED destinations & attractions
+             */
+            const assetsToDelete: Types.ObjectId[] = [];
+            const existingDestinations = existingTour.destinations ?? [];
+            const incomingDestinations = validatedData.destinations ?? [];
+
+
+            const existingDestMap = new Map<string, NonNullable<ITour["destinations"]>[number]>();
+
+            for (const dest of existingDestinations) {
+                if (!dest._id) continue;
+                existingDestMap.set(dest._id.toString(), dest);
             }
 
-            if (existingTour.status === TOUR_STATUS.ACTIVE) {
-                throw new ApiError("Completed tours cannot be modified", 409);
+            const incomingDestIds = new Set<string>();
+
+            for (const dest of incomingDestinations) {
+                if (dest.id && Types.ObjectId.isValid(dest.id)) {
+                    incomingDestIds.add(dest.id);
+                }
             }
 
-            /** 1️⃣ Collect OLD referenced images */
-            const oldImageIds = collectImageAssetIdsFromTour(existingTour);
+            // Removed destinations
+            for (const dest of existingDestinations) {
+                if (!dest._id) continue;
 
-            /** 2️⃣ Collect NEW referenced images */
-            const newImageIds = collectImageAssetIdsFromPayload(validatedData);
+                if (!incomingDestIds.has(dest._id.toString())) {
+                    dest.images?.forEach((id) => assetsToDelete.push(id));
+                    dest.attractions?.forEach((attr) => {
+                        attr.images?.forEach((id) => assetsToDelete.push(id));
+                    });
+                }
+            }
 
-            /** 3️⃣ Find ORPHANED assets */
-            const assetsToDelete = [...oldImageIds].filter(
-                (id) => !newImageIds.has(id)
-            );
+            // Removed attractions inside existing destinations
+            validatedData.destinations?.forEach((incomingDest) => {
+                if (!incomingDest.id) return;
 
-            /** 4️⃣ Update ONLY non-image fields */
+                const existingDest = existingDestMap.get(incomingDest.id);
+                if (!existingDest) return;
+
+                const incomingAttrIds = new Set(
+                    incomingDest.attractions
+                        ?.filter((a) => a.id)
+                        .map((a) => a.id!)
+                );
+
+                existingDest.attractions?.forEach((attr) => {
+                    if (!attr._id) return;
+                    if (!incomingAttrIds.has(attr?._id.toString())) {
+                        attr.images?.forEach((id) => assetsToDelete.push(id));
+                    }
+                });
+            });
+
+            /**
+             * 2️⃣ Build update object (preserve _id)
+             */
             const updateObj: Partial<ITour> = {};
 
-            // destinations handled explicitly (correct)
             if (validatedData.destinations) {
                 updateObj.destinations = validatedData.destinations.map((dest) => ({
+                    ...(dest.id && { _id: new Types.ObjectId(dest.id) }),
                     description: dest.description,
                     highlights: dest.highlights,
                     activities: dest.activities,
+                    coordinates: dest.coordinates,
+                    images: dest.imageIds?.map((img) => new Types.ObjectId(img.id)) ?? [],
                     attractions: dest.attractions?.map((attr) => ({
+                        ...(attr.id && { _id: new Types.ObjectId(attr.id) }),
                         title: attr.title,
                         description: attr.description,
                         bestFor: attr.bestFor,
@@ -143,14 +141,11 @@ export const PATCH = withErrorHandler(
                         address: attr.address,
                         openingHours: attr.openingHours,
                         coordinates: attr.coordinates,
-                        images: attr.imageIds?.map((id) => new Types.ObjectId(id)),
+                        images: attr.imageIds?.map((img) => new Types.ObjectId(img.id)) ?? [],
                     })),
-                    images: dest.imageIds?.map((id) => new Types.ObjectId(id)),
-                    coordinates: dest.coordinates,
                 }));
             }
 
-            // Safe, type-correct assignments
             setIfDefined(updateObj, validatedData, "itinerary");
             setIfDefined(updateObj, validatedData, "inclusions");
             setIfDefined(updateObj, validatedData, "exclusions");
@@ -173,17 +168,25 @@ export const PATCH = withErrorHandler(
                 throw new ApiError("Failed to update tour", 500);
             }
 
-            /** 5️⃣ Delete orphaned assets */
+            /**
+             * 3️⃣ Cleanup removed assets
+             */
             if (assetsToDelete.length > 0) {
-                await cleanupAssets(
-                    assetsToDelete.map((id) => new Types.ObjectId(id)),
-                    session
-                );
+                await cleanupAssets(assetsToDelete, session);
             }
 
+            const detailDto = await buildTourDetailDTO((updatedTour._id as Types.ObjectId), false, session);
+
             return {
-                deletedAssets: assetsToDelete,
-                updatedFields: Object.keys(updateObj),
+                destinations: detailDto.destinations,
+                itinerary: detailDto.itinerary,
+                inclusions: detailDto.inclusions,
+                exclusions: detailDto.exclusions,
+                difficulty: detailDto.difficulty,
+                bestSeason: detailDto.bestSeason,
+                audience: detailDto.audience,
+                categories: detailDto.categories,
+                translations: detailDto.translations,
             };
         });
 

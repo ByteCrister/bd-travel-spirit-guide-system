@@ -8,19 +8,19 @@ import { validateTourUpdateSchema } from "@/utils/validators/tour/update-tour.va
 import { Step4PricingSchema } from "@/utils/validators/tour/add-tour.validator";
 import TourModel from "@/models/tours/tour.model";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
-import { Types } from "mongoose";
+import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 
 /**
  * Update Step-4 pricing
  */
 export const PATCH = withErrorHandler(async (
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ tourId: string }> }
 ) => {
-    const tourId = params.id;
+    const tourId = decodeId(decodeURIComponent((await params).tourId));
 
     // Validate tour ID
-    if (!mongoose.Types.ObjectId.isValid(tourId)) {
+    if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
         throw new ApiError("Invalid tour ID", 400);
     }
 
@@ -120,12 +120,12 @@ export const PATCH = withErrorHandler(async (
         tour.status = TOUR_STATUS.DRAFT;
         tour.updatedAt = new Date();
 
-        return await tour.save({ session });
+        const savedTour = await tour.save({ session });
+        return savedTour.toObject();
     });
 
     // Convert to DTO format for response
     const responseData = {
-        id: (updatedTour._id as Types.ObjectId).toString(),
         basePrice: updatedTour.basePrice,
         discounts: updatedTour.discounts?.map(d => ({
             ...d,
@@ -147,9 +147,6 @@ export const PATCH = withErrorHandler(async (
             meetingCoordinates: d.meetingCoordinates,
         })) || [],
         paymentMethods: updatedTour.paymentMethods,
-        status: updatedTour.status,
-        moderationStatus: updatedTour.moderationStatus,
-        updatedAt: updatedTour.updatedAt.toISOString(),
     };
 
     return {

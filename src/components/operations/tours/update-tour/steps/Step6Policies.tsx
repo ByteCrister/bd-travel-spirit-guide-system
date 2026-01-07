@@ -64,9 +64,9 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
     },
   });
 
-  const formik = useFormik({
+  const formik = useFormik<UpdateTourPoliciesDTO>({
     initialValues: {
-      cancellationPolicy: initialData.cancellationPolicy || {
+      cancellationPolicy: initialData.cancellationPolicy ?? {
         refundable: true,
         rules: [{ daysBefore: 0, refundPercent: 0 }],
       },
@@ -244,7 +244,7 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
                           </div>
                         </div>
                         <Switch
-                          checked={formik.values.cancellationPolicy?.refundable || true}
+                          checked={formik.values.cancellationPolicy?.refundable ?? true}
                           onCheckedChange={(checked) => formik.setFieldValue('cancellationPolicy.refundable', checked)}
                           className="data-[state=checked]:bg-emerald-600"
                         />
@@ -286,19 +286,20 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
                                 <Badge variant="outline" className="text-xs font-medium">
                                   Rule {index + 1}
                                 </Badge>
-                                {formik.values.cancellationPolicy?.rules?.length > 1 && (
-                                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeCancellationRule(index)}
-                                      className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </motion.div>
-                                )}
+                                {formik.values.cancellationPolicy?.rules
+                                  && formik.values.cancellationPolicy?.rules?.length > 1 && (
+                                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => removeCancellationRule(index)}
+                                        className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </motion.div>
+                                  )}
                               </div>
 
                               <div className="grid grid-cols-2 gap-3">

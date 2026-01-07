@@ -41,13 +41,14 @@ export interface GeoPointDTO {
 }
 
 export interface AttractionDTO {
+    id?: string;
     title: string;
     description?: string;
     bestFor?: string;
     insiderTip?: string;
     address?: string;
     openingHours?: string;
-    imageIds?: string[];
+    imageIds?: { id: string; url: string }[];
     coordinates?: GeoPointDTO;
 }
 
@@ -61,11 +62,12 @@ export interface ActivityDTO {
 }
 
 export interface DestinationBlockDTO {
+    id?: string;
     description?: string;
     highlights?: string[];
     attractions?: AttractionDTO[];
     activities?: ActivityDTO[];
-    imageIds?: string[];
+    imageIds?: { id: string; url: string }[];
     coordinates?: GeoPointDTO;
 }
 
@@ -119,7 +121,6 @@ export interface OperatingWindowDTO {
 }
 
 export interface DepartureDTO {
-    id?: string;
     date: string;
     seatsTotal: number;
     seatsBooked: number;
@@ -496,7 +497,7 @@ export interface CreateTourDTO {
         nights?: number;
     };
     operatingWindows?: OperatingWindowDTO[];
-    departures?: Omit<DepartureDTO, 'id' | 'seatsBooked'>[]; // seatsBooked starts at 0 //
+    departures?: Omit<DepartureDTO, 'seatsBooked'>[]; // seatsBooked starts at 0 //
     paymentMethods: PaymentMethod[];
 
     // =============== COMPLIANCE & ACCESSIBILITY ===============
@@ -535,7 +536,7 @@ export interface UpdateTourGalleryDTO {
  * Update destination images
  */
 export interface UpdateDestinationImgDTO {
-    destinationIndex: number;
+    destinationId: string;
     deleteImageIds: string[];
     newImages: string[];
 }
@@ -544,8 +545,8 @@ export interface UpdateDestinationImgDTO {
  * Update destination-> attractions -> images 
  */
 export interface UpdateDestinationAttrImgDTO {
-    destinationIndex: number;
-    attractionIndex: number;
+    destinationId: string;
+    attractionId: string;
     deleteImageIds: string[];
     newImages: string[];
 }
@@ -625,7 +626,7 @@ export interface UpdateTourPricingDTO {
         nights?: number;
     };
     operatingWindows?: OperatingWindowDTO[];
-    departures?: Omit<DepartureDTO, 'id' | 'seatsBooked'>[];
+    departures?: Omit<DepartureDTO, 'seatsBooked'>[];
     paymentMethods?: PaymentMethod[];
 }
 

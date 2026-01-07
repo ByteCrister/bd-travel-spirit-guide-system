@@ -145,9 +145,6 @@ export const PATCH = withErrorHandler(async (
         pickupOptions: updatedTour.pickupOptions,
         meetingPoint: updatedTour.meetingPoint,
         packingList: updatedTour.packingList,
-        status: updatedTour.status,
-        moderationStatus: updatedTour.moderationStatus,
-        updatedAt: updatedTour.updatedAt.toISOString(),
     };
 
     return {

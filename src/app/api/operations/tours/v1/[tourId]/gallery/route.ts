@@ -91,7 +91,7 @@ export const PATCH = withErrorHandler(async (
 
         await tour.save({ session });
 
-        const detailDto = await buildTourDetailDTO(tour._id as Types.ObjectId, true, session)
+        const detailDto = await buildTourDetailDTO(tour._id as Types.ObjectId, false, session)
 
         if (!detailDto || !detailDto.gallery) {
             throw new ApiError('Failed to fetch updated gallery', 500);

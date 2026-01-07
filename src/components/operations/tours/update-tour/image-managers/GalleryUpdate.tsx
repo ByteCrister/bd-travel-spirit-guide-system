@@ -1,4 +1,3 @@
-// app/operations/tours/[tourId]/update-tour/components/GalleryUpdate.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -34,12 +33,16 @@ const getApiUrl = (tourId: string) => {
   return `/operations/tours/v1/${tourId}/gallery`
 }
 
+// Constants for upload limits
+const MAX_IMAGES = 5;
+const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 export default function GalleryUpdate({ tourId, currentGallery, updateData }: GalleryUpdateProps) {
   const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
   const [localGallery, setLocalGallery] = useState<string[]>(currentGallery);
   const [isGalleryModified, setIsGalleryModified] = useState(false);
-
 
   React.useEffect(() => {
     setLocalGallery(currentGallery);
@@ -68,27 +71,54 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
   const convertFilesToBase64 = async (files: File[]): Promise<string[]> => {
     setIsUploading(true);
     try {
-      const validFiles = files.filter(file =>
-        isAllowedExtension(file.name, IMAGE_EXTENSIONS)
-      );
+      // Validate each file before processing
+      const validatedFiles: File[] = [];
+      const validationErrors: string[] = [];
 
-      if (validFiles.length === 0) {
+      files.forEach((file) => {
+        // Check file extension
+        if (!isAllowedExtension(file.name, IMAGE_EXTENSIONS)) {
+          validationErrors.push(`Invalid file type: ${file.name}`);
+          return;
+        }
+
+        // Check file size (5MB limit)
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+          validationErrors.push(
+            `${file.name} exceeds ${MAX_FILE_SIZE_MB}MB limit (${(file.size / (1024 * 1024)).toFixed(2)}MB)`
+          );
+          return;
+        }
+
+        validatedFiles.push(file);
+      });
+
+      // Show validation errors if any
+      if (validationErrors.length > 0) {
+        showToast.warning(
+          `Some files were skipped:\n${validationErrors.join('\n')}`,
+        );
+      }
+
+      if (validatedFiles.length === 0) {
         showToast.warning('No valid image files selected');
         return [];
       }
 
+      // Process valid files
       const base64Images = await Promise.all(
-        validFiles.map((file) =>
+        validatedFiles.map((file) =>
           fileToBase64(file, {
             compressImages: true,
             maxWidth: 1920,
             quality: 0.8,
-            maxFileBytes: 5 * 1024 * 1024,
+            maxFileBytes: MAX_FILE_SIZE_BYTES,
           })
         )
       );
 
-      return base64Images;
+      // Filter out any failed conversions
+      return base64Images.filter(img => img !== null);
     } catch (error) {
       const message = extractErrorMessage(error);
       showToast.error(`Image processing failed: ${message}`);
@@ -103,11 +133,28 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
     event.target.value = '';
     if (files.length === 0) return;
 
-    if (files.length > 10) {
-      showToast.warning('You can only upload up to 10 images at once');
+    // Calculate how many more images can be added
+    const remainingSlots = MAX_IMAGES - localGallery.length;
+    
+    if (remainingSlots <= 0) {
+      showToast.warning(`Gallery is full. Maximum ${MAX_IMAGES} images allowed.`);
       return;
     }
 
+    if (files.length > remainingSlots) {
+      showToast.warning(`You can only add ${remainingSlots} more image(s) (max ${MAX_IMAGES} total)`);
+      // Only process the first N files that fit in remaining slots
+      const filesToProcess = files.slice(0, remainingSlots);
+      const newImages = await convertFilesToBase64(filesToProcess);
+      
+      if (newImages.length > 0) {
+        setLocalGallery(prev => [...prev, ...newImages]);
+        setIsGalleryModified(true);
+      }
+      return;
+    }
+
+    // If within limits, process all files
     const newImages = await convertFilesToBase64(files);
 
     if (newImages.length > 0) {
@@ -121,8 +168,16 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
     event.target.value = '';
     if (files.length === 0) return;
 
-    if (files.length > 20) {
-      showToast.warning('You can only upload up to 20 images at once');
+    if (files.length > MAX_IMAGES) {
+      showToast.warning(`Maximum ${MAX_IMAGES} images allowed. Only the first ${MAX_IMAGES} will be processed.`);
+      // Only process first MAX_IMAGES files
+      const filesToProcess = files.slice(0, MAX_IMAGES);
+      const newImages = await convertFilesToBase64(filesToProcess);
+
+      if (newImages.length > 0) {
+        setLocalGallery(newImages);
+        setIsGalleryModified(true);
+      }
       return;
     }
 
@@ -152,6 +207,12 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
   const handleSaveGallery = () => {
     if (!isGalleryModified) {
       showToast.warning('No changes to save');
+      return;
+    }
+
+    // Validate we don't exceed MAX_IMAGES (shouldn't happen with UI controls, but just in case)
+    if (localGallery.length > MAX_IMAGES) {
+      showToast.warning(`Maximum ${MAX_IMAGES} images allowed. Please remove some images before saving.`);
       return;
     }
 
@@ -192,7 +253,7 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
               <CardTitle className="text-lg font-semibold text-slate-800">Gallery Images</CardTitle>
             </div>
             <p className="text-sm text-slate-600 ml-12">
-              <span className="font-medium text-slate-700">{localGallery.length}</span> image(s) in gallery
+              <span className="font-medium text-slate-700">{localGallery.length}</span> / {MAX_IMAGES} image(s) in gallery
               {isGalleryModified && (
                 <motion.span
                   initial={{ opacity: 0, x: -10 }}
@@ -213,7 +274,7 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
               type="file"
               multiple
               onChange={handleFileChange}
-              disabled={isProcessing}
+              disabled={isProcessing || localGallery.length >= MAX_IMAGES}
             />
             <input
               accept="image/*"
@@ -230,12 +291,15 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
                   variant="outline"
                   size="sm"
                   className="cursor-pointer gap-2 border-slate-300 text-slate-700 hover:bg-slate-50"
-                  disabled={isProcessing}
+                  disabled={isProcessing || localGallery.length >= MAX_IMAGES}
                   asChild
                 >
                   <span className="flex items-center gap-2">
                     <Upload className="h-4 w-4" />
                     Add Images
+                    {localGallery.length >= MAX_IMAGES && (
+                      <span className="text-xs text-amber-600">(Full)</span>
+                    )}
                   </span>
                 </Button>
               </motion.div>
@@ -335,7 +399,7 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
               <Images className="h-16 w-16 mx-auto text-slate-400 mb-4" />
               <p className="text-slate-600 font-medium mb-1">No images in gallery</p>
               <p className="text-sm text-slate-500">
-                Upload some images to get started
+                Upload up to {MAX_IMAGES} images to get started
               </p>
             </motion.div>
           )}
@@ -421,7 +485,11 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
             </p>
             <p className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-              Maximum file size: 5MB per image
+              Maximum file size: {MAX_FILE_SIZE_MB}MB per image
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              Maximum {MAX_IMAGES} images in gallery
             </p>
             <p className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>

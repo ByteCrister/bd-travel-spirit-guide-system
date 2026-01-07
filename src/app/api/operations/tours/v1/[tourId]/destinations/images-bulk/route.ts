@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { uploadAssets } from "@/lib/cloudinary/upload.cloudinary";
 import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
 import { Base64Asset } from "@/lib/cloudinary/upload.cloudinary";
@@ -11,9 +11,11 @@ import TourModel from "@/models/tours/tour.model";
 import { ASSET_TYPE } from "@/constants/asset.const";
 import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
+
 /**
  * PATCH api/operations/tours/v1/[tourId]/destinations/images-bulk/route.ts
- * Update destination images with transaction support
+ * Update destination images with transaction support using destination ID
  */
 export const PATCH = withErrorHandler(async (
     request: NextRequest,
@@ -29,9 +31,9 @@ export const PATCH = withErrorHandler(async (
     // Parse request body
     const body = (await request.json()) as UpdateDestinationImgDTO;
 
-    // Validate destination index
-    if (body.destinationIndex === undefined || body.destinationIndex < 0) {
-        throw new ApiError("Destination index is required", 400);
+    // Validate destination ID
+    if (!body.destinationId || !mongoose.Types.ObjectId.isValid(body.destinationId)) {
+        throw new ApiError("Valid destination ID is required", 400);
     }
 
     // Validate at least one operation is requested
@@ -43,7 +45,7 @@ export const PATCH = withErrorHandler(async (
     }
 
     // Run in transaction
-    const result = await withTransaction(async (session) => {
+    const tourDetailDto = await withTransaction(async (session) => {
         // Find the tour with session
         const tour = await TourModel.findOne({
             _id: tourId,
@@ -71,12 +73,15 @@ export const PATCH = withErrorHandler(async (
             throw new ApiError("Tour is deleted", 410);
         }
 
-        // Validate destination index exists
-        if (!tour.destinations || body.destinationIndex >= tour.destinations.length) {
+        // Find destination by ID
+        const destination = tour?.destinations?.find(
+            dest => dest?._id?.toString() === body?.destinationId
+        );
+
+        if (!destination) {
             throw new ApiError("Destination not found", 404);
         }
 
-        const destination = tour.destinations[body.destinationIndex];
         const currentImageIds = destination.images || [];
 
         // Step 1: Delete specified images
@@ -103,16 +108,16 @@ export const PATCH = withErrorHandler(async (
 
             // Remove deleted IDs from destination images
             destination.images = currentImageIds.filter(
-                (imgId) => !body.deleteImageIds.includes(imgId.toString())
+                (imgId) => !body.deleteImageIds!.includes(imgId.toString())
             );
         }
 
         // Step 2: Upload new images
         if (body.newImages && body.newImages.length > 0) {
             // Convert base64 strings to Base64Asset format
-            const newAssets: Base64Asset[] = body.newImages.map((base64) => ({
+            const newAssets: Base64Asset[] = body.newImages.map((base64, index) => ({
                 base64,
-                name: `destination-${body.destinationIndex}-image-${Date.now()}`,
+                name: `destination-${destination._id}-image-${Date.now()}-${index}`,
                 assetType: ASSET_TYPE.IMAGE,
             }));
 
@@ -134,18 +139,17 @@ export const PATCH = withErrorHandler(async (
         tour.status = TOUR_STATUS.DRAFT;
 
         // Save the tour
-        const updatedTour = await tour.save({ session });
-
-        return {
-            tourId: updatedTour._id,
-            destinationIndex: body.destinationIndex,
-            imageCount: destination.images?.length || 0,
-            message: "Destination images updated successfully",
-        };
+        await tour.save({ session });
+        return await buildTourDetailDTO(tour._id as Types.ObjectId, false, session);
     });
 
+    // Find the updated destination to return
+    const updatedDestination = tourDetailDto?.destinations?.find(
+        dest => dest.id === body?.destinationId
+    );
+
     return {
-        data: result,
+        data: updatedDestination?.imageIds,
         status: 200,
     };
 });

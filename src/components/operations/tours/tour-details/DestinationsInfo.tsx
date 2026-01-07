@@ -212,16 +212,16 @@ const DestinationsInfo = ({ tour }: DestinationsInfoProps) => {
                                                                     Images ({attraction.imageIds.length})
                                                                 </div>
                                                                 <div className="flex gap-2 overflow-x-auto pb-2">
-                                                                    {attraction.imageIds.map((imageUrl, imgIdx) => (
+                                                                    {attraction.imageIds.map((image, imgIdx) => (
                                                                         <motion.div
-                                                                            key={imgIdx}
+                                                                            key={image.id}
                                                                             initial={{ opacity: 0, scale: 0.9 }}
                                                                             animate={{ opacity: 1, scale: 1 }}
                                                                             transition={{ delay: 0.1 + imgIdx * 0.05 }}
                                                                             className="relative w-20 h-20 rounded-lg flex-shrink-0 overflow-hidden border-2 border-muted hover:border-primary transition-colors group cursor-pointer"
                                                                         >
                                                                             <Image
-                                                                                src={imageUrl}
+                                                                                src={image.url}
                                                                                 alt={`${attraction.title} image ${imgIdx + 1}`}
                                                                                 fill
                                                                                 className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -346,7 +346,7 @@ const DestinationsInfo = ({ tour }: DestinationsInfoProps) => {
                                             </Badge>
                                         </div>
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                            {destination.imageIds.map((imageUrl, idx) => (
+                                            {destination.imageIds.map((image, idx) => (
                                                 <motion.div
                                                     key={idx}
                                                     initial={{ opacity: 0, scale: 0.9 }}
@@ -355,7 +355,7 @@ const DestinationsInfo = ({ tour }: DestinationsInfoProps) => {
                                                     className="relative aspect-square rounded-xl overflow-hidden border-2 border-muted hover:border-primary transition-all duration-300 group cursor-pointer"
                                                 >
                                                     <Image
-                                                        src={imageUrl}
+                                                        src={image.url}
                                                         alt={`Destination ${index + 1} image ${idx + 1}`}
                                                         fill
                                                         className="object-cover transition-transform duration-300 group-hover:scale-110"

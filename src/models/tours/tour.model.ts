@@ -148,6 +148,7 @@ export type IAddressTranslationBlock = {
 
 // =============== DESTINATION TYPES ===============
 export interface IAttraction {
+  _id?: Types.ObjectId;
   title: string;
   description?: string;
   bestFor?: string;
@@ -168,6 +169,7 @@ interface IActivity {
 }
 
 export interface IDestinationBlock {
+  _id?: Types.ObjectId;
   description?: string;
   highlights?: string[];
   attractions?: IAttraction[];
@@ -431,7 +433,7 @@ const TourSchema = new Schema<ITour>(
                 images: [{ type: Schema.Types.ObjectId, ref: "Asset" }],
                 coordinates: { lat: Number, lng: Number },
               },
-              { _id: false }
+              { _id: true }
             ),
           ],
           activities: [
@@ -453,7 +455,7 @@ const TourSchema = new Schema<ITour>(
           images: [{ type: Schema.Types.ObjectId, ref: "Asset" }],
           coordinates: { lat: Number, lng: Number },
         },
-        { _id: false }
+        { _id: true }
       ),
     ],
 

@@ -4,37 +4,65 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
 import { TourDetailDTO } from "@/types/tour.types"
-import { Building, Calendar, Eye, Heart, Share2, Star, Tag, Image as ImageIcon, Sparkles, TrendingUp } from "lucide-react";
+import { Building, Calendar, Eye, Heart, Share2, Star, Tag, Image as ImageIcon, Sparkles, TrendingUp, Check, Copy } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { showToast } from "@/components/global/showToast";
+import { Button } from "@/components/ui/button";
+import { encodeId } from "@/utils/helpers/mongodb-id-conversions";
 
 interface TourBasicInfoProps {
     tour: TourDetailDTO;
 }
 
-const TourBasicInfo = ({ tour }: TourBasicInfoProps) => {
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case TOUR_STATUS.ACTIVE: return "bg-green-500"
-            case TOUR_STATUS.SUBMITTED: return "bg-blue-500"
-            case TOUR_STATUS.DRAFT: return "bg-gray-500"
-            case TOUR_STATUS.COMPLETED: return "bg-purple-500"
-            case TOUR_STATUS.TERMINATED: return "bg-red-500"
-            case TOUR_STATUS.ARCHIVED: return "bg-gray-300"
-            default: return "bg-gray-200"
-        }
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case TOUR_STATUS.ACTIVE: return "bg-green-500"
+        case TOUR_STATUS.SUBMITTED: return "bg-blue-500"
+        case TOUR_STATUS.DRAFT: return "bg-gray-500"
+        case TOUR_STATUS.COMPLETED: return "bg-purple-500"
+        case TOUR_STATUS.TERMINATED: return "bg-red-500"
+        case TOUR_STATUS.ARCHIVED: return "bg-gray-300"
+        default: return "bg-gray-200"
     }
+}
 
-    const getModerationColor = (status: string) => {
-        switch (status) {
-            case MODERATION_STATUS.APPROVED: return "bg-green-500"
-            case MODERATION_STATUS.PENDING: return "bg-yellow-500"
-            case MODERATION_STATUS.DENIED: return "bg-red-500"
-            case MODERATION_STATUS.SUSPENDED: return "bg-orange-500"
-            default: return "bg-gray-200"
-        }
+const getModerationColor = (status: string) => {
+    switch (status) {
+        case MODERATION_STATUS.APPROVED: return "bg-green-500"
+        case MODERATION_STATUS.PENDING: return "bg-yellow-500"
+        case MODERATION_STATUS.DENIED: return "bg-red-500"
+        case MODERATION_STATUS.SUSPENDED: return "bg-orange-500"
+        default: return "bg-gray-200"
     }
+}
+
+const TourBasicInfo = ({ tour }: TourBasicInfoProps) => {
+
+
+    const [copiedCompany, setCopiedCompany] = useState(false);
+    const [copiedAuthor, setCopiedAuthor] = useState(false);
+
+    const copyToClipboard = (text: string, type: 'company' | 'author') => {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                if (type === 'company') {
+                    setCopiedCompany(true);
+                    setTimeout(() => setCopiedCompany(false), 2000);
+                } else {
+                    setCopiedAuthor(true);
+                    setTimeout(() => setCopiedAuthor(false), 2000);
+                }
+                showToast.info(`${type === 'company' ? 'Company' : 'Author'} ID copied to clipboard`);
+            })
+            .catch((err) => {
+                console.error('Failed to copy:', err);
+                showToast.error('Failed to copy to clipboard');
+            });
+    };
+
 
     return (
         <Card className="border-2 shadow-lg overflow-hidden">
@@ -175,13 +203,49 @@ const TourBasicInfo = ({ tour }: TourBasicInfoProps) => {
                             Organization
                         </h4>
                         <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Company:</span>
-                                <span className="text-sm font-medium">{tour.companyId}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Author:</span>
-                                <span className="text-sm font-medium">{tour.authorId}</span>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-muted-foreground">Company ID:</span>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => copyToClipboard(encodeURIComponent(encodeId(tour.companyId)), 'company')}
+                                        className="gap-1"
+                                    >
+                                        {copiedCompany ? (
+                                            <>
+                                                <Check className="h-3 w-3" />
+                                                <span>Copied!</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Copy className="h-3 w-3" />
+                                                <span>Copy ID</span>
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-muted-foreground">Author ID:</span>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => copyToClipboard(encodeURIComponent(encodeId(tour.authorId)), 'author')}
+                                        className="gap-1"
+                                    >
+                                        {copiedAuthor ? (
+                                            <>
+                                                <Check className="h-3 w-3" />
+                                                <span>Copied!</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Copy className="h-3 w-3" />
+                                                <span>Copy ID</span>
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
                             </div>
                             {tour.categories && tour.categories.length > 0 && (
                                 <div className="pt-2 border-t">

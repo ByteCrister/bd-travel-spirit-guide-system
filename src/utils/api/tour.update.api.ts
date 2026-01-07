@@ -1,4 +1,3 @@
-// app/operations/tours/[tourId]/update-tour/services/tourUpdateService.ts
 import {
     UpdateTourBasicInfoDTO,
     UpdateTourBangladeshFieldsDTO,
@@ -7,73 +6,91 @@ import {
     UpdateTourPricingDTO,
     UpdateTourComplianceDTO,
     UpdateTourPoliciesDTO,
+    TourDetailDTO,
+    DepartureDTO,
 } from '@/types/tour.types';
+import api from '../axios/axios';
+import { useCompanyDashboardStore } from '@/store/company-detail.store';
+import { ApiResponse } from '@/types/api.types';
+
+// Helper function to update store after successful API call
+const updateStoreAfterSuccess = (tourId: string, tourData: Partial<TourDetailDTO>) => {
+    const store = useCompanyDashboardStore.getState();
+    store.updateTourLocal(tourId, tourData);
+    store.invalidateCache?.('tours');
+};
 
 class TourUpdateService {
-    private baseUrl = '/api/operations/tours/v1';
+    private baseUrl = '/operations/tours/v1';
 
     // Modular update methods
     async updateBasicInfo(tourId: string, data: UpdateTourBasicInfoDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/basic-info`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
+        const response = await api.patch<ApiResponse<UpdateTourBasicInfoDTO>>(`${this.baseUrl}/${tourId}/basic-info`, data);
+        if (!response.data || !response.data.data)
+            throw new Error("Invalid response body.")
+
+        updateStoreAfterSuccess(tourId, response.data.data)
+        return response.data;
     }
 
     async updateBangladeshFields(tourId: string, data: UpdateTourBangladeshFieldsDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/bangladesh-fields`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
+        const response = await api.patch<ApiResponse<UpdateTourBangladeshFieldsDTO>>(`${this.baseUrl}/${tourId}/bangladesh-fields`, data);
+        if (!response.data || !response.data.data)
+            throw new Error("Invalid response body.")
+
+        updateStoreAfterSuccess(tourId, response.data.data)
+        return response.data;
     }
 
     async updateContentItinerary(tourId: string, data: UpdateTourContentItineraryDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/content-itinerary`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
+        const response = await api.patch<ApiResponse<UpdateTourContentItineraryDTO>>(`${this.baseUrl}/${tourId}/content-itinerary`, data);
+        if (!response.data || !response.data.data)
+            throw new Error("Invalid response body.")
+
+        updateStoreAfterSuccess(tourId, response.data.data)
+        return response.data;
     }
 
     async updateLogistics(tourId: string, data: UpdateTourLogisticsDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/logistics`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
+        const response = await api.patch<ApiResponse<UpdateTourLogisticsDTO>>(`${this.baseUrl}/${tourId}/logistics`, data);
+        if (!response.data || !response.data.data)
+            throw new Error("Invalid response body.")
+
+        updateStoreAfterSuccess(tourId, response.data.data)
+        return response.data;
     }
 
     async updatePricing(tourId: string, data: UpdateTourPricingDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/pricing`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
+        const response = await api.patch<
+            ApiResponse<
+                Omit<UpdateTourPricingDTO, "departures"> & {
+                    departures: DepartureDTO[]
+                }
+            >
+        >(`${this.baseUrl}/${tourId}/pricing`, data);
+        if (!response.data || !response.data.data)
+            throw new Error("Invalid response body.")
+
+        updateStoreAfterSuccess(tourId, response.data.data)
+        return response.data;
     }
 
     async updateCompliance(tourId: string, data: UpdateTourComplianceDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/compliance`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
+        const response = await api.patch<ApiResponse<UpdateTourComplianceDTO>>(`${this.baseUrl}/${tourId}/compliance`, data);
+        if (!response.data || !response.data.data)
+            throw new Error("Invalid response body.")
+
+        updateStoreAfterSuccess(tourId, response.data.data)
+        return response.data;
     }
 
     async updatePolicies(tourId: string, data: UpdateTourPoliciesDTO) {
-        const response = await fetch(`${this.baseUrl}/${tourId}/policies`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-        return response.json();
+        const response = await api.patch<ApiResponse<UpdateTourPoliciesDTO>>(`${this.baseUrl}/${tourId}/policies`, data);
+        if (!response.data || !response.data.data)
+            throw new Error("Invalid response body.")
+
+        updateStoreAfterSuccess(tourId, response.data.data)
+        return response.data;
     }
 }
 

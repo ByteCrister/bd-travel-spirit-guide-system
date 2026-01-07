@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikHelpers } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
@@ -39,6 +39,9 @@ import Step2BestSeason from './step2-contentItinerary/Step2BestSeason';
 import Step2Audience from './step2-contentItinerary/Step2Audience';
 import Step2Categories from './step2-contentItinerary/Step2Categories';
 import Step2Translations from './step2-contentItinerary/Step2Translations';
+import { showToast } from '@/components/global/showToast';
+import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
+import { ValidationError } from 'yup';
 
 interface Step2ContentItineraryProps {
   tourId: string;
@@ -47,73 +50,73 @@ interface Step2ContentItineraryProps {
 
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 0.4, ease: 'easeOut' }
   }
 };
 
 const sections = [
-  { 
-    icon: MapPin, 
-    title: 'Destinations', 
+  {
+    icon: MapPin,
+    title: 'Destinations',
     description: 'Define tour destinations and locations',
-    component: Step2Destinations 
+    component: Step2Destinations
   },
-  { 
-    icon: Calendar, 
-    title: 'Itinerary', 
+  {
+    icon: Calendar,
+    title: 'Itinerary',
     description: 'Day-by-day schedule and activities',
-    component: Step2Itinerary 
+    component: Step2Itinerary
   },
-  { 
-    icon: CheckCircle, 
-    title: 'Inclusions', 
+  {
+    icon: CheckCircle,
+    title: 'Inclusions',
     description: 'Services and amenities included',
-    component: Step2Inclusions 
+    component: Step2Inclusions
   },
-  { 
-    icon: XCircle, 
-    title: 'Exclusions', 
+  {
+    icon: XCircle,
+    title: 'Exclusions',
     description: 'Items not covered in the package',
-    component: Step2Exclusions 
+    component: Step2Exclusions
   },
-  { 
-    icon: Mountain, 
-    title: 'Difficulty', 
+  {
+    icon: Mountain,
+    title: 'Difficulty',
     description: 'Physical difficulty and skill level',
-    component: Step2Difficulty 
+    component: Step2Difficulty
   },
-  { 
-    icon: Sun, 
-    title: 'Best Season', 
+  {
+    icon: Sun,
+    title: 'Best Season',
     description: 'Optimal travel periods and weather',
-    component: Step2BestSeason 
+    component: Step2BestSeason
   },
-  { 
-    icon: Users, 
-    title: 'Audience', 
+  {
+    icon: Users,
+    title: 'Audience',
     description: 'Target demographics and groups',
-    component: Step2Audience 
+    component: Step2Audience
   },
-  { 
-    icon: Tag, 
-    title: 'Categories', 
+  {
+    icon: Tag,
+    title: 'Categories',
     description: 'Tour type and classification',
-    component: Step2Categories 
+    component: Step2Categories
   },
-  { 
-    icon: Languages, 
-    title: 'Translations', 
+  {
+    icon: Languages,
+    title: 'Translations',
     description: 'Multi-language content support',
-    component: Step2Translations 
+    component: Step2Translations
   },
 ];
 
-export default function Step2ContentItinerary({ 
-  tourId, 
-  initialData 
+export default function Step2ContentItinerary({
+  tourId,
+  initialData
 }: Step2ContentItineraryProps) {
   const queryClient = useQueryClient();
 
@@ -122,6 +125,10 @@ export default function Step2ContentItinerary({
       tourUpdateService.updateContentItinerary(tourId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
+      showToast.success('Content & itinerary updated successfully!');
+    },
+    onError: (error) => {
+      showToast.warning('Update Failed', extractErrorMessage(error));
     },
   });
 
@@ -135,6 +142,37 @@ export default function Step2ContentItinerary({
     audience: initialData.audience || [],
     categories: initialData.categories || [],
     translations: initialData.translations || { bn: {}, en: {} },
+  };
+
+  const handleSubmit = async (
+    values: typeof initialValues,
+    { setSubmitting }: FormikHelpers<typeof initialValues>
+  ) => {
+    // console.log('Form submitted with values:', values); // Debug log
+
+    try {
+      // Validate with the Step2ContentSchema
+      await Step2ContentSchema.validate(values, { abortEarly: false });
+      // console.log('Validation passed'); // Debug log
+
+      // If validation passes, submit the mutation
+      mutation.mutate(values);
+    } catch (error: unknown) {
+      // console.error('Validation error:', error); // Debug log
+
+      if (error instanceof ValidationError) {
+        // Handle Yup validation errors
+        showToast.warning('Validation Error', error.errors[0] || 'Validation error');
+      } else if (error instanceof Error) {
+        // Handle generic JavaScript errors
+        showToast.warning('Submission Error', error.message || 'An unknown error occurred');
+      } else {
+        // Handle unknown errors
+        showToast.warning('Submission Error', 'An unknown error occurred');
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -166,10 +204,8 @@ export default function Step2ContentItinerary({
         <CardContent className="pt-6">
           <Formik
             initialValues={initialValues}
-            validationSchema={Step2ContentSchema}
-            onSubmit={(values) => {
-              mutation.mutate(values);
-            }}
+            // validationSchema={Step2ContentSchema}
+            onSubmit={handleSubmit}
             enableReinitialize
           >
             {({ isSubmitting }) => (
@@ -178,7 +214,7 @@ export default function Step2ContentItinerary({
                   {sections.map((section, index) => {
                     const Icon = section.icon;
                     const SectionComponent = section.component;
-                    
+
                     return (
                       <motion.div
                         key={section.title}
@@ -245,7 +281,7 @@ export default function Step2ContentItinerary({
                     )}
                   </AnimatePresence>
 
-                  <motion.div 
+                  <motion.div
                     className="flex justify-end pt-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}

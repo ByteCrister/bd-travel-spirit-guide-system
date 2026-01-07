@@ -7,6 +7,8 @@ import { ClientSession, Types } from "mongoose";
 import "@/models/assets/asset.model";
 import AssetModel from "@/models/assets/asset.model";
 import AssetFileModel from "@/models/assets/asset-file.model";
+import { ApiError } from "../helpers/withErrorHandler";
+import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 
 type ObjectId = Types.ObjectId;
 
@@ -36,156 +38,168 @@ export async function buildTourDetailDTO(
     tourId: ObjectId,
     withDeleted = false,
     session?: ClientSession,
-): Promise<TourDetailDTO | null> {
+): Promise<TourDetailDTO> {
     if (!tourId) throw new Error("tourId is required");
 
-    const baseQuery = withDeleted
-        ? TourModel.findOneWithDeleted({ _id: tourId }).session(session ?? null)
-        : TourModel.findById(tourId).session(session ?? null);
+    try {
+        const baseQuery = withDeleted
+            ? TourModel.findOneWithDeleted({ _id: tourId }).session(session ?? null)
+            : TourModel.findById(tourId).session(session ?? null);
 
-    const rawTour = await baseQuery
-        .populate({
-            path: "heroImage",
-            select: "file deletedAt",
-            model: AssetModel,
-            populate: { path: "file", select: "publicUrl", model: AssetFileModel },
-            ...(withDeleted ? {} : { match: { deletedAt: null } }),
-            options: { lean: true } // optional
-        })
-        .populate({
-            path: "gallery",
-            select: "file deletedAt",
-            model: AssetModel,
-            populate: { path: "file", select: "publicUrl", model: AssetFileModel },
-            ...(withDeleted ? {} : { match: { deletedAt: null } }),
-        })
-        .populate({
-            path: "destinations.images",
-            select: "file deletedAt",
-            model: AssetModel,
-            populate: { path: "file", select: "publicUrl", model: AssetFileModel },
-            ...(withDeleted ? {} : { match: { deletedAt: null } }),
-        })
-        .populate({
-            path: "destinations.attractions.images",
-            select: "file deletedAt",
-            model: AssetModel,
-            populate: { path: "file", select: "publicUrl", model: AssetFileModel },
-            ...(withDeleted ? {} : { match: { deletedAt: null } }),
-        })
-        .lean()
-        .exec();
+        const rawTour = await baseQuery
+            .populate({
+                path: "heroImage",
+                select: "file deletedAt",
+                model: AssetModel,
+                populate: { path: "file", select: "publicUrl", model: AssetFileModel },
+                ...(withDeleted ? {} : { match: { deletedAt: null } }),
+                options: { lean: true } // optional
+            })
+            .populate({
+                path: "gallery",
+                select: "file deletedAt",
+                model: AssetModel,
+                populate: { path: "file", select: "publicUrl", model: AssetFileModel },
+                ...(withDeleted ? {} : { match: { deletedAt: null } }),
+            })
+            .populate({
+                path: "destinations.images",
+                select: "file deletedAt",
+                model: AssetModel,
+                populate: { path: "file", select: "publicUrl", model: AssetFileModel },
+                ...(withDeleted ? {} : { match: { deletedAt: null } }),
+            })
+            .populate({
+                path: "destinations.attractions.images",
+                select: "file deletedAt",
+                model: AssetModel,
+                populate: { path: "file", select: "publicUrl", model: AssetFileModel },
+                ...(withDeleted ? {} : { match: { deletedAt: null } }),
+            })
+            .exec();
 
-    if (!rawTour) return null;
+        if (!rawTour) {
+            throw new ApiError(`Tour not found for id: ${tourId.toString()}`, 404);
+        };
 
-    const tour = rawTour as unknown as TourLeanPopulated;
+        const tour = rawTour.toObject() as unknown as TourLeanPopulated;
 
-    // Calculate computed fields
-    const priceSummary = calculatePriceSummary(tour);
-    const bookingSummary = calculateBookingSummary(tour);
-    const nextDeparture = calculateNextDeparture(tour);
-    const hasActiveDiscount = checkActiveDiscount(tour.discounts);
+        // Calculate computed fields
+        const priceSummary = calculatePriceSummary(tour);
+        const bookingSummary = calculateBookingSummary(tour);
+        const nextDeparture = calculateNextDeparture(tour);
+        const hasActiveDiscount = checkActiveDiscount(tour.discounts);
 
-    return {
-        // =============== IDENTITY & BASIC INFO ===============
-        id: tour._id.toString(),
-        title: tour.title,
-        slug: tour.slug,
-        status: tour.status,
-        summary: tour.summary,
-        heroImage: tour.heroImage?.file?.publicUrl.toString() ?? undefined,
-        gallery: tour.gallery?.map((asset) => asset?.file?.publicUrl ?? "") || [],
-        seo: tour.seo,
+        return {
+            // =============== IDENTITY & BASIC INFO ===============
+            id: tour._id.toString(),
+            title: tour.title,
+            slug: tour.slug,
+            status: tour.status,
+            summary: tour.summary,
+            heroImage: tour.heroImage?.file?.publicUrl.toString() ?? undefined,
+            gallery: tour.gallery?.map((asset) => asset?.file?.publicUrl ?? "") || [],
+            seo: tour.seo,
 
-        // =============== BANGLADESH-SPECIFIC FIELDS ===============
-        tourType: tour.tourType,
-        division: tour.division,
-        district: tour.district,
-        accommodationType: tour.accommodationType || [],
-        guideIncluded: tour.guideIncluded,
-        transportIncluded: tour.transportIncluded,
-        emergencyContacts: tour.emergencyContacts || {},
+            // =============== BANGLADESH-SPECIFIC FIELDS ===============
+            tourType: tour.tourType,
+            division: tour.division,
+            district: tour.district,
+            accommodationType: tour.accommodationType || [],
+            guideIncluded: tour.guideIncluded,
+            transportIncluded: tour.transportIncluded,
+            emergencyContacts: tour.emergencyContacts || {},
 
-        // =============== CONTENT & ITINERARY ===============
-        destinations: transformDestinations(tour.destinations) || [],
-        itinerary: tour.itinerary || [],
-        inclusions: tour.inclusions || [],
-        exclusions: tour.exclusions || [],
-        difficulty: tour.difficulty,
-        bestSeason: tour.bestSeason || [],
-        audience: tour.audience || [],
-        categories: tour.categories || [],
-        translations: tour.translations || {},
+            // =============== CONTENT & ITINERARY ===============
+            destinations: transformDestinations(tour.destinations) || [],
+            itinerary: tour.itinerary || [],
+            inclusions: tour.inclusions || [],
+            exclusions: tour.exclusions || [],
+            difficulty: tour.difficulty,
+            bestSeason: tour.bestSeason || [],
+            audience: tour.audience || [],
+            categories: tour.categories || [],
+            translations: tour.translations || {},
 
-        // =============== LOGISTICS ===============
-        mainLocation: tour.mainLocation,
-        transportModes: tour.transportModes || [],
-        pickupOptions: tour.pickupOptions || [],
-        meetingPoint: tour.meetingPoint || '',
-        packingList: tour.packingList || [],
+            // =============== LOGISTICS ===============
+            mainLocation: tour.mainLocation,
+            transportModes: tour.transportModes || [],
+            pickupOptions: tour.pickupOptions || [],
+            meetingPoint: tour.meetingPoint || '',
+            packingList: tour.packingList || [],
 
-        // =============== PRICING & COMMERCE ===============
-        basePrice: tour.basePrice,
-        discounts: transformDiscounts(tour.discounts) || [],
-        duration: tour.duration,
-        operatingWindows: transformOperatingWindows(tour.operatingWindows) || [],
-        departures: transformDepartures(tour.departures) || [],
-        paymentMethods: tour.paymentMethods || [],
+            // =============== PRICING & COMMERCE ===============
+            basePrice: tour.basePrice,
+            discounts: transformDiscounts(tour.discounts) || [],
+            duration: tour.duration,
+            operatingWindows: transformOperatingWindows(tour.operatingWindows) || [],
+            departures: transformDepartures(tour.departures) || [],
+            paymentMethods: tour.paymentMethods || [],
 
-        // =============== COMPLIANCE & ACCESSIBILITY ===============
-        licenseRequired: tour.licenseRequired || false,
-        ageSuitability: tour.ageSuitability,
-        accessibility: tour.accessibility || {},
+            // =============== COMPLIANCE & ACCESSIBILITY ===============
+            licenseRequired: tour.licenseRequired || false,
+            ageSuitability: tour.ageSuitability,
+            accessibility: tour.accessibility || {},
 
-        // =============== POLICIES ===============
-        cancellationPolicy: tour.cancellationPolicy,
-        refundPolicy: tour.refundPolicy,
-        terms: tour.terms || '',
+            // =============== POLICIES ===============
+            cancellationPolicy: tour.cancellationPolicy,
+            refundPolicy: tour.refundPolicy,
+            terms: tour.terms || '',
 
-        // =============== ENGAGEMENT & RATINGS ===============
-        ratings: tour.ratings || { average: 0, count: 0 },
-        wishlistCount: tour.wishlistCount || 0,
-        featured: tour.featured || false,
+            // =============== ENGAGEMENT & RATINGS ===============
+            ratings: tour.ratings || { average: 0, count: 0 },
+            wishlistCount: tour.wishlistCount || 0,
+            featured: tour.featured || false,
 
-        // =============== MODERATION ===============
-        moderationStatus: tour.moderationStatus,
-        rejectionReason: tour.rejectionReason,
-        completedAt: tour.completedAt?.toISOString(),
-        reApprovalRequestedAt: tour.reApprovalRequestedAt?.toISOString(),
+            // =============== MODERATION ===============
+            moderationStatus: tour.moderationStatus,
+            rejectionReason: tour.rejectionReason,
+            completedAt: tour.completedAt?.toISOString(),
+            reApprovalRequestedAt: tour.reApprovalRequestedAt?.toISOString(),
 
-        // =============== SYSTEM FIELDS ===============
-        companyId: tour.companyId._id.toString(),
-        authorId: tour.authorId._id.toString(),
-        tags: tour.tags || [],
-        publishedAt: tour.publishedAt?.toISOString(),
-        viewCount: tour.viewCount || 0,
-        likeCount: tour.likeCount || 0,
-        shareCount: tour.shareCount || 0,
-        createdAt: tour.createdAt.toISOString(),
-        updatedAt: tour.updatedAt.toISOString(),
-        deletedAt: tour.deletedAt?.toISOString(),
+            // =============== SYSTEM FIELDS ===============
+            companyId: tour.companyId._id.toString(),
+            authorId: tour.authorId._id.toString(),
+            tags: tour.tags || [],
+            publishedAt: tour.publishedAt?.toISOString(),
+            viewCount: tour.viewCount || 0,
+            likeCount: tour.likeCount || 0,
+            shareCount: tour.shareCount || 0,
+            createdAt: tour.createdAt.toISOString(),
+            updatedAt: tour.updatedAt.toISOString(),
+            deletedAt: tour.deletedAt?.toISOString(),
 
-        // =============== COMPUTED/UI-ONLY FIELDS ===============
-        priceSummary,
-        bookingSummary,
-        nextDeparture,
-        isUpcoming: isTourUpcoming(tour),
-        isExpired: isTourExpired(tour),
-        hasActiveDiscount
-    };
+            // =============== COMPUTED/UI-ONLY FIELDS ===============
+            priceSummary,
+            bookingSummary,
+            nextDeparture,
+            isUpcoming: isTourUpcoming(tour),
+            isExpired: isTourExpired(tour),
+            hasActiveDiscount
+        };
+    } catch (error: unknown) {
+        const message = extractErrorMessage(error);
+        console.error("[buildTourDetailDTO Error]", message);
+        throw new ApiError(
+            `Failed to build tour details: ${message || error}`,
+            500
+        );
+    }
 }
 
 // Helper function to transform destinations with image URLs
 function transformDestinations(destinations: IDestinationBlockLean[] | undefined): TourDetailDTO['destinations'] {
     if (!destinations) return [];
 
-    return destinations.map(dest => ({
-        ...dest,
-        attractions: (dest.attractions ?? []).map(att => ({
-            ...att,
-            imageIds: att.images.map(attImgs => attImgs?.file?.publicUrl ?? "") ?? []
+    return destinations.map(({ _id, attractions, images, ...rest }) => ({
+        ...rest,
+        id: _id?.toString(),
+        attractions: (attractions ?? []).map(({ _id, images, ...attRest }) => ({
+            ...attRest,
+            id: _id?.toString(),
+            imageIds: images?.map(img => ({ id: img?._id.toString(), url: img?.file?.publicUrl ?? "" })) ?? [],
         })),
-        imageIds: dest.images.map(desImgs => desImgs?.file?.publicUrl ?? "") ?? []
+        imageIds: images?.map(img => ({ id: img?._id.toString(), url: img?.file?.publicUrl ?? "" })) ?? [],
     }));
 }
 
