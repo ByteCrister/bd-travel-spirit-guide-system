@@ -10,6 +10,7 @@ import { UpdateDestinationImgDTO } from "@/types/tour.types";
 import TourModel from "@/models/tours/tour.model";
 import { ASSET_TYPE } from "@/constants/asset.const";
 import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
+import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
 /**
  * PATCH api/operations/tours/v1/[tourId]/destinations/images-bulk/route.ts
  * Update destination images with transaction support
@@ -44,10 +45,25 @@ export const PATCH = withErrorHandler(async (
     // Run in transaction
     const result = await withTransaction(async (session) => {
         // Find the tour with session
-        const tour = await TourModel.findById(tourId).session(session);
+        const tour = await TourModel.findOne({
+            _id: tourId,
+            deletedAt: null,
+        }).session(session);
 
         if (!tour) {
             throw new ApiError("Tour not found", 404);
+        }
+
+        if (tour.status === TOUR_STATUS.TERMINATED) {
+            throw new ApiError("Tour is terminated and cannot be modified", 409);
+        }
+
+        if (tour.status === TOUR_STATUS.ARCHIVED) {
+            throw new ApiError("Tour is archived and cannot be modified", 409);
+        }
+
+        if (tour.status === TOUR_STATUS.ACTIVE) {
+            throw new ApiError("Completed tours cannot be modified", 409);
         }
 
         // Check if tour is deleted
@@ -113,6 +129,9 @@ export const PATCH = withErrorHandler(async (
 
         // Mark destinations as modified
         tour.markModified("destinations");
+
+        tour.moderationStatus = MODERATION_STATUS.PENDING;
+        tour.status = TOUR_STATUS.DRAFT;
 
         // Save the tour
         const updatedTour = await tour.save({ session });

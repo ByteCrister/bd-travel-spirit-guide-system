@@ -8,7 +8,7 @@ import { Step0BasicInfoSchema } from "@/utils/validators/tour/add-tour.validator
 import { validateTourUpdateSchema } from "@/utils/validators/tour/update-tour.validator";
 import TourModel from "@/models/tours/tour.model";
 import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
-import { TOUR_STATUS } from "@/constants/tour.const";
+import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
 
 /**
  * Update Step-0 basic info
@@ -39,11 +39,22 @@ export const PATCH = withErrorHandler(async (
         const tour = await TourModel.findOne({
             _id: tourId,
             deletedAt: null,
-            status: { $ne: TOUR_STATUS.TERMINATED },
         }).session(session);
 
         if (!tour) {
             throw new ApiError("Tour not found", 404);
+        }
+
+        if (tour.status === TOUR_STATUS.TERMINATED) {
+            throw new ApiError("Tour is terminated and cannot be modified", 409);
+        }
+
+        if (tour.status === TOUR_STATUS.ARCHIVED) {
+            throw new ApiError("Tour is archived and cannot be modified", 409);
+        }
+
+        if (tour.status === TOUR_STATUS.ACTIVE) {
+            throw new ApiError("Completed tours cannot be modified", 409);
         }
 
         // Update other basic info fields
@@ -65,6 +76,9 @@ export const PATCH = withErrorHandler(async (
         if (validate.tags !== undefined) {
             tour.tags = validate.tags.map((tag) => tag.trim()).filter(Boolean);
         }
+
+        tour.moderationStatus = MODERATION_STATUS.PENDING;
+        tour.status = TOUR_STATUS.DRAFT;
 
         // Save the tour
         const updatedTour = await tour.save({ session });

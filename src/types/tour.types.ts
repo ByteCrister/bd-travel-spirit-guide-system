@@ -589,7 +589,7 @@ export interface UpdateTourContentItineraryDTO {
     itinerary?: ItineraryEntryDTO[];
     inclusions?: InclusionDTO[];
     exclusions?: ExclusionDTO[];
-    difficulty?: DifficultyLevel;
+    difficulty: DifficultyLevel;
     bestSeason?: Season[];
     audience?: AudienceType[];
     categories?: TourCategories[];

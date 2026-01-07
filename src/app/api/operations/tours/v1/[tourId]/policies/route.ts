@@ -39,11 +39,22 @@ export const PATCH = withErrorHandler(async (
         const tour = await TourModel.findOne({
             _id: tourId,
             deletedAt: null,
-            status: { $nin: [TOUR_STATUS.TERMINATED] }
         }).session(session);
 
         if (!tour) {
-            throw new ApiError('Tour not found or you do not have permission to update it', 404);
+            throw new ApiError("Tour not found", 404);
+        }
+
+        if (tour.status === TOUR_STATUS.TERMINATED) {
+            throw new ApiError("Tour is terminated and cannot be modified", 409);
+        }
+
+        if (tour.status === TOUR_STATUS.ARCHIVED) {
+            throw new ApiError("Tour is archived and cannot be modified", 409);
+        }
+
+        if (tour.status === TOUR_STATUS.ACTIVE) {
+            throw new ApiError("Completed tours cannot be modified", 409);
         }
 
         // Prepare update data

@@ -11,7 +11,7 @@ import { TourDetailDTO, UpdateTourGalleryDTO } from '@/types/tour.types';
 import TourModel from '@/models/tours/tour.model';
 import { buildTourDetailDTO } from '@/lib/build-responses/build-tour-details';
 import { decodeId } from '@/utils/helpers/mongodb-id-conversions';
-import { TOUR_STATUS } from '@/constants/tour.const';
+import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour.const';
 
 
 // Export the PATCH handler with error handling
@@ -57,11 +57,22 @@ export const PATCH = withErrorHandler(async (
         const tour = await TourModel.findOne({
             _id: tourId,
             deletedAt: null,
-            status: { $nin: [TOUR_STATUS.TERMINATED] }
         }).session(session);
 
         if (!tour) {
-            throw new ApiError('Tour not found', 404);
+            throw new ApiError("Tour not found", 404);
+        }
+
+        if (tour.status === TOUR_STATUS.TERMINATED) {
+            throw new ApiError("Tour is terminated and cannot be modified", 409);
+        }
+
+        if (tour.status === TOUR_STATUS.ARCHIVED) {
+            throw new ApiError("Tour is archived and cannot be modified", 409);
+        }
+
+        if (tour.status === TOUR_STATUS.ACTIVE) {
+            throw new ApiError("Completed tours cannot be modified", 409);
         }
 
         // Get existing gallery asset IDs
@@ -74,6 +85,9 @@ export const PATCH = withErrorHandler(async (
         // Update tour
         tour.gallery = newGalleryIds.map((g) => g.asset);
         tour.updatedAt = new Date();
+
+        tour.moderationStatus = MODERATION_STATUS.PENDING;
+        tour.status = TOUR_STATUS.DRAFT;
 
         await tour.save({ session });
 

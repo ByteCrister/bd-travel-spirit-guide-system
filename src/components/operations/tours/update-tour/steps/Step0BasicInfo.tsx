@@ -12,13 +12,14 @@ import {
   Chip,
   Autocomplete,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UpdateTourBasicInfoDTO } from '@/types/tour.types';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import { Step0BasicInfoSchema } from '@/utils/validators/tour/add-tour.validator';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { FileText, Tag, Search, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { FileText, Tag, Search, CheckCircle2, AlertCircle, SaveIcon } from 'lucide-react';
 import { ValidationError } from 'yup';
 
 interface Step0BasicInfoProps {
@@ -360,37 +361,43 @@ export default function Step0BasicInfo({ tourId, initialData }: Step0BasicInfoPr
                 )}
               </AnimatePresence>
 
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={mutation.isPending}
+                  sx={{
+                    px: 3,
+                    py: 0.75,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    fontSize: '0.875rem',
+                    bgcolor: 'primary.main',
+                    minWidth: 140,
+                    height: 36,
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      transform: 'translateY(-1px)'
+                    },
+                    '&:active': {
+                      transform: 'translateY(0)'
+                    },
+                    '&:disabled': {
+                      bgcolor: 'action.disabledBackground',
+                      transform: 'none'
+                    }
+                  }}
+                  startIcon={mutation.isPending ?
+                    <CircularProgress size={16} color="inherit" /> :
+                    <SaveIcon fontSize={18} />
+                  }
                 >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={mutation.isPending}
-                    sx={{
-                      px: 4,
-                      py: 1.25,
-                      borderRadius: 1.5,
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      fontSize: '0.9375rem',
-                      bgcolor: 'primary.main',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-                      '&:hover': {
-                        bgcolor: 'primary.dark',
-                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                      },
-                      '&:disabled': {
-                        bgcolor: 'action.disabledBackground'
-                      }
-                    }}
-                    startIcon={mutation.isPending ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : null}
-                  >
-                    {mutation.isPending ? 'Updating...' : 'Update Basic Info'}
-                  </Button>
-                </motion.div>
+                  {mutation.isPending ? 'Saving...' : 'Save Changes'}
+                </Button>
               </Box>
             </Box>
           </form>
