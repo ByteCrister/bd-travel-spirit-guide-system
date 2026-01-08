@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
@@ -50,6 +50,10 @@ interface Props {
 export default function DestinationImagesManager({ tourId, destinations, updateData }: Props) {
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState<string[]>([]);
+
+  // Separate loading states
+  const [destSaving, setDestSaving] = useState<Record<string, boolean>>({});
+  const [attrSaving, setAttrSaving] = useState<Record<string, boolean>>({});
 
   // Destination-level drafts keyed by destination ID
   const [destDrafts, setDestDrafts] = useState<Map<string, ImageDraft>>(
@@ -229,12 +233,14 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
     });
   };
 
-  /* ---------------------------- Save Mutations ---------------------------- */
+  /* ---------------------------- Save Functions ---------------------------- */
 
-  const saveDestMutation = useMutation({
-    mutationFn: async (destId: string) => {
-      const draft = destDrafts.get(destId);
-      if (!draft) throw new Error('Destination draft not found');
+  const saveDestinationImages = async (destId: string) => {
+    const draft = destDrafts.get(destId);
+    if (!draft) throw new Error('Destination draft not found');
+
+    try {
+      setDestSaving(prev => ({ ...prev, [destId]: true }));
 
       const base64 = await Promise.all(draft.toAdd.map(f =>
         fileToBase64(f.file, {
@@ -246,7 +252,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
         })
       ));
 
-      return await api.patch<ApiResponse<Array<{ id: string, url: string }>>>(
+      const response = await api.patch<ApiResponse<Array<{ id: string, url: string }>>>(
         getDestinationUrl(tourId),
         {
           destinationId: destId,
@@ -254,10 +260,6 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
           newImages: base64
         }
       );
-    },
-    onSuccess: (response, destId) => {
-      const draft = destDrafts.get(destId);
-      if (!draft) return;
 
       // API returns the complete updated list of images
       const allImages = response.data.data ?? [];
@@ -286,14 +288,20 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
 
       queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
       showToast.success('Destination images saved');
-    },
-    onError: err => showToast.error('Save failed', extractErrorMessage(err as Error))
-  });
+    } catch (error) {
+      showToast.error('Save failed', extractErrorMessage(error as Error));
+      throw error;
+    } finally {
+      setDestSaving(prev => ({ ...prev, [destId]: false }));
+    }
+  };
 
-  const saveAttrMutation = useMutation({
-    mutationFn: async ({ attrId, destId }: { attrId: string; destId: string }) => {
-      const draft = attrDrafts.get(attrId);
-      if (!draft) throw new Error('Attraction draft not found');
+  const saveAttractionImages = async (attrId: string, destId: string) => {
+    const draft = attrDrafts.get(attrId);
+    if (!draft) throw new Error('Attraction draft not found');
+
+    try {
+      setAttrSaving(prev => ({ ...prev, [attrId]: true }));
 
       const base64 = await Promise.all(draft.toAdd.map(f =>
         fileToBase64(f.file, {
@@ -305,7 +313,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
         })
       ));
 
-      return await api.patch<ApiResponse<Array<{ id: string, url: string }>>>(
+      const response = await api.patch<ApiResponse<Array<{ id: string, url: string }>>>(
         getAttractionUrl(tourId),
         {
           destinationId: destId,
@@ -314,10 +322,6 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
           newImages: base64
         }
       );
-    },
-    onSuccess: (response, { attrId, destId }) => {
-      const draft = attrDrafts.get(attrId);
-      if (!draft) return;
 
       // API returns the complete updated list of images
       const allImages = response.data.data ?? [];
@@ -351,9 +355,13 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
 
       queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
       showToast.success('Attraction images saved');
-    },
-    onError: err => showToast.error('Save failed', extractErrorMessage(err as Error))
-  });
+    } catch (error) {
+      showToast.error('Save failed', extractErrorMessage(error as Error));
+      throw error;
+    } finally {
+      setAttrSaving(prev => ({ ...prev, [attrId]: false }));
+    }
+  };
 
   /* --------------------------------- UI --------------------------------- */
 
@@ -475,10 +483,10 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                         <Button
                           size="sm"
                           className="ml-auto gap-2"
-                          onClick={() => saveDestMutation.mutate(destination.id!)}
-                          disabled={!hasDestChanges(destination.id) || saveDestMutation.isPending}
+                          onClick={() => saveDestinationImages(destination.id!)}
+                          disabled={!hasDestChanges(destination.id) || destSaving[destination.id]}
                         >
-                          {saveDestMutation.isPending ? (
+                          {destSaving[destination.id] ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
                             <Save className="h-4 w-4" />
@@ -623,13 +631,10 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                             <Button
                               size="sm"
                               className="ml-auto gap-2"
-                              onClick={() => saveAttrMutation.mutate({
-                                attrId: attraction.id!,
-                                destId: destination.id!
-                              })}
-                              disabled={!hasAttrChanges(attraction.id) || saveAttrMutation.isPending}
+                              onClick={() => saveAttractionImages(attraction.id!, destination.id!)}
+                              disabled={!hasAttrChanges(attraction.id) || attrSaving[attraction.id]}
                             >
-                              {saveAttrMutation.isPending ? (
+                              {attrSaving[attraction.id] ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
                               ) : (
                                 <Save className="h-4 w-4" />
