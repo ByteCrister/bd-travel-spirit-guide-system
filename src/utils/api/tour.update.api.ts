@@ -8,10 +8,14 @@ import {
     UpdateTourPoliciesDTO,
     TourDetailDTO,
     DepartureDTO,
+    CreateTourDTO,
 } from '@/types/tour.types';
 import api from '../axios/axios';
 import { useCompanyDashboardStore } from '@/store/company-detail.store';
 import { ApiResponse } from '@/types/api.types';
+import { showToast } from '@/components/global/showToast';
+import { extractErrorMessage } from '../axios/extractErrorMessage';
+import { encodeId } from '../helpers/mongodb-id-conversions';
 
 // Helper function to update store after successful API call
 const updateStoreAfterSuccess = (tourId: string, tourData: Partial<TourDetailDTO>) => {
@@ -24,6 +28,26 @@ class TourUpdateService {
     private baseUrl = '/operations/tours/v1';
 
     // Modular update methods
+    async createTourApi(data: CreateTourDTO): Promise<TourDetailDTO> {
+        try {
+            const res = await api.post<ApiResponse<TourDetailDTO>>(
+                `${this.baseUrl}`,
+                data
+            );
+
+            if (!res.data || !res.data.data) {
+                throw new Error("Invalid response body")
+            }
+
+            updateStoreAfterSuccess(encodeURIComponent(encodeId(res.data.data.id)), res.data.data)
+
+            return res.data.data;
+        } catch (error: unknown) {
+            const message = extractErrorMessage(error);
+            throw new Error(message);
+        }
+    };
+
     async updateBasicInfo(tourId: string, data: UpdateTourBasicInfoDTO) {
         const response = await api.patch<ApiResponse<UpdateTourBasicInfoDTO>>(`${this.baseUrl}/${tourId}/basic-info`, data);
         if (!response.data || !response.data.data)
@@ -92,6 +116,22 @@ class TourUpdateService {
         updateStoreAfterSuccess(tourId, response.data.data)
         return response.data;
     }
+
+    async submitTourForApprovalApi(
+        tourId: string
+    ): Promise<TourDetailDTO> {
+        const res = await api.post<ApiResponse<TourDetailDTO>>(
+            `${this.baseUrl}/${tourId}`
+        );
+
+        if (!res.data || !res.data.data) {
+            throw new Error("Invalid response body")
+        }
+
+        updateStoreAfterSuccess(tourId, res.data.data);
+        showToast.success("Tour submitted for approval!");
+        return res.data.data;
+    };
 }
 
 export const tourUpdateService = new TourUpdateService();

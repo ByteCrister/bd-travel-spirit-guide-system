@@ -2,13 +2,11 @@
 import api from "@/utils/axios/axios";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import {
-    CreateTourDTO,
     // RequestReapprovalDTO,
     TourDetailDTO,
 } from "@/types/tour.types";
 import { useCompanyDashboardStore } from "@/store/company-detail.store";
 import { showToast } from "@/components/global/showToast";
-import { ApiResponse } from "@/types/api.types";
 
 // const BASE_URL = "/mock/operations/tours";
 const BASE_URL = "/operations/tours/v1";
@@ -19,49 +17,7 @@ const updateStoreAfterSuccess = (tourId: string, tourData: TourDetailDTO) => {
     store.updateTourLocal(tourId, tourData);
 };
 
-// =============== CREATE TOUR ===============
-export const createTourApi = async (data: CreateTourDTO): Promise<TourDetailDTO> => {
-    try {
-        const res = await api.post<ApiResponse<TourDetailDTO>>(
-            `${BASE_URL}`,
-            data
-        );
-
-        if (!res.data || !res.data.data) {
-            throw new Error("Invalid response body")
-        }
-
-        // Update store
-        const store = useCompanyDashboardStore.getState();
-        store.updateTourLocal(res.data.data.id, res.data.data);
-        store.invalidateCache?.('tours');
-
-        return res.data.data;
-    } catch (error: unknown) {
-        const message = extractErrorMessage(error);
-        throw new Error(message);
-    }
-};
-
-
 // =============== MODERATION ACTIONS ===============
-export const submitTourForApprovalApi = async (
-    tourId: string
-): Promise<TourDetailDTO> => {
-    try {
-        const response = await api.post<{ data: TourDetailDTO }>(
-            `${BASE_URL}/tours/${tourId}/submit`
-        );
-
-        updateStoreAfterSuccess(tourId, response.data.data);
-        showToast.success("Tour submitted for approval!");
-        return response.data.data;
-    } catch (error: unknown) {
-        const message = extractErrorMessage(error);
-        showToast.error(`Failed to submit for approval: ${message}`);
-        throw new Error(message);
-    }
-};
 
 // export const requestTourReapprovalApi = async (
 //     tourId: string,

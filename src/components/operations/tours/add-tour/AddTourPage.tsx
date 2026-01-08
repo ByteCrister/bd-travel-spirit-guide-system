@@ -28,8 +28,8 @@ import { Breadcrumbs } from '@/components/global/Breadcrumbs';
 import { Loader2, SaveAll } from 'lucide-react';
 import { GuideTestData } from '@/data/tour-1';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
-import { createTourApi } from '@/utils/api/tour.api';
 import { encodeId } from '@/utils/helpers/mongodb-id-conversions';
+import { tourUpdateService } from '@/utils/api/tour.update.api';
 
 const items = [
     { label: "Home", href: "/" },
@@ -146,7 +146,7 @@ export default function AddTourPage() {
                 })),
             };
 
-            const result = await createTourApi(processedValues)
+            const result = await tourUpdateService.createTourApi(processedValues);
 
             showToast.success('Tour created successfully!');
             router.push(`/operations/tours/${encodeURIComponent(encodeId(result.id))}`);

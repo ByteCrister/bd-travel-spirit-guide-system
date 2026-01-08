@@ -9,7 +9,7 @@ import {
   Container
 } from '@mui/material';
 import { Breadcrumbs } from '@/components/global/Breadcrumbs';
-import { SaveAll, Send, Loader2 } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 
 import HeroImageUpdate from './image-managers/HeroImageUpdate';
 import GalleryUpdate from './image-managers/GalleryUpdate';
@@ -28,7 +28,11 @@ import {
 } from '@/store/company-detail.store';
 import { TourDetailDTO } from '@/types/tour.types';
 import LoadingUpdateTourContainer from './loading-skeletons/LoadingUpdateTourContainer';
-import { TOUR_STATUS } from '@/constants/tour.const';
+import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
+import { formatValidationErrors, validateTourDataStepByStep } from '@/utils/validators/tour/validateTour';
+import ConfirmationAlert from './ConfirmationAlert';
+import { useRouter } from 'next/navigation';
+import { tourUpdateService } from '@/utils/api/tour.update.api';
 
 const steps = [
   { label: 'Basic Info', icon: '/images/tour-review/sticky-note.png' },
@@ -48,8 +52,10 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
   const [activeStep, setActiveStep] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const { fetchTourDetail, updateTourLocal, tourDetails, loading } = useCompanyDashboardStore();
   const tourData = tourDetails[tourId];
+  const router = useRouter();
 
   useEffect(() => {
     fetchTourDetail(tourId);
@@ -75,24 +81,73 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
     }
   };
 
-  const handleSave = async (status: TOUR_STATUS.DRAFT | TOUR_STATUS.SUBMITTED) => {
+  const validateAndSubmit = async () => {
+    if (!tourData) {
+      setSaveError("No tour data available to submit");
+      return;
+    }
+
     setIsSaving(true);
     setSaveError(null);
 
     try {
-      // TODO: Implement save logic
-      console.log('Saving tour with status:', status, tourData);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Step 1: Validate the tour data
+      const validationErrors = await validateTourDataStepByStep(tourData);
 
-      // Show success message
-      alert(`Tour ${status === TOUR_STATUS.DRAFT ? 'saved as draft' : TOUR_STATUS.SUBMITTED} successfully!`);
+      if (validationErrors.length > 0) {
+        const errorMessage = formatValidationErrors(validationErrors);
+        setSaveError(`Validation failed:\n${errorMessage}`);
+        setIsSaving(false);
+        return;
+      }
+
+      // Step 2: Show confirmation dialog
+      setShowConfirmation(true);
+      setIsSaving(false); // IMPORTANT: Reset saving state so dialog can be interacted with
+
     } catch (error) {
-      console.error('Error saving tour:', error);
-      setSaveError(error instanceof Error ? error.message : 'Failed to save tour');
-    } finally {
+      console.error('Error during validation:', error);
+      setSaveError('Validation error occurred. Please try again.');
       setIsSaving(false);
     }
+  };
+
+
+  const handleConfirmSubmit = async () => {
+    // Set loading state for dialog button
+    setIsSaving(true);
+
+    if (!tourData) {
+      setSaveError("No tour data available to submit");
+      setShowConfirmation(false);
+      setIsSaving(false);
+      return;
+    }
+
+    try {
+      // Step 3: Submit for approval
+      await tourUpdateService.submitTourForApprovalApi(tourId);
+
+      // Success - navigate away
+      router.push(`/operations/tours/${tourId}`);
+
+    } catch (error) {
+      console.error('Error submitting tour:', error);
+      const message = extractErrorMessage(error);
+      setSaveError(`Failed to submit tour: ${message}`);
+      // Don't close dialog on error - let user retry
+      setIsSaving(false);
+      // Keep dialog open for retry
+    } finally {
+      // Only close dialog on successful submission or explicit cancel
+      // setShowConfirmation(false); // Remove this line
+    }
+  };
+
+  // Add this function to handle dialog close
+  const handleDialogClose = () => {
+    setShowConfirmation(false);
+    setIsSaving(false);
   };
 
   if (loading[tourDetailLoadingKey(tourId)]) {
@@ -458,95 +513,48 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
                         Next →
                       </motion.button>
                     ) : (
-                      <>
-                        {/* Save as Draft Button */}
-                        <motion.button
-                          type="button"
-                          whileHover={{ scale: isSaving ? 1 : 1.02 }}
-                          whileTap={{ scale: isSaving ? 1 : 0.98 }}
-                          disabled={isSaving}
-                          onClick={() => handleSave(TOUR_STATUS.DRAFT)}
-                          className={`
-                            flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold
-                            shadow-lg transition-all duration-200
-                            ${isSaving
-                              ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-slate-600 to-slate-700 text-white hover:from-slate-700 hover:to-slate-800 shadow-slate-500/25 hover:shadow-xl hover:shadow-slate-500/30'
-                            }
-                          `}
-                        >
-                          {isSaving ? (
-                            <>
-                              <Loader2 className="h-5 w-5 animate-spin" />
-                              <span>Saving...</span>
-                            </>
-                          ) : (
-                            <>
-                              <SaveAll className="h-5 w-5" />
-                              <span>Save as Draft</span>
-                            </>
-                          )}
-                        </motion.button>
-
-                        {/* Update Tour Button */}
-                        <motion.button
-                          type="button"
-                          whileHover={{ scale: isSaving ? 1 : 1.02 }}
-                          whileTap={{ scale: isSaving ? 1 : 0.98 }}
-                          disabled={isSaving}
-                          onClick={() => handleSave(TOUR_STATUS.SUBMITTED)}
-                          className={`
+                      <motion.button
+                        type="button"
+                        whileHover={{ scale: isSaving ? 1 : 1.02 }}
+                        whileTap={{ scale: isSaving ? 1 : 0.98 }}
+                        disabled={isSaving}
+                        onClick={() => validateAndSubmit()}
+                        className={`
                             flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-semibold
                             shadow-lg transition-all duration-200
                             ${isSaving
-                              ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40'
-                            }
+                            ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40'
+                          }
                           `}
-                        >
-                          {isSaving ? (
-                            <>
-                              <Loader2 className="h-5 w-5 animate-spin" />
-                              <span>Submitting...</span>
-                            </>
-                          ) : (
-                            <>
-                              <Send className="h-5 w-5" />
-                              <span>Submit Tour</span>
-                            </>
-                          )}
-                        </motion.button>
-                      </>
+                      >
+                        {isSaving ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <span>Submitting...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-5 w-5" />
+                            <span>Submit Tour</span>
+                          </>
+                        )}
+                      </motion.button>
                     )}
                   </div>
                 </div>
               </div>
-
-              {/* Loading Overlay */}
-              <AnimatePresence>
-                {isSaving && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-3xl"
-                  >
-                    <div className="text-center">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto mb-4"
-                      />
-                      <p className="text-lg font-semibold text-slate-700">Saving your changes...</p>
-                      <p className="text-sm text-slate-500 mt-1">Please wait a moment</p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </motion.div>
         </motion.div>
       </div>
+      {/* Confirmation Alert Dialog */}
+      <ConfirmationAlert
+        open={showConfirmation}
+        onOpenChange={handleDialogClose} 
+        onConfirm={handleConfirmSubmit}
+        isLoading={isSaving}
+      />
     </div>
   );
 }
