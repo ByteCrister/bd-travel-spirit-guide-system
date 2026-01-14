@@ -54,7 +54,6 @@ export type ReportListItem = {
     messagePreview?: string; // truncated message for list
     createdAt: string; // ISO
     updatedAt: string; // ISO
-    assignedTo?: UserRef | null;
     reopenedCount: number;
     tags?: string[];
 };
@@ -72,10 +71,11 @@ export type ReportFull = {
     evidenceImages?: string[]; // asset URLs or ids
     evidenceLinks?: string[];
     status: ReportStatus;
-    assignedTo?: UserRef | null;
     priority: ReportPriority;
     resolutionNotes?: string | null;
     resolvedAt?: string | null;
+    rejectionNotes?: string;
+    rejectedAt?: string | null;
     reopenedCount: number;
     tags?: string[];
     createdAt: string;
@@ -129,15 +129,11 @@ export type ReportsQueryParams = {
     page?: number; // 1-indexed
     limit?: number;
     sort?: ReportsSort;
-    status?: ReportStatus | "any";
-    priority?: ReportPriority | "any";
-    reason?: ReportReason | "any";
+    status?: ReportStatus | null;
+    priority?: ReportPriority | null;
+    reason?: ReportReason | null;
     search?: string;
     searchScope?: ReportsSearchScope;
-    assignedTo?: string | "any"; // userId
-    tourId?: string | null; // Important input field: show reports for a specific tour
-    companyId?: string | null; // to restrict to company-wide reports
-    includeDeleted?: boolean; // admin flag
 };
 
 /* -------------------------------------------------------------------------- */
@@ -194,9 +190,10 @@ export type ReportsCacheKey = string;
 export type ReportsCacheEntry = {
     key: ReportsCacheKey;
     params: ReportsQueryParams;
-    docs: ReportListItem[]; // accumulation of fetched docs for this query
+    pages: Map<number, ReportListItem[]>;
+    // docs: ReportListItem[]; // accumulation of fetched docs for this query
+    // pagesLoaded: Set<number>; // pages fetched for this params
     total: number | null; // total known from API, null until first fetch
-    pagesLoaded: Set<number>; // pages fetched for this params
     lastFetchedAt: number; // epoch ms
     ttlMs: number; // TTL in ms (use NEXT_PUBLIC_GUIDE_CACHE_TTL)
     isStale: boolean; // heuristics for staleness
@@ -270,11 +267,13 @@ export interface ReportsStoreState {
     // Fetch full detail for a specific report (used on accordion open)
     fetchReportDetail: (reportId: string) => Promise<ReportFull>;
 
-    // Assign report to user
-    assignReport: (reportId: string, userId: string) => Promise<ReportFull>;
-
     // Resolve report with optional notes
     resolveReport: (reportId: string, notes?: string) => Promise<ReportFull>;
+
+    bulkResolveReports: (reportIds: string[], notes?: string) => Promise<{ success: boolean; message?: string; resolvedCount?: number }>;
+
+    // Reject a single report
+    rejectReport: (reportId: string, notes?: string) => Promise<ReportFull>;
 
     // Reopen a report
     reopenReport: (reportId: string) => Promise<ReportFull>;
@@ -323,7 +322,7 @@ export type IdLike = string | Types.ObjectId;
  *
  * const key = stableSerializeReportsParams(params);
  *
- * - Order keys deterministically (page, limit, sort.field, sort.dir, status, priority, reason, search, searchScope, assignedTo, tourId, companyId)
+ * - Order keys deterministically (page, limit, sort.field, sort.dir, status, priority, reason, search, searchScope, tourId, companyId)
  */
 
 /* -------------------------------------------------------------------------- */

@@ -7,6 +7,7 @@ type DBMap = Map<string, ReportFull>;
 const DB_KEY = "__mock_reports_db_v1";
 
 function getSharedDB(): DBMap {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (!(globalThis as any)[DB_KEY]) {
     const map: DBMap = new Map();
     const makeReportFull = (overrides?: Partial<ReportFull>): ReportFull => {
@@ -33,13 +34,6 @@ function getSharedDB(): DBMap {
         evidenceImages: faker.helpers.maybe(() => [faker.image.urlLoremFlickr()]),
         evidenceLinks: faker.helpers.maybe(() => [faker.internet.url()]),
         status: faker.helpers.arrayElement(Object.values(REPORT_STATUS)),
-        assignedTo: faker.helpers.maybe(() => ({
-          _id: faker.string.uuid(),
-          name: faker.person.fullName(),
-          email: faker.internet.email(),
-          avatarUrl: faker.image.avatar(),
-          role: "support",
-        })),
         priority: faker.helpers.arrayElement(Object.values(REPORT_PRIORITY)),
         resolutionNotes: null,
         resolvedAt: null,
@@ -58,9 +52,11 @@ function getSharedDB(): DBMap {
       map.set(r._id, r);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any)[DB_KEY] = map;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (globalThis as any)[DB_KEY] as DBMap;
 }
 
@@ -93,7 +89,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
       evidenceImages: faker.helpers.maybe(() => [faker.image.urlLoremFlickr()]),
       evidenceLinks: faker.helpers.maybe(() => [faker.internet.url()]),
       status: faker.helpers.arrayElement(Object.values(REPORT_STATUS)),
-      assignedTo: null,
       priority: faker.helpers.arrayElement(Object.values(REPORT_PRIORITY)),
       resolutionNotes: null,
       resolvedAt: null,
@@ -107,7 +102,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 
   const payload: ReportDetailResponse = { report };
-  return NextResponse.json(payload);
+  return NextResponse.json({ data: payload });
 };
 
 /** POST actions: assign, resolve, reopen */
@@ -121,15 +116,6 @@ export async function POST(request: Request, { params }: { params: { id: string 
   }
 
   if (path.endsWith("/assign")) {
-    const body = (await request.json().catch(() => ({}))) as { userId?: string };
-    const userId = body.userId ?? faker.string.uuid();
-    report.assignedTo = {
-      _id: userId,
-      name: faker.person.fullName(),
-      email: faker.internet.email(),
-      avatarUrl: faker.image.avatar(),
-      role: "support",
-    };
     report.status = REPORT_STATUS.IN_REVIEW;
     report.updatedAt = new Date().toISOString();
     DB.set(report._id, report);
@@ -190,7 +176,6 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       evidenceImages: [],
       evidenceLinks: [],
       status: REPORT_STATUS.OPEN,
-      assignedTo: null,
       priority: faker.helpers.arrayElement(Object.values(REPORT_PRIORITY)),
       resolutionNotes: null,
       resolvedAt: null,
@@ -207,5 +192,5 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     DB.set(id, report);
   }
 
-  return NextResponse.json({ success: true, reportId: id });
+  return NextResponse.json({ data: { success: true, reportId: id } });
 };

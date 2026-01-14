@@ -2,7 +2,7 @@
 "use client";
 
 import type { FC } from "react";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { REPORT_STATUS, REPORT_PRIORITY } from "@/types/reports.types";
 import type { ReportListItem } from "@/types/reports.types";
@@ -84,25 +84,14 @@ const priorityConfig = {
 };
 
 const ReportsCounters: FC = () => {
-  const { params, readCachedList, fetchListPage, cacheTtlMs } = useReportsStore();
-  const [loading, setLoading] = useState(false);
+  const { params, readCachedList } = useReportsStore();
+  const [loading] = useState(false);
   const currentEntry = readCachedList(params);
 
-  const isStale =
-    !currentEntry ||
-    !currentEntry.total ||
-    Date.now() - (currentEntry?.lastFetchedAt ?? 0) > cacheTtlMs ||
-    (currentEntry?.docs.length ?? 0) === 0;
-
-  useEffect(() => {
-    if (isStale) {
-      setLoading(true);
-      void fetchListPage(params.page).finally(() => setLoading(false));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStale]);
-
-  const docs: ReportListItem[] = useMemo(() => currentEntry?.docs ?? [], [currentEntry]);
+  const docs: ReportListItem[] = useMemo(
+    () => currentEntry?.pages.get(params.page ?? 1) ?? [],
+    [currentEntry, params.page]
+  );
 
   const byStatus = useMemo(() => {
     const m = new Map<string, number>();

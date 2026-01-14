@@ -52,7 +52,6 @@ function makeReportFull(overrides?: Partial<ReportFull>): ReportFull {
         evidenceImages: faker.helpers.maybe(() => [faker.image.urlLoremFlickr()]),
         evidenceLinks: faker.helpers.maybe(() => [faker.internet.url()]),
         status: faker.helpers.arrayElement(statusValues),
-        assignedTo: faker.helpers.maybe(() => makeUserRef()),
         priority: faker.helpers.arrayElement(priorityValues),
         resolutionNotes: null,
         resolvedAt: null,
@@ -77,7 +76,6 @@ function toListItem(r: ReportFull): ReportListItem {
         messagePreview: r.message.slice(0, 120),
         createdAt: r.createdAt,
         updatedAt: r.updatedAt,
-        assignedTo: r.assignedTo ?? null,
         reopenedCount: r.reopenedCount,
         tags: r.tags ?? [],
     };
@@ -90,19 +88,23 @@ function parseQueryParams(urlSearchParams: URLSearchParams): ReportsQueryParams 
     const sortField = urlSearchParams.get("sortField") ?? "createdAt";
     const sortDir = (urlSearchParams.get("sortDir") as "asc" | "desc") ?? "desc";
 
+    // Helper function to parse filter values
+    const parseFilterParam = (param: string | null): string | null => {
+        if (!param || param === "any" || param === "") {
+            return null;
+        }
+        return param;
+    };
+
     return {
         page: Math.max(1, page),
         limit: Math.max(1, limit),
         sort: { field: sortField as ReportsSortField, direction: sortDir },
-        status: urlSearchParams.get("status") as ReportsQueryParams["status"] ?? undefined,
-        priority: urlSearchParams.get("priority") as ReportsQueryParams["priority"] ?? undefined,
-        reason: urlSearchParams.get("reason") as ReportsQueryParams["reason"] ?? undefined,
-        search: urlSearchParams.get("search") ?? undefined,
-        searchScope: urlSearchParams.get("searchScope") as ReportsQueryParams["searchScope"] ?? undefined,
-        assignedTo: urlSearchParams.get("assignedTo") ?? undefined,
-        tourId: urlSearchParams.get("tourId") ?? null,
-        companyId: urlSearchParams.get("companyId") ?? null,
-        includeDeleted: urlSearchParams.get("includeDeleted") === "true",
+        status: parseFilterParam(urlSearchParams.get("status")) as ReportsQueryParams["status"],
+        priority: parseFilterParam(urlSearchParams.get("priority")) as ReportsQueryParams["priority"],
+        reason: parseFilterParam(urlSearchParams.get("reason")) as ReportsQueryParams["reason"],
+        search: urlSearchParams.get("search") || undefined,
+        searchScope: (urlSearchParams.get("searchScope") as ReportsQueryParams["searchScope"]) || undefined,
     };
 }
 
@@ -119,13 +121,12 @@ function generateReports(params: ReportsQueryParams): ReportsListResponse {
 
     // Apply search & filters
     const filtered = allReports.filter((r) => {
-        if (!params.includeDeleted && r.deletedAt) return false;
-        if (params.status && params.status !== "any" && r.status !== params.status) return false;
-        if (params.priority && params.priority !== "any" && r.priority !== params.priority) return false;
-        if (params.reason && params.reason !== "any" && r.reason !== params.reason) return false;
-        if (params.tourId && r.tour._id !== params.tourId) return false;
-        if (params.companyId && r.tour.companyId !== params.companyId) return false;
-        if (params.assignedTo && params.assignedTo !== "any" && r.assignedTo?._id !== params.assignedTo) return false;
+
+        // Handle null filter values (no filter applied)
+        if (params.status !== null && r.status !== params.status) return false;
+        if (params.priority !== null && r.priority !== params.priority) return false;
+        if (params.reason !== null && r.reason !== params.reason) return false;
+
         if (params.search && params.search.trim()) {
             const q = params.search.toLowerCase();
             const matchAny = [
@@ -177,5 +178,5 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const params = parseQueryParams(url.searchParams);
     const payload = generateReports(params);
-    return NextResponse.json(payload);
+    return NextResponse.json({ data: payload });
 }

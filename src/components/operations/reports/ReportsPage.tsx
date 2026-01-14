@@ -5,7 +5,7 @@
 "use client";
 
 import { useEffect, type FC } from "react";
-import  ReportsCounters  from "./ReportsCounters";
+import ReportsCounters from "./ReportsCounters";
 import { ReportsToolbar } from "./ReportsToolbar";
 import { ReportsTable } from "./ReportsTable";
 import { useReportsStore } from "@/store/report.store";
@@ -16,7 +16,10 @@ import { HiDocumentReport, HiTrendingUp, HiSparkles } from "react-icons/hi";
 import { plusJakartaSans } from "@/app/fonts";
 
 export const ReportsPage: FC = () => {
-    const { params, fetchListPage, loading } = useReportsStore();
+    const {
+        fetchListPage,
+        params,
+        loading } = useReportsStore();
 
     // Initial load: hydrate current params then fetch first page
     useEffect(() => {
@@ -58,7 +61,7 @@ export const ReportsPage: FC = () => {
             </div>
 
             {/* Header with modern gradient background */}
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -67,7 +70,7 @@ export const ReportsPage: FC = () => {
                 <div className="mx-auto max-w-7xl px-6 py-10">
                     <div className="flex items-start justify-between">
                         <div className="space-y-2">
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.2, duration: 0.5 }}
@@ -94,9 +97,9 @@ export const ReportsPage: FC = () => {
                                 </div>
                             </motion.div>
                         </div>
-                        
+
                         {/* Status indicator */}
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.3, duration: 0.4 }}
@@ -104,8 +107,8 @@ export const ReportsPage: FC = () => {
                         >
                             <span className={cn(
                                 "inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold shadow-sm transition-all",
-                                loading.type === "loading" 
-                                    ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200/50" 
+                                loading.type === "loading"
+                                    ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200/50"
                                     : "bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700 border border-emerald-200/50"
                             )}>
                                 <span className="relative flex h-2 w-2">
@@ -122,21 +125,21 @@ export const ReportsPage: FC = () => {
                             </span>
                         </motion.div>
                     </div>
-                    
-                    <motion.p 
+
+                    <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4, duration: 0.5 }}
                         className="mt-4 max-w-3xl text-sm leading-relaxed text-slate-600"
                     >
-                        Streamline your workflow with intelligent caching, real-time updates, and advanced filtering. 
+                        Streamline your workflow with intelligent caching, real-time updates, and advanced filtering.
                         Review, triage, and resolve incoming reports efficiently with our centralized management system.
                     </motion.p>
                 </div>
             </motion.div>
 
             {/* Main content */}
-            <motion.div 
+            <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
@@ -164,7 +167,7 @@ export const ReportsPage: FC = () => {
                     {/* Table section */}
                     <motion.div variants={itemVariants}>
                         <Card className="border-slate-200/50 bg-white/70 backdrop-blur-xl shadow-sm transition-shadow hover:shadow-md">
-                            <ReportsTable loading={loading} />
+                            <ReportsTable />
                         </Card>
                     </motion.div>
                 </div>

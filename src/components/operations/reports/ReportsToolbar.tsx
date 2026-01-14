@@ -1,13 +1,8 @@
-// components/reports/ReportsToolbar.tsx
-// Debounced search, searchScope, filters (status, reason, priority), sort, bulk selection, clear filters, export placeholder.
-// Updates store.params through setParams and triggers fetchListPage appropriately.
-
 "use client";
 
 import type { FC, ChangeEvent } from "react";
-import { useMemo, useRef } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import debounce from "lodash.debounce";
 import { REPORT_STATUS, REPORT_REASON, REPORT_PRIORITY } from "@/types/reports.types";
 import type { ReportsQueryParams, ReportsSearchScope, ReportsSortField } from "@/types/reports.types";
 import { Button } from "@/components/ui/button";
@@ -17,24 +12,22 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useReportsStore } from "@/store/report.store";
 import { ReportPriority, ReportReason, ReportStatus } from "@/constants/report.const";
 import { cn } from "@/lib/utils";
+import { useDebouncedCallback } from "@/hooks/useDebouncedCallback"; // Import the custom hook
 import {
     HiSearch,
     HiFilter,
     HiSortAscending,
     HiSortDescending,
     HiX,
-    HiCheckCircle,
-    HiUserAdd,
     HiRefresh,
-    HiDownload,
     HiAdjustments,
     HiViewGrid
 } from "react-icons/hi";
+import { HiArrowPath } from "react-icons/hi2";
 import {
     IoFunnel,
     IoClose,
     IoCheckmarkDone,
-    IoPersonAdd
 } from "react-icons/io5";
 
 const sortFields: ReportsSortField[] = [
@@ -57,17 +50,29 @@ const sortFieldLabels: Record<ReportsSortField, string> = {
 };
 
 export const ReportsToolbar: FC = () => {
-    const { params, setParams, fetchListPage, selectedIds, clearSelection } = useReportsStore();
+    const { params, setParams, fetchListPage, selectedIds, clearSelection, loading } = useReportsStore();
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
-    const onDebouncedSearch = useRef(
-        debounce((value: string) => {
-            setParams({ search: value, page: 1 });
-            void fetchListPage(1);
-        }, 400)
-    ).current;
+    // Use the custom debounced callback hook
+    const onDebouncedSearch = useDebouncedCallback((value: string) => {
+        setParams({ search: value, page: 1 });
+        void fetchListPage(1);
+    }, 400);
 
     const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
         onDebouncedSearch(e.target.value);
+    };
+
+    // Handle refresh button click
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        try {
+            // Force a fresh fetch by invalidating cache and refetching current page
+            await fetchListPage(params.page);
+        } finally {
+            // Add a small delay for visual feedback
+            setTimeout(() => setIsRefreshing(false), 300);
+        }
     };
 
     const selectionCount = selectedIds.size;
@@ -81,9 +86,9 @@ export const ReportsToolbar: FC = () => {
     const priorityItems = useMemo(() => Object.values(REPORT_PRIORITY).map((v) => ({ value: v, label: v })), []);
 
     const hasActiveFilters =
-        (params.status && params.status !== "any") ||
-        (params.priority && params.priority !== "any") ||
-        (params.reason && params.reason !== "any") ||
+        params.status !== null ||
+        params.priority !== null ||
+        params.reason !== null ||
         (params.search && params.search.length > 0);
 
     return (
@@ -112,6 +117,10 @@ export const ReportsToolbar: FC = () => {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             onClick={() => {
+                                // Cancel any pending debounced calls
+                                if ('cancel' in onDebouncedSearch && typeof onDebouncedSearch.cancel === 'function') {
+                                    onDebouncedSearch.cancel();
+                                }
                                 setParams({ search: "", page: 1 });
                                 void fetchListPage(1);
                             }}
@@ -177,17 +186,21 @@ export const ReportsToolbar: FC = () => {
                                 Status
                             </label>
                             <Select
-                                value={params.status ?? "any"}
-                                onValueChange={(val: ReportStatus) => {
-                                    setParams({ status: val, page: 1 });
+                                value={params.status ?? "null"}
+                                onValueChange={(val: string) => {
+                                    // Convert empty string to null, otherwise use the value
+                                    const newStatus = val === "null" ? null : val as ReportStatus;
+                                    setParams({ status: newStatus, page: 1 });
                                     void fetchListPage(1);
                                 }}
                             >
                                 <SelectTrigger aria-label="Status filter" className="h-10 border-slate-300 bg-white/80 backdrop-blur-sm shadow-sm hover:border-slate-400 transition-colors">
-                                    <SelectValue placeholder="Status" />
+                                    <SelectValue placeholder="All Status">
+                                        {params.status ? params.status.replace("_", " ") : "All Status"}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="any">All Status</SelectItem>
+                                    <SelectItem value="null">All Status</SelectItem>
                                     {statusItems.map((i) => (
                                         <SelectItem key={i.value} value={i.value}>
                                             {i.label}
@@ -204,17 +217,21 @@ export const ReportsToolbar: FC = () => {
                                 Reason
                             </label>
                             <Select
-                                value={params.reason ?? "any"}
-                                onValueChange={(val: ReportReason) => {
-                                    setParams({ reason: val, page: 1 });
+                                value={params.reason ?? "null"}
+                                onValueChange={(val: string) => {
+                                    // Convert empty string to null, otherwise use the value
+                                    const newReason = val === "null" ? null : val as ReportReason;
+                                    setParams({ reason: newReason, page: 1 });
                                     void fetchListPage(1);
                                 }}
                             >
                                 <SelectTrigger aria-label="Reason filter" className="h-10 border-slate-300 bg-white/80 backdrop-blur-sm shadow-sm hover:border-slate-400 transition-colors">
-                                    <SelectValue placeholder="Reason" />
+                                    <SelectValue placeholder="All Reasons">
+                                        {params.reason ? params.reason.replace("_", " ") : "All Reasons"}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="any">All Reasons</SelectItem>
+                                    <SelectItem value="null">All Reasons</SelectItem>
                                     {reasonItems.map((i) => (
                                         <SelectItem key={i.value} value={i.value}>
                                             {i.label}
@@ -231,17 +248,21 @@ export const ReportsToolbar: FC = () => {
                                 Priority
                             </label>
                             <Select
-                                value={params.priority ?? "any"}
-                                onValueChange={(val: ReportPriority) => {
-                                    setParams({ priority: val, page: 1 });
+                                value={params.priority ?? "null"}
+                                onValueChange={(val: string) => {
+                                    // Convert empty string to null, otherwise use the value
+                                    const newPriority = val === "null" ? null : val as ReportPriority;
+                                    setParams({ priority: newPriority, page: 1 });
                                     void fetchListPage(1);
                                 }}
                             >
                                 <SelectTrigger aria-label="Priority filter" className="h-10 border-slate-300 bg-white/80 backdrop-blur-sm shadow-sm hover:border-slate-400 transition-colors">
-                                    <SelectValue placeholder="Priority" />
+                                    <SelectValue placeholder="All Priority">
+                                        {params.priority || "All Priority"}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="any">All Priority</SelectItem>
+                                    <SelectItem value="null">All Priority</SelectItem>
                                     {priorityItems.map((i) => (
                                         <SelectItem key={i.value} value={i.value}>
                                             {i.label}
@@ -328,14 +349,37 @@ export const ReportsToolbar: FC = () => {
                     transition={{ duration: 0.3, delay: 0.2 }}
                     className="flex items-center justify-end gap-3"
                 >
+                    {/* Refresh Button */}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRefresh}
+                        disabled={loading.type === "loading" || isRefreshing}
+                        className="border-slate-300 bg-white hover:bg-slate-50 shadow-sm transition-all"
+                    >
+                        <motion.div
+                            animate={{ rotate: isRefreshing ? 360 : 0 }}
+                            transition={{ duration: 0.5, repeat: isRefreshing ? Infinity : 0 }}
+                        >
+                            <HiArrowPath className={`mr-2 h-4 w-4 ${isRefreshing ? 'text-blue-600' : ''}`} aria-hidden />
+                        </motion.div>
+                        {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+                    </Button>
+
+                    {/* Reset Filters Button */}
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
+                            // Cancel any pending debounced search calls
+                            if ('cancel' in onDebouncedSearch && typeof onDebouncedSearch.cancel === 'function') {
+                                onDebouncedSearch.cancel();
+                            }
+
                             const defaults: Partial<ReportsQueryParams> = {
-                                status: "any" as ReportsQueryParams["status"],
-                                priority: "any" as ReportsQueryParams["priority"],
-                                reason: "any" as ReportsQueryParams["reason"],
+                                status: null as ReportsQueryParams["status"],
+                                priority: null as ReportsQueryParams["priority"],
+                                reason: null as ReportsQueryParams["reason"],
                                 search: "",
                                 searchScope: "any" as ReportsQueryParams["searchScope"],
                                 page: 1,
@@ -349,16 +393,6 @@ export const ReportsToolbar: FC = () => {
                     >
                         <HiRefresh className="mr-2 h-4 w-4" aria-hidden />
                         Reset Filters
-                    </Button>
-
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => { /* placeholder export */ }}
-                        className="border-slate-300 bg-white hover:bg-slate-50 shadow-sm transition-all"
-                    >
-                        <HiDownload className="mr-2 h-4 w-4" aria-hidden />
-                        Export CSV
                     </Button>
                 </motion.div>
             </div>
@@ -455,24 +489,6 @@ export const ReportsToolbar: FC = () => {
                                 >
                                     <IoCheckmarkDone className="mr-2 h-4 w-4" aria-hidden />
                                     Resolve Selected
-                                </Button>
-
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    disabled={!hasSelection}
-                                    onClick={async () => {
-                                        const ids = Array.from(useReportsStore.getState().selectedIds);
-                                        const adminUserId = "admin-user-id";
-                                        for (const id of ids) {
-                                            await useReportsStore.getState().assignReport(id, adminUserId);
-                                        }
-                                        useReportsStore.getState().clearSelection();
-                                    }}
-                                    className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 shadow-md hover:shadow-lg transition-all"
-                                >
-                                    <IoPersonAdd className="mr-2 h-4 w-4" aria-hidden />
-                                    Assign Selected
                                 </Button>
                             </motion.div>
                         )}

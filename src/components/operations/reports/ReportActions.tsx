@@ -14,33 +14,21 @@ import {
 } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { MdAssignmentInd, MdCheckCircle, MdRestore, MdDeleteForever, MdMoreHoriz } from "react-icons/md";
+import { MdCheckCircle, MdRestore, MdDeleteForever, MdMoreHoriz, MdCancel } from "react-icons/md";
 import { useReportsStore } from "@/store/report.store";
 import { PulseLoader } from "./PulseLoader";
 
 export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
-    const { assignReport, resolveReport, reopenReport, softDeleteReport } = useReportsStore();
+    const { resolveReport, reopenReport, softDeleteReport, rejectReport } = useReportsStore();
 
-    const [assignOpen, setAssignOpen] = useState(false);
     const [resolveOpen, setResolveOpen] = useState(false);
+    const [rejectOpen, setRejectOpen] = useState(false);
     const [reopenConfirmOpen, setReopenConfirmOpen] = useState(false);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
 
-    const [assignUserId, setAssignUserId] = useState("");
     const [resolutionNotes, setResolutionNotes] = useState("");
-
-    const onAssign = async (e: FormEvent) => {
-        e.preventDefault();
-        setActionLoading(true);
-        try {
-            await assignReport(reportId, assignUserId);
-            setAssignOpen(false);
-            setAssignUserId("");
-        } finally {
-            setActionLoading(false);
-        }
-    };
+    const [rejectNotes, setRejectNotes] = useState("");
 
     const onResolve = async (e: FormEvent) => {
         e.preventDefault();
@@ -49,6 +37,18 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
             await resolveReport(reportId, resolutionNotes);
             setResolveOpen(false);
             setResolutionNotes("");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const onReject = async (e: FormEvent) => {
+        e.preventDefault();
+        setActionLoading(true);
+        try {
+            await rejectReport(reportId, rejectNotes);
+            setRejectOpen(false);
+            setRejectNotes("");
         } finally {
             setActionLoading(false);
         }
@@ -80,64 +80,64 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="flex flex-col space-y-2 p-2 w-44">
-                {/* Assign Dialog */}
-                <Dialog open={assignOpen} onOpenChange={setAssignOpen}>
-                    <DialogTrigger asChild>
-                        <Button variant="ghost" size="sm" className="justify-start w-full">
-                            <MdAssignmentInd className="mr-2" /> Assign
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Assign report</DialogTitle>
-                            <DialogDescription>Enter the admin/user ID to assign this report.</DialogDescription>
-                        </DialogHeader>
-                        <form onSubmit={onAssign} className="space-y-4">
-                            <Input
-                                value={assignUserId}
-                                onChange={(e) => setAssignUserId(e.target.value)}
-                                placeholder="User ID"
-                                aria-label="User ID"
-                                required
-                            />
-                            <DialogFooter>
-                                <Button type="button" variant="ghost" onClick={() => setAssignOpen(false)}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" disabled={actionLoading}>
-                                    {actionLoading ? <PulseLoader /> : "Assign"}
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+            <PopoverContent className="flex flex-col space-y-2 p-2 w-48">
 
                 {/* Resolve Dialog */}
                 <Dialog open={resolveOpen} onOpenChange={setResolveOpen}>
                     <DialogTrigger asChild>
                         <Button variant="ghost" size="sm" className="justify-start w-full">
-                            <MdCheckCircle className="mr-2" /> Resolve
+                            <MdCheckCircle className="mr-2 text-emerald-600" /> Resolve
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Resolve report</DialogTitle>
-                            <DialogDescription>Optional: Add resolution notes for internal tracking.</DialogDescription>
+                            <DialogTitle>Resolve Report</DialogTitle>
+                            <DialogDescription>Mark this report as resolved. Add optional notes for internal tracking.</DialogDescription>
                         </DialogHeader>
                         <form onSubmit={onResolve} className="space-y-4">
                             <Input
                                 value={resolutionNotes}
                                 onChange={(e) => setResolutionNotes(e.target.value)}
-                                placeholder="Resolution notes"
+                                placeholder="Add resolution notes..."
                                 aria-label="Resolution notes"
                             />
                             <DialogFooter>
                                 <Button type="button" variant="ghost" onClick={() => setResolveOpen(false)}>
                                     Cancel
                                 </Button>
-                                <Button type="submit" disabled={actionLoading}>
-                                    {actionLoading ? <PulseLoader /> : "Resolve"}
+                                <Button type="submit" disabled={actionLoading} className="bg-emerald-600 hover:bg-emerald-700">
+                                    {actionLoading ? <PulseLoader /> : "Mark as Resolved"}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Reject Dialog */}
+                <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="justify-start w-full">
+                            <MdCancel className="mr-2 text-red-600" /> Reject
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Reject Report</DialogTitle>
+                            <DialogDescription>Mark this report as rejected. Add optional notes explaining the reason.</DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={onReject} className="space-y-4">
+                            <Input
+                                value={rejectNotes}
+                                onChange={(e) => setRejectNotes(e.target.value)}
+                                placeholder="Add rejection reason..."
+                                aria-label="Rejection notes"
+                            />
+                            <DialogFooter>
+                                <Button type="button" variant="ghost" onClick={() => setRejectOpen(false)}>
+                                    Cancel
+                                </Button>
+                                <Button type="submit" disabled={actionLoading} className="bg-red-600 hover:bg-red-700">
+                                    {actionLoading ? <PulseLoader /> : "Reject Report"}
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -148,17 +148,17 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
                 <AlertDialog open={reopenConfirmOpen} onOpenChange={setReopenConfirmOpen}>
                     <AlertDialogTrigger asChild>
                         <Button variant="ghost" size="sm" className="justify-start w-full">
-                            <MdRestore className="mr-2" /> Reopen
+                            <MdRestore className="mr-2 text-amber-600" /> Reopen
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>Reopen Report?</AlertDialogTitle>
-                            Are you sure you want to reopen this report?
+                            Are you sure you want to reopen this report? This will change its status back to pending review.
                         </AlertDialogHeader>
                         <div className="flex justify-end space-x-2 mt-4">
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={onReopen} disabled={actionLoading}>
+                            <AlertDialogAction onClick={onReopen} disabled={actionLoading} className="bg-amber-600 hover:bg-amber-700">
                                 {actionLoading ? <PulseLoader /> : "Reopen"}
                             </AlertDialogAction>
                         </div>
@@ -175,7 +175,7 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>Delete Report?</AlertDialogTitle>
-                            This action cannot be undone. Are you sure you want to delete this report?
+                            This action cannot be undone. The report will be soft-deleted and archived.
                         </AlertDialogHeader>
                         <div className="flex justify-end space-x-2 mt-4">
                             <AlertDialogCancel>Cancel</AlertDialogCancel>

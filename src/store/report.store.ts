@@ -10,7 +10,6 @@
 // - API endpoints assumed:
 //    GET  /operations/reports         -> list with query params
 //    GET  /operations/reports/:id     -> single report detail
-//    POST /operations/reports/:id/assign  { userId }
 //    POST /operations/reports/:id/resolve { notes }
 //    POST /operations/reports/:id/reopen
 //    DELETE /operations/reports/:id   -> soft-delete
@@ -26,15 +25,17 @@ import {
     ReportsCacheKey,
     ReportsCacheEntry,
     ReportsListResponse,
-    ReportListItem,
     ReportFull,
     ReportDetailResponse,
     ReportActionResponse,
 } from "@/types/reports.types";
 import api from "@/utils/axios/axios";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
+import { ApiResponse } from "@/types/api.types";
 
 const URL_AFTER_API = `/mock/operations/reports`;
+// const URL_AFTER_API = `/operations/reports/v1`;
+
 const DEFAULT_LIMITS = [10, 20, 50];
 const DEFAULT_LIMIT = 10;
 const CACHE_TTL_MS = Number(process.env.NEXT_PUBLIC_GUIDE_CACHE_TTL ?? 60000);
@@ -44,26 +45,22 @@ enableMapSet();
 // Stable serialization order for cache keys.
 function stableSerializeParams(p: ReportsQueryParams): string {
     const ordered: Record<string, unknown> = {
-        page: p.page ?? 1,
+        // page: p.page ?? 1,
         limit: p.limit ?? DEFAULT_LIMIT,
         sortField: p.sort?.field ?? "createdAt",
         sortDirection: p.sort?.direction ?? "desc",
-        status: p.status ?? "any",
-        priority: p.priority ?? "any",
-        reason: p.reason ?? "any",
+        status: p.status ?? null,
+        priority: p.priority ?? null,
+        reason: p.reason ?? null,
         search: p.search ?? "",
         searchScope: p.searchScope ?? "any",
-        assignedTo: p.assignedTo ?? "any",
-        tourId: p.tourId ?? null,
-        companyId: p.companyId ?? null,
-        includeDeleted: p.includeDeleted ?? false,
     };
     return JSON.stringify(ordered);
 }
 
 function makeCacheKey(p?: ReportsQueryParams): ReportsCacheKey {
     const params: ReportsQueryParams = {
-        page: p?.page ?? 1,
+        // page: p?.page ?? 1,
         limit: p?.limit ?? DEFAULT_LIMIT,
         sort: p?.sort,
         status: p?.status,
@@ -71,10 +68,6 @@ function makeCacheKey(p?: ReportsQueryParams): ReportsCacheKey {
         reason: p?.reason,
         search: p?.search,
         searchScope: p?.searchScope,
-        assignedTo: p?.assignedTo,
-        tourId: p?.tourId ?? null,
-        companyId: p?.companyId ?? null,
-        includeDeleted: p?.includeDeleted ?? false,
     };
     return stableSerializeParams(params);
 }
@@ -83,9 +76,10 @@ function createCacheEntry(params: ReportsQueryParams): ReportsCacheEntry {
     return {
         key: makeCacheKey(params),
         params,
-        docs: [],
+        pages: new Map(),
+        // docs: [],
+        // pagesLoaded: new Set<number>(),
         total: null,
-        pagesLoaded: new Set<number>(),
         lastFetchedAt: Date.now(),
         ttlMs: CACHE_TTL_MS,
         isStale: false,
@@ -102,46 +96,59 @@ async function fetchListFromApi(params: ReportsQueryParams): Promise<ReportsList
         query.sortField = params.sort.field;
         query.sortDir = params.sort.direction;
     }
-    if (params.status && params.status !== "any") query.status = params.status;
-    if (params.priority && params.priority !== "any") query.priority = params.priority;
-    if (params.reason && params.reason !== "any") query.reason = params.reason;
+    if (params.status !== null) query.status = params.status;
+    if (params.priority !== null) query.priority = params.priority;
+    if (params.reason !== null) query.reason = params.reason;
     if (params.search) {
         query.search = params.search;
         query.searchScope = params.searchScope ?? "any";
     }
-    if (params.assignedTo && params.assignedTo !== "any") query.assignedTo = params.assignedTo;
-    if (params.tourId) query.tourId = params.tourId;
-    if (params.companyId) query.companyId = params.companyId;
-    if (params.includeDeleted) query.includeDeleted = true;
 
-    const resp = await api.get(`${URL_AFTER_API}`, { params: query });
+    const resp = await api.get<ApiResponse<ReportsListResponse>>(`${URL_AFTER_API}`, { params: query });
     // Expect backend paginated shape identical to ReportsListResponse
-    return resp.data as ReportsListResponse;
+    return resp.data.data as ReportsListResponse;
 }
 
 async function fetchDetailFromApi(reportId: string): Promise<ReportFull> {
-    const resp = await api.get(`${URL_AFTER_API}/${reportId}`);
-    const payload = resp.data as ReportDetailResponse;
+    const resp = await api.get<ApiResponse<ReportDetailResponse>>(`${URL_AFTER_API}/${reportId}`);
+    const payload = resp.data.data as ReportDetailResponse;
     return payload.report;
 }
 
-async function assignReportApi(reportId: string, userId: string): Promise<ReportFull> {
-    const resp = await api.post(`${URL_AFTER_API}/${reportId}/assign`, { userId });
-    const payload = resp.data as ReportActionResponse;
-    if (!payload.success) throw new Error(payload.message ?? "Assign failed");
-    return payload.report!;
+async function rejectReportApi(reportId: string, notes?: string): Promise<ReportActionResponse> {
+    const resp = await api.post<ApiResponse<ReportActionResponse>>(
+        `${URL_AFTER_API}/${reportId}/reject`,
+        { notes }
+    );
+
+    if (!resp.data || !resp.data.data)
+        throw new Error("Invalid response body.");
+
+    return resp.data.data;
 }
 
 async function resolveReportApi(reportId: string, notes?: string): Promise<ReportFull> {
-    const resp = await api.post(`${URL_AFTER_API}/${reportId}/resolve`, { notes });
-    const payload = resp.data as ReportActionResponse;
+    const resp = await api.post<ApiResponse<ReportActionResponse>>(`${URL_AFTER_API}/${reportId}/resolve`, { notes });
+    const payload = resp.data.data as ReportActionResponse;
     if (!payload.success) throw new Error(payload.message ?? "Resolve failed");
     return payload.report!;
 }
 
+async function bulkResolveApi(reportIds: string[], notes?: string): Promise<{ success: boolean; message?: string; resolvedCount?: number }> {
+    const resp = await api.post<ApiResponse<{ success: boolean; message?: string; resolvedCount?: number }>>(
+        `${URL_AFTER_API}/bulk/resolve`,
+        { reportIds, notes }
+    );
+
+    if (!resp.data || !resp.data.data)
+        throw new Error("Invalid response body.");
+
+    return resp.data.data;
+}
+
 async function reopenReportApi(reportId: string): Promise<ReportFull> {
-    const resp = await api.post(`${URL_AFTER_API}/${reportId}/reopen`);
-    const payload = resp.data as ReportActionResponse;
+    const resp = await api.post<ApiResponse<ReportActionResponse>>(`${URL_AFTER_API}/${reportId}/reopen`);
+    const payload = resp.data.data as ReportActionResponse;
     if (!payload.success) throw new Error(payload.message ?? "Reopen failed");
     return payload.report!;
 }
@@ -160,15 +167,11 @@ export const useReportsStore = create<ReportsStoreState>()(
                 page: 1,
                 limit: DEFAULT_LIMIT,
                 sort: { field: "createdAt", direction: "desc" },
-                status: "any",
-                priority: "any",
-                reason: "any",
+                status: null,
+                priority: null,
+                reason: null,
                 search: "",
                 searchScope: "any",
-                assignedTo: "any",
-                tourId: null,
-                companyId: null,
-                includeDeleted: false,
             },
             cache: {},
             detailsCache: {},
@@ -245,7 +248,6 @@ export const useReportsStore = create<ReportsStoreState>()(
                 const params = { ...state.params, page: page ?? state.params.page ?? 1 };
                 const key = makeCacheKey(params);
 
-                // Ensure cache entry
                 let entry = state.cache[key];
                 if (!entry) {
                     entry = createCacheEntry(params);
@@ -254,60 +256,48 @@ export const useReportsStore = create<ReportsStoreState>()(
                     }));
                 }
 
-                const pageToFetch = params.page ?? 1;
+                const pageToFetch = params.page!;
                 const limit = params.limit ?? state.defaultLimit;
                 const now = Date.now();
 
-                // Return cached page if still valid
-                if (entry.pagesLoaded.has(pageToFetch) && now - entry.lastFetchedAt < entry.ttlMs) {
-                    const start = (pageToFetch - 1) * limit;
-                    const docs = entry.docs.slice(start, start + limit);
+                // return cached page
+                const cachedPage = entry.pages.get(pageToFetch);
+                if (cachedPage && now - entry.lastFetchedAt < entry.ttlMs) {
                     return {
-                        docs,
-                        total: entry.total ?? docs.length,
+                        docs: cachedPage,
+                        total: entry.total ?? cachedPage.length,
                         page: pageToFetch,
                         pages: entry.total ? Math.ceil(entry.total / limit) : 1,
                         limit,
-                    } as ReportsListResponse;
+                    };
                 }
 
-                // Start loading
                 set(produce((s: ReportsStoreState) => {
                     s.loading = { type: "loading", context: "list" };
-                    s.cache[key]!.error = null;
                 }));
 
                 try {
                     const resp = await fetchListFromApi(params);
 
                     set(produce((s: ReportsStoreState) => {
-                        const entryRef = s.cache[key]!;
-                        const start = (pageToFetch - 1) * limit;
-
-                        // Replace/insert fetched docs
-                        entryRef.docs.splice(start, resp.docs.length, ...resp.docs);
-
-                        entryRef.total = resp.total;
-                        entryRef.pagesLoaded.add(pageToFetch);
-                        entryRef.lastFetchedAt = Date.now();
-                        entryRef.isStale = false;
-                        entryRef.error = null;
+                        const e = s.cache[key]!;
+                        e.pages.set(pageToFetch, resp.docs);
+                        e.total = resp.total;
+                        e.lastFetchedAt = Date.now();
+                        e.error = null;
                         s.loading = { type: "success" };
                     }));
-
 
                     return resp;
                 } catch (err) {
                     const message = extractErrorMessage(err);
                     set(produce((s: ReportsStoreState) => {
                         s.loading = { type: "error", message };
-                        s.cache[key]?.pagesLoaded.add(pageToFetch); // Optional: mark as attempted
                         s.cache[key]!.error = message;
                     }));
                     throw new Error(message);
                 }
             },
-
 
             fetchReportDetail: async (reportId: string) => {
                 const state = get();
@@ -362,51 +352,6 @@ export const useReportsStore = create<ReportsStoreState>()(
                 }
             },
 
-            assignReport: async (reportId: string, userId: string) => {
-                set(
-                    produce((s: ReportsStoreState) => {
-                        s.loading = { type: "loading", context: "action" };
-                    })
-                );
-                try {
-                    const report = await assignReportApi(reportId, userId);
-                    // update detail and cached lists
-                    set(
-                        produce((s: ReportsStoreState) => {
-                            s.detailsCache[reportId] = {
-                                data: report,
-                                loading: false,
-                                error: null,
-                                fetchedAt: Date.now(),
-                            };
-                            // Update any cached list entries that include this report
-                            for (const key of Object.keys(s.cache)) {
-                                const e = s.cache[key];
-                                const idx = e.docs.findIndex((d) => d._id === report._id);
-                                if (idx >= 0) {
-                                    e.docs[idx] = {
-                                        ...e.docs[idx],
-                                        assignedTo: report.assignedTo ?? null,
-                                        status: report.status,
-                                        updatedAt: report.updatedAt,
-                                    };
-                                }
-                            }
-                            s.loading = { type: "success" };
-                        })
-                    );
-                    return report;
-                } catch (err) {
-                    const message = extractErrorMessage(err);
-                    set(
-                        produce((s: ReportsStoreState) => {
-                            s.loading = { type: "error", message };
-                        })
-                    );
-                    throw new Error(message);
-                }
-            },
-
             resolveReport: async (reportId: string, notes?: string) => {
                 set(
                     produce((s: ReportsStoreState) => {
@@ -425,13 +370,17 @@ export const useReportsStore = create<ReportsStoreState>()(
                             };
                             for (const key of Object.keys(s.cache)) {
                                 const e = s.cache[key];
-                                const idx = e.docs.findIndex((d) => d._id === report._id);
-                                if (idx >= 0) {
-                                    e.docs[idx] = {
-                                        ...e.docs[idx],
-                                        status: report.status,
-                                        updatedAt: report.updatedAt,
-                                    };
+                                for (const [pageNum, pageDocs] of e.pages.entries()) {
+                                    const idx = pageDocs.findIndex((d) => d._id === report._id);
+                                    if (idx >= 0) {
+                                        pageDocs[idx] = {
+                                            ...pageDocs[idx],
+                                            status: report.status,
+                                            updatedAt: report.updatedAt,
+                                        };
+                                        // Update the page in the Map
+                                        e.pages.set(pageNum, pageDocs);
+                                    }
                                 }
                             }
                             s.loading = { type: "success" };
@@ -443,6 +392,84 @@ export const useReportsStore = create<ReportsStoreState>()(
                     set(
                         produce((s: ReportsStoreState) => {
                             s.loading = { type: "error", message };
+                        })
+                    );
+                    throw new Error(message);
+                }
+            },
+
+            bulkResolveReports: async (reportIds: string[], notes?: string) => {
+                set(
+                    produce((s: ReportsStoreState) => {
+                        s.loading = { type: "loading", context: "bulkAction" };
+                    })
+                );
+                try {
+                    const result = await bulkResolveApi(reportIds, notes);
+                    // Invalidate the cache so that the next fetch will get updated data
+                    // We can invalidate all cache entries that have these reportIds, or simply invalidate all.
+                    // For simplicity, we invalidate all cache entries.
+                    set(
+                        produce((s: ReportsStoreState) => {
+                            s.cache = {};
+                            s.loading = { type: "success" };
+                        })
+                    );
+                    return result;
+                } catch (err) {
+                    const message = extractErrorMessage(err);
+                    set(
+                        produce((s: ReportsStoreState) => {
+                            s.loading = { type: "error", message };
+                        })
+                    );
+                    throw new Error(message);
+                }
+            },
+
+            rejectReport: async (reportId: string, notes?: string) => {
+                set(
+                    produce((s: ReportsStoreState) => {
+                        s.loading = { type: 'loading', context: 'action' };
+                    })
+                );
+                try {
+                    const result = await rejectReportApi(reportId, notes);
+                    if (!result.success) throw new Error(result.message ?? 'Reject failed');
+
+                    const report = result.report!;
+                    set(
+                        produce((s: ReportsStoreState) => {
+                            s.detailsCache[reportId] = {
+                                data: report,
+                                loading: false,
+                                error: null,
+                                fetchedAt: Date.now(),
+                            };
+                            for (const key of Object.keys(s.cache)) {
+                                const e = s.cache[key];
+                                for (const [pageNum, pageDocs] of e.pages.entries()) {
+                                    const idx = pageDocs.findIndex((d) => d._id === report._id);
+                                    if (idx >= 0) {
+                                        pageDocs[idx] = {
+                                            ...pageDocs[idx],
+                                            status: report.status,
+                                            updatedAt: report.updatedAt,
+                                        };
+                                        // Update the page in the Map
+                                        e.pages.set(pageNum, pageDocs);
+                                    }
+                                }
+                            }
+                            s.loading = { type: 'success' };
+                        })
+                    );
+                    return report;
+                } catch (err) {
+                    const message = extractErrorMessage(err);
+                    set(
+                        produce((s: ReportsStoreState) => {
+                            s.loading = { type: 'error', message };
                         })
                     );
                     throw new Error(message);
@@ -467,14 +494,17 @@ export const useReportsStore = create<ReportsStoreState>()(
                             };
                             for (const key of Object.keys(s.cache)) {
                                 const e = s.cache[key];
-                                const idx = e.docs.findIndex((d) => d._id === report._id);
-                                if (idx >= 0) {
-                                    e.docs[idx] = {
-                                        ...e.docs[idx],
-                                        status: report.status,
-                                        reopenedCount: report.reopenedCount,
-                                        updatedAt: report.updatedAt,
-                                    };
+                                for (const [pageNum, pageDocs] of e.pages.entries()) {
+                                    const idx = pageDocs.findIndex((d) => d._id === report._id);
+                                    if (idx >= 0) {
+                                        pageDocs[idx] = {
+                                            ...pageDocs[idx],
+                                            status: report.status,
+                                            updatedAt: report.updatedAt,
+                                        };
+                                        // Update the page in the Map
+                                        e.pages.set(pageNum, pageDocs);
+                                    }
                                 }
                             }
                             s.loading = { type: "success" };
@@ -504,12 +534,26 @@ export const useReportsStore = create<ReportsStoreState>()(
                     set(
                         produce((s: ReportsStoreState) => {
                             delete s.detailsCache[reportId];
+
+                            // Remove the report from all pages in all cache entries
                             for (const key of Object.keys(s.cache)) {
                                 const e = s.cache[key];
-                                const oldLen = e.docs.length;
-                                e.docs = e.docs.filter((d) => d._id !== reportId);
-                                if (e.docs.length !== oldLen) {
-                                    // keep pagesLoaded as-is; front-end may trigger refetch
+                                let reportFound = false;
+
+                                // Check each page for the report
+                                for (const [pageNum, pageItems] of e.pages.entries()) {
+                                    const oldLen = pageItems.length;
+                                    const newPageItems = pageItems.filter((d) => d._id !== reportId);
+
+                                    if (newPageItems.length !== oldLen) {
+                                        reportFound = true;
+                                        e.pages.set(pageNum, newPageItems);
+                                    }
+                                }
+
+                                // If we found and removed the report, decrement total count
+                                if (reportFound && e.total !== null) {
+                                    e.total = Math.max(0, e.total - 1);
                                 }
                             }
                             s.loading = { type: "success" };
@@ -552,36 +596,24 @@ export const useReportsStore = create<ReportsStoreState>()(
                 ),
         }),
         {
-            name: "operations-reports-store", // localStorage key
+            name: "operations-reports-store",
 
-            /**
-             * Persist only plain-serializable parts:
-             * - params (object)
-             * - selectedIds as array (convert Set -> array)
-             *
-             * Typed as unknown here to satisfy the persist generic signature,
-             * but we ensure runtime shape is correct and safe.
-             */
             partialize: (state) =>
-            // Return plain serializable object only
+            // Return only selectedIds, NOT params
             ({
-                params: state.params,
                 selectedIds: Array.from(state.selectedIds),
             } as unknown),
 
-            /**
-             * merge receives persisted state as unknown (Zustand definition).
-             * Safely cast to our persisted shape and rehydrate Set for selectedIds.
-             */
             merge: (persistedState: unknown, currentState: ReportsStoreState) => {
                 const persisted = (persistedState as
-                    | { params?: ReportsQueryParams; selectedIds?: string[] }
+                    | { selectedIds?: string[] }
                     | undefined) ?? {};
 
                 const selectedIds = new Set<string>(persisted.selectedIds ?? []);
                 return {
                     ...currentState,
-                    params: persisted.params ?? currentState.params,
+                    // DO NOT merge params from persisted state
+                    // Keep currentState.params (which has defaults)
                     selectedIds,
                 };
             },

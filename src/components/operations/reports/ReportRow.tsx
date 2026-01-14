@@ -10,26 +10,29 @@ import type { ReportListItem } from "@/types/reports.types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { 
-    MdExpandMore, 
-    MdCheckCircle, 
+import {
+    MdExpandMore,
+    MdCheckCircle,
     MdPending,
     MdCancel,
-    MdSchedule 
+    MdSchedule
 } from "react-icons/md";
 import { HiSparkles } from "react-icons/hi";
 import { ReportActions } from "./ReportActions";
 import { ReportDetailsPanel } from "./ReportDetailsPanel";
 import { useReportsStore } from "@/store/report.store";
 import { formatDateTime } from "@/utils/helpers/format.reports";
+import { REPORT_STATUS, ReportStatus } from "@/constants/report.const";
 
 export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {
     const { toggleSelect, selectedIds, fetchReportDetail, detailsCache } = useReportsStore();
     const [expanded, setExpanded] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    const [showResolvedTooltip, setShowResolvedTooltip] = useState(false);
     const detailsRegionId = useId();
 
     const isSelected = selectedIds.has(item._id);
+    const isResolved = item.status === REPORT_STATUS.RESOLVED;
 
     const onToggleExpand = async () => {
         const next = !expanded;
@@ -42,24 +45,34 @@ export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {
         }
     };
 
-    const getStatusConfig = (status: string) => {
+    const handleCheckboxChange = () => {
+        if (isResolved) {
+            // Show tooltip for resolved reports
+            setShowResolvedTooltip(true);
+            setTimeout(() => setShowResolvedTooltip(false), 2000); // Hide after 2 seconds
+            return;
+        }
+        toggleSelect(item._id);
+    };
+
+    const getStatusConfig = (status: ReportStatus) => {
         const normalized = status.toLowerCase().replace("_", " ");
         switch (normalized) {
-            case "resolved":
+            case REPORT_STATUS.RESOLVED:
                 return {
                     icon: MdCheckCircle,
                     color: "text-emerald-600 dark:text-emerald-400",
                     bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
                     borderColor: "border-emerald-200 dark:border-emerald-800"
                 };
-            case "pending":
+            case REPORT_STATUS.IN_REVIEW:
                 return {
                     icon: MdPending,
                     color: "text-amber-600 dark:text-amber-400",
                     bgColor: "bg-amber-100 dark:bg-amber-900/30",
                     borderColor: "border-amber-200 dark:border-amber-800"
                 };
-            case "rejected":
+            case REPORT_STATUS.REJECTED:
                 return {
                     icon: MdCancel,
                     color: "text-red-600 dark:text-red-400",
@@ -81,7 +94,7 @@ export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {
 
     return (
         <>
-            <TableRow 
+            <TableRow
                 className={`
                     group relative transition-all duration-200 cursor-pointer
                     ${isSelected ? 'bg-blue-50 dark:bg-blue-950/30 border-l-4 border-l-blue-500' : ''}
@@ -94,26 +107,53 @@ export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {
             >
                 {/* Selection Checkbox */}
                 <TableCell className="relative">
-                    <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <Checkbox
-                            checked={isSelected}
-                            onCheckedChange={() => toggleSelect(item._id)}
-                            aria-label={`Select report ${item._id}`}
-                            className="border-2"
-                        />
-                    </motion.div>
-                    {isSelected && (
+                    <div className="relative">
                         <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="absolute -top-1 -right-1"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
                         >
-                            <HiSparkles className="text-blue-500" size={12} />
+                            <Checkbox
+                                checked={isSelected}
+                                onCheckedChange={handleCheckboxChange}
+                                aria-label={`Select report ${item._id}`}
+                                className={`border-2 ${isResolved ? 'cursor-not-allowed opacity-70' : ''}`}
+                                disabled={isResolved}
+                            />
                         </motion.div>
-                    )}
+
+                        {/* Tooltip for resolved reports */}
+                        <AnimatePresence>
+                            {showResolvedTooltip && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 5, scale: 0.9 }}
+                                    className="absolute left-0 bottom-full mb-2 z-50"
+                                >
+                                    <div className="relative">
+                                        <div className="bg-red-500 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+                                            <div className="flex items-center gap-1">
+                                                <MdCancel size={14} />
+                                                <span>It&apos;s already resolved.</span>
+                                            </div>
+                                            {/* Tooltip arrow */}
+                                            <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-red-500"></div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {isSelected && (
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute -top-1 -right-1"
+                            >
+                                <HiSparkles className="text-blue-500" size={12} />
+                            </motion.div>
+                        )}
+                    </div>
                 </TableCell>
 
                 {/* Report ID */}
@@ -225,16 +265,16 @@ export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {
                                 role="region"
                                 aria-label={`Details for report ${item._id}`}
                                 initial={{ height: 0, opacity: 0 }}
-                                animate={{ 
-                                    height: "auto", 
+                                animate={{
+                                    height: "auto",
                                     opacity: 1,
                                     transition: {
                                         height: { duration: 0.3, ease: "easeOut" },
                                         opacity: { duration: 0.2, delay: 0.1 }
                                     }
                                 }}
-                                exit={{ 
-                                    height: 0, 
+                                exit={{
+                                    height: 0,
                                     opacity: 0,
                                     transition: {
                                         height: { duration: 0.3, ease: "easeIn" },

@@ -1,20 +1,18 @@
 // components/reports/ReportsTable.tsx
-// Modern, animated reports table with enhanced UI/UX
 
 "use client";
 
 import type { FC } from "react";
-import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import type { ReportsCacheEntry, ReportListItem } from "@/types/reports.types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ReportRow } from "./ReportRow";
-import { 
-    MdChevronLeft, 
-    MdChevronRight, 
-    MdFirstPage, 
+import {
+    MdChevronLeft,
+    MdChevronRight,
+    MdFirstPage,
     MdLastPage,
     MdCheckBox,
     MdFingerprint,
@@ -29,35 +27,20 @@ import { HiDocumentText, HiFilter, HiSparkles } from "react-icons/hi";
 import { useReportsStore } from "@/store/report.store";
 import { PulseLoader } from "./PulseLoader";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const ReportsTable: FC<{ loading: { type: string; message?: string } }> = ({ loading }) => {
-    const {params, pageLimitOptions, readCachedList, fetchListPage, setParams, cacheTtlMs} = useReportsStore();
+export const ReportsTable: FC = () => {
+    const { params, pageLimitOptions, readCachedList, fetchListPage, setParams, loading } = useReportsStore();
 
-    const [localLoading, setLocalLoading] = useState(false);
+    const localLoading = loading.type === "loading" && loading.context === "list";
 
     const entry: ReportsCacheEntry | null = readCachedList(params);
     const limit = params.limit ?? 10;
     const page = params.page ?? 1;
 
-    const isPageLoaded = entry?.pagesLoaded?.has(page) ?? false;
-    const isStale = !entry || Date.now() - (entry.lastFetchedAt ?? 0) > cacheTtlMs || entry.error != null;
+    const docsPageSlice: ReportListItem[] =
+        entry?.pages.get(page) ?? [];
 
-    useEffect(() => {
-        if (!isPageLoaded || isStale) {
-            setLocalLoading(true);
-            void fetchListPage(page).finally(() => setLocalLoading(false));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, limit]);
-
-    const docsPageSlice: ReportListItem[] = useMemo(() => {
-        const start = (page - 1) * limit;
-        const slice = entry?.docs.slice(start, start + limit) ?? [];
-        return slice;
-    }, [entry, page, limit]);
-
-    const total = entry?.total ?? docsPageSlice.length;
-    const pages = total > 0 ? Math.max(1, Math.ceil(total / limit)) : 1;
+    const total = entry?.total ?? 0;
+    const pages = total > 0 ? Math.ceil(total / limit) : 1;
 
     const startIdx = total > 0 ? (page - 1) * limit + 1 : 0;
     const endIdx = total > 0 ? Math.min(page * limit, total) : 0;
@@ -98,7 +81,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                 <div className="relative rounded-2xl bg-white dark:bg-gray-950 overflow-hidden">
                     {/* Decorative Background Pattern */}
                     <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-900/30 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] pointer-events-none" />
-                    
+
                     {/* Loading Overlay */}
                     <AnimatePresence>
                         {localLoading && docsPageSlice.length > 0 && (
@@ -129,7 +112,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                             <TableHeader>
                                 <TableRow className="border-b-2 border-gray-200 dark:border-gray-800 bg-gradient-to-r from-gray-50 via-gray-50/80 to-gray-50 dark:from-gray-900/80 dark:via-gray-900/60 dark:to-gray-900/80 hover:from-gray-100 hover:via-gray-100/80 hover:to-gray-100 dark:hover:from-gray-900 dark:hover:via-gray-900/80 dark:hover:to-gray-900 transition-colors">
                                     <TableHead className="w-12">
-                                        <motion.div 
+                                        <motion.div
                                             className="flex items-center gap-2"
                                             variants={headerVariants}
                                         >
@@ -137,7 +120,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                                         </motion.div>
                                     </TableHead>
                                     <TableHead>
-                                        <motion.div 
+                                        <motion.div
                                             className="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300"
                                             variants={headerVariants}
                                         >
@@ -146,7 +129,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                                         </motion.div>
                                     </TableHead>
                                     <TableHead>
-                                        <motion.div 
+                                        <motion.div
                                             className="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300"
                                             variants={headerVariants}
                                         >
@@ -155,7 +138,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                                         </motion.div>
                                     </TableHead>
                                     <TableHead>
-                                        <motion.div 
+                                        <motion.div
                                             className="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300"
                                             variants={headerVariants}
                                         >
@@ -164,7 +147,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                                         </motion.div>
                                     </TableHead>
                                     <TableHead>
-                                        <motion.div 
+                                        <motion.div
                                             className="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300"
                                             variants={headerVariants}
                                         >
@@ -173,7 +156,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                                         </motion.div>
                                     </TableHead>
                                     <TableHead>
-                                        <motion.div 
+                                        <motion.div
                                             className="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300"
                                             variants={headerVariants}
                                         >
@@ -182,7 +165,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                                         </motion.div>
                                     </TableHead>
                                     <TableHead>
-                                        <motion.div 
+                                        <motion.div
                                             className="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300"
                                             variants={headerVariants}
                                         >
@@ -191,7 +174,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                                         </motion.div>
                                     </TableHead>
                                     <TableHead className="text-right">
-                                        <motion.div 
+                                        <motion.div
                                             className="flex items-center justify-end gap-2 font-semibold text-gray-700 dark:text-gray-300"
                                             variants={headerVariants}
                                         >
@@ -368,7 +351,7 @@ export const ReportsTable: FC<{ loading: { type: string; message?: string } }> =
                             >
                                 <MdChevronLeft size={20} />
                             </Button>
-                            
+
                             <div className="px-4 min-w-[90px] text-center">
                                 <span className="text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
                                     {page}

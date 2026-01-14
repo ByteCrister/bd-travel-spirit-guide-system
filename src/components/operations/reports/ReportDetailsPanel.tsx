@@ -233,12 +233,6 @@ export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
 
                         <div className="space-y-3">
                             <InfoRow
-                                icon={MdPerson}
-                                label="Assigned to"
-                                value={report.assignedTo?.name ?? "-"}
-                                iconColor="text-purple-500 dark:text-purple-400"
-                            />
-                            <InfoRow
                                 icon={MdPriorityHigh}
                                 label="Priority"
                                 value={report.priority}
