@@ -33,7 +33,6 @@ export interface IReport {
     evidenceImages?: Types.ObjectId[]; // Image references to Assets model
     evidenceLinks?: string[];          // External proof URLs
     status: ReportStatus;              // Current workflow state
-    assignedTo?: Types.ObjectId;       // Admin/Traveler handling it
     priority: ReportPriority;          // Triage urgency
     resolutionNotes?: string;          // Internal post-resolution notes
     rejectionNotes?: string;           // Notes for why report was rejected
@@ -315,13 +314,10 @@ function enhancedSoftDeletePlugin(
         id: Types.ObjectId | string,
         options: { session?: ClientSession } = {}
     ) {
-        return this.findByIdAndUpdate(
-            id,
+        return this.findOneAndUpdate(
+            { _id: id, deletedAt: null },
             { deletedAt: new Date() },
-            {
-                new: true,
-                session: options.session
-            }
+            { new: true, session: options.session }
         ) as Promise<HydratedReportDocument | null>;
     };
 
@@ -329,13 +325,10 @@ function enhancedSoftDeletePlugin(
         id: Types.ObjectId | string,
         options: { session?: ClientSession } = {}
     ) {
-        return this.findByIdAndUpdate(
-            id,
+        return this.findOneAndUpdate(
+            { _id: id, deletedAt: { $ne: null } },
             { deletedAt: null },
-            {
-                new: true,
-                session: options.session
-            }
+            { new: true, session: options.session }
         ) as Promise<HydratedReportDocument | null>;
     };
 
@@ -394,14 +387,12 @@ const ReportSchema = new Schema<IReport, IReportModel, IReportMethods, ReportQue
             type: Schema.Types.ObjectId,
             ref: "Traveler",
             required: true,
-            index: true,
         },
 
         tour: {
             type: Schema.Types.ObjectId,
             ref: "Tour",
             required: true,
-            index: true,
         },
 
         reason: {
@@ -429,14 +420,12 @@ const ReportSchema = new Schema<IReport, IReportModel, IReportMethods, ReportQue
             type: String,
             enum: Object.values(REPORT_STATUS),
             default: REPORT_STATUS.OPEN,
-            index: true,
         },
 
         priority: {
             type: String,
             enum: Object.values(REPORT_PRIORITY),
             default: REPORT_PRIORITY.NORMAL,
-            index: true,
         },
 
         resolutionNotes: {
@@ -490,16 +479,16 @@ ReportSchema.index({ tour: 1, reporter: 1 }, {
 });
 
 // Prioritized and recent first
-ReportSchema.index({ status: 1, priority: -1, createdAt: -1 });
-
-// Reports assigned to a staff member
-ReportSchema.index({ assignedTo: 1, status: 1 });
+ReportSchema.index(
+    { status: 1, priority: -1, createdAt: -1 },
+    { partialFilterExpression: { deletedAt: null } }
+);
 
 // Index for status-specific queries
-ReportSchema.index({ status: 1, deletedAt: 1 });
-
-// Index for deletedAt queries
-ReportSchema.index({ deletedAt: 1 });
+ReportSchema.index(
+    { status: 1 },
+    { partialFilterExpression: { deletedAt: null } }
+);
 
 ////////////////////////////////////////////////////////////////////////////////
 // INSTANCE METHODS: Workflow & Lifecycle helpers with session support
@@ -645,45 +634,52 @@ ReportSchema.statics.paginate = async function (
     const limit = options.limit && options.limit > 0 ? options.limit : 10;
     const skip = (page - 1) * limit;
 
-    // Build base query
+    // -----------------------------
+    // Build base find query
+    // -----------------------------
     let query = this.find(filter);
 
-    // Apply session if provided
     if (options.session) {
         query = query.session(options.session);
     }
 
-    // Handle deleted document inclusion
-    if (options.includeDeleted) {
+    // IMPORTANT: onlyDeleted must win
+    if (options.onlyDeleted) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        query = (query as any).onlyDeleted();
+    } else if (options.includeDeleted) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         query = (query as any).includeDeleted();
     }
 
-    if (options.onlyDeleted) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        query = (query as any).onlyDeleted();
-    }
-
+    // -----------------------------
     // Build count query
+    // -----------------------------
     let countQuery = this.countDocuments(filter);
+
     if (options.session) {
         countQuery = countQuery.session(options.session);
     }
-    if (options.includeDeleted) {
+
+    // Use the SAME logic as find()
+    if (options.onlyDeleted) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        countQuery = (countQuery as any).onlyDeleted();
+    } else if (options.includeDeleted) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         countQuery = (countQuery as any).includeDeleted();
     }
-    if (options.onlyDeleted) {
-        countQuery = countQuery.where({ deletedAt: { $ne: null } });
-    }
 
+    // -----------------------------
+    // Execute
+    // -----------------------------
     const [docs, total] = await Promise.all([
         query.skip(skip).limit(limit).exec(),
         countQuery.exec(),
     ]);
 
     return {
-        docs: docs as unknown as HydratedReportDocument[],
+        docs: docs as HydratedReportDocument[],
         total,
         page,
         pages: Math.ceil(total / limit),

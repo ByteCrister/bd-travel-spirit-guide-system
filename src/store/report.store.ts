@@ -116,7 +116,7 @@ async function fetchDetailFromApi(reportId: string): Promise<ReportFull> {
 }
 
 async function rejectReportApi(reportId: string, notes?: string): Promise<ReportActionResponse> {
-    const resp = await api.post<ApiResponse<ReportActionResponse>>(
+    const resp = await api.put<ApiResponse<ReportActionResponse>>(
         `${URL_AFTER_API}/${reportId}/reject`,
         { notes }
     );
@@ -128,15 +128,15 @@ async function rejectReportApi(reportId: string, notes?: string): Promise<Report
 }
 
 async function resolveReportApi(reportId: string, notes?: string): Promise<ReportFull> {
-    const resp = await api.post<ApiResponse<ReportActionResponse>>(`${URL_AFTER_API}/${reportId}/resolve`, { notes });
+    const resp = await api.put<ApiResponse<ReportActionResponse>>(`${URL_AFTER_API}/${reportId}/resolve`, { notes });
     const payload = resp.data.data as ReportActionResponse;
     if (!payload.success) throw new Error(payload.message ?? "Resolve failed");
     return payload.report!;
 }
 
 async function bulkResolveApi(reportIds: string[], notes?: string): Promise<{ success: boolean; message?: string; resolvedCount?: number }> {
-    const resp = await api.post<ApiResponse<{ success: boolean; message?: string; resolvedCount?: number }>>(
-        `${URL_AFTER_API}/bulk/resolve`,
+    const resp = await api.patch<ApiResponse<{ success: boolean; message?: string; resolvedCount?: number }>>(
+        `${URL_AFTER_API}/bulk-resolve`,
         { reportIds, notes }
     );
 
@@ -147,7 +147,7 @@ async function bulkResolveApi(reportIds: string[], notes?: string): Promise<{ su
 }
 
 async function reopenReportApi(reportId: string): Promise<ReportFull> {
-    const resp = await api.post<ApiResponse<ReportActionResponse>>(`${URL_AFTER_API}/${reportId}/reopen`);
+    const resp = await api.put<ApiResponse<ReportActionResponse>>(`${URL_AFTER_API}/${reportId}/reopen`);
     const payload = resp.data.data as ReportActionResponse;
     if (!payload.success) throw new Error(payload.message ?? "Reopen failed");
     return payload.report!;

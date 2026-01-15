@@ -6,11 +6,12 @@ export enum FEEDBACK_TYPE {
   DISLIKE = "dislike",
   HIDE = "hide",
 }
+export type FeedBackTypes = `${FEEDBACK_TYPE}`;
 export interface IRecoFeedback extends Document {
   user: Types.ObjectId;
   tour: Types.ObjectId;
   variant?: string; // AB test variant / strategy name
-  feedback: FEEDBACK_TYPE;
+  feedback: FeedBackTypes;
   createdAt: Date;
 }
 const RecoFeedbackSchema = new Schema<IRecoFeedback>(
