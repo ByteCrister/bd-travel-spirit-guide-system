@@ -20,7 +20,6 @@ function getSharedDB(): DBMap {
           name: faker.person.fullName(),
           email: faker.internet.email(),
           avatarUrl: faker.image.avatar(),
-          role: faker.helpers.arrayElement(["admin", "support", "user"]),
         },
         tour: {
           _id: faker.string.uuid(),
@@ -75,7 +74,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
         name: faker.person.fullName(),
         email: faker.internet.email(),
         avatarUrl: faker.image.avatar(),
-        role: "user",
       },
       tour: {
         _id: faker.string.uuid(),
@@ -162,7 +160,6 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         name: faker.person.fullName(),
         email: faker.internet.email(),
         avatarUrl: faker.image.avatar(),
-        role: "user",
       },
       tour: {
         _id: faker.string.uuid(),

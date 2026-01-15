@@ -1,5 +1,4 @@
 // components/reports/ReportDetailsPanel.tsx
-// Modern details panel with gradient cards, icons, and smooth animations
 
 "use client";
 
@@ -14,7 +13,6 @@ import { formatDateTime } from "@/utils/helpers/format.reports";
 import {
     MdPerson,
     MdEmail,
-    MdBadge,
     MdTour,
     MdLink,
     MdBusiness,
@@ -165,12 +163,6 @@ export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
                                 label="Email"
                                 value={report.reporter?.email ?? "-"}
                                 iconColor="text-blue-500 dark:text-blue-400"
-                            />
-                            <InfoRow
-                                icon={MdBadge}
-                                label="Role"
-                                value={report.reporter?.role ?? "-"}
-                                iconColor="text-purple-500 dark:text-purple-400"
                             />
                         </div>
                     </div>
@@ -336,6 +328,7 @@ export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
                         </div>
 
                         <div className="space-y-4">
+
                             {/* Images */}
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
@@ -347,15 +340,19 @@ export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
                                         <span className="text-xs text-gray-500 dark:text-gray-400 italic">No images</span>
                                     ) : (
                                         report.evidenceImages!.map((src, idx) => (
-                                            <motion.span
+                                            <motion.a
                                                 key={src}
+                                                href={src}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
                                                 initial={{ opacity: 0, scale: 0.8 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 transition={{ delay: idx * 0.05 }}
-                                                className="inline-flex items-center rounded-lg border-2 border-pink-200 dark:border-pink-800 bg-pink-50 dark:bg-pink-950/30 px-3 py-1.5 text-xs font-medium text-pink-700 dark:text-pink-300 hover:shadow-md transition-all"
+                                                className="inline-flex items-center rounded-lg border-2 border-pink-200 dark:border-pink-800 bg-pink-50 dark:bg-pink-950/30 px-3 py-1.5 text-xs font-medium text-pink-700 dark:text-pink-300 hover:shadow-md transition-all hover:bg-pink-100 dark:hover:bg-pink-900/50 cursor-pointer"
+                                                title={`View image: ${src}`}
                                             >
-                                                {src.slice(0, 20)}...
-                                            </motion.span>
+                                                Image {idx + 1}
+                                            </motion.a>
                                         ))
                                     )}
                                 </div>
@@ -371,20 +368,31 @@ export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
                                     {(report.evidenceLinks ?? []).length === 0 ? (
                                         <span className="text-xs text-gray-500 dark:text-gray-400 italic">No links</span>
                                     ) : (
-                                        report.evidenceLinks!.map((href, idx) => (
-                                            <motion.div
-                                                key={href}
-                                                initial={{ opacity: 0, x: -10 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: idx * 0.05 }}
-                                                className="flex items-start gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 hover:shadow-sm transition-all"
-                                            >
-                                                <MdLink className="text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0" size={14} />
-                                                <span className="text-xs text-blue-700 dark:text-blue-300 break-all font-mono">
-                                                    {href}
-                                                </span>
-                                            </motion.div>
-                                        ))
+                                        report.evidenceLinks!.map((href, idx) => {
+                                            // Try to create a clean display URL
+                                            const displayUrl = href
+                                                .replace(/^https?:\/\//, '')
+                                                .replace(/^www\./, '')
+                                                .slice(0, 30) + (href.length > 30 ? '...' : '');
+
+                                            return (
+                                                <motion.a
+                                                    key={href}
+                                                    href={href}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    initial={{ opacity: 0, x: -10 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: idx * 0.05 }}
+                                                    className="flex items-start gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 hover:shadow-sm transition-all hover:bg-blue-100 dark:hover:bg-blue-900/50 cursor-pointer group"
+                                                >
+                                                    <MdLink className="text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform" size={14} />
+                                                    <span className="text-xs text-blue-700 dark:text-blue-300 break-all font-mono group-hover:text-blue-900 dark:group-hover:text-blue-200 transition-colors">
+                                                        {displayUrl}
+                                                    </span>
+                                                </motion.a>
+                                            );
+                                        })
                                     )}
                                 </div>
                             </div>

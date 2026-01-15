@@ -8,7 +8,7 @@ import ReviewsPagination from "./ReviewsPagination";
 import { ErrorBanner } from "./primitives/ErrorBanner";
 import { TableSkeleton, ToolbarSkeleton } from "./Skeletons";
 import { clampPages, isApiError } from "@/utils/helpers/reviews.uiHelpers";
-import type { ApiError, BulkActionPayload, ReviewToolbarState } from "@/types/reviews.types";
+import type { ApiError, ReviewToolbarState } from "@/types/reviews.types";
 import { toast } from "sonner";
 import { ReviewsAdminShellSkeleton } from "./ReviewsAdminShellSkeleton";
 
@@ -96,7 +96,6 @@ export default function ReviewsAdminShell(): JSX.Element {
             sort: { field: "createdAt", dir: "desc" },
             page: 1,
             limit: 10,
-            selectedIds: [],
             searchField: "comment",
         };
 
@@ -139,28 +138,6 @@ export default function ReviewsAdminShell(): JSX.Element {
                 : { message: err instanceof Error ? err.message : "Failed to change page size" };
             toast.error(normalized?.message ?? "Failed to change page size");
         } finally {
-            setLoading(false);
-        }
-    };
-
-
-    const handleBulkAction = async (
-        ids: string[],
-        action: "approve" | "reject" | "delete" | "restore" | "export_csv",
-        payload?: BulkActionPayload
-    ): Promise<void> => {
-        setLoading(true);
-        try {
-            await useReviewsStore.getState().bulkAction(ids, action, payload);
-            toast.success("Bulk action completed");
-            await fetchList({ useCache: false });
-        } catch (err: unknown) {
-            const normalized: ApiError = isApiError(err)
-                ? err
-                : { message: err instanceof Error ? err.message : "Bulk action failed" };
-            toast.error(normalized?.message ?? "Bulk action failed");
-        } finally {
-            persistToLocalStorage();
             setLoading(false);
         }
     };
@@ -231,7 +208,6 @@ export default function ReviewsAdminShell(): JSX.Element {
                                 onSearchChange={handleSearchChange}
                                 onApplyFilters={handleApplyFilters}
                                 onResetFilters={handleResetFilters}
-                                onBulkAction={handleBulkAction}
                             />
                         ) : (
                             <ToolbarSkeleton />

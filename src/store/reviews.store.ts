@@ -17,8 +17,6 @@ import {
     ReviewListItemDTO,
     ReviewDetailDTO,
     ReviewReplyDTO,
-    BulkReviewAction,
-    BulkActionPayload,
     REVIEWS_CACHE_TTL_MS,
     LS_KEYS,
     ApiError,
@@ -146,11 +144,9 @@ function flattenFiltersForParams(filters: ReviewFilters): Record<string, string 
     if (typeof filters.query === "string" && filters.query.length > 0) params.q = filters.query;
     if (filters.queryField) params.qField = filters.queryField;
     if (filters.tourId) params.tourId = filters.tourId;
-    if (filters.userId) params.userId = filters.userId;
     if (typeof filters.ratingMin === "number") params.ratingMin = Number(filters.ratingMin);
     if (typeof filters.ratingMax === "number") params.ratingMax = Number(filters.ratingMax);
     if (filters.isApproved === true || filters.isApproved === false) params.isApproved = filters.isApproved;
-    if (filters.isVerified === true || filters.isVerified === false) params.isVerified = filters.isVerified;
     if (filters.hasImages === true || filters.hasImages === false) params.hasImages = filters.hasImages as boolean;
     if (filters.tripType != null) params.tripType = String(filters.tripType);
     if (filters.dateFrom) params.dateFrom = filters.dateFrom;
@@ -179,7 +175,6 @@ export const useReviewsStore = create<ReviewsStoreState>()(
             sort: { field: "createdAt", dir: "desc" },
             page: 1,
             limit: 10,
-            selectedIds: [],
         };
 
         function safeParse<T>(raw: string | null): T | null {
@@ -240,21 +235,6 @@ export const useReviewsStore = create<ReviewsStoreState>()(
             listCache: {},
             detailCache: {},
             currentListKey: null,
-
-            toggleSelect: (id: string, selected: boolean) => {
-                set((s) => {
-                    // update toolbar.selectedIds immutably
-                    const nextSelected = selected
-                        ? Array.from(new Set([...s.toolbar.selectedIds, id]))
-                        : s.toolbar.selectedIds.filter((x) => x !== id);
-
-                    return { toolbar: { ...s.toolbar, selectedIds: nextSelected } };
-                });
-            },
-            
-            setSelectedIds: (ids: ObjectIdStr[]) => {
-                set((s) => ({ toolbar: { ...s.toolbar, selectedIds: ids } }));
-            },
 
             setToolbar: (next: Partial<ReviewToolbarState>) => {
                 set((s) => {
@@ -545,7 +525,7 @@ export const useReviewsStore = create<ReviewsStoreState>()(
                 try {
                     const payload = { isApproved: true, note };
                     const res = await api.post<{ data: ReviewDetailDTO }>(
-                        `${URL_AFTER_API}/${encodeURIComponent(reviewId)}/moderate`,
+                        `${URL_AFTER_API}/${encodeURIComponent(reviewId)}/moderate/approve`,
                         payload
                     );
                     const updated = res.data.data;
@@ -562,7 +542,7 @@ export const useReviewsStore = create<ReviewsStoreState>()(
                 try {
                     const payload = { isApproved: false, note: reason };
                     const res = await api.post<{ data: ReviewDetailDTO }>(
-                        `${URL_AFTER_API}/${encodeURIComponent(reviewId)}/moderate`,
+                        `${URL_AFTER_API}/${encodeURIComponent(reviewId)}/moderate/reject`,
                         payload
                     );
                     const updated = res.data.data;
@@ -596,40 +576,10 @@ export const useReviewsStore = create<ReviewsStoreState>()(
                     throw normalizeApiError(err);
                 }
             },
-
-            incrementHelpful: async (reviewId: ObjectIdStr) => {
-                try {
-                    const res = await api.post<{ data: { helpfulCount: number } }>(
-                        `${URL_AFTER_API}/${encodeURIComponent(reviewId)}/helpful`
-                    );
-                    const newCount = res.data.data.helpfulCount;
-                    const detail = get().detailCache[reviewId];
-                    if (detail?.data) set((s) => ({ detailCache: { ...s.detailCache, [reviewId]: makeDetailEntry(reviewId, { ...detail.data, helpfulCount: newCount } as ReviewDetailDTO) } }));
-
-                    // update list caches safely: ensure Paginated totals remain numbers
-                    const listKeys = Object.keys(get().listCache);
-                    for (const k of listKeys) {
-                        const entry = get().listCache[k];
-                        if (!entry?.data) continue;
-                        const docs = entry.data.docs.map((d) => (d._id === reviewId ? { ...d, helpfulCount: newCount } : d));
-                        const updatedData: Paginated<ReviewListItemDTO> = {
-                            docs,
-                            total: Number(entry.data.total ?? docs.length),
-                            page: Number(entry.data.page ?? 1),
-                            pages: Math.max(1, Math.ceil(Number(entry.data.total ?? docs.length) / (entry.data?.docs.length || 1))),
-                        };
-                        set((s) => ({ listCache: { ...s.listCache, [k]: { ...entry, data: updatedData } } }));
-                    }
-                    persistToLocalStorage();
-                    return newCount;
-                } catch (err) {
-                    throw normalizeApiError(err);
-                }
-            },
-
+            
             deleteReview: async (reviewId: ObjectIdStr, soft = true) => {
                 try {
-                    if (soft) await api.post(`${URL_AFTER_API}/${encodeURIComponent(reviewId)}/delete`);
+                    if (soft) await api.post(`${URL_AFTER_API}/${encodeURIComponent(reviewId)}`);
                     else await api.delete(`${URL_AFTER_API}/${encodeURIComponent(reviewId)}`);
                     get().invalidateDetailCache(reviewId);
                     get().invalidateListCache();
@@ -649,18 +599,6 @@ export const useReviewsStore = create<ReviewsStoreState>()(
                     get().invalidateListCache();
                     persistToLocalStorage();
                     return restored;
-                } catch (err) {
-                    throw normalizeApiError(err);
-                }
-            },
-
-            bulkAction: async (ids: ObjectIdStr[], action: BulkReviewAction, payload?: BulkActionPayload) => {
-                try {
-                    const body = { ids, action, payload: payload ?? {} };
-                    await api.post(`${URL_AFTER_API}/bulk`, body);
-                    get().invalidateListCache();
-                    for (const id of ids) get().invalidateDetailCache(id);
-                    persistToLocalStorage();
                 } catch (err) {
                     throw normalizeApiError(err);
                 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { JSX, useMemo, useState } from "react";
+import { JSX, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
     FaStar,
@@ -15,7 +15,6 @@ import {
 import { truncate, formatRelativeDate } from "@/utils/helpers/reviews.uiHelpers";
 import ReviewsTableRow from "./ReviewsTableRow";
 import type { ReviewsListCache } from "@/types/reviews.types";
-import { useReviewsStore } from "@/store/reviews.store";
 
 interface Props {
     entry: ReviewsListCache | null;
@@ -25,8 +24,6 @@ interface Props {
 }
 
 function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element {
-    const { setSelectedIds } = useReviewsStore();
-    const [selectAll, setSelectAll] = useState(false);
     const docs = useMemo(() => entry?.data?.docs ?? [], [entry?.data?.docs]);
     const empty = !entry?.isLoading && docs.length === 0;
     const isLoading = entry?.isLoading ?? false;
@@ -43,16 +40,6 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
 
         return { approvedCount, verifiedCount, withImagesCount, avgRating };
     }, [rows]);
-
-    const handleSelectAll = (next: boolean) => {
-        setSelectAll(next);
-        if (next) {
-            const idsOnPage = docs.map(d => d._id);
-            setSelectedIds(idsOnPage);
-        } else {
-            setSelectedIds([]);
-        }
-    }
 
     return (
         <div className="relative" data-testid="table">
@@ -99,23 +86,6 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
                 {/* Table Header - Sticky with modern styling */}
                 <div className="sticky top-0 z-20 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
                     <div className="grid grid-cols-[40px_60px_1fr_200px_140px_100px_120px_50px] gap-4 px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={selectAll}
-                                onChange={(e) => {
-                                    const next = e.target.checked;
-                                    handleSelectAll(next)
-                                    // mark all current page docs selected/unselected
-                                    for (const d of docs) {
-                                        d.isSelected = next;
-                                    }
-                                    // If you keep docs in state, update state; otherwise call a store action.
-                                }}
-                                className="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
-                                aria-label="Select all reviews"
-                            />
-                        </div>
                         <div className="flex items-center">Rating</div>
                         <div className="flex items-center">Review Content</div>
                         <div className="flex items-center gap-1">
@@ -241,16 +211,6 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
                             <span className="font-medium text-slate-900">
                                 Showing {((page - 1) * limit) + 1}-{Math.min(page * limit, entry.data.total)} of {entry.data.total.toLocaleString()} reviews
                             </span>
-                            {selectAll && (
-                                <motion.span
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 text-blue-700 rounded-lg"
-                                >
-                                    <FaCheckCircle className="w-3 h-3" />
-                                    All {rows.length} on page selected
-                                </motion.span>
-                            )}
                         </div>
                         <div className="flex items-center gap-4 text-slate-600">
                             {entry.fetchedAt && (

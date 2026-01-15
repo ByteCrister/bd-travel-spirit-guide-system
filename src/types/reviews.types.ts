@@ -46,7 +46,6 @@ export interface ReviewListItemDTO {
     updatedAt: string;
     deletedAt?: string | null;
     // UI flags (not persisted)
-    isSelected?: boolean;
     isExpanded?: boolean;
 }
 
@@ -111,10 +110,8 @@ export interface ReviewFilters {
     query?: string; // free text
     queryField?: ReviewSearchField;
     tourId?: ObjectIdStr;
-    userId?: ObjectIdStr;
     ratingMin?: number;
     ratingMax?: number;
-    isVerified?: boolean | null; // null = any
     isApproved?: boolean | null;
     hasImages?: boolean | null;
     tripType?: TravelTypeEnum | null;
@@ -149,7 +146,6 @@ export interface ReviewToolbarState {
     sort: ReviewSort;
     page: number;
     limit: number;
-    selectedIds: ObjectIdStr[]; // bulk actions
 }
 
 /* =========================
@@ -187,8 +183,6 @@ export interface ReviewsStoreState {
 
     // currently visible slice (derived from active list cache)
     currentListKey?: string | null;
-    toggleSelect: (id: string, selected: boolean) => void;
-    setSelectedIds: (ids: ObjectIdStr[]) => void;
     setToolbar: (next: Partial<ReviewToolbarState>) => void;
 
     // operations
@@ -197,10 +191,8 @@ export interface ReviewsStoreState {
     approveReview: (reviewId: ObjectIdStr, note?: string) => Promise<ReviewDetailDTO>;
     rejectReview: (reviewId: ObjectIdStr, reason?: string) => Promise<ReviewDetailDTO>;
     addReply: (reviewId: ObjectIdStr, message: string) => Promise<ReviewReplyDTO>;
-    incrementHelpful: (reviewId: ObjectIdStr) => Promise<number>;
     deleteReview: (reviewId: ObjectIdStr, soft?: boolean) => Promise<void>;
     restoreReview: (reviewId: ObjectIdStr) => Promise<ReviewDetailDTO>;
-    bulkAction: (ids: ObjectIdStr[], action: BulkReviewAction, payload?: BulkActionPayload) => Promise<void>;
 
     // low-level cache management
     setListCache: (key: string, entry: ReviewsListCache) => void;
@@ -219,7 +211,6 @@ export interface ReviewsStoreState {
    Actions / DTOs for server operations
    ========================= */
 
-export type BulkReviewAction = "approve" | "reject" | "delete" | "restore" | "export_csv";
 
 /** Payload for approve/reject endpoints */
 export interface ModerationPayload {
@@ -242,25 +233,6 @@ export interface AddReplyPayload {
  * - GenericRecord allows extension for other admin actions (export options, CSV options, etc).
  */
 export type GenericRecord = Record<string, unknown>;
-
-export type BulkActionPayload =
-    | ModerationPayload
-    | AddReplyPayload
-    | GenericRecord
-    | undefined;
-
-/** Standardized API success envelope */
-export interface ApiSuccess<T> {
-    success: true;
-    data: T;
-    message?: string;
-}
-
-/** Standardized API failure */
-export interface ApiFailure {
-    success: false;
-    error: ApiError;
-}
 
 /* =========================
    Client-side utility / helpers types

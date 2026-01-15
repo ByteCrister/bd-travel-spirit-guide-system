@@ -91,8 +91,6 @@ function applyFilters(list: StoredReview[], filters: Partial<ReviewFilters> | nu
     if (!filters || Object.keys(filters).length === 0) return list;
     return list.filter((r) => {
         if (filters.tourId && r.tourId !== filters.tourId) return false;
-        if (filters.userId && r.userId !== filters.userId) return false;
-        if (typeof filters.isVerified === "boolean" && r.isVerified !== filters.isVerified) return false;
         if (typeof filters.isApproved === "boolean" && r.isApproved !== filters.isApproved) return false;
         if (filters.ratingMin !== undefined && r.rating < Number(filters.ratingMin)) return false;
         if (filters.ratingMax !== undefined && r.rating > Number(filters.ratingMax)) return false;
