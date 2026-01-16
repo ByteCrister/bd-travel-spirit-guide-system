@@ -1,4 +1,4 @@
-// api/users/employees/[employeeId]
+// api/users/employees/v1/[employeeId]
 import { NextRequest } from "next/server";
 import { buildEmployeeDTO } from "@/lib/build-responses/build-employee-dt";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
@@ -110,6 +110,8 @@ export const PUT = withErrorHandler(async (req: NextRequest, { params }: Params)
             status: body.status,
             employmentType: body.employmentType,
             salary: body.salary,
+            currency: body.currency,
+            paymentMode: body.paymentMode,
             dateOfJoining: toDate(body.dateOfJoining),
             dateOfLeaving: toDate(body.dateOfLeaving),
             contactInfo: body.contactInfo,

@@ -136,6 +136,7 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
             avatar: avatarAssetId,
             salary: body.salary || 0,
             currency: body.currency,
+            paymentMode: body.paymentMode,
             dateOfJoining: new Date(body.dateOfJoining),
             contactInfo: {
                 phone: body.contactInfo.phone,

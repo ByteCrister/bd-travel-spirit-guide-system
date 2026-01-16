@@ -20,6 +20,8 @@ import { useEmployeeStore } from "@/store/employee.store";
 export default function EmployeesPage() {
     const router = useRouter();
     const store = useEmployeeStore();
+    const [retryLoading, setRetryLoading] = useState<string | null>(null);
+
     const [query, setQuery] = useState<EmployeesQuery>({
         page: 1,
         limit: 20,
@@ -69,6 +71,12 @@ export default function EmployeesPage() {
     const onLimitChange = (limit: number) =>
         setQuery((q) => ({ ...q, limit, page: 1 }));
 
+    const handleRetryPayment = async (employeeId: string) => {
+        setRetryLoading(employeeId);
+        await store.retryEmployeeSalaryPayment(employeeId);
+        setRetryLoading(null);
+    };
+
     return (
         <div className="space-y-6">
             <Breadcrumbs items={breadcrumbItems} />
@@ -103,6 +111,8 @@ export default function EmployeesPage() {
                 onSort={onSort}
                 sortBy={query.sortBy ?? "createdAt"}
                 sortOrder={query.sortOrder ?? "desc"}
+                onRetryPayment={handleRetryPayment}
+                retryLoading={retryLoading || undefined}
             />
 
             <PaginationControls

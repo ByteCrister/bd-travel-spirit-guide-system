@@ -3,6 +3,8 @@ import * as yup from "yup";
 import {
     EMPLOYMENT_TYPE,
     EmploymentType,
+    SALARY_PAYMENT_MODE,
+    SalaryPaymentMode,
 } from "@/constants/employee.const";
 import { CURRENCY, Currency } from "@/constants/tour.const";
 import { DayOfWeek, EmergencyContactDTO, ContactInfoDTO, ShiftDTO, DocumentDTO, CreateEmployeePayload } from "@/types/employee.types";
@@ -101,6 +103,10 @@ export const createEmployeeValidationSchema = yup.object({
         .mixed<Currency>()
         .oneOf(Object.values(CURRENCY))
         .required("Currency is required"),
+    paymentMode: yup
+        .mixed<SalaryPaymentMode>()
+        .oneOf(Object.values(SALARY_PAYMENT_MODE))
+        .required("Payment mode is required"),
     dateOfJoining: yup
         .date()
         .min(new Date(), "Date cannot be in the past")
@@ -125,6 +131,7 @@ export type CreateEmployeeFormValues = {
     avatar: string | null;
     salary: number | null;
     currency: Currency;
+    paymentMode: SalaryPaymentMode; // auto | manual
     dateOfJoining: Date;
     contactInfo: ContactInfoDTO;
     shifts: ShiftDTO[];
@@ -142,6 +149,7 @@ export const transformToCreateEmployeePayload = (
         password: values.password,
         salary: values.salary,
         currency: values.currency,
+        paymentMode: values.paymentMode,
         employmentType: values.employmentType
             ? EMPLOYMENT_TYPE[values.employmentType as keyof typeof EMPLOYMENT_TYPE]
             : EMPLOYMENT_TYPE.FULL_TIME, // default

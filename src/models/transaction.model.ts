@@ -2,7 +2,13 @@
 import { defineModel } from "@/lib/helpers/defineModel";
 import mongoose, { Schema, Document } from "mongoose";
 
-export type TransactionStatus = "pending" | "succeeded" | "failed";
+export enum TRANSACTION_STATUS {
+  PENDING = "pending",
+  SUCCEEDED = "succeeded",
+  FAILED = "failed",
+}
+
+export type TransactionStatus = `${TRANSACTION_STATUS}`;
 
 export interface ITransaction extends Document {
   paymentAccountId: mongoose.Types.ObjectId; // link to StripePaymentAccount

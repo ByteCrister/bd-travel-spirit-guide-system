@@ -1,8 +1,10 @@
-// employee.validator.ts
+// employee-server-payload.validator.ts
 import * as yup from "yup";
 import {
     EMPLOYMENT_TYPE,
     EmploymentType,
+    SALARY_PAYMENT_MODE,
+    SalaryPaymentMode,
 } from "@/constants/employee.const";
 import { CURRENCY, Currency } from "@/constants/tour.const";
 import { DayOfWeek, EmergencyContactDTO, ContactInfoDTO, ShiftDTO, DocumentDTO } from "@/types/employee.types";
@@ -101,6 +103,10 @@ export const updateEmployeeServerSchema = yup.object({
         .mixed<Currency>()
         .oneOf(Object.values(CURRENCY))
         .required("Currency is required"),
+    paymentMode: yup
+        .mixed<SalaryPaymentMode>()
+        .oneOf(Object.values(SALARY_PAYMENT_MODE))
+        .required("Payment mode is required"),
     /**
   * dateOfJoining
   * - Accepts Date | ISO string | timestamp

@@ -1,7 +1,7 @@
 import EmployeeDetailPage from "@/components/users/employees/details/EmployeeDetailPage";
 
 interface PageProps {
-    params: { employeeId: string };
+    params: Promise<{ employeeId: string }>;
 }
 
 export default async function Page({ params }: PageProps) {
