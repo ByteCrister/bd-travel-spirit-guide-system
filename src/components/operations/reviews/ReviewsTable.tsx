@@ -40,7 +40,6 @@ function ReviewsTable({
     // Calculate statistics from rows
     const stats = useMemo(() => {
         const approvedCount = rows.filter((r) => r.isApproved).length;
-        const verifiedCount = rows.filter((r) => r.isVerified).length;
         const withImagesCount =
             rows.length > 0 ? rows.reduce((sum, r) => sum + r.imageCount, 0) : 0;
         const avgRating =
@@ -48,7 +47,7 @@ function ReviewsTable({
                 ? rows.reduce((sum, r) => sum + r.rating, 0) / rows.length
                 : 0;
 
-        return { approvedCount, verifiedCount, withImagesCount, avgRating };
+        return { approvedCount, withImagesCount, avgRating };
     }, [rows]);
 
     return (
@@ -72,13 +71,6 @@ function ReviewsTable({
                                     {stats.approvedCount}
                                 </span>
                                 <span className="text-slate-500">approved</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg shadow-sm">
-                                <FaUserCircle className="w-3 h-3 text-blue-600" />
-                                <span className="font-medium text-slate-900">
-                                    {stats.verifiedCount}
-                                </span>
-                                <span className="text-slate-500">verified</span>
                             </div>
                             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg shadow-sm">
                                 <FaImage className="w-3 h-3 text-purple-600" />
