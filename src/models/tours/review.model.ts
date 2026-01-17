@@ -149,6 +149,11 @@ export interface IReview extends Document {
         message: string,
         session?: ClientSession
     ): Promise<this>;
+    updateReply(
+        replayId: Types.ObjectId,
+        message: string,
+        session?: ClientSession
+    ): Promise<this>;
     approveReply(
         replyId: Types.ObjectId,
         session?: ClientSession
@@ -292,11 +297,8 @@ ReviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 ReviewSchema.index({ tour: 1, rating: -1 });
 ReviewSchema.index({ tour: 1, helpfulCount: -1 });
 ReviewSchema.index({ isApproved: 1, createdAt: -1 });
-ReviewSchema.index({ approvedAt: 1 });
-ReviewSchema.index({ rejectedAt: 1 });
 
 // Compound index for efficient helpful vote queries
-ReviewSchema.index({ "helpfulVotes.user": 1 }, { sparse: true });
 ReviewSchema.index({ "helpfulVotes.createdAt": -1 });
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -409,6 +411,40 @@ ReviewSchema.methods.addReply = async function (
     };
 
     this.replies.push(newReply);
+
+    const options = session ? { session } : {};
+    await this.save(options);
+
+    return this;
+};
+
+/**
+ * Update an existing reply
+ */
+ReviewSchema.methods.updateReply = async function (
+    this: IReview,
+    replyId: Types.ObjectId,
+    message: string,
+    session?: ClientSession
+): Promise<IReview> {
+    const replies = this.replies as Types.DocumentArray<IReviewReply> & {
+        id(id: Types.ObjectId): IReviewReply | null;
+    };
+
+    const reply = replies.id(replyId);
+    if (!reply) {
+        throw new Error("Reply not found");
+    }
+
+    // Update the reply message
+    reply.message = message;
+    reply.updatedAt = new Date();
+
+    // Optional: for reset approval status when a reply is updated
+    // reply.isApproved = false;
+    // reply.approvedAt = null;
+    // reply.rejectedAt = null;
+    // reply.rejectionReason = undefined;
 
     const options = session ? { session } : {};
     await this.save(options);

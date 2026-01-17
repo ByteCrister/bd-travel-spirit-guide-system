@@ -14,7 +14,6 @@ import {
     Star,
     StarHalf,
     Image as ImageIcon,
-    ShieldCheck,
     ExternalLink,
     MoreVertical,
     Clock,
@@ -116,7 +115,7 @@ function ReviewsTableRow({ review, isFirst, onFirstRef }: Props): JSX.Element {
                     toast.success("Review rejected");
                     break;
                 case "delete":
-                    await deleteReview(review._id, true);
+                    await deleteReview(review._id);
                     toast.success("Review deleted");
                     break;
                 case "restore":
@@ -152,7 +151,7 @@ function ReviewsTableRow({ review, isFirst, onFirstRef }: Props): JSX.Element {
         [isFirst, onFirstRef]
     );
 
-    const hasImages = review.images && review.images.length > 0;
+    const hasImages = review.imageCount && review.imageCount > 0;
     const isDeleted = !!review.deletedAt;
     const isEdited = review.updatedAt && review.updatedAt !== review.createdAt;
 
@@ -199,13 +198,7 @@ function ReviewsTableRow({ review, isFirst, onFirstRef }: Props): JSX.Element {
                         {hasImages && (
                             <span className="inline-flex items-center gap-1 text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
                                 <ImageIcon className="w-3 h-3" />
-                                {review.images!.length}
-                            </span>
-                        )}
-                        {review.isVerified && (
-                            <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded-md">
-                                <ShieldCheck className="w-3 h-3" />
-                                Verified
+                                {review.imageCount}
                             </span>
                         )}
                         {isEdited && (

@@ -576,11 +576,80 @@ export const useReviewsStore = create<ReviewsStoreState>()(
                     throw normalizeApiError(err);
                 }
             },
-            
-            deleteReview: async (reviewId: ObjectIdStr, soft = true) => {
+
+            updateReply: async (reviewId: ObjectIdStr, replyId: ObjectIdStr, message: string) => {
                 try {
-                    if (soft) await api.post(`${URL_AFTER_API}/${encodeURIComponent(reviewId)}`);
-                    else await api.delete(`${URL_AFTER_API}/${encodeURIComponent(reviewId)}`);
+                    const payload = { message, replyId };
+                    const res = await api.patch<{ data: ReviewReplyDTO }>(
+                        `${URL_AFTER_API}/${encodeURIComponent(reviewId)}/replies/${encodeURIComponent(replyId)}`,
+                        payload
+                    );
+                    const updatedReply = res.data.data;
+
+                    // Update the cache for this review
+                    const existing = get().detailCache[reviewId];
+                    if (existing?.data) {
+                        const updatedReplies = existing.data.replies.map(reply =>
+                            reply._id === replyId ? updatedReply : reply
+                        );
+                        const updatedDetail: ReviewDetailDTO = {
+                            ...existing.data,
+                            replies: updatedReplies
+                        };
+                        set((s) => ({
+                            detailCache: {
+                                ...s.detailCache,
+                                [reviewId]: makeDetailEntry(reviewId, updatedDetail)
+                            }
+                        }));
+                        persistToLocalStorage();
+                    } else {
+                        // If not cached, force a refresh of the detail
+                        void get().fetchDetail(reviewId, { force: true }).catch(() => { });
+                    }
+
+                    return updatedReply;
+                } catch (err) {
+                    throw normalizeApiError(err);
+                }
+            },
+
+            deleteReply: async (reviewId: ObjectIdStr, replyId: ObjectIdStr) => {
+                try {
+                    await api.delete(
+                        `${URL_AFTER_API}/${encodeURIComponent(reviewId)}/replies/${encodeURIComponent(replyId)}`
+                    );
+
+                    // Update the cache for this review
+                    const existing = get().detailCache[reviewId];
+                    if (existing?.data) {
+                        const updatedReplies = existing.data.replies.filter(reply => reply._id !== replyId);
+                        const updatedDetail: ReviewDetailDTO = {
+                            ...existing.data,
+                            replies: updatedReplies
+                        };
+                        set((s) => ({
+                            detailCache: {
+                                ...s.detailCache,
+                                [reviewId]: makeDetailEntry(reviewId, updatedDetail)
+                            }
+                        }));
+                        persistToLocalStorage();
+                    } else {
+                        // If not cached, invalidate to force refetch
+                        get().invalidateDetailCache(reviewId);
+                    }
+
+                    // Return void as expected by the interface
+                    return;
+                } catch (err) {
+                    throw normalizeApiError(err);
+                }
+            },
+
+            deleteReview: async (reviewId: ObjectIdStr) => {
+                try {
+                    await api.delete(`${URL_AFTER_API}/${encodeURIComponent(reviewId)}`);
                     get().invalidateDetailCache(reviewId);
                     get().invalidateListCache();
                     persistToLocalStorage();

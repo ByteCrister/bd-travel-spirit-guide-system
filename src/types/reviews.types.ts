@@ -1,10 +1,8 @@
 // /types/reviews.types.ts
-// Production-grade TypeScript types for review admin (/operations/review) store, API DTOs,
-// UI components and caching. Designed for Next.js 15+ app-router + TypeScript + Zustand store.
 
 import { AxiosError } from "axios";
 import {
-    TRAVEL_TYPE,
+    TravelType,
     TRAVEL_TYPE as TravelTypeEnum,
 } from "@/constants/tour.const";
 
@@ -36,10 +34,9 @@ export interface ReviewListItemDTO {
     rating: number; // 1-5
     title?: string | null;
     comment: string;
-    images?: string[]; // asset URLs or ids depending on API
-    tripType?: (typeof TRAVEL_TYPE)[keyof typeof TRAVEL_TYPE] | null;
+    imageCount: number;
+    tripType?: TravelType | null;
     travelDate?: string | null; // ISO
-    isVerified: boolean;
     isApproved: boolean;
     helpfulCount: number;
     createdAt: string;
@@ -56,16 +53,7 @@ export interface ReviewDetailDTO extends ReviewListItemDTO {
     userEmail?: string | null;
     tourSlug?: string | null;
     tourHeroImage?: string | null;
-    moderationHistory?: {
-        action: "approved" | "rejected" | "flagged" | "edited";
-        by: ObjectIdStr;
-        at: string;
-        note?: string | null;
-    }[];
-    // any additional admin-only metadata
-    ipAddress?: string | null;
-    userAgent?: string | null;
-    bookingReference?: string | null;
+    imageUrls?: string[]; // cloudinary image urls
 }
 
 /* =========================
@@ -172,6 +160,13 @@ export type ReviewsListCache = CacheEntry<Paginated<ReviewListItemDTO>>;
 /** Specific cache for single review detail */
 export type ReviewDetailCache = CacheEntry<ReviewDetailDTO>;
 
+/** DTO used for reply operations */
+export interface ReplyOperationPayload {
+    reviewId: ObjectIdStr;
+    replyId: ObjectIdStr;
+    message?: string; // For update operations
+}
+
 /** Global store state maintained in Zustand */
 export interface ReviewsStoreState {
     // UI + query state
@@ -190,8 +185,12 @@ export interface ReviewsStoreState {
     fetchDetail: (reviewId: ObjectIdStr, options?: { force?: boolean }) => Promise<ReviewDetailDTO>;
     approveReview: (reviewId: ObjectIdStr, note?: string) => Promise<ReviewDetailDTO>;
     rejectReview: (reviewId: ObjectIdStr, reason?: string) => Promise<ReviewDetailDTO>;
+
     addReply: (reviewId: ObjectIdStr, message: string) => Promise<ReviewReplyDTO>;
-    deleteReview: (reviewId: ObjectIdStr, soft?: boolean) => Promise<void>;
+    updateReply: (reviewId: ObjectIdStr, replyId: ObjectIdStr, message: string) => Promise<ReviewReplyDTO>;
+    deleteReply: (reviewId: ObjectIdStr, replyId: ObjectIdStr) => Promise<void>;
+
+    deleteReview: (reviewId: ObjectIdStr) => Promise<void>;
     restoreReview: (reviewId: ObjectIdStr) => Promise<ReviewDetailDTO>;
 
     // low-level cache management

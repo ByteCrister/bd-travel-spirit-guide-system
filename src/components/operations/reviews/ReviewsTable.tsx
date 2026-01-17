@@ -12,7 +12,10 @@ import {
     FaFilter,
     FaInfoCircle,
 } from "react-icons/fa";
-import { truncate, formatRelativeDate } from "@/utils/helpers/reviews.uiHelpers";
+import {
+    truncate,
+    formatRelativeDate,
+} from "@/utils/helpers/reviews.uiHelpers";
 import ReviewsTableRow from "./ReviewsTableRow";
 import type { ReviewsListCache } from "@/types/reviews.types";
 
@@ -23,7 +26,12 @@ interface Props {
     onFirstRowRef?: (el: HTMLButtonElement | HTMLAnchorElement | null) => void;
 }
 
-function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element {
+function ReviewsTable({
+    entry,
+    page,
+    limit,
+    onFirstRowRef,
+}: Props): JSX.Element {
     const docs = useMemo(() => entry?.data?.docs ?? [], [entry?.data?.docs]);
     const empty = !entry?.isLoading && docs.length === 0;
     const isLoading = entry?.isLoading ?? false;
@@ -31,12 +39,14 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
     const rows = useMemo(() => docs, [docs]);
     // Calculate statistics from rows
     const stats = useMemo(() => {
-        const approvedCount = rows.filter(r => r.isApproved).length;
-        const verifiedCount = rows.filter(r => r.isVerified).length;
-        const withImagesCount = rows.filter(r => r.images && r.images.length > 0).length;
-        const avgRating = rows.length > 0
-            ? rows.reduce((sum, r) => sum + r.rating, 0) / rows.length
-            : 0;
+        const approvedCount = rows.filter((r) => r.isApproved).length;
+        const verifiedCount = rows.filter((r) => r.isVerified).length;
+        const withImagesCount =
+            rows.length > 0 ? rows.reduce((sum, r) => sum + r.imageCount, 0) : 0;
+        const avgRating =
+            rows.length > 0
+                ? rows.reduce((sum, r) => sum + r.rating, 0) / rows.length
+                : 0;
 
         return { approvedCount, verifiedCount, withImagesCount, avgRating };
     }, [rows]);
@@ -58,22 +68,30 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
                             </div>
                             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg shadow-sm">
                                 <FaCheckCircle className="w-3 h-3 text-emerald-600" />
-                                <span className="font-medium text-slate-900">{stats.approvedCount}</span>
+                                <span className="font-medium text-slate-900">
+                                    {stats.approvedCount}
+                                </span>
                                 <span className="text-slate-500">approved</span>
                             </div>
                             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg shadow-sm">
                                 <FaUserCircle className="w-3 h-3 text-blue-600" />
-                                <span className="font-medium text-slate-900">{stats.verifiedCount}</span>
+                                <span className="font-medium text-slate-900">
+                                    {stats.verifiedCount}
+                                </span>
                                 <span className="text-slate-500">verified</span>
                             </div>
                             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg shadow-sm">
                                 <FaImage className="w-3 h-3 text-purple-600" />
-                                <span className="font-medium text-slate-900">{stats.withImagesCount}</span>
+                                <span className="font-medium text-slate-900">
+                                    {stats.withImagesCount}
+                                </span>
                                 <span className="text-slate-500">with images</span>
                             </div>
                             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg shadow-sm">
                                 <FaStar className="w-3 h-3 text-amber-400" />
-                                <span className="font-medium text-slate-900">{stats.avgRating.toFixed(2)}</span>
+                                <span className="font-medium text-slate-900">
+                                    {stats.avgRating.toFixed(2)}
+                                </span>
                                 <span className="text-slate-500">avg rating</span>
                             </div>
                         </div>
@@ -100,9 +118,7 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
                             <FaClock className="w-3 h-3" />
                             Date
                         </div>
-                        <div className="flex items-center gap-1">
-                            Status
-                        </div>
+                        <div className="flex items-center gap-1">Status</div>
                         <div className="flex items-center justify-center">Actions</div>
                     </div>
                 </div>
@@ -176,8 +192,7 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
                                 <p className="text-sm text-slate-600 mb-6">
                                     {entry?.error
                                         ? `Error: ${entry.error.message}. Please try again.`
-                                        : "No reviews match your current filters. Try adjusting your search criteria or resetting filters to see more results."
-                                    }
+                                        : "No reviews match your current filters. Try adjusting your search criteria or resetting filters to see more results."}
                                 </p>
                                 <div className="flex items-center gap-3 text-xs text-slate-500">
                                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-lg">
@@ -209,14 +224,17 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
                     <div className="flex items-center justify-between px-4 py-2.5 text-xs">
                         <div className="flex items-center gap-4">
                             <span className="font-medium text-slate-900">
-                                Showing {((page - 1) * limit) + 1}-{Math.min(page * limit, entry.data.total)} of {entry.data.total.toLocaleString()} reviews
+                                Showing {(page - 1) * limit + 1}-
+                                {Math.min(page * limit, entry.data.total)} of{" "}
+                                {entry.data.total.toLocaleString()} reviews
                             </span>
                         </div>
                         <div className="flex items-center gap-4 text-slate-600">
                             {entry.fetchedAt && (
                                 <span className="flex items-center gap-1.5">
                                     <FaClock className="w-3 h-3" />
-                                    Updated {formatRelativeDate(new Date(entry.fetchedAt).toISOString())}
+                                    Updated{" "}
+                                    {formatRelativeDate(new Date(entry.fetchedAt).toISOString())}
                                 </span>
                             )}
                             {entry.isStale && (
