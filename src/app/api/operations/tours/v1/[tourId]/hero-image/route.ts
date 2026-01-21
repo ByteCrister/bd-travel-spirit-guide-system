@@ -9,9 +9,9 @@ import ConnectDB from "@/config/db";
 import TourModel from "@/models/tours/tour.model";
 import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
-import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { ASSET_TYPE } from "@/constants/asset.const";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 
 // Asset helper functions
 const AssetHelper = {
@@ -30,7 +30,7 @@ export const PATCH = withErrorHandler(
     ) => {
         await ConnectDB();
 
-        const tourId = decodeId(decodeURIComponent((await params).tourId));
+        const tourId = resolveMongoId((await params).tourId);
 
         if (!tourId) {
             throw new ApiError("Invalid tour ID", 400);

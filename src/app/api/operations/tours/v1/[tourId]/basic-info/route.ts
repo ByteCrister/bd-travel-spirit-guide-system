@@ -5,10 +5,10 @@ import { withTransaction } from "@/lib/helpers/withTransaction";
 import mongoose from "mongoose";
 import { UpdateTourBasicInfoDTO } from "@/types/tour.types";
 import { Step0BasicInfoSchema } from "@/utils/validators/tour/add-tour.validator";
-import { validateTourUpdateSchema } from "@/utils/validators/tour/update-tour.validator";
+import { validateUpdatedYupSchema } from "@/utils/validators/common/update-updated-yup-schema";
 import TourModel from "@/models/tours/tour.model";
-import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 
 /**
  * Update Step-0 basic info
@@ -17,7 +17,7 @@ export const PATCH = withErrorHandler(async (
     request: NextRequest,
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
-    const tourId = decodeId(decodeURIComponent((await params).tourId));
+    const tourId = resolveMongoId((await params).tourId);
 
     // Validate tour ID
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -28,7 +28,7 @@ export const PATCH = withErrorHandler(async (
     const body = (await request.json()) as UpdateTourBasicInfoDTO;
 
     // Validate request body
-    const validate = validateTourUpdateSchema<UpdateTourBasicInfoDTO>(
+    const validate = validateUpdatedYupSchema<UpdateTourBasicInfoDTO>(
         Step0BasicInfoSchema,
         body
     );

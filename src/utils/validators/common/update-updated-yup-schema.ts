@@ -7,7 +7,7 @@ import { ValidationError, AnyObjectSchema } from "yup";
  * - Collects all errors
  * - Returns typed data or throws NextResponse
  */
-export function validateTourUpdateSchema<T>(
+export function validateUpdatedYupSchema<T>(
     schema: AnyObjectSchema,
     payload: unknown
 ): T {

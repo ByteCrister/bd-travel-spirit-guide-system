@@ -4,11 +4,11 @@ import { withErrorHandler, ApiError } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import { UpdateTourPricingDTO } from "@/types/tour.types";
 import mongoose from "mongoose";
-import { validateTourUpdateSchema } from "@/utils/validators/tour/update-tour.validator";
+import { validateUpdatedYupSchema } from "@/utils/validators/common/update-updated-yup-schema";
 import { Step4PricingSchema } from "@/utils/validators/tour/add-tour.validator";
 import TourModel from "@/models/tours/tour.model";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
-import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
+import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 
 /**
  * Update Step-4 pricing
@@ -17,7 +17,7 @@ export const PATCH = withErrorHandler(async (
     req: NextRequest,
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
-    const tourId = decodeId(decodeURIComponent((await params).tourId));
+    const tourId = resolveMongoId((await params).tourId);
 
     // Validate tour ID
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -27,7 +27,7 @@ export const PATCH = withErrorHandler(async (
     const updatePayload = await req.json();
 
     // Validate payload using the schema
-    const validatedData = validateTourUpdateSchema<UpdateTourPricingDTO>(
+    const validatedData = validateUpdatedYupSchema<UpdateTourPricingDTO>(
         Step4PricingSchema,
         updatePayload
     );

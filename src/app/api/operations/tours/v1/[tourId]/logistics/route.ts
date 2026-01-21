@@ -4,11 +4,11 @@ import { withErrorHandler, ApiError } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import { UpdateTourLogisticsDTO } from "@/types/tour.types";
 import mongoose from "mongoose";
-import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
-import { validateTourUpdateSchema } from "@/utils/validators/tour/update-tour.validator";
+import { validateUpdatedYupSchema } from "@/utils/validators/common/update-updated-yup-schema";
 import { Step3LogisticsSchema } from "@/utils/validators/tour/add-tour.validator";
 import TourModel from "@/models/tours/tour.model";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 
 /**
  * Update Step-3 logistics
@@ -18,7 +18,7 @@ export const PATCH = withErrorHandler(async (
     req: NextRequest,
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
-    const tourId = decodeId(decodeURIComponent((await params).tourId));
+    const tourId = resolveMongoId((await params).tourId);
 
     // Validate tour ID
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -28,7 +28,7 @@ export const PATCH = withErrorHandler(async (
     const updatePayload = await req.json();
 
     // Validate payload using the schema
-    const validatedData = validateTourUpdateSchema<UpdateTourLogisticsDTO>(
+    const validatedData = validateUpdatedYupSchema<UpdateTourLogisticsDTO>(
         Step3LogisticsSchema,
         updatePayload
     );

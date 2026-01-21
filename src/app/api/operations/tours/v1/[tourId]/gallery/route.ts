@@ -10,8 +10,8 @@ import ConnectDB from '@/config/db';
 import { TourDetailDTO, UpdateTourGalleryDTO } from '@/types/tour.types';
 import TourModel from '@/models/tours/tour.model';
 import { buildTourDetailDTO } from '@/lib/build-responses/build-tour-details';
-import { decodeId } from '@/utils/helpers/mongodb-id-conversions';
 import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour.const';
+import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
 
 
 // Export the PATCH handler with error handling
@@ -21,7 +21,7 @@ export const PATCH = withErrorHandler(async (
 ) => {
     await ConnectDB();
 
-    const tourId = decodeId(decodeURIComponent((await params).tourId));
+    const tourId = resolveMongoId((await params).tourId);
 
     if (!tourId) {
         throw new ApiError("Invalid tour ID", 400)

@@ -9,9 +9,9 @@ import { Base64Asset } from "@/lib/cloudinary/upload.cloudinary";
 import { UpdateDestinationAttrImgDTO } from "@/types/tour.types";
 import TourModel from "@/models/tours/tour.model";
 import { ASSET_TYPE } from "@/constants/asset.const";
-import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
+import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 
 /**
  * PATCH /api/tours/[tourId]/attraction-images
@@ -22,7 +22,7 @@ export const PATCH = withErrorHandler(async (
     request: NextRequest,
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
-    const tourId = decodeId(decodeURIComponent((await params).tourId));
+    const tourId = resolveMongoId((await params).tourId);
 
     // Validate tour ID
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {

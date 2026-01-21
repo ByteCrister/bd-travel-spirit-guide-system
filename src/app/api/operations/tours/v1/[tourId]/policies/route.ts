@@ -1,13 +1,13 @@
 import { NextRequest } from 'next/server';
-import { validateTourUpdateSchema } from '@/utils/validators/tour/update-tour.validator';
+import { validateUpdatedYupSchema } from '@/utils/validators/common/update-updated-yup-schema';
 import { Step6PolicySchema } from '@/utils/validators/tour/add-tour.validator';
 import TourModel, { ITour } from '@/models/tours/tour.model';
 import { UpdateTourPoliciesDTO } from '@/types/tour.types';
 import { TOUR_STATUS, MODERATION_STATUS } from '@/constants/tour.const';
 import mongoose from 'mongoose';
-import { decodeId } from '@/utils/helpers/mongodb-id-conversions';
 import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import { withTransaction } from '@/lib/helpers/withTransaction';
+import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
 
 /**
  * Update Step-6 policy
@@ -17,7 +17,7 @@ export const PATCH = withErrorHandler(async (
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
     // Get tourId from params
-    const tourId = decodeId(decodeURIComponent((await params).tourId));
+    const tourId = resolveMongoId((await params).tourId);
 
     // Validate tourId format
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -28,7 +28,7 @@ export const PATCH = withErrorHandler(async (
     const body = await request.json();
 
     // Validate request body using the provided validator
-    const validatedData = validateTourUpdateSchema<UpdateTourPoliciesDTO>(
+    const validatedData = validateUpdatedYupSchema<UpdateTourPoliciesDTO>(
         Step6PolicySchema,
         body
     );

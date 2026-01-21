@@ -4,15 +4,15 @@ import { NextRequest } from "next/server";
 import { Types } from "mongoose";
 import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
 import ConnectDB from "@/config/db";
-import { validateTourUpdateSchema } from "@/utils/validators/tour/update-tour.validator";
+import { validateUpdatedYupSchema } from "@/utils/validators/common/update-updated-yup-schema";
 import { Step2ContentSchema } from "@/utils/validators/tour/add-tour.validator";
 import { UpdateTourContentItineraryDTO } from "@/types/tour.types";
 import TourModel, { ITour } from "@/models/tours/tour.model";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
-import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
+import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 
 // helper that preserves key-value coupling
 function setIfDefined<K extends keyof ITour>(
@@ -30,7 +30,7 @@ export const PATCH = withErrorHandler(
         request: NextRequest,
         { params }: { params: Promise<{ tourId: string }> }
     ) => {
-        const tourId = decodeId(decodeURIComponent((await params).tourId));
+        const tourId = resolveMongoId((await params).tourId);
 
         if (!tourId || !Types.ObjectId.isValid(tourId)) {
             throw new ApiError("Invalid tour ID", 400);
@@ -38,7 +38,7 @@ export const PATCH = withErrorHandler(
 
         const body = await request.json();
         const validatedData =
-            validateTourUpdateSchema<UpdateTourContentItineraryDTO>(
+            validateUpdatedYupSchema<UpdateTourContentItineraryDTO>(
                 Step2ContentSchema,
                 body
             );

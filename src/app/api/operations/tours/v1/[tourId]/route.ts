@@ -5,9 +5,9 @@ import { buildTourDetailDTO } from '@/lib/build-responses/build-tour-details';
 import ConnectDB from '@/config/db';
 import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import { withTransaction } from '@/lib/helpers/withTransaction';
-import { decodeId } from '@/utils/helpers/mongodb-id-conversions';
 import TourModel, { ITour } from '@/models/tours/tour.model';
 import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour.const';
+import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
 
 /**
  * GET Full Tour details 
@@ -16,7 +16,7 @@ export const GET = withErrorHandler(async (
     request: NextRequest,
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
-    const tourId = decodeId(decodeURIComponent((await params).tourId));
+    const tourId = resolveMongoId((await params).tourId);
 
     if (!tourId) {
         throw new ApiError("Invalid tour ID", 400);
@@ -48,7 +48,7 @@ export const POST = withErrorHandler(async (
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
 
-    const tourId = decodeId(decodeURIComponent((await params).tourId));
+    const tourId = resolveMongoId((await params).tourId);
 
     if (!tourId || !Types.ObjectId.isValid(tourId)) {
         throw new ApiError("Invalid tour ID", 400);
