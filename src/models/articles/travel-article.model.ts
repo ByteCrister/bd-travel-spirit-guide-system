@@ -1,83 +1,108 @@
 // models/travelArticle.model.ts
-import { ARTICLE_STATUS, ARTICLE_TYPE, ArticleStatus, ArticleType } from "@/constants/article.const";
-import { TRAVEL_TYPE, TravelType } from "@/constants/tour.const";
+import {
+  ARTICLE_RICH_TEXT_BLOCK_TYPE,
+  ARTICLE_STATUS,
+  ARTICLE_TYPE,
+  ArticleRichTextBlockType,
+  ArticleStatus,
+  ArticleType,
+  FAQ_CATEGORY,
+  FaqCategory,
+  FOOD_RECO_SPICE_TYPE,
+  FoodRecoSpiceType
+} from "@/constants/article.const";
+import {
+  DISTRICT,
+  District,
+  DIVISION,
+  Division,
+  TOUR_CATEGORIES,
+  TourCategories
+} from "@/constants/tour.const";
 import { defineModel } from "@/lib/helpers/defineModel";
-import { Schema, Types, Document } from "mongoose";
+import { SlugService } from "@/lib/helpers/slug-services";
+import { Query } from "mongoose";
+import { Schema, Types, Document, Model, ClientSession, FilterQuery, QueryOptions } from "mongoose";
 
 /**
- * Interface for structured activities
+ * Interface for Bangladeshi cuisine/dining recommendations
  */
-interface IActivity {
-  title: string;
-  url?: string;
-  provider?: string;
-  duration?: string;
-  price?: string;
-  rating?: number;
-}
-
-/**
- * Interface for structured attractions
- */
-interface IAttraction {
-  title: string;
+export interface IFoodRecommendation {
+  dishName: string;
   description: string;
-  bestFor?: string;
-  insiderTip?: string;
-  address?: string;
-  openingHours?: string;
-  images: string[];
-  coordinates?: { lat: number; lng: number };
+  bestPlaceToTry?: string;
+  approximatePrice?: string;
+  spiceLevel?: FoodRecoSpiceType;
 }
 
 /**
- * Interface for destination blocks (multi-destination articles)
+ * Interface for local festivals/events in Bangladesh
  */
-interface IDestinationBlock {
-  city: string;
-  country: string;
-  region?: string;
+export interface ILocalFestival {
+  name: string;
+  description: string;
+  timeOfYear: string;
+  location: string;
+  significance?: string;
+}
+
+/**
+ * Interface for destination blocks within Bangladesh
+ */
+export interface IDestinationBlock {
+  _id: Types.ObjectId;
+  division: Division;
+  district: District;
+  area?: string;
   description: string;
   content: IRichTextBlock[];
   highlights?: string[];
-  attractions?: IAttraction[];
-  activities?: IActivity[];
-  images?: string[];
+  foodRecommendations?: IFoodRecommendation[];
+  localFestivals?: ILocalFestival[];
+  localTips?: string[];
+  transportOptions?: string[];
+  accommodationTips?: string[];
+  coordinates?: { lat: number; lng: number };
+  imageAsset?: { title: string, assetId: Types.ObjectId };
 }
 
-/**
- * Interface for FAQs
- */
-interface IFAQ {
-  question: string;
-  answer: string;
-}
-
-interface IRichTextBlock {
-  type: "paragraph" | "link" | "heading";
+export interface IRichTextBlock {
+  type: ArticleRichTextBlockType;
   text?: string;
   href?: string;
 }
 
+export interface IFAQ {
+  question: string;
+  answer: string;
+  category?: FaqCategory;
+}
+
 /**
- * Main travel article interface
+ * Main travel article interface for Bangladesh with soft delete fields
  */
 export interface ITravelArticle extends Document {
+  _id: Types.ObjectId;
   title: string;
+  banglaTitle?: string;
   slug: string;
   status: ArticleStatus;
   articleType: ArticleType;
   author: Types.ObjectId;
   authorBio?: string;
   summary: string;
-  heroImage: string;
-  destinations?: IDestinationBlock[]; // replaces single `destination`
-  categories?: TravelType[];
+  heroImage: Types.ObjectId;
+  destinations?: IDestinationBlock[];
+  categories?: TourCategories[];
   tags?: string[];
   publishedAt?: Date;
   readingTime?: number;
   wordCount?: number;
-  seo: { metaTitle: string; metaDescription: string; ogImage?: string };
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+    ogImage?: string;
+  };
   faqs?: IFAQ[];
   contentEmbeddingId?: Types.ObjectId;
   topicTags?: string[];
@@ -85,13 +110,72 @@ export interface ITravelArticle extends Document {
   likeCount: number;
   shareCount: number;
   allowComments: boolean;
+
+  // Soft delete fields
+  deleted: boolean;
+  deletedAt?: Date;
+  deletedBy?: Types.ObjectId;
+
   createdAt: Date;
   updatedAt: Date;
 }
 
-const TravelArticleSchema = new Schema<ITravelArticle>(
+/**
+ * Static methods interface for the model
+ */
+export interface ITravelArticleModel extends Model<ITravelArticle> {
+  // Find methods including deleted
+  findWithDeleted(
+    filter?: FilterQuery<ITravelArticle>,
+    options?: QueryOptions,
+    session?: ClientSession
+  ): Promise<ITravelArticle[]>;
+
+  findOneWithDeleted(
+    filter: FilterQuery<ITravelArticle>,
+    options?: QueryOptions,
+    session?: ClientSession
+  ): Query<ITravelArticle | null, ITravelArticle>;
+
+  findByIdWithDeleted(
+    id: Types.ObjectId | string,
+    options?: QueryOptions,
+    session?: ClientSession
+  ): Promise<ITravelArticle | null>;
+
+  // Soft delete methods
+  softDeleteById(
+    id: Types.ObjectId | string,
+    deletedBy?: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<ITravelArticle | null>;
+
+  restoreById(
+    id: Types.ObjectId | string,
+    session?: ClientSession
+  ): Promise<ITravelArticle | null>;
+
+  // Count methods
+  countWithDeleted(
+    filter?: FilterQuery<ITravelArticle>,
+    session?: ClientSession
+  ): Promise<number>;
+
+  countDeleted(
+    filter?: FilterQuery<ITravelArticle>,
+    session?: ClientSession
+  ): Promise<number>;
+
+  countActive(
+    filter?: FilterQuery<ITravelArticle>,
+    session?: ClientSession
+  ): Promise<number>;
+}
+
+const TravelArticleSchema = new Schema<ITravelArticle, ITravelArticleModel>(
   {
     title: { type: String, required: true, trim: true },
+    banglaTitle: { type: String, trim: true },
     slug: {
       type: String,
       required: true,
@@ -111,22 +195,26 @@ const TravelArticleSchema = new Schema<ITravelArticle>(
       required: true,
       index: true,
     },
-    author: { type: Schema.Types.ObjectId, ref: "Traveler", required: true },
+    author: { type: Schema.Types.ObjectId, ref: "User", required: true },
     authorBio: { type: String, trim: true },
     summary: { type: String, required: true, trim: true },
-    heroImage: { type: String, required: true },
+    heroImage: { type: Schema.Types.ObjectId, ref: "Asset", required: true },
 
     destinations: [
       {
-        city: { type: String, required: true, trim: true },
-        country: { type: String, required: true, trim: true },
-        region: { type: String, trim: true },
+        _id: {
+          type: Schema.Types.ObjectId,
+          auto: true,
+        },
+        division: { type: String, enum: Object.values(DIVISION), required: true, trim: true, index: true },
+        district: { type: String, enum: Object.values(DISTRICT), required: true, trim: true, index: true },
+        area: { type: String, trim: true },
         description: { type: String, required: true },
         content: [
           {
             type: {
               type: String,
-              enum: ["paragraph", "link", "heading"],
+              enum: Object.values(ARTICLE_RICH_TEXT_BLOCK_TYPE),
               required: true,
             },
             text: { type: String },
@@ -134,36 +222,54 @@ const TravelArticleSchema = new Schema<ITravelArticle>(
           },
         ],
         highlights: [{ type: String, trim: true }],
-        attractions: [
+        foodRecommendations: [
           {
-            title: { type: String, required: true, trim: true },
+            dishName: { type: String, required: true },
             description: { type: String, required: true },
-            bestFor: { type: String, trim: true },
-            insiderTip: { type: String, trim: true },
-            address: { type: String, trim: true },
-            openingHours: { type: String, trim: true },
-            images: [{ type: Schema.Types.ObjectId, ref: "Asset" }], // ref to Image model
-            coordinates: { lat: Number, lng: Number },
+            bestPlaceToTry: { type: String },
+            approximatePrice: { type: String },
+            spiceLevel: {
+              type: String,
+              enum: Object.values(FOOD_RECO_SPICE_TYPE)
+            },
           },
         ],
-        activities: [
+        localFestivals: [
           {
-            title: { type: String, required: true },
-            url: { type: String },
-            provider: { type: String },
-            duration: { type: String },
-            price: { type: String },
-            rating: { type: Number },
+            name: { type: String, required: true },
+            description: { type: String, required: true },
+            timeOfYear: { type: String, required: true },
+            location: { type: String, required: true },
+            significance: { type: String },
           },
         ],
-        images: [{ type: Schema.Types.ObjectId, ref: "Asset" }], // ref to Image model
+        localTips: [{ type: String, trim: true }],
+        transportOptions: [{ type: String, trim: true }],
+        accommodationTips: [{ type: String, trim: true }],
+        coordinates: {
+          lat: {
+            type: Number,
+            min: -90,
+            max: 90,
+          },
+          lng: {
+            type: Number,
+            min: -180,
+            max: 180,
+          },
+        },
+        imageAsset:
+        {
+          title: { type: String, required: true, trim: true },
+          assetId: { type: Schema.Types.ObjectId, ref: "Asset", required: true }
+        }
+        ,
       },
     ],
 
-    categories: [
-      { type: String, enum: Object.values(TRAVEL_TYPE), index: true },
-    ],
+    categories: [{ type: String, enum: Object.values(TOUR_CATEGORIES), trim: true, index: true }],
     tags: [{ type: String, trim: true, index: true }],
+
     publishedAt: { type: Date, index: true },
     readingTime: { type: Number, default: 0 },
     wordCount: { type: Number, default: 0 },
@@ -171,14 +277,16 @@ const TravelArticleSchema = new Schema<ITravelArticle>(
     seo: {
       metaTitle: { type: String, trim: true },
       metaDescription: { type: String, trim: true },
-      ogImage: { type: String, trim: true },
+      ogImage: { type: Schema.Types.ObjectId, ref: "Asset" },
     },
     faqs: [
       {
         question: { type: String, required: true },
-        askedBy: { type: String, default: "Traveler" },
         answer: { type: String, required: true },
-        answeredBy: { type: String, default: "Traveler" },
+        category: {
+          type: String,
+          enum: Object.values(FAQ_CATEGORY),
+        },
       },
     ],
     contentEmbeddingId: {
@@ -191,17 +299,190 @@ const TravelArticleSchema = new Schema<ITravelArticle>(
     likeCount: { type: Number, default: 0 },
     shareCount: { type: Number, default: 0 },
     allowComments: { type: Boolean, default: true },
+
+    // Soft delete fields
+    deleted: { type: Boolean, default: false },
+    deletedAt: { type: Date, index: true },
+    deletedBy: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );
 
+// Indexes for better query performance
 TravelArticleSchema.index({ status: 1, publishedAt: -1 });
-TravelArticleSchema.index({ slug: 1 });
-TravelArticleSchema.index({
-  "destinations.city": 1,
-  "destinations.country": 1,
-});
-TravelArticleSchema.index({ topicTags: 1 });
-TravelArticleSchema.index({ contentEmbeddingId: 1 });
+TravelArticleSchema.index({ "destinations.division": 1, "destinations.district": 1 });
+TravelArticleSchema.index({ deleted: 1, status: 1, publishedAt: -1 });
+TravelArticleSchema.index({ deleted: 1, slug: 1 });
 
-export const TravelArticleModel = defineModel("TravelArticle", TravelArticleSchema);
+// Query middleware to filter out deleted documents by default
+TravelArticleSchema.pre(/^find/, function (this: Query<ITravelArticle[], ITravelArticle>, next) {
+  const filter = this.getFilter();
+  if (filter.deleted === undefined) {
+    this.where({ deleted: false });
+  }
+  next();
+});
+
+// Enhanced pre-save middleware with logging
+TravelArticleSchema.pre('save', async function (next) {
+  try {
+    console.log(
+      'Pre-save middleware triggered.',
+      'isNew:', this.isNew,
+      'isModified(title):', this.isModified('title')
+    );
+
+    if (this.isNew || this.isModified('title')) {
+      const titleToSlugify = this.title || this.banglaTitle;
+
+      if (!titleToSlugify) {
+        return next();
+      }
+
+      this.slug = await SlugService.generateUniqueSlug(
+        titleToSlugify,
+        !this.isNew ? this.slug : undefined
+      );
+
+      console.log('Generated slug:', this.slug);
+    }
+
+    next();
+  } catch (err) {
+    next(err as Error);
+  }
+});
+
+TravelArticleSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc, ret) => {
+    ret.id = ret._id;
+  },
+});
+
+TravelArticleSchema.set('toObject', {
+  virtuals: true,
+});
+// Static Methods Implementation
+
+/**
+ * Find one document including deleted ones
+ */
+TravelArticleSchema.statics.findOneWithDeleted = function (
+  filter: FilterQuery<ITravelArticle>,
+  options: QueryOptions = {},
+  session?: ClientSession
+) {
+  // Explicitly include deleted documents by not filtering on deleted field
+  // OR explicitly set deleted to include both true and false
+  const modifiedFilter = { ...filter };
+  if (modifiedFilter.deleted === undefined) {
+    modifiedFilter.deleted = { $in: [true, false] }; // Include both deleted and non-deleted
+  }
+  return this.findOne(modifiedFilter, null, { ...options, session });
+};
+
+/**
+ * Find documents including deleted ones
+ */
+TravelArticleSchema.statics.findWithDeleted = async function (
+  filter: FilterQuery<ITravelArticle> = {},
+  options: QueryOptions = {},
+  session?: ClientSession
+): Promise<ITravelArticle[]> {
+  const modifiedFilter = { ...filter };
+  if (modifiedFilter.deleted === undefined) {
+    modifiedFilter.deleted = { $in: [true, false] };
+  }
+  return this.find(modifiedFilter, null, { ...options, session });
+};
+
+/**
+ * Find by ID including deleted ones
+ */
+TravelArticleSchema.statics.findByIdWithDeleted = async function (
+  id: Types.ObjectId | string,
+  options: QueryOptions = {},
+  session?: ClientSession
+): Promise<ITravelArticle | null> {
+  const filter: FilterQuery<ITravelArticle> = {
+    _id: id,
+    deleted: { $in: [true, false] }  // Explicitly include both
+  };
+  return this.findOne(filter, null, { ...options, session });
+};
+
+/**
+ * Soft delete by ID
+ */
+TravelArticleSchema.statics.softDeleteById = async function (
+  id: Types.ObjectId | string,
+  deletedBy?: Types.ObjectId,
+  session?: ClientSession
+): Promise<ITravelArticle | null> {
+  const update = {
+    $set: {
+      status: ARTICLE_STATUS.ARCHIVED,
+      deleted: true,
+      deletedAt: new Date(),
+      ...(deletedBy && { deletedBy }),
+    },
+  };
+
+  return this.findByIdAndUpdate(id, update, { new: true, session });
+};
+
+/**
+ * Restore by ID
+ */
+TravelArticleSchema.statics.restoreById = async function (
+  id: Types.ObjectId | string,
+  session?: ClientSession
+): Promise<ITravelArticle | null> {
+  const article = await this.findByIdWithDeleted(id, {}, session);
+  if (!article) return null;
+
+  article.status = ARTICLE_STATUS.DRAFT;
+  article.deleted = false;
+  article.deletedAt = undefined;
+  article.deletedBy = undefined;
+
+  await article.save({ session });
+  return article;
+};
+
+/**
+ * Count documents including deleted ones
+ */
+TravelArticleSchema.statics.countWithDeleted = async function (
+  filter: FilterQuery<ITravelArticle> = {},
+  session?: ClientSession
+): Promise<number> {
+  return this.countDocuments(filter, { session });
+};
+
+/**
+ * Count only deleted documents
+ */
+TravelArticleSchema.statics.countDeleted = async function (
+  filter: FilterQuery<ITravelArticle> = {},
+  session?: ClientSession
+): Promise<number> {
+  return this.countDocuments({ ...filter, deleted: true }, { session });
+};
+
+/**
+ * Count only active (non-deleted) documents
+ */
+TravelArticleSchema.statics.countActive = async function (
+  filter: FilterQuery<ITravelArticle> = {},
+  session?: ClientSession
+): Promise<number> {
+  return this.countDocuments({ ...filter, deleted: false }, { session });
+};
+
+export const TravelArticleModel = defineModel<ITravelArticle, ITravelArticleModel>(
+  "TravelArticle",
+  TravelArticleSchema
+);
