@@ -103,7 +103,6 @@ export const PATCH = withErrorHandler(
 
                 const detailDto: TourDetailDTO | null = await buildTourDetailDTO(
                     tour._id as Types.ObjectId,
-                    false,
                     session
                 );
                 if (!detailDto) throw new ApiError("Tour not found after update", 500);

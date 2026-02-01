@@ -4,6 +4,7 @@ import { USER_ROLE } from "@/constants/user.const";
 import { EmployeeDetailDTO } from "./employee.types";
 import { EmployeeRole } from "@/constants/employee.const";
 import { AuditAction } from "@/constants/audit-action.const";
+import { Guide } from "./guide.types";
 
 /**
  * Roles allowed in the admin dashboard
@@ -24,11 +25,7 @@ export interface IBaseUser {
 /**
  * Extended information for Owner (platform administrator)
  */
-export interface IOwnerInfo {
-    email: string;
-    fullName?: string;
-    role: USER_ROLE.GUIDE;
-}
+export type IOwnerGuideInfo = Guide;
 
 /**
  * Extended information for Employee (support)
@@ -49,7 +46,7 @@ export type IEmployeeInfo = Omit<EmployeeDetailDTO,
 /**
  * Union for full/expanded user
  */
-export type CurrentUser = IOwnerInfo | IEmployeeInfo;
+export type CurrentUser = IOwnerGuideInfo | IEmployeeInfo;
 
 /**
  * Audit log entry aligned with audit.model.ts
@@ -117,6 +114,10 @@ export interface RequestMeta {
     hasMore?: boolean;
 }
 
+/**
+ * Update profile data for owner (social, address, bio)
+ */
+export type OwnerProfileUpdateData = Pick<Guide, "bio" | "address" | "social">
 
 /**
  * Zustand store state for current user
@@ -142,6 +143,9 @@ export interface CurrentUserState {
     // update meta
     updateNameMeta?: RequestMeta;
     updatePasswordMeta?: RequestMeta;
+    updateCompanyNameMeta?: RequestMeta;
+    updateCompanyLogoMeta?: RequestMeta;
+    updateOwnerProfileMeta?: RequestMeta;
 
     // Abort controllers to cancel inflight requests
     _abortBase?: AbortController | null;
@@ -151,6 +155,9 @@ export interface CurrentUserState {
     // Abort controllers for update operations
     _abortUpdateName?: AbortController | null;
     _abortUpdatePassword?: AbortController | null;
+    _abortUpdateCompanyName?: AbortController | null;
+    _abortUpdateCompanyLogo?: AbortController | null;
+    _abortUpdateOwnerProfile?: AbortController | null;
 
     // Actions
     fetchBaseUser: (opts?: { force?: boolean }) => Promise<IBaseUser | null>;
@@ -172,6 +179,9 @@ export interface CurrentUserState {
 
     updateUserName: (data: { name: string }) => Promise<CurrentUser | null>;
     updateUserPassword: (data: { currentPassword: string; newPassword: string }) => Promise<void>;
+    updateCompanyName: (data: { companyName: string }) => Promise<CurrentUser | null>;
+    updateCompanyLogo: (data: { logoUrl: string }) => Promise<CurrentUser | null>;
+    updateOwnerProfile: (data: OwnerProfileUpdateData) => Promise<CurrentUser | null>;
 
     markStale: (scope: "base" | "full" | "audits") => void;
     clearUser: () => void;

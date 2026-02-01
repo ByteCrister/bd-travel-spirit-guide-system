@@ -29,7 +29,7 @@ export const GET = withErrorHandler(async (
     await ConnectDB();
 
     const tourDetail = await withTransaction(async (session) => {
-        return buildTourDetailDTO(new mongoose.Types.ObjectId(tourId), false, session);
+        return await buildTourDetailDTO(new mongoose.Types.ObjectId(tourId), session);
     });
 
     if (!tourDetail) {
@@ -116,7 +116,7 @@ export const POST = withErrorHandler(async (
             throw new ApiError("Failed to update tour", 500);
         }
 
-        const detailDto = await buildTourDetailDTO(updatedTour._id as Types.ObjectId, false, session);
+        const detailDto = await buildTourDetailDTO(updatedTour._id as Types.ObjectId, session);
 
         return detailDto
     });

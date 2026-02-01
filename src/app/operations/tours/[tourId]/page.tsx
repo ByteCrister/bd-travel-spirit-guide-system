@@ -1,5 +1,6 @@
 // app/operations/tours/[tourId]/page.tsx
-import TourDetailPage from '@/components/operations/tours/tour-details/TourDetailPage';
+import TourDetailPage from '@/components/operations/tours/details/TourDetailPage';
+import { decodeId } from '@/utils/helpers/mongodb-id-conversions';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
@@ -13,5 +14,5 @@ export default async function Page({ params }: PageProps) {
     notFound();
   }
 
-  return <TourDetailPage tourId={tourId} />;
+  return <TourDetailPage tourId={decodeId(decodeURIComponent(tourId)) ?? '-'} />;
 }

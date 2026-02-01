@@ -17,7 +17,7 @@ export class TestReportGenerator {
     static generate(data: TestReportData = {}) {
         const reasons = Object.values(REPORT_REASON);
         const priorities = Object.values(REPORT_PRIORITY);
-        const statuses = REPORT_STATUS.IN_REVIEW;
+        const statuses = Object.values(REPORT_STATUS);
 
         const fakeMessages = [
             "The tour guide was not professional and arrived 30 minutes late.",
@@ -46,7 +46,7 @@ export class TestReportGenerator {
             tour: data.tour || new Types.ObjectId(),
             reason: data.reason || reasons[Math.floor(Math.random() * reasons.length)],
             message: data.message || fakeMessages[Math.floor(Math.random() * fakeMessages.length)],
-            status: data.status || statuses[Math.floor(Math.random() * statuses.length)],
+            status: data.status || statuses[Math.floor(Math.random() * statuses.length)], // ✅ Now works with array
             priority: data.priority || priorities[Math.floor(Math.random() * priorities.length)],
             evidenceLinks: data.evidenceLinks || [
                 fakeLinks[Math.floor(Math.random() * fakeLinks.length)],

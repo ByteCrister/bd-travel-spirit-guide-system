@@ -24,7 +24,6 @@ import {
   X,
   ChevronDown,
   Info,
-  DollarSign,
 } from 'lucide-react';
 import {
   Card,
@@ -45,6 +44,7 @@ import {
 } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { ValidationError } from 'yup';
+import { FaBangladeshiTakaSign } from 'react-icons/fa6';
 
 interface Step6PoliciesProps {
   tourId: string;
@@ -237,7 +237,7 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
                       {/* Refundable Toggle */}
                       <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-200">
                         <div className="flex items-center gap-3">
-                          <DollarSign className="h-5 w-5 text-slate-500" />
+                          <FaBangladeshiTakaSign className="h-5 w-5 text-slate-500" />
                           <div>
                             <Label className="text-sm font-semibold text-slate-800">Refundable Tour</Label>
                             <p className="text-xs text-slate-600 mt-0.5">Allow customers to request refunds</p>
@@ -391,7 +391,7 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
                           Refund Methods
                         </Label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {Object.values(PAYMENT_METHOD).map((method) => {
+                          {Object.values([PAYMENT_METHOD.CARD]).map((method) => {
                             const isSelected = formik.values.refundPolicy?.method?.includes(method);
                             return (
                               <motion.div

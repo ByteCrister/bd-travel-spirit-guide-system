@@ -24,8 +24,8 @@ import Step6Policies from './steps/Step6Policies';
 import {
   tourDetailErrorKey,
   tourDetailLoadingKey,
-  useCompanyDashboardStore
-} from '@/store/company-detail.store';
+  useTourDetailStore
+} from '@/store/tour-detail.store';
 import { TourDetailDTO } from '@/types/tour.types';
 import LoadingUpdateTourContainer from './loading-skeletons/LoadingUpdateTourContainer';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
@@ -53,7 +53,7 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const { fetchTourDetail, updateTourLocal, tourDetails, loading } = useCompanyDashboardStore();
+  const { fetchTourDetail, updateTourLocal, tourDetails, loading } = useTourDetailStore();
   const tourData = tourDetails[tourId];
   const router = useRouter();
 

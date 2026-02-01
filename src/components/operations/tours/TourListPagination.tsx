@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { useCompanyDashboardStore } from "@/store/company-detail.store";
+import { useTourDetailStore } from "@/store/tour-detail.store";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -20,14 +20,14 @@ const TourListPagination: React.FC<Props> = ({ pagination }) => {
         fetchTours,
         listCache,
         activeCacheKey
-    } = useCompanyDashboardStore();
+    } = useTourDetailStore();
     const activeKey = activeCacheKey.tours;
 
     const current = activeKey
         ? listCache.tours[activeKey]
         : undefined;
 
-    const page = pagination.page ?? 1;
+    const page = pagination?.page ?? 1;
     const pages = current?.pages ?? 1;
     const total = current?.total ?? 0;
 

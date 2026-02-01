@@ -58,7 +58,6 @@ import {
   Plus,
   Trash2,
   CalendarIcon,
-  DollarSign,
   Percent,
   Plane,
   Users,
@@ -79,6 +78,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MapPickerDialog } from '@/components/global/MapPickerDialog';
+import { FaBangladeshiTakaSign } from 'react-icons/fa6';
 
 interface Step4PricingProps {
   tourId: string;
@@ -375,7 +375,7 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
             >
               <CardTitle className="flex items-center gap-3 text-2xl font-bold">
                 <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
-                  <DollarSign className="h-6 w-6" />
+                  <FaBangladeshiTakaSign className="h-6 w-6" />
                 </div>
                 Pricing & Commerce
               </CardTitle>
@@ -1225,7 +1225,7 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                         className="space-y-4"
                       >
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                          {Object.values(PAYMENT_METHOD).map((method) => {
+                          {Object.values([PAYMENT_METHOD.CARD]).map((method) => {
                             const isSelected = (formik.values.paymentMethods ?? []).includes(method);
                             return (
                               <motion.div

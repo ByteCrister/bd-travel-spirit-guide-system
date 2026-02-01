@@ -177,7 +177,7 @@ export const PATCH = withErrorHandler(async (
         // Save the tour
         await tour.save({ session });
 
-        return await buildTourDetailDTO(tour._id as Types.ObjectId, false, session);
+        return await buildTourDetailDTO(tour._id as Types.ObjectId, session);
     });
 
     // Find the updated attraction in the DTO to return

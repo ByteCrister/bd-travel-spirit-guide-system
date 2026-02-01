@@ -21,6 +21,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCurrentUserStore } from "@/store/current-user.store";
 import { USER_ROLE } from "@/constants/user.const";
+import { ShieldQuestion, User } from "lucide-react";
 interface SidebarProps {
   isMobile?: boolean;
   onClose?: () => void;
@@ -49,6 +50,7 @@ const navigationGroups: NavGroup[] = [
     items: [
       { href: "/dashboard", label: "Dashboard", icon: FiHome },
       { href: "/dashboard/overview", label: "Company Overview", icon: RiDashboardLine, adminOnly: true },
+      { href: "/dashboard/profile", label: "Profile", icon: User },
     ],
   },
   {
@@ -66,6 +68,7 @@ const navigationGroups: NavGroup[] = [
     items: [
       { href: "/support/travelers", label: "Customer Support", icon: FiHeadphones },
       { href: "/support/faqs", label: "FAQs", icon: FiFileText },
+      { href: "/support/reset-password-requests", label: "Password Requests", icon: ShieldQuestion, adminOnly: true },
     ],
   },
   {
@@ -96,9 +99,9 @@ export function Sidebar({
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const [hasAutoCollapsed, setHasAutoCollapsed] = useState(false);
 
-    // ? matching is the current user is admin or not
-    const { baseUser } = useCurrentUserStore();
-    const isGuide = baseUser?.role === USER_ROLE.GUIDE
+  // ? matching is the current user is admin or not
+  const { baseUser } = useCurrentUserStore();
+  const isGuide = baseUser?.role === USER_ROLE.GUIDE
 
   useEffect(() => {
     // find the group that matches the current route

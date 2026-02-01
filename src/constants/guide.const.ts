@@ -43,6 +43,9 @@ export enum GUIDE_STATUS {
 
   /** Rejected after review */
   REJECTED = "rejected",
+
+  /** Suspended after review */
+  SUSPENDED = "suspended",
 }
 export type GuideStatus = EnumValues<typeof GUIDE_STATUS>;
 

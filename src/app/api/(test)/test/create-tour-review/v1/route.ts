@@ -1,77 +1,127 @@
-import { NextResponse } from 'next/server';
-import { faker } from '@faker-js/faker';
-import mongoose from 'mongoose';
-import { TRAVEL_TYPE, TravelType } from '@/constants/tour.const';
-import { ReviewModel } from '@/models/tours/review.model';
-import ConnectDB from '@/config/db';
+import { NextRequest, NextResponse } from "next/server";
+import { faker } from "@faker-js/faker";
+import mongoose from "mongoose";
 
-const tourId: string = "695e8f262529c71561f19a06";
-const userId: string = "69688f3b92b7be1cc4819170"; // traveler id
+import ConnectDB from "@/config/db";
+import { TRAVEL_TYPE, TravelType } from "@/constants/tour.const";
+import { ASSET_TYPE } from "@/constants/asset.const";
 
-export async function POST() {
+import { ReviewModel } from "@/models/tours/review.model";
+import { uploadAssets, Base64Asset } from "@/lib/cloudinary/upload.cloudinary";
+import { TravelerModel } from "@/models/travelers/traveler.model";
+
+const tourId = "697b9332224e38cd018b70e3";
+const travelerId = "697c77134df80d599997b85f"; // Traveler _id
+
+export async function POST(request: NextRequest) {
+    let session: mongoose.ClientSession | null = null;
+
     try {
-        // Safety check - only allow in development
-        if (process.env.NODE_ENV === 'production') {
+        /* ------------------------- Dev-only safety check ------------------------- */
+        if (process.env.NODE_ENV === "production") {
             return NextResponse.json(
                 {
                     success: false,
-                    message: 'This test endpoint is only available in development mode'
+                    message:
+                        "This test endpoint is only available in development mode",
                 },
                 { status: 403 }
             );
         }
 
-        // Validate ObjectId format
+        /* --------------------------- ObjectId validation -------------------------- */
         if (!mongoose.Types.ObjectId.isValid(tourId)) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: 'Invalid tourId format. Must be a valid MongoDB ObjectId.'
+                    message: "Invalid tourId format",
                 },
                 { status: 400 }
             );
         }
 
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
+        if (!mongoose.Types.ObjectId.isValid(travelerId)) {
             return NextResponse.json(
-                {
-                    success: false,
-                    message: 'Invalid userId format. Must be a valid MongoDB ObjectId.'
-                },
+                { success: false, message: "Invalid travelerId format" },
                 { status: 400 }
             );
         }
 
         await ConnectDB();
 
-        // Get travel types from your constants
+        session = await mongoose.startSession();
+        session.startTransaction();
+
+        /* -------------------------- Get User from Traveler ------------------------ */
+        const traveler = await TravelerModel.findById(travelerId)
+            .select("user")
+            .session(session);
+
+        if (!traveler) {
+            throw new Error("Traveler not found");
+        }
+
+        const userObjectId = traveler.user;
+
+        /* ----------------------------- Parse request ----------------------------- */
+        // Optional body:
+        // { images?: string[] }
+        let images: string[] = [];
+        try {
+            const body = await request.json();
+            if (Array.isArray(body?.images)) {
+                images = body.images;
+            }
+        } catch {
+            // body is optional for this test endpoint
+        }
+
+        /* ----------------------------- Upload images ----------------------------- */
+        let imageAssetIds: mongoose.Types.ObjectId[] = [];
+
+        if (images.length > 0) {
+            const assets: Base64Asset[] = images.map((img, index) => {
+                if (!img.startsWith("data:image/")) {
+                    throw new Error(`Invalid image format at index ${index}`);
+                }
+
+                return {
+                    base64: img,
+                    name: `review-${tourId}-${index + 1}`,
+                    assetType: ASSET_TYPE.IMAGE,
+                };
+            });
+
+            imageAssetIds = await uploadAssets(assets, session);
+        }
+
+        /* ---------------------------- Create review ----------------------------- */
         const travelTypes = Object.values(TRAVEL_TYPE) as TravelType[];
 
-        // Generate a single fake review
-        const fakeReviewData = {
+        const review = new ReviewModel({
             tour: new mongoose.Types.ObjectId(tourId),
-            user: new mongoose.Types.ObjectId(userId),
-            rating: faker.number.int({ min: 1, max: 5 }), // Use provided rating or random
+            user: new mongoose.Types.ObjectId(userObjectId),
+            rating: faker.number.int({ min: 1, max: 5 }),
             title: faker.lorem.sentence({ min: 3, max: 8 }),
             comment: faker.lorem.paragraphs({ min: 1, max: 3 }),
-            images: [], // Empty array or you can add fake image IDs
+            images: imageAssetIds, // uploaded Asset IDs
             tripType: faker.helpers.arrayElement(travelTypes),
             travelDate: faker.date.past({ years: 1 }),
-            isApproved: false, // Default false
-            helpfulCount: 0, // Start with 0 helpful votes
+            isApproved: false,
+            helpfulCount: 0,
             helpfulVotes: [],
             replies: [],
-            approvedAt: new Date(), // Set approved timestamp
-        };
+            approvedAt: new Date(),
+        });
 
-        // Create the review
-        const review = new ReviewModel(fakeReviewData);
-        await review.save();
+        await review.save({ session });
 
-        // Return the created review
+        await session.commitTransaction();
+
+        /* ------------------------------ Response ------------------------------ */
         return NextResponse.json({
             success: true,
-            message: 'Test review created successfully',
+            message: "Test review created successfully",
             data: {
                 review: {
                     id: review._id,
@@ -80,55 +130,56 @@ export async function POST() {
                     rating: review.rating,
                     title: review.title,
                     comment: review.comment,
+                    images: review.images,
                     tripType: review.tripType,
                     travelDate: review.travelDate,
                     isApproved: review.isApproved,
                     createdAt: review.createdAt,
                     updatedAt: review.updatedAt,
                 },
-                tourId: tourId,
-                userId: userId,
-            }
+            },
         });
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-        console.error('Error creating test review:', error);
+        if (session) await session.abortTransaction();
 
-        // Handle duplicate key error (tour + user unique constraint)
-        if (error.code === 11000) {
+        console.error("Error creating test review:", error);
+
+        if (error?.code === 11000) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: 'A review already exists for this user and tour.',
-                    error: 'Duplicate review error'
+                    message:
+                        "A review already exists for this user and tour.",
                 },
                 { status: 409 }
             );
         }
 
-        // Handle validation errors
-        if (error.name === 'ValidationError') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const errors = Object.values(error.errors).map((err: any) => err.message);
+        if (error?.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (err: any) => err.message
+            );
             return NextResponse.json(
                 {
                     success: false,
-                    message: 'Validation failed',
-                    errors
+                    message: "Validation failed",
+                    errors,
                 },
                 { status: 400 }
             );
         }
 
-        // Generic error
         return NextResponse.json(
             {
                 success: false,
-                message: 'Failed to create test review',
-                error: error.message
+                message: "Failed to create test review",
+                error: error?.message,
             },
             { status: 500 }
         );
+    } finally {
+        if (session) await session.endSession();
     }
 }

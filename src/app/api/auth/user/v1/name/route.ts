@@ -4,12 +4,14 @@ import { withErrorHandler, HandlerResult, ApiError } from "@/lib/helpers/withErr
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import { Types } from "mongoose";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
-import { validateUser } from "@/lib/auth/validateUser";
 import { USER_ROLE } from "@/constants/user.const";
-import { IOwnerInfo, IEmployeeInfo } from "@/types/current-user.types";
+import { IOwnerGuideInfo, IEmployeeInfo } from "@/types/current-user.types";
 import UserModel, { IUserDoc } from "@/models/user.model";
 import { buildEmployeeDTO } from "@/lib/build-responses/build-employee-dt";
 import mappedEmployeeUser from "@/lib/build-responses/build-mappedEmployeeUser";
+import { buildGuideDto } from "@/lib/build-responses/buildGuideOwner-dt";
+import GuideModel from "@/models/guide/guide.model";
+import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
 
 // Request body type for name update
 interface UpdateNameRequest {
@@ -17,7 +19,7 @@ interface UpdateNameRequest {
 }
 
 // Response type for name update
-type UpdateNameResponse = IOwnerInfo | IEmployeeInfo;
+type UpdateNameResponse = IOwnerGuideInfo | IEmployeeInfo;
 
 // Helper function to validate name
 function validateName(name: string): string {
@@ -48,7 +50,8 @@ async function handler(request: NextRequest): Promise<HandlerResult<UpdateNameRe
     }
 
     // 2. Validate user has required role (admin or support)
-    await validateUser(currentUserId, [USER_ROLE.GUIDE, USER_ROLE.ASSISTANT]);
+    await VERIFY_USER_ROLE.MULTIPLE(currentUserId, [USER_ROLE.GUIDE, USER_ROLE.ASSISTANT]);
+
 
     // 3. Parse and validate request body
     let body: UpdateNameRequest;
@@ -85,11 +88,22 @@ async function handler(request: NextRequest): Promise<HandlerResult<UpdateNameRe
 
         // Return appropriate response based on role
         if (user.role === USER_ROLE.GUIDE) {
-            const response: IOwnerInfo = {
-                email: user.email,
-                fullName: user.name,
-                role: USER_ROLE.ADMIN,
-            };
+            // 1. Find guide using user _id
+            const guide = await GuideModel.findOne(
+                {
+                    "owner.user": user._id,
+                    deletedAt: null,
+                },
+                null,
+                { session }
+            ).select("_id");
+
+            if (!guide) {
+                throw new ApiError("Guide profile not found", 404);
+            }
+
+            // 2. Build guide DTO using guide _id
+            const response = await buildGuideDto(guide._id as Types.ObjectId, session);
             return response;
         } else if (user.role === USER_ROLE.ASSISTANT) {
             // For support users, we need to fetch employee details

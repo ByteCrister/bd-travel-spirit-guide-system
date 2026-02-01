@@ -1,4 +1,4 @@
-import DashboardOverviewPage from "@/components/dashboard-overview/DashboardOverviewPage"
+import DashboardOverviewPage from "@/components/dashboard/overview/DashboardOverviewPage"
 
 const page = () => {
   return (

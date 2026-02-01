@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { IoMdClose, IoMdMenu } from "react-icons/io";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, LayoutDashboard, LogIn } from "lucide-react";
 import { FaUserTie } from "react-icons/fa";
 import { useScrollStore } from "@/hooks/scroll-store";
+import { useCurrentUserStore } from "@/store/current-user.store";
+import DottedLoader from "../global/DottedLoader";
 
 export default function Navbar() {
     const {
@@ -15,12 +17,14 @@ export default function Navbar() {
         mobileOpen,
         setMobileOpen
     } = useScrollStore();
+
+    const { baseUser, baseMeta } = useCurrentUserStore();
     
     const [scrolled, setScrolled] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [hidden, setHidden] = useState(false);
-
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const onScrollWin = () => {
@@ -43,6 +47,30 @@ export default function Navbar() {
         window.addEventListener("scroll", onScrollWin, { passive: true });
         return () => window.removeEventListener("scroll", onScrollWin);
     }, [lastScrollY]);
+
+    // Handle Join button click
+    const handleJoinClick = () => {
+        if (!baseUser && !baseMeta.loading) {
+            setIsLoading(true);
+            scrollToSection("join-section");
+            // Reset loading after scroll animation
+            setTimeout(() => setIsLoading(false), 1000);
+        } else {
+            scrollToSection("join-section");
+        }
+    };
+
+    // Handle Login button click
+    const handleLoginClick = () => {
+        if (!baseUser && !baseMeta.loading) {
+            setIsLoading(true);
+            scrollToSection("join-section");
+            // Reset loading after scroll animation
+            setTimeout(() => setIsLoading(false), 1000);
+        } else {
+            scrollToSection("join-section");
+        }
+    };
 
     return (
         <motion.header
@@ -99,7 +127,6 @@ export default function Navbar() {
                         {[
                             { label: "Features", id: "features-section" },
                             { label: "How it works", id: "how-section" },
-                            { label: "Join", id: "join-section" },
                         ].map((item) => (
                             <button
                                 key={item.id}
@@ -110,6 +137,39 @@ export default function Navbar() {
                                 <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-gradient-to-r from-emerald-500 to-teal-500 transition-all group-hover:w-full rounded-full" />
                             </button>
                         ))}
+                        
+                        {/* Conditionally render Dashboard or Join/Login button */}
+                        {baseUser ? (
+                            // Logged in: Show Dashboard button
+                            <Link
+                                href="/dashboard"
+                                className="relative flex items-center gap-2 text-slate-600 hover:text-emerald-600 transition-colors group font-medium"
+                            >
+                                <LayoutDashboard className="h-4 w-4" />
+                                Dashboard
+                                <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-gradient-to-r from-emerald-500 to-teal-500 transition-all group-hover:w-full rounded-full" />
+                            </Link>
+                        ) : (
+                            // Not logged in: Show Join button with loading state
+                            <Button
+                                onClick={handleJoinClick}
+                                disabled={isLoading || baseMeta.loading}
+                                className="relative flex items-center gap-2 text-slate-600 hover:text-emerald-600 transition-colors group font-medium bg-transparent hover:bg-transparent p-0 h-auto"
+                                variant="ghost"
+                            >
+                                {isLoading || baseMeta.loading ? (
+                                    <>
+                                        <DottedLoader />
+                                    </>
+                                ) : (
+                                    <>
+                                        <LogIn className="h-4 w-4" />
+                                        Join
+                                    </>
+                                )}
+                                <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-gradient-to-r from-emerald-500 to-teal-500 transition-all group-hover:w-full rounded-full" />
+                            </Button>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -178,7 +238,6 @@ export default function Navbar() {
                             {[
                                 { label: "Features", id: "features-section" },
                                 { label: "How it works", id: "how-section" },
-                                { label: "Join", id: "join-section" },
                             ].map((item) => (
                                 <button
                                     key={item.id}
@@ -191,6 +250,38 @@ export default function Navbar() {
                                     {item.label}
                                 </button>
                             ))}
+
+                            {/* Conditionally render Dashboard or Join/Login button for mobile */}
+                            {baseUser ? (
+                                <Link
+                                    href="/dashboard"
+                                    className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-white/20 hover:text-slate-900 rounded-xl font-medium transition-colors"
+                                    onClick={() => setMobileOpen(false)}
+                                >
+                                    <LayoutDashboard className="h-5 w-5" />
+                                    <span>Dashboard</span>
+                                </Link>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        handleLoginClick();
+                                        setMobileOpen(false);
+                                    }}
+                                    disabled={isLoading || baseMeta.loading}
+                                    className="flex items-center gap-3 w-full text-left px-4 py-3 text-slate-700 hover:bg-white/20 hover:text-slate-900 rounded-xl font-medium transition-colors disabled:opacity-50"
+                                >
+                                    {isLoading || baseMeta.loading ? (
+                                        <>
+                                            <DottedLoader />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <LogIn className="h-5 w-5" />
+                                            <span>Login / Join</span>
+                                        </>
+                                    )}
+                                </button>
+                            )}
 
                             <Link
                                 href="/register-guide"

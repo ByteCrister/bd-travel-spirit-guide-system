@@ -5,34 +5,27 @@ import { FiLogOut, FiAlertTriangle, FiX } from "react-icons/fi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react"; // Import the shadcn loader
+import { useCurrentUserStore } from "@/store/current-user.store";
+import userProfilePreview from "@/utils/helpers/user-profile-preview";
 
 interface LogoutConfirmationProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   isLoggingOut?: boolean;
-  admin?: {
-    name: string;
-    email: string;
-    avatar?: string;
-    role: string;
-  };
 }
-
-const mockAdmin = {
-  name: "Sarah Johnson",
-  email: "sarah@travelspirit.com",
-  avatar: "/avatars/sarah.jpg",
-  role: "Administrator",
-};
 
 export function LogoutConfirmation({
   isOpen,
   onClose,
   onConfirm,
   isLoggingOut = false,
-  admin = mockAdmin
 }: LogoutConfirmationProps) {
+
+  const { baseUser, fullUser } = useCurrentUserStore();
+
+  userProfilePreview.setUsers(baseUser, fullUser);
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -89,14 +82,14 @@ export function LogoutConfirmation({
             <div className="p-6">
               <div className="flex items-center gap-4 mb-6">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={admin.avatar} alt={admin.name} />
+                  <AvatarImage src={userProfilePreview.getAvatar()} alt={userProfilePreview.getDisplayName()} />
                   <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                    {getInitials(admin.name)}
+                    {getInitials(userProfilePreview.getDisplayName())}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-slate-900 dark:text-slate-100">{admin.name}</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{admin.email}</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">{userProfilePreview.getDisplayName()}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{baseUser?.email}</p>
                 </div>
               </div>
 

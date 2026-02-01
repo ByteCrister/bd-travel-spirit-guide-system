@@ -79,8 +79,6 @@ export async function GET(
 
 // Helper function to generate a complete mock tour
 function generateMockTourDetail(tourId: string): TourDetailDTO {
-    const companyId = faker.string.uuid();
-    const authorId = faker.string.uuid();
     const createdAt = faker.date.past({ years: 1 });
     const updatedAt = faker.date.recent({ days: 30 });
     const publishedAt = faker.date.between({ from: createdAt, to: updatedAt });
@@ -93,6 +91,21 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
     const ageSuitability = faker.helpers.arrayElement(Object.values(AGE_SUITABILITY));
     const currency = faker.helpers.arrayElement(Object.values(CURRENCY));
     const moderationStatus = faker.helpers.arrayElement(Object.values(MODERATION_STATUS));
+
+    // Generate company info
+    const companyInfo = {
+        id: faker.string.uuid(),
+        name: faker.company.name(),
+        createdAt: faker.date.past({ years: 2 }).toISOString()
+    };
+
+    // Generate author info
+    const authorInfo = {
+        id: faker.string.uuid(),
+        name: faker.person.fullName(),
+        email: faker.internet.email(),
+        avatarUrl: faker.image.avatar()
+    };
 
     // Generate random categories (1-3)
     const categories = faker.helpers.arrayElements(
@@ -154,25 +167,27 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
 
     // Generate destinations (2-5)
     const destinations = Array.from({ length: faker.number.int({ min: 2, max: 5 }) }).map(() => ({
+        id: faker.string.uuid(),
         description: faker.lorem.paragraphs(2),
         highlights: Array.from({ length: faker.number.int({ min: 3, max: 7 }) }).map(() =>
             faker.lorem.sentence()
         ),
         attractions: Array.from({ length: faker.number.int({ min: 2, max: 5 }) }).map(() => ({
+            id: faker.string.uuid(),
             title: faker.lorem.words(3),
             description: faker.lorem.sentence(),
             bestFor: faker.lorem.words(2),
             insiderTip: faker.lorem.sentence(),
             address: faker.location.streetAddress(),
             openingHours: '9:00 AM - 6:00 PM',
-            imageIds: Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map(() =>
-                faker.image.urlLoremFlickr({ category: 'landscape' })
-            ),
+            imageIds: Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map(() => ({
+                id: faker.string.uuid(),
+                url: faker.image.urlLoremFlickr({ category: 'landscape' })
+            })),
             coordinates: {
                 lat: faker.location.latitude(),
                 lng: faker.location.longitude()
             },
-            
         })),
         activities: Array.from({ length: faker.number.int({ min: 1, max: 4 }) }).map(() => ({
             title: faker.lorem.words(3),
@@ -185,9 +200,10 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
             },
             rating: faker.number.float({ min: 3, max: 5, fractionDigits: 1 })
         })),
-        imageIds: Array.from({ length: faker.number.int({ min: 3, max: 8 }) }).map(() =>
-            faker.image.urlLoremFlickr({ category: 'landscape' })
-        ),
+        imageIds: Array.from({ length: faker.number.int({ min: 3, max: 8 }) }).map(() => ({
+            id: faker.string.uuid(),
+            url: faker.image.urlLoremFlickr({ category: 'landscape' })
+        })),
         coordinates: {
             lat: faker.location.latitude(),
             lng: faker.location.longitude()
@@ -227,9 +243,8 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         description: faker.lorem.sentence()
     }));
 
-    // Generate departures (3-10)
+    // Generate departures (3-10) - Note: No id field in DepartureDTO
     const departures = Array.from({ length: faker.number.int({ min: 3, max: 10 }) }).map(() => ({
-        id: faker.string.uuid(),
         date: faker.date.future({ years: 1, refDate: new Date() }).toISOString(),
         seatsTotal: faker.number.int({ min: 10, max: 50 }),
         seatsBooked: faker.number.int({ min: 0, max: 45 }),
@@ -460,8 +475,8 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
             : undefined,
 
         // =============== SYSTEM FIELDS ===============
-        companyId,
-        authorId,
+        companyInfo,  // Changed from companyId
+        authorInfo,   // Changed from authorId
         tags,
         publishedAt: publishedAt.toISOString(),
         viewCount: faker.number.int({ min: 100, max: 5000 }),

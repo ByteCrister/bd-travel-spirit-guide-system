@@ -1,4 +1,5 @@
 import EmployeeDetailPage from "@/components/users/employees/details/EmployeeDetailPage";
+import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 
 interface PageProps {
     params: Promise<{ employeeId: string }>;
@@ -7,5 +8,5 @@ interface PageProps {
 export default async function Page({ params }: PageProps) {
     const { employeeId } = await params;
 
-    return <EmployeeDetailPage employeeId={employeeId} />;
+    return <EmployeeDetailPage employeeId={decodeId(decodeURIComponent(employeeId)) ?? '-'} />;
 }

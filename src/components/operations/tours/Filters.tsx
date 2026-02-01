@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { FiSearch, FiFilter, FiX } from "react-icons/fi";
-import { useCompanyDashboardStore } from "@/store/company-detail.store";
+import { useTourDetailStore } from "@/store/tour-detail.store";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -45,7 +45,7 @@ type ItemPerPage = 10 | 20 | 50 | 100;
 const ITEMS_PER_PAGE_OPTIONS: ItemPerPage[] = [10, 20, 50, 100];
 
 export const Filters: React.FC = () => {
-    const { fetchTours, tourFilters: initialFilters } = useCompanyDashboardStore();
+    const { fetchTours, tourFilters: initialFilters } = useTourDetailStore();
 
     // Initialize all filter states with proper types
     const [search, setSearch] = useState<string>(initialFilters?.search || "");

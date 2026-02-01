@@ -7,7 +7,6 @@ import {
     FileText,
     MapPin,
     Tag,
-    DollarSign,
     Calendar,
     CreditCard,
     CheckCircle,
@@ -64,6 +63,7 @@ import {
     TranslationBlockDTO,
     PriceDTO,
 } from "@/types/tour.types";
+import { FaBangladeshiTakaSign } from "react-icons/fa6";
 
 // Type definitions
 type FieldType =
@@ -921,7 +921,7 @@ export default function ReviewStep() {
         {
             id: "pricing",
             title: "Pricing & Commerce",
-            icon: DollarSign,
+            icon: FaBangladeshiTakaSign,
             color: {
                 bg: "bg-green-50",
                 text: "text-green-600",
@@ -931,7 +931,7 @@ export default function ReviewStep() {
                 {
                     label: "Base Price",
                     value: formatCurrency(values.basePrice.amount, values.basePrice.currency),
-                    icon: DollarSign,
+                    icon: FaBangladeshiTakaSign,
                     type: 'price',
                     data: values.basePrice,
                     status: "success",
@@ -1041,7 +1041,7 @@ export default function ReviewStep() {
                 {
                     label: "Refund Policy",
                     value: values.refundPolicy ? "Configured" : "Not set",
-                    icon: DollarSign,
+                    icon: FaBangladeshiTakaSign,
                     type: 'refund',
                     data: values.refundPolicy,
                     status: values.refundPolicy ? "success" : "error",
@@ -1173,7 +1173,7 @@ export default function ReviewStep() {
                                     </div>
                                     <div className="text-xs text-gray-500">Base Price</div>
                                 </div>
-                                <DollarSign className="h-8 w-8 text-green-500" />
+                                <FaBangladeshiTakaSign className="h-8 w-8 text-green-500" />
                             </div>
                         </div>
 

@@ -237,8 +237,6 @@ export interface IEmployee extends Document {
     status: EmployeeStatus;
     employmentType?: EmploymentType;
 
-    avatar?: Types.ObjectId;
-
     salary: number;
     currency: Currency;
     salaryHistory: ISalaryHistory[];
@@ -303,8 +301,6 @@ const EmployeeSchema = new Schema<IEmployee, IEmployeeModel, IEmployeeMethods>(
             type: String,
             enum: Object.values(EMPLOYMENT_TYPE),
         },
-
-        avatar: { type: Schema.Types.ObjectId, ref: "Asset" },
 
         /* FINANCIAL */
         salary: { type: Number, required: true, min: 0 },
@@ -385,6 +381,11 @@ EmployeeSchema.pre(/^find/, function (
     this: Query<unknown, IEmployee>,
     next
 ) {
+
+    if (this.getOptions()?.withDeleted) {
+        return next();
+    }
+
     const query = this.getQuery() as { deletedAt?: unknown };
 
     // If deletedAt is explicitly specified, do nothing
@@ -475,7 +476,10 @@ EmployeeSchema.statics.findOneWithDeleted = function (
     query: FilterQuery<IEmployee>,
     session?: ClientSession
 ) {
-    return this.findOne(query).session(session ?? null);
+    return this
+        .findOne(query)
+        .setOptions({ withDeleted: true }) 
+        .session(session ?? null);
 };
 
 /* =========================================================

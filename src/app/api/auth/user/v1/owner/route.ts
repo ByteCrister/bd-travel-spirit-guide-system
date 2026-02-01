@@ -1,11 +1,12 @@
 // app/api/auth/user/v1/owner/route.ts
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import ConnectDB from "@/config/db";
-import UserModel from "@/models/user.model";
-import { IOwnerInfo } from "@/types/current-user.types";
-import { USER_ROLE } from "@/constants/user.const";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
-import { validateUser } from "@/lib/auth/validateUser";
+import GuideModel from "@/models/guide/guide.model";
+import { buildGuideDto } from "@/lib/build-responses/buildGuideOwner-dt";
+import { withTransaction } from "@/lib/helpers/withTransaction";
+import { Types } from "mongoose";
+import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
 
 /**
  * GET /api/auth/user/owner
@@ -13,37 +14,37 @@ import { validateUser } from "@/lib/auth/validateUser";
  */
 export const GET = withErrorHandler(async () => {
 
-    await ConnectDB();
-
     // Get user ID from session
     const userId = await getUserIdFromSession();
     if (!userId) {
-        throw new ApiError("Unauthorized", 401)
+        throw new ApiError("Unauthorized", 401);
     }
+    await ConnectDB();
 
-    await validateUser(userId, USER_ROLE.GUIDE);
+    return withTransaction(async (session) => {
 
-    // Fetch user directly
-    const user = await UserModel.findOne({
-        _id: userId,
-        role: { $in: [USER_ROLE.GUIDE] },
-    }).select("name role email");
+        await VERIFY_USER_ROLE.GUIDE(userId);
 
-    // Ensure the user is actually an Admin / Owner
-    if (!user) {
-        throw new ApiError("User not found", 404)
-    }
+        // IMPORTANT: attach session to queries
+        const guide = await GuideModel.findOne(
+            {
+                "owner.user": userId,
+                deletedAt: null,
+            },
+            null,
+            { session }
+        );
 
-    // Map to IOwnerInfo
-    const ownerInfo: IOwnerInfo = {
-        role: user.role as USER_ROLE.GUIDE,
-        fullName: user.name ?? "Guide",
-        email: user.email
-    };
+        if (!guide) {
+            throw new ApiError("Guide profile not found", 404);
+        }
 
-    return {
-        data: ownerInfo,
-        status: 200,
-    }
+        // Pass session down if buildGuideDto does DB work
+        const guideDto = await buildGuideDto(guide._id as Types.ObjectId, session);
 
-})
+        return {
+            data: guideDto,
+            status: 200,
+        };
+    });
+});

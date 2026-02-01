@@ -1,8 +1,8 @@
-// /app/api/users-management/companies/[companyId]/tours/[tourId]/reports/route.ts
+// api/mock/operations/tours/[tourId]/reports/route.ts
 import { NextResponse } from "next/server";
 import { faker } from "@faker-js/faker";
 import { REPORT_PRIORITY, REPORT_REASON, REPORT_STATUS } from "@/constants/report.const";
-import { TourReportListItemDTO } from "@/types/report.tour.response.types";
+import { TourReportListItemDTO } from "@/types/tour-detail-report.types";
 
 // enum arrays for faker
 const reasons = Object.values(REPORT_REASON);
@@ -11,7 +11,7 @@ const priorities = Object.values(REPORT_PRIORITY);
 
 export async function GET(
     req: Request,
-    { params }: { params: { companyId: string; tourId: string } }
+    { params }: { params: Promise<{ tourId: string }> }
 ) {
     const url = new URL(req.url);
     const page = Number(url.searchParams.get("page") ?? "1");

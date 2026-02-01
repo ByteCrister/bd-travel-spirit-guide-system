@@ -26,7 +26,7 @@ import ReviewStep from './ReviewStep';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/global/Breadcrumbs';
 import { Loader2, SaveAll } from 'lucide-react';
-import { GuideTestData } from '@/data/tour-1';
+import { GUIDE_DEFAULT_1 } from '@/data/tour-defaults';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
 import { encodeId } from '@/utils/helpers/mongodb-id-conversions';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
@@ -85,7 +85,7 @@ const steps = [
     { label: 'Review & Submit', icon: '/images/tour-review/code-review.png' },
 ];
 
-const initialValues: CreateTourDTO = GuideTestData
+const initialValues: CreateTourDTO = GUIDE_DEFAULT_1
 
 export default function AddTourPage() {
     const [activeStep, setActiveStep] = useState(0)

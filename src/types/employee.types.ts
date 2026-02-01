@@ -152,7 +152,7 @@ export interface EmployeeDetailDTO {
 
   // Compensation
   salary: number;
-  currency: string;
+  currency: Currency;
   salaryHistory: SalaryHistoryDTO[];
   paymentMode: SalaryPaymentMode; // auto | manual
   currentMonthPayment?: CurrentMonthPaymentStatusDTO; // current month payment status

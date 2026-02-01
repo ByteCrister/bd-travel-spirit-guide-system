@@ -175,7 +175,7 @@ export const PATCH = withErrorHandler(
                 await cleanupAssets(assetsToDelete, session);
             }
 
-            const detailDto = await buildTourDetailDTO((updatedTour._id as Types.ObjectId), false, session);
+            const detailDto = await buildTourDetailDTO((updatedTour._id as Types.ObjectId), session);
 
             return {
                 destinations: detailDto.destinations,

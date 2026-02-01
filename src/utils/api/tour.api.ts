@@ -5,7 +5,7 @@ import {
     // RequestReapprovalDTO,
     TourDetailDTO,
 } from "@/types/tour.types";
-import { useCompanyDashboardStore } from "@/store/company-detail.store";
+import { useTourDetailStore } from "@/store/tour-detail.store";
 import { showToast } from "@/components/global/showToast";
 
 // const BASE_URL = "/mock/operations/tours";
@@ -13,31 +13,9 @@ const BASE_URL = "/operations/tours/v1";
 
 // Helper function to update store after successful API call
 const updateStoreAfterSuccess = (tourId: string, tourData: TourDetailDTO) => {
-    const store = useCompanyDashboardStore.getState();
+    const store = useTourDetailStore.getState();
     store.updateTourLocal(tourId, tourData);
 };
-
-// =============== MODERATION ACTIONS ===============
-
-// export const requestTourReapprovalApi = async (
-//     tourId: string,
-//     data?: RequestReapprovalDTO
-// ): Promise<TourDetailDTO> => {
-//     try {
-//         const response = await api.post<{ data: TourDetailDTO }>(
-//             `${BASE_URL}/tours/${tourId}/request-reapproval`,
-//             data
-//         );
-
-//         updateStoreAfterSuccess(tourId, response.data.data);
-//         showToast.success("Re-approval requested successfully!");
-//         return response.data.data;
-//     } catch (error: unknown) {
-//         const message = extractErrorMessage(error);
-//         showToast.error(`Failed to request re-approval: ${message}`);
-//         throw new Error(message);
-//     }
-// };
 
 export const publishTourApi = async (
     tourId: string
@@ -57,12 +35,16 @@ export const publishTourApi = async (
     }
 };
 
-export const archiveTourApi = async (
-    tourId: string
+
+// =============== TERMINATE, DELETE & RESTORE OPERATIONS ===============
+export const terminateTourApi = async (
+    tourId: string,
+    reason: string,
 ): Promise<TourDetailDTO> => {
     try {
         const response = await api.post<{ data: TourDetailDTO }>(
-            `${BASE_URL}/tours/${tourId}/archive`
+            `${BASE_URL}/${tourId}/moderation-status/terminate`,
+            { reason }
         );
 
         updateStoreAfterSuccess(tourId, response.data.data);
@@ -75,22 +57,20 @@ export const archiveTourApi = async (
     }
 };
 
-// =============== DELETE & RESTORE OPERATIONS ===============
-export const deleteTourApi = async (
+export const archiveTourApi = async (
     tourId: string
-): Promise<void> => {
+): Promise<TourDetailDTO> => {
     try {
-        await api.delete(`${BASE_URL}/tours/${tourId}`);
+        const response = await api.delete<{ data: TourDetailDTO }>(
+            `${BASE_URL}/${tourId}/moderation-status/archive`
+        );
 
-        // Remove from store
-        const store = useCompanyDashboardStore.getState();
-        store.removeTourLocal(tourId);
-        store.invalidateCache?.('tours');
-
-        showToast.success("Tour deleted successfully!");
+        updateStoreAfterSuccess(tourId, response.data.data);
+        showToast.success("Tour archived successfully!");
+        return response.data.data;
     } catch (error: unknown) {
         const message = extractErrorMessage(error);
-        showToast.error(`Failed to delete tour: ${message}`);
+        showToast.error(`Failed to archive tour: ${message}`);
         throw new Error(message);
     }
 };
@@ -100,7 +80,7 @@ export const restoreTourApi = async (
 ): Promise<TourDetailDTO> => {
     try {
         const response = await api.post<{ data: TourDetailDTO }>(
-            `${BASE_URL}/tours/${tourId}/restore`
+            `${BASE_URL}/${tourId}/moderation-status/restore`
         );
 
         updateStoreAfterSuccess(tourId, response.data.data);

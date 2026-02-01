@@ -4,12 +4,14 @@ import bcrypt from "bcryptjs";
 import validator from 'validator';
 import { defineModel } from "@/lib/helpers/defineModel";
 import { USER_ROLE, UserRole } from "@/constants/user.const";
+import { Types } from "mongoose";
 
 const passwordRegex = /^(?=.{6,}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).+$/
 
 export interface IUser {
     name: string;
     email: string;
+    avatar?: Types.ObjectId;
     password: string;
     role: UserRole;
     createdAt?: Date;
@@ -32,6 +34,10 @@ const UserSchema = new Schema<IUserDoc, IUserModel>(
             type: String,
             required: true,
             trim: true
+        },
+        avatar: {
+            type: Schema.Types.ObjectId,
+            ref: "Asset",
         },
         email: {
             type: String,

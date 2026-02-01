@@ -12,12 +12,10 @@ interface TopbarProps {
   onMenuClick?: () => void;
   isMobile?: boolean;
   isCollapsed?: boolean;
-  onViewProfile?: () => void;
-  onSettings?: () => void;
   onLogout?: () => void;
 }
 
-export function Topbar({ onMenuClick, isMobile = false, isCollapsed = false, onViewProfile, onSettings, onLogout }: TopbarProps) {
+export function Topbar({ onMenuClick, isMobile = false, isCollapsed = false, onLogout }: TopbarProps) {
   const desktopLeft = isCollapsed ? "lg:left-20" : "lg:left-72"; // 80px vs 288px
   return (
     <motion.header
@@ -92,8 +90,6 @@ export function Topbar({ onMenuClick, isMobile = false, isCollapsed = false, onV
 
         {/* Profile Popover */}
         <ProfilePopover
-          onViewProfile={onViewProfile}
-          onSettings={onSettings}
           onLogout={onLogout}
         />
       </motion.div>

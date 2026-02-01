@@ -11,7 +11,7 @@ import {
     CreateTourDTO,
 } from '@/types/tour.types';
 import api from '../axios/axios';
-import { useCompanyDashboardStore } from '@/store/company-detail.store';
+import { useTourDetailStore } from '@/store/tour-detail.store';
 import { ApiResponse } from '@/types/api.types';
 import { showToast } from '@/components/global/showToast';
 import { extractErrorMessage } from '../axios/extractErrorMessage';
@@ -19,7 +19,7 @@ import { encodeId } from '../helpers/mongodb-id-conversions';
 
 // Helper function to update store after successful API call
 const updateStoreAfterSuccess = (tourId: string, tourData: Partial<TourDetailDTO>) => {
-    const store = useCompanyDashboardStore.getState();
+    const store = useTourDetailStore.getState();
     store.updateTourLocal(tourId, tourData);
     store.invalidateCache?.('tours');
 };

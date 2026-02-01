@@ -1,73 +1,156 @@
-// app/api/test/reports/route.ts
-import { NextRequest, NextResponse } from "next/server";
+// api/test/create-reports/v1/route.ts
+import { NextRequest } from "next/server";
 import { Types } from "mongoose";
 import ConnectDB from "@/config/db";
 import { ReportModel } from "@/models/tours/report.model";
 import { TestReportGenerator } from "@/lib/mock/test-report-generator";
+import { Base64Asset, uploadAssets } from "@/lib/cloudinary/upload.cloudinary";
+import { withErrorHandler, ApiError, HandlerResult } from "@/lib/helpers/withErrorHandler";
+import { withTransaction } from "@/lib/helpers/withTransaction";
 
 // Static IDs for testing (replace with your actual IDs)
-const STATIC_USER_ID = new Types.ObjectId("67a1b2c3d4e5f67890123456");
-const STATIC_TOUR_ID = new Types.ObjectId("67a1b2c3d4e5f67890123457");
+const STATIC_TRAVELER_ID = new Types.ObjectId("697c77134df80d599997b85f");
+const STATIC_TOUR_ID = new Types.ObjectId("697b9332224e38cd018b70e3");
 
-export async function POST(request: NextRequest) {
-    try {
+// Define the response type
+interface CreateReportsResponse {
+    success: boolean;
+    message: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    reports: any[];
+    stats: {
+        total: number;
+        active: number;
+        withStaticUser: number;
+        withStaticTour: number;
+    };
+}
 
-        const body = await request.json();
-        const { count = 1, clearExisting = false, useStaticIds = true } = body;
+// Handler function
+async function createReportsHandler(request: NextRequest): Promise<HandlerResult<CreateReportsResponse>> {
+    const body = await request.json();
+    const { count = 1, clearExisting = false, useStaticIds = true, images = [] } = body;
 
-        // Connect to database
-        await ConnectDB();
+    console.log(`[DEBUG] Creating ${count} reports, clearExisting: ${clearExisting}, useStaticIds: ${useStaticIds}`);
 
-        // Optional: Clear existing test reports
+    // Validate input
+    if (typeof count !== 'number' || count < 1 || count > 100) {
+        throw new ApiError('Count must be between 1 and 100', 400);
+    }
+
+    // 1️⃣ Connect to DB
+    await ConnectDB();
+
+    // Run everything in a transaction
+    const result = await withTransaction(async (session) => {
+        let uploadedImageIds: Types.ObjectId[] = [];
+
+        // 2️⃣ Optional: Clear existing test reports
         if (clearExisting) {
-            await ReportModel.deleteMany({
-                $or: [
-                    { reporter: STATIC_USER_ID },
-                    { tour: STATIC_TOUR_ID }
-                ]
-            });
+            console.log(`[DEBUG] Clearing existing reports with static IDs...`);
+            const deleteResult = await ReportModel.deleteMany(
+                {
+                    $or: [
+                        { reporter: STATIC_TRAVELER_ID },
+                        { tour: STATIC_TOUR_ID }
+                    ]
+                },
+                { session }
+            );
+            console.log(`[DEBUG] Cleared ${deleteResult.deletedCount} reports`);
         }
 
-        // Generate test reports
-        const testReportsData = TestReportGenerator.generateMultiple(
+        // 3️⃣ Upload images using Cloudinary helper (within the same transaction)
+        if (images.length > 0) {
+            console.log(`[DEBUG] Uploading ${images.length} images...`);
+            const base64Assets: Base64Asset[] = images.map((img: string) => ({
+                base64: img,
+                assetType: 'image'
+            }));
+            uploadedImageIds = await uploadAssets(base64Assets, session, 2);
+            console.log(`[DEBUG] Uploaded ${uploadedImageIds.length} images`);
+        }
+
+        // 4️⃣ Generate test report data
+        console.log(`[DEBUG] Generating test report data...`);
+        const generatedReports = TestReportGenerator.generateMultiple(
             count,
             useStaticIds
-                ? {
-                    reporter: STATIC_USER_ID,
-                    tour: STATIC_TOUR_ID,
-                }
+                ? { reporter: STATIC_TRAVELER_ID, tour: STATIC_TOUR_ID }
                 : {}
         );
 
-        // Insert reports
-        const createdReports = await ReportModel.insertMany(testReportsData, {
-            ordered: false,
-        });
+        console.log(`[DEBUG] Generated ${generatedReports.length} reports`);
 
-        return NextResponse.json(
-            {
+        // Log sample of generated data for debugging
+        if (generatedReports.length > 0) {
+            console.log(`[DEBUG] Sample report:`, {
+                reporter: generatedReports[0].reporter.toString(),
+                tour: generatedReports[0].tour.toString(),
+                status: generatedReports[0].status,
+                reason: generatedReports[0].reason,
+                hasEvidenceLinks: generatedReports[0].evidenceLinks?.length || 0
+            });
+        }
+
+        const testReportsData = generatedReports.map((report) => ({
+            ...report,
+            evidenceImages: uploadedImageIds,
+            evidenceLinks: report.evidenceLinks || [],
+            // Ensure required fields exist
+            reopenedCount: 0,
+            deletedAt: null
+        }));
+
+        // 5️⃣ Insert reports into DB
+        console.log(`[DEBUG] Inserting reports into database...`);
+        try {
+            const createdReports = await ReportModel.insertMany(testReportsData, {
+                session,
+                ordered: false // Continue even if some fail
+            });
+            console.log(`[DEBUG] Successfully inserted ${createdReports.length} reports`);
+
+            // 6️⃣ Get statistics
+            const [total, active, withStaticUser, withStaticTour] = await Promise.all([
+                ReportModel.countDocuments().session(session),
+                ReportModel.countActive().session(session),
+                ReportModel.countActive({ reporter: STATIC_TRAVELER_ID }).session(session),
+                ReportModel.countActive({ tour: STATIC_TOUR_ID }).session(session),
+            ]);
+
+            console.log(`[DEBUG] Statistics: total=${total}, active=${active}, withStaticUser=${withStaticUser}, withStaticTour=${withStaticTour}`);
+
+            return {
                 success: true,
                 message: `Created ${createdReports.length} test report(s)`,
                 reports: createdReports,
                 stats: {
-                    total: await ReportModel.countDocuments(),
-                    active: await ReportModel.countActive(),
-                    withStaticUser: await ReportModel.countActive({ reporter: STATIC_USER_ID }),
-                    withStaticTour: await ReportModel.countActive({ tour: STATIC_TOUR_ID }),
-                }
-            },
-            { status: 201 }
-        );
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-        console.error("Test report creation failed:", error);
-        return NextResponse.json(
-            {
-                success: false,
-                error: error.message,
-                stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
-            },
-            { status: 500 }
-        );
-    }
+                    total,
+                    active,
+                    withStaticUser,
+                    withStaticTour,
+                },
+            };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            console.error(`[ERROR] Failed to insert reports:`, error.message);
+            console.error(`[ERROR] Error details:`, error);
+
+            // Check for specific MongoDB errors
+            if (error.code === 11000) {
+                console.error(`[ERROR] Duplicate key error. Unique constraint violation.`);
+            }
+
+            throw error;
+        }
+    });
+
+    return {
+        data: result,
+        status: 201,
+    };
 }
+
+// Export the wrapped handler
+export const POST = withErrorHandler(createReportsHandler);

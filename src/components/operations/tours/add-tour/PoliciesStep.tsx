@@ -408,7 +408,7 @@ export default function PoliciesStep() {
                                         </Typography>
                                     </Box>
                                     <FormGroup row sx={{ gap: 1 }}>
-                                        {Object.values(PAYMENT_METHOD).map((method) => (
+                                        {Object.values([PAYMENT_METHOD.CARD]).map((method) => (
                                             <Chip
                                                 key={method}
                                                 label={method}

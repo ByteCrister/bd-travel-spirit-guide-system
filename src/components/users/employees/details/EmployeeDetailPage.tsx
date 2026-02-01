@@ -22,7 +22,6 @@ import {
     User,
     Briefcase,
     Phone,
-    DollarSign,
     History,
     TrendingUp,
     FileText,
@@ -65,6 +64,8 @@ import { validateUpdateEmployeePayload } from "@/utils/validators/employee/emplo
 import generateStrongPassword from "@/utils/helpers/generate-strong-password";
 import { updateEmployeePassword } from "@/utils/api/update-employee-pass.api";
 import { formatDate, latestEffectiveFrom } from "@/utils/helpers/employees.details";
+import { FaBangladeshiTakaSign } from "react-icons/fa6";
+import { encodeId } from "@/utils/helpers/mongodb-id-conversions";
 
 /* --------------------------------------------
   Form type: lightweight and focused on fields edited in UI
@@ -141,7 +142,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
         () => [
             { label: "Home", href: "/" },
             { label: "Employees", href: "/users/employees" },
-            { label: detail?.user.name ?? "Employee detail", href: `/users/employees/${employeeId}` },
+            { label: detail?.user.name ?? "Employee detail", href: `/users/employees/${encodeURIComponent(encodeId(employeeId))}` },
         ],
         [employeeId, detail?.user.name]
     );
@@ -161,6 +162,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                     employmentType: d.employmentType,
                     avatar: d.avatar,
                     salary: d.salary,
+                    currency: d.currency,
                     paymentMode: d.paymentMode,
                     dateOfJoining: d.dateOfJoining,
                     dateOfLeaving: d.dateOfLeaving,
@@ -291,6 +293,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                 currency: (form.currency ?? detail.currency) as UpdateEmployeePayload["currency"],
                 status: (form.status ?? detail.status) as UpdateEmployeePayload["status"],
                 employmentType: (form.employmentType ?? detail.employmentType) as UpdateEmployeePayload["employmentType"],
+                paymentMode: form.paymentMode,
                 contactInfo: form.contactInfo ?? detail.contactInfo,
                 shifts: form.shifts ?? detail.shifts,
                 notes: form.notes ?? detail.notes ?? "",
@@ -487,7 +490,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                                 </TabsTrigger>
 
                                 <TabsTrigger value="compensation" className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600">
-                                    <DollarSign className="h-4 w-4" />
+                                    <FaBangladeshiTakaSign className="h-4 w-4" />
                                     <span className="hidden sm:inline">Compensation</span>
                                 </TabsTrigger>
 
@@ -611,7 +614,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <InfoCard icon={DollarSign} title="Compensation">
+                                <InfoCard icon={FaBangladeshiTakaSign} title="Compensation">
                                     <div className="space-y-4">
                                         <div className="relative overflow-hidden">
                                             <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-blue-500/10 rounded-lg"></div>
@@ -868,9 +871,9 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
 
                         {/* Compensation */}
                         <TabsContent value="compensation" className="space-y-6 mt-6">
-                            <InfoCard icon={DollarSign} title="Current Compensation">
+                            <InfoCard icon={FaBangladeshiTakaSign} title="Current Compensation">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    <FormRow label="Current Salary" icon={DollarSign}>
+                                    <FormRow label="Current Salary" icon={FaBangladeshiTakaSign}>
                                         <Input
                                             type="text"
                                             inputMode="decimal"
@@ -910,7 +913,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                                         />
                                     </FormRow>
 
-                                    <FormRow label="Currency" icon={DollarSign}>
+                                    <FormRow label="Currency" icon={FaBangladeshiTakaSign}>
                                         <Select
                                             value={(form?.currency ?? detail.currency) ?? CURRENCY.BDT}
                                             onValueChange={(value) => setField("currency", value as CURRENCY)}

@@ -35,7 +35,6 @@ import {
 } from "@/constants/tour.const";
 import { useState } from "react";
 import {
-    DollarSign,
     Plus,
     Trash2,
     MapPin,
@@ -46,6 +45,7 @@ import {
     TrendingDown,
 } from "lucide-react";
 import { MapPickerDialog } from "@/components/global/MapPickerDialog";
+import { FaBangladeshiTakaSign } from "react-icons/fa6";
 
 export default function PricingCommerceStep() {
     const { values, errors, touched, setFieldValue } =
@@ -158,7 +158,7 @@ export default function PricingCommerceStep() {
                                     justifyContent: "center",
                                 }}
                             >
-                                <DollarSign className="w-6 h-6 text-white" />
+                                <FaBangladeshiTakaSign className="w-6 h-6 text-white" />
                             </Box>
                             <Box>
                                 <Typography variant="h5" fontWeight="bold" sx={{ mb: 0.5 }}>
@@ -187,7 +187,7 @@ export default function PricingCommerceStep() {
                                         justifyContent: "center",
                                     }}
                                 >
-                                    <DollarSign className="w-4 h-4 text-white" />
+                                    <FaBangladeshiTakaSign className="w-4 h-4 text-white" />
                                 </Box>
                                 <Typography variant="h6" fontWeight="bold">
                                     Base Price *
@@ -789,7 +789,7 @@ export default function PricingCommerceStep() {
                                 }}
                             >
                                 <FormGroup row sx={{ gap: 1 }}>
-                                    {Object.values(PAYMENT_METHOD).map((method) => (
+                                    {Object.values([PAYMENT_METHOD.CARD]).map((method) => (
                                         <Chip
                                             key={method}
                                             label={method}

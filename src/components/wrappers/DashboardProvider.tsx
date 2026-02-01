@@ -9,15 +9,17 @@ import { DashboardLayout } from "@/components/dashboard-layout/DashboardLayout";
 const ADMIN_ROUTES = [
   "/dashboard",
   "/dashboard/overview",
+  "/dashboard/profile",
 
   "/operations/tours",
   "/operations/reports",
   "/operations/reviews",
-
+  
   "/users/employees",
-
+  
   "/support/faqs",
   "/support/travelers",
+  "/support/reset-password-requests", // for "assistant" employees
 
   "/social/advertising",
   "/social/notifications",

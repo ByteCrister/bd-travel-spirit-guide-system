@@ -29,7 +29,7 @@ import generateStrongPassword from "@/utils/helpers/generate-strong-password";
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Address information for the guide */
-export interface GuideAddress {
+export interface IGuideAddress {
     country?: string;
     division?: string;
     city?: string;
@@ -38,7 +38,7 @@ export interface GuideAddress {
 }
 
 /** Social media platform link */
-export interface GuideSocialLink {
+export interface IGuideSocialLink {
     platform: GuideSocialPlatform;
     url: string;
 }
@@ -51,14 +51,14 @@ export interface IGuideDocument {
 }
 
 /** Owner account information */
-export interface GuideOwner {
+export interface IGuideOwner {
     user: Types.ObjectId;      // Reference to User model for authentication
     phone?: string;            // Contact number
     oauthProvider?: string;    // "google", "facebook", etc.
 }
 
 /** Suspension details */
-export interface GuideSuspension {
+export interface IGuideSuspension {
     reason: string;
     suspendedBy: Types.ObjectId;
     until: Date;
@@ -76,14 +76,14 @@ export interface IGuide extends Document {
     logoUrl: Types.ObjectId;   // Company logo reference
 
     // ========== SOCIAL MEDIA ==========
-    social?: GuideSocialLink[];
+    social?: IGuideSocialLink[];
 
     // ========== OWNER INFORMATION ==========
-    owner: GuideOwner;
+    owner: IGuideOwner;
 
     // ========== VERIFICATION ==========
     documents: IGuideDocument[];  // Required verification docs
-    address?: GuideAddress;        // Business address
+    address?: IGuideAddress;        // Business address
 
     // ========== STATUS & LIFECYCLE ==========
     status: GuideStatus;           // Current approval status
@@ -92,7 +92,7 @@ export interface IGuide extends Document {
     reviewComment?: string;
 
     // ========== MODERATION ==========
-    suspension?: GuideSuspension;  // Suspension details if applicable
+    suspension?: IGuideSuspension;  // Suspension details if applicable
     deletedAt?: Date;              // Soft delete timestamp
 
     // ========== TIMESTAMPS ==========
@@ -167,7 +167,7 @@ export interface GuideModel extends Model<IGuide> {
  * - Used for business location
  * - Hierarchical: Country → Division → City → Street
  */
-const AddressSchema = new Schema<GuideAddress>(
+const AddressSchema = new Schema<IGuideAddress>(
     {
         country: { type: String, trim: true },
         division: { type: String, trim: true },
@@ -183,7 +183,7 @@ const AddressSchema = new Schema<GuideAddress>(
  * - Validates URL format
  * - Platform must be from predefined enum
  */
-const SocialLinkSchema = new Schema<GuideSocialLink>(
+const SocialLinkSchema = new Schema<IGuideSocialLink>(
     {
         platform: {
             type: String,
@@ -230,7 +230,7 @@ const DocumentSchema = new Schema<IGuideDocument>(
  * - Links guide to User model for authentication
  * - Validates Bangladeshi phone numbers
  */
-const OwnerSchema = new Schema<GuideOwner>(
+const OwnerSchema = new Schema<IGuideOwner>(
     {
         user: {
             type: Schema.Types.ObjectId,
@@ -259,7 +259,7 @@ const OwnerSchema = new Schema<GuideOwner>(
  * - Tracks moderation actions
  * - Includes duration and reason
  */
-const SuspensionSchema = new Schema<GuideSuspension>(
+const SuspensionSchema = new Schema<IGuideSuspension>(
     {
         reason: {
             type: String,
@@ -323,7 +323,7 @@ const GuideSchema = new Schema<IGuide>(
             type: [SocialLinkSchema],
             default: [],
             validate: {
-                validator: (links: GuideSocialLink[]) => links.length <= 5,
+                validator: (links: IGuideSocialLink[]) => links.length <= 5,
                 message: 'Cannot have more than 5 social links',
             },
         },
@@ -333,7 +333,7 @@ const GuideSchema = new Schema<IGuide>(
             type: OwnerSchema,
             required: [true, 'Owner information is required'],
             validate: {
-                validator: function (this: IGuide, value: GuideOwner) {
+                validator: function (this: IGuide, value: IGuideOwner) {
                     // Owner is required only after approval
                     return this.status !== GUIDE_STATUS.APPROVED || !!value?.user;
                 },

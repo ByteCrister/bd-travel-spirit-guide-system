@@ -1,16 +1,13 @@
-// api/users-management/companies/[companyId]/tours/[tourId]/faqs/route.ts
+// api/mock/operations/tours/[tourId]/faqs/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
 import { faker } from "@faker-js/faker";
-import { decodeId, encodeId } from "@/utils/helpers/mongodb-id-conversions";
+import { MODERATION_STATUS, ModerationStatus } from "@/constants/tour.const";
 
 /**
  * Mock moderation statuses used by the frontend types.
  * Adjust values if your real app exports different constants.
  */
-const MODERATION_STATUSES = ["approved", "pending", "rejected"] as const;
-
-type ModerationStatus = (typeof MODERATION_STATUSES)[number];
 
 type FAQUserDTO = {
     id: string;
@@ -116,7 +113,7 @@ const makeFaq = (tourId: string, order: number): TourFAQDTO => {
         answer: hasAnswer ? faker.lorem.paragraph() : undefined,
         askedBy: asked,
         answeredBy: answered,
-        status: faker.helpers.arrayElement(MODERATION_STATUSES),
+        status: faker.helpers.arrayElement(Object.values(MODERATION_STATUS)),
         order,
         isActive: Math.random() > 0.05,
         likes,
@@ -137,9 +134,9 @@ const makeFaq = (tourId: string, order: number): TourFAQDTO => {
  */
 export async function GET(
     req: NextRequest,
-    { params }: { params: { companyId: string; tourId: string } }
+    { params }: { params: Promise<{ tourId: string }> }
 ) {
-    const { companyId, tourId } = await params;
+    const { tourId } = await params;
     const url = new URL(req.url);
 
     const page = Math.max(1, Number(url.searchParams.get("page") ?? "1"));

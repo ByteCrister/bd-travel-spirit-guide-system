@@ -1,7 +1,8 @@
+// api/mock/operations/tours/[tourId]/reviews/route.ts
 import { NextResponse } from "next/server";
 import { faker } from "@faker-js/faker";
 import { TRAVEL_TYPE } from "@/constants/tour.const";
-import { TourReviewsResponseDTO, ReviewReplyDTO } from "@/types/review.tour.response.type";
+import { TourReviewsResponseDTO, ReviewReplyDTO } from "@/types/tour-detail-review.type";
 
 /** Helper: generate a consistent avatar for each user/employee */
 function getAvatar(userId: string) {
@@ -66,7 +67,6 @@ function generateRandomReview(tourId: string) {
         comment,
         tripType: faker.helpers.arrayElement(Object.values(TRAVEL_TYPE)),
         travelDate: faker.date.past({ years: 1 }).toISOString(),
-        isVerified: faker.datatype.boolean({ probability: 0.8 }),
         isApproved: faker.datatype.boolean({ probability: 0.9 }),
         helpfulCount: faker.number.int({ min: 0, max: faker.helpers.arrayElement([10, 20, 50, 100]) }),
         createdAt: faker.date.between({ from: "2022-01-01", to: new Date() }).toISOString(),
@@ -84,12 +84,12 @@ function parseIntOrDefault(value: string | null, fallback: number) {
 /** GET handler: returns paginated reviews in a consistent format */
 export async function GET(
     req: Request,
-    { params }: { params: Promise<{ companyId: string; tourId: string }> } // Note: params is now a Promise
+    { params }: { params: Promise<{ tourId: string }> } // Note: params is now a Promise
 ) {
     try {
         // Await the params since they're now a Promise
         const awaitedParams = await params;
-        const { companyId, tourId } = awaitedParams;
+        const { tourId } = awaitedParams;
 
         const url = new URL(req.url);
         const page = parseIntOrDefault(url.searchParams.get("page"), 1);
@@ -119,15 +119,14 @@ export async function GET(
             return acc;
         }, {} as Record<1 | 2 | 3 | 4 | 5, number>);
 
-        const verifiedCount = allReviews.filter(r => r.isVerified).length;
+        const isApproved = allReviews.filter(r => r.isApproved).length;
 
         const data: TourReviewsResponseDTO = {
-            companyId,
             tourId,
             summary: {
                 totalReviews: total,
                 averageRating,
-                verifiedCount,
+                isApproved,
                 ratingBreakdown,
             },
             docs,

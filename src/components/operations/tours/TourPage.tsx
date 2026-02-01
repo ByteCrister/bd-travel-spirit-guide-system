@@ -1,6 +1,6 @@
 "use client";
 
-import { useCompanyDashboardStore } from "@/store/company-detail.store";
+import { useTourDetailStore } from "@/store/tour-detail.store";
 import { useEffect } from "react";
 import { Kpis } from "./Kpis";
 import { Filters } from "./Filters";
@@ -40,7 +40,7 @@ export default function ToursPage() {
         listCache,
         activeCacheKey,
         params: p,
-    } = useCompanyDashboardStore();
+    } = useTourDetailStore();
     const params = p.tours;
 
     useEffect(() => {

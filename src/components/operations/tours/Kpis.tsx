@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCompanyDashboardStore } from "@/store/company-detail.store";
+import { useTourDetailStore } from "@/store/tour-detail.store";
 import { FiFileText, FiStar, FiUsers } from "react-icons/fi";
 import { KpisSkeleton } from "./skeletons/KpisSkeleton";
 import { motion, Variants } from "framer-motion";
@@ -16,7 +16,7 @@ const cardVariants: Variants = {
 };
 
 export const Kpis: React.FC = () => {
-    const { selectCompanyKpisFromActiveTours, loading } = useCompanyDashboardStore()
+    const { selectCompanyKpisFromActiveTours, loading } = useTourDetailStore()
     const kpis = selectCompanyKpisFromActiveTours();
 
     if (loading["tours"])

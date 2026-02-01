@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, MapPin, TrendingUp, Eye, Heart, Share2, Calendar, Clock } from "lucide-react";
 import { TourListItemDTO } from "@/types/tour.types";
-import { useCompanyDashboardStore } from "@/store/company-detail.store";
+import { useTourDetailStore } from "@/store/tour-detail.store";
 import TourTableSkeleton from "./skeletons/TourTableSkeleton";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -30,7 +30,7 @@ type Props = {
 
 export const TourTable: React.FC<Props> = ({ list }) => {
     const router = useRouter();
-    const { loading } = useCompanyDashboardStore();
+    const { loading } = useTourDetailStore();
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
     if (loading['tours']) {

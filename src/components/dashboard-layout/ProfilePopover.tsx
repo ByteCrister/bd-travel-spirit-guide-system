@@ -2,31 +2,23 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiUser, FiSettings, FiLogOut, FiChevronDown } from "react-icons/fi";
+import { FiLogOut, FiChevronDown } from "react-icons/fi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { useCurrentUserStore } from "@/store/current-user.store";
+import userProfilePreview from "@/utils/helpers/user-profile-preview";
 
 interface ProfilePopoverProps {
-  admin?: {
-    name: string;
-    email: string;
-    avatar?: string;
-    role: string;
-  };
-  onViewProfile?: () => void;
-  onSettings?: () => void;
   onLogout?: () => void;
 }
 
-const mockAdmin = {
-  name: "Sarah Johnson",
-  email: "sarah@travelspirit.com",
-  avatar: "/avatars/sarah.jpg",
-  role: "Administrator",
-};
 
-export function ProfilePopover({ admin = mockAdmin, onViewProfile, onSettings, onLogout }: ProfilePopoverProps) {
+export function ProfilePopover({ onLogout }: ProfilePopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { fullUser, baseUser } = useCurrentUserStore();
+
+  userProfilePreview.setUsers(baseUser, fullUser);
 
   const getInitials = (name: string) => {
     return name
@@ -36,6 +28,7 @@ export function ProfilePopover({ admin = mockAdmin, onViewProfile, onSettings, o
       .toUpperCase()
       .slice(0, 2);
   };
+
 
   const handleLogoutClick = () => {
     onLogout?.();
@@ -54,18 +47,18 @@ export function ProfilePopover({ admin = mockAdmin, onViewProfile, onSettings, o
           className="flex items-center gap-2 rounded-xl p-1.5 transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          aria-label={`Profile menu for ${admin.name}`}
+          aria-label={`Profile menu for ${userProfilePreview.getDisplayName()}`}
           aria-expanded={isOpen}
         >
           <Avatar className="h-8 w-8">
-            <AvatarImage src={admin.avatar} alt={admin.name} />
+            <AvatarImage src={userProfilePreview.getAvatar()} alt={userProfilePreview.getDisplayName()} />
             <AvatarFallback className="text-xs bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-              {getInitials(admin.name)}
+              {getInitials(userProfilePreview.getDisplayName())}
             </AvatarFallback>
           </Avatar>
           <div className="hidden md:block text-left">
-            <p className="text-sm font-medium truncate max-w-24 text-slate-900 dark:text-slate-100">{admin.name}</p>
-            <p className="text-xs text-slate-600 dark:text-slate-400 truncate max-w-24">{admin.role}</p>
+            <p className="text-sm font-medium truncate max-w-24 text-slate-900 dark:text-slate-100">{userProfilePreview.getDisplayName()}</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400 truncate max-w-24">{baseUser?.role}</p>
           </div>
           <motion.div
             animate={{ rotate: isOpen ? 180 : 0 }}
@@ -87,7 +80,7 @@ export function ProfilePopover({ admin = mockAdmin, onViewProfile, onSettings, o
                 className="fixed inset-0 z-40"
                 onClick={() => setIsOpen(false)}
               />
-              
+
               {/* Profile Panel */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: -10 }}
@@ -101,47 +94,16 @@ export function ProfilePopover({ admin = mockAdmin, onViewProfile, onSettings, o
                 {/* Profile Header */}
                 <div className="flex items-center gap-3 p-4">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={admin.avatar} alt={admin.name} />
+                    <AvatarImage src={userProfilePreview.getAvatar()} alt={userProfilePreview.getDisplayName()} />
                     <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                      {getInitials(admin.name)}
+                      {getInitials(userProfilePreview.getDisplayName())}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate text-slate-900 dark:text-slate-100">{admin.name}</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{admin.email}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-500">{admin.role}</p>
+                    <p className="font-medium truncate text-slate-900 dark:text-slate-100">{userProfilePreview.getDisplayName()}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{baseUser?.email}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-500">{baseUser?.role}</p>
                   </div>
-                </div>
-
-                <Separator />
-
-                {/* Menu Items */}
-                <div className="p-2">
-                  <motion.button
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                    whileHover={{ x: 4 }}
-                    whileTap={{ scale: 0.98 }}
-                                      onClick={() => {
-                    onViewProfile?.();
-                    setIsOpen(false);
-                  }}
-                  >
-                    <FiUser className="h-4 w-4" />
-                    View Profile
-                  </motion.button>
-                  
-                  <motion.button
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                    whileHover={{ x: 4 }}
-                    whileTap={{ scale: 0.98 }}
-                                      onClick={() => {
-                    onSettings?.();
-                    setIsOpen(false);
-                  }}
-                  >
-                    <FiSettings className="h-4 w-4" />
-                    Settings
-                  </motion.button>
                 </div>
 
                 <Separator />

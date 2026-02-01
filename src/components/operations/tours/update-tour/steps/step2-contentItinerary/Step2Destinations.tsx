@@ -29,7 +29,6 @@ import {
     MapPinned,
     Compass,
     Activity,
-    DollarSign,
     Clock,
 } from 'lucide-react';
 import {
@@ -40,6 +39,7 @@ import {
 } from '@/types/tour.types';
 import { CURRENCY } from '@/constants/tour.const';
 import { MapPickerDialog } from '@/components/global/MapPickerDialog';
+import { FaBangladeshiTakaSign } from 'react-icons/fa6';
 
 const cardVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
@@ -802,7 +802,7 @@ export default function Step2Destinations() {
                                                                                             </div>
                                                                                             <div className="space-y-2">
                                                                                                 <Label className="flex items-center gap-2">
-                                                                                                    <DollarSign className="h-4 w-4 text-green-500" />
+                                                                                                    <FaBangladeshiTakaSign className="h-4 w-4 text-green-500" />
                                                                                                     Price
                                                                                                 </Label>
                                                                                                 <Input

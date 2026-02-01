@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from "react";
-import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,7 +38,7 @@ export function MultiSelect<T extends string>({
     onChange,
     placeholder = "Select options...",
     className,
-    maxDisplay = 2,
+    maxDisplay = 1,
 }: MultiSelectProps<T>) {
 
     const [open, setOpen] = React.useState(false);
@@ -50,10 +49,6 @@ export function MultiSelect<T extends string>({
         } else {
             onChange([...selected, value]);
         }
-    };
-
-    const removeItem = (value: T) => {
-        onChange(selected.filter((item) => item !== value));
     };
 
     const displayedItems = selected.slice(0, maxDisplay);
@@ -118,27 +113,6 @@ export function MultiSelect<T extends string>({
                     </Command>
                 </PopoverContent>
             </Popover>
-
-            {selected.length > maxDisplay && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                    {selected.map((value) => {
-                        const option = options.find((opt) => opt.value === value);
-                        return (
-                            <Badge key={value} variant="secondary" className="flex items-center gap-1">
-                                {option?.label || value}
-                                <button
-                                    type="button"
-                                    onClick={() => removeItem(value)}
-                                    className="ml-1 hover:text-destructive"
-                                    aria-label={`Remove ${option?.label || value}`}
-                                >
-                                    <X size={12} />
-                                </button>
-                            </Badge>
-                        );
-                    })}
-                </div>
-            )}
         </div>
     );
 }

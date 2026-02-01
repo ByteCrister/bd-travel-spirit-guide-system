@@ -131,14 +131,29 @@ export default function JoinForgotSection() {
         }
     };
 
-    const handleForgotSubmit = (ev: React.FormEvent) => {
+    const handleForgotSubmit = async (ev: React.FormEvent) => {
         ev.preventDefault();
         if (!validateForgot()) return;
 
-        setIsSubmitting(true);
-        // TODO: Integrate with backend (API route /auth/request-reset).
-        alert("Reset request submitted. We will verify and contact you via email.");
-        setIsSubmitting(false);
+        try {
+            setIsSubmitting(true);
+
+            // Make API call using your axios instance
+            await api.post("/operations/password-requests/v1", {
+                email: forgot.email,
+                description: forgot.reason,
+            });
+
+            showToast.success("Password reset request submitted successfully")
+            setForgot({ email: "", reason: "" });
+
+        } catch (err: unknown) {
+            console.error("Unexpected error:", err);
+            const message = extractErrorMessage(err)
+            showToast.error(message);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const isJoin = activeForm === "join";
@@ -225,7 +240,7 @@ export default function JoinForgotSection() {
                                                 isJoin ? "bg-emerald-500" : "bg-cyan-500",
                                             ].join(" ")}
                                         />
-                                        {isJoin ? "Create account" : "Account recovery"}
+                                        {isJoin ? "Join" : "Request for password reset"}
                                         {isSubmitting && (
                                             <Loader2 className="h-3 w-3 animate-spin ml-1" />
                                         )}
@@ -348,16 +363,6 @@ export default function JoinForgotSection() {
                                                     )}
                                                 </Button>
 
-                                                {/* Loader under submit button */}
-                                                {isSubmitting && (
-                                                    <div className="flex justify-center">
-                                                        <div className="flex items-center gap-2 text-sm text-emerald-700">
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                            <span>Submitting your request...</span>
-                                                        </div>
-                                                    </div>
-                                                )}
-
                                                 <button
                                                     type="button"
                                                     onClick={() => setActiveForm("forgot")}
@@ -457,17 +462,6 @@ export default function JoinForgotSection() {
                                                         "Request reset"
                                                     )}
                                                 </Button>
-
-                                                {/* Loader under submit button */}
-                                                {isSubmitting && (
-                                                    <div className="flex justify-center">
-                                                        <div className="flex items-center gap-2 text-sm text-cyan-700">
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                            <span>Sending your reset request...</span>
-                                                        </div>
-                                                    </div>
-                                                )}
-
                                                 <button
                                                     type="button"
                                                     onClick={() => setActiveForm("join")}
