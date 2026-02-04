@@ -11,7 +11,7 @@ import { uploadAssets, Base64Asset } from "@/lib/cloudinary/upload.cloudinary";
 import { TravelerModel } from "@/models/travelers/traveler.model";
 
 const tourId = "697b9332224e38cd018b70e3";
-const travelerId = "697c77134df80d599997b85f"; // Traveler _id
+const travelerId = "6982c9d33afd45667a05b56a"; // Traveler _id
 
 export async function POST(request: NextRequest) {
     let session: mongoose.ClientSession | null = null;

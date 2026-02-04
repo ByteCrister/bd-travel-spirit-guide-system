@@ -14,6 +14,9 @@ import GuideModel from "@/models/guide/guide.model";
 import EmployeeModel from "@/models/employees/employees.model";
 import { getCollectionName } from "@/lib/helpers/get-collection-name";
 import { TravelerModel } from "@/models/travelers/traveler.model";
+import { sanitizeSearch } from "@/lib/helpers/sanitize-search";
+import AssetModel from "@/models/assets/asset.model";
+import AssetFileModel from "@/models/assets/asset-file.model";
 
 /**
  * Build aggregation pipeline for review list
@@ -24,8 +27,9 @@ function buildAggregationPipeline(
     queryField: ReviewSearchField | undefined,
     sortField: string,
     sortDir: "asc" | "desc",
+    allowedTourIds: Types.ObjectId[],
+    includeDeleted = false,
     tourTitle?: string,
-    includeDeleted = false
 ): mongoose.PipelineStage[] {
     const pipeline: mongoose.PipelineStage[] = [];
 
@@ -53,7 +57,7 @@ function buildAggregationPipeline(
     });
     pipeline.push({ $unwind: { path: "$travelerInfo", preserveNullAndEmptyArrays: true } });
 
-    // 3️⃣ Lookup user info
+    // 3️⃣ Lookup user info (inside traveler)
     pipeline.push({
         $lookup: {
             from: getCollectionName(UserModel),
@@ -64,23 +68,51 @@ function buildAggregationPipeline(
     });
     pipeline.push({ $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } });
 
+    // 3️⃣a Lookup avatar file from userInfo.avatar
+    pipeline.push({
+        $lookup: {
+            from: getCollectionName(AssetModel),
+            localField: "userInfo.avatar",
+            foreignField: "_id",
+            as: "avatarInfo"
+        }
+    });
+    pipeline.push({ $unwind: { path: "$avatarInfo", preserveNullAndEmptyArrays: true } });
+
+    // 3️⃣b Lookup asset file
+    pipeline.push({
+        $lookup: {
+            from: getCollectionName(AssetFileModel),
+            localField: "avatarInfo.file",
+            foreignField: "_id",
+            as: "avatarFile"
+        }
+    });
+    pipeline.push({ $unwind: { path: "$avatarFile", preserveNullAndEmptyArrays: true } });
+
     // 4️⃣ Add computed fields
     pipeline.push({
         $addFields: {
-            userName: "$travelerInfo.name",
+            userName: "$userInfo.name",
             userEmail: "$userInfo.email",
+            userAvatar: "$avatarFile.publicUrl",
             tourTitle: "$tourInfo.title",
             imageCount: { $size: "$images" }
         }
     });
 
-    // 5️⃣ Base filter including soft-delete
+
+    // 5️⃣ Base filter including soft-delete (FIXED VERSION)
     pipeline.push({
         $match: {
             ...filter,
+            tour: {
+                $in: allowedTourIds
+            },
             deletedAt: includeDeleted ? { $ne: null } : null
         }
     });
+
 
     // 6️⃣ Filter by tourTitle if provided
     if (tourTitle) {
@@ -130,9 +162,12 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
     const sortDir = (searchParams.get("sortDir") as "asc" | "desc") || "desc";
 
     // Filters
-    const query = searchParams.get("q") || undefined;
+    const rawQuery = searchParams.get("q");
+    const rawTourTitle = searchParams.get("tourTitle");
+
+    const query = sanitizeSearch(rawQuery);
+    const tourTitle = sanitizeSearch(rawTourTitle);
     const queryField = searchParams.get("qField") as ReviewSearchField || undefined;
-    const tourTitle = searchParams.get("tourTitle") || undefined;
     const ratingMin = searchParams.get("ratingMin") ? parseInt(searchParams.get("ratingMin")!) : undefined;
     const ratingMax = searchParams.get("ratingMax") ? parseInt(searchParams.get("ratingMax")!) : undefined;
     const isApproved = searchParams.get("isApproved");
@@ -181,7 +216,9 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
         if (ratingMax !== undefined) filter.rating.$lte = ratingMax;
     }
 
-    if (isApproved !== undefined) filter.isApproved = isApproved === "true";
+    if (isApproved === "true") {
+        filter.isApproved = true;
+    }
     if (tripType) filter.tripType = tripType;
     if (dateFrom || dateTo) {
         filter.createdAt = {};
@@ -190,7 +227,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
     }
 
     // Build aggregation pipelines
-    const basePipeline = buildAggregationPipeline(filter, query, queryField, sortField, sortDir, tourTitle, includeDeleted);
+    const basePipeline = buildAggregationPipeline(filter, query, queryField, sortField, sortDir, allowedTourIds, includeDeleted, tourTitle);
 
     const countPipeline = [...basePipeline, { $count: "total" }];
     const dataPipeline = [...basePipeline];

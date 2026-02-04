@@ -42,6 +42,8 @@ export const GET = withErrorHandler(async (
         return detail;
     });
 
+    // console.log(JSON.stringify(reviewDetail, null, 2));
+
     return {
         data: reviewDetail,
         status: 200

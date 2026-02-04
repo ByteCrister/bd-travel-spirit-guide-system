@@ -10,7 +10,7 @@ async function createTestFAQHandler() {
      * TEST VARIABLES (replace with real IDs)
      */
     const tourId = new Types.ObjectId("697b9332224e38cd018b70e3");
-    const travelerId = new Types.ObjectId("697c77134df80d599997b85f");
+    const travelerId = new Types.ObjectId("6982ca2c3afd45667a05b575");
 
     await ConnectDB();
 

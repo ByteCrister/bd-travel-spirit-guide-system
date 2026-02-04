@@ -9,7 +9,7 @@ import { withErrorHandler, ApiError, HandlerResult } from "@/lib/helpers/withErr
 import { withTransaction } from "@/lib/helpers/withTransaction";
 
 // Static IDs for testing (replace with your actual IDs)
-const STATIC_TRAVELER_ID = new Types.ObjectId("697c77134df80d599997b85f");
+const STATIC_TRAVELER_ID = new Types.ObjectId("6982c7383afd45667a05b540");
 const STATIC_TOUR_ID = new Types.ObjectId("697b9332224e38cd018b70e3");
 
 // Define the response type

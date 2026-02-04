@@ -35,7 +35,7 @@ import {
     truncate,
 } from "@/utils/helpers/reviews.uiHelpers";
 import { toast } from "sonner";
-import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
+import { encodeId } from "@/utils/helpers/mongodb-id-conversions";
 
 interface Props {
     review: ReviewListItemDTO;
@@ -222,7 +222,7 @@ function ReviewsTableRow({ review, isFirst, onFirstRef }: Props): JSX.Element {
                 {/* Tour Column */}
                 <div role="cell" className="flex items-center min-w-0">
                     <Link
-                        href={`/operations/tours/${decodeURIComponent(decodeId(review.tourId)!)}`}
+                        href={`/operations/tours/${encodeURIComponent(encodeId(review.tourId)!)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 hover:underline transition-colors truncate group p-2 rounded hover:bg-blue-50"

@@ -1,19 +1,24 @@
-// /lib/api/reviews/getReviewDetail.ts (with proper typing)
 import { Types, ClientSession, HydratedDocument, Query } from "mongoose";
 import { ReviewDetailDTO } from "@/types/reviews.types";
 import { PopulatedAssetLean } from "@/types/populated-asset.types";
 import { IReview, ReviewModel } from "@/models/tours/review.model";
+import TourModel from "@/models/tours/tour.model";
+import AssetModel from "@/models/assets/asset.model";
+import AssetFileModel from "@/models/assets/asset-file.model";
+import { TravelerModel } from "@/models/travelers/traveler.model";
+import UserModel from "@/models/user.model";
+import EmployeeModel from "@/models/employees/employees.model";
 
 // Helper types for populated fields
 export type PopulatedUser = {
     _id: Types.ObjectId;
     email: string;
     name?: string;
+    avatar?: PopulatedAssetLean;
 };
 
 export type PopulatedTraveler = {
     _id: Types.ObjectId;
-    avatar?: PopulatedAssetLean;
     user?: PopulatedUser;
 };
 
@@ -64,134 +69,113 @@ export async function buildTourReviewDTO(
     session?: ClientSession
 ): Promise<ReviewDetailDTO | null> {
     try {
-        // Create properly typed query with method chaining
         let query: ReviewQuery = ReviewModel.findById(reviewId) as ReviewQuery;
 
-        // Apply population with proper typing - tour
+        // Populate tour with heroImage
         query = query.populate<{ tour: PopulatedTour }>({
             path: "tour",
             select: "title slug heroImage",
-            model: "Tour",
+            model: TourModel,
             populate: {
                 path: "heroImage",
-                model: "Asset",
+                model: AssetModel,
                 select: "file",
                 populate: {
                     path: "file",
-                    model: "AssetFile",
-                    select: "publicUrl"
-                }
-            }
+                    model: AssetFileModel,
+                    select: "publicUrl",
+                },
+            },
         }) as ReviewQuery;
 
-        // Apply population - user with nested population
+        // Populate traveler -> user -> avatar
         query = query.populate<{ user: PopulatedTraveler }>({
-            path: "user",
-            select: "avatar user",
-            model: "Traveler",
-            populate: [
-                {
+            path: "user", // Traveler
+            select: "user",
+            model: TravelerModel,
+            populate: {
+                path: "user", // nested UserModel
+                model: UserModel,
+                select: "name email avatar",
+                populate: {
                     path: "avatar",
-                    model: "Asset",
+                    model: AssetModel,
                     select: "file",
                     populate: {
                         path: "file",
-                        model: "AssetFile",
-                        select: "publicUrl"
-                    }
+                        model: AssetFileModel,
+                        select: "publicUrl",
+                    },
                 },
-                {
-                    path: "user",
-                    model: "User",
-                    select: "email name"
-                }
-            ]
+            },
         }) as ReviewQuery;
 
-        // Apply population - images
+        // Populate review images
         query = query.populate<{ images: PopulatedAssetLean[] }>({
             path: "images",
-            model: "Asset",
+            model: AssetModel,
             select: "file",
             populate: {
                 path: "file",
-                model: "AssetFile",
-                select: "publicUrl"
-            }
+                model: AssetFileModel,
+                select: "publicUrl",
+            },
         }) as ReviewQuery;
 
-        // Apply population - replies.employee
+        // Populate replies' employee
         query = query.populate<{ replies: PopulatedReviewReply[] }>({
             path: "replies.employee",
-            model: "Employee",
-            select: "_id name"
+            model: EmployeeModel,
+            select: "_id name",
         }) as ReviewQuery;
 
-        // Handle soft-deleted reviews
-        if (!withDeleted) {
-            query = query.where({ deletedAt: null });
-        }
+        if (!withDeleted) query = query.where({ deletedAt: null });
+        if (session) query = query.session(session);
 
-        // Apply session if provided
-        if (session) {
-            query = query.session(session);
-        }
-
-        // Execute the query and get plain object
         const review = await query.lean<PopulatedReview>().exec();
+        if (!review) return null;
 
-        if (!review) {
-            return null;
-        }
+        const getAssetUrl = (asset?: PopulatedAssetLean): string | null => asset?.file?.publicUrl || null;
+        const toObjectIdString = (id: Types.ObjectId | string): string =>
+            id instanceof Types.ObjectId ? id.toString() : id;
 
-        // Helper function to safely get public URL from asset
-        const getAssetUrl = (asset?: PopulatedAssetLean): string | null => {
-            return asset?.file?.publicUrl || null;
-        };
+        // Flatten user info
+        const user = review.user?.user;
 
-        // Helper function to safely extract ObjectId as string
-        const toObjectIdString = (id: Types.ObjectId | string): string => {
-            return id instanceof Types.ObjectId ? id.toString() : id;
-        };
-
-        // Transform the data to ReviewDetailDTO
         const reviewDetail: ReviewDetailDTO = {
             _id: toObjectIdString(review._id as Types.ObjectId),
             tourId: toObjectIdString(review.tour._id),
             tourTitle: review.tour.title || undefined,
-            userId: toObjectIdString(review.user._id),
-            userName: review.user.user?.name || undefined,
+            tourSlug: review.tour.slug || null,
+            tourHeroImage: getAssetUrl(review.tour.heroImage),
+            userId: user ? toObjectIdString(user._id) : '-',
+            userName: user?.name || undefined,
+            userEmail: user?.email || null,
+            userAvatar: getAssetUrl(user?.avatar),
             rating: review.rating,
             title: review.title || null,
             comment: review.comment,
             imageCount: review.images.length,
-            tripType: review.tripType  || null,
+            imageUrls: review.images.map(img => getAssetUrl(img)).filter(Boolean) as string[],
+            tripType: review.tripType || null,
             travelDate: review.travelDate?.toISOString() || null,
             isApproved: review.isApproved,
             helpfulCount: review.helpfulCount,
             createdAt: review.createdAt.toISOString(),
             updatedAt: review.updatedAt.toISOString(),
             deletedAt: review.deletedAt?.toISOString() || null,
-            
             replies: review.replies.map(reply => ({
                 _id: toObjectIdString(reply._id),
-                employeeId: toObjectIdString(
-                    reply.employee && typeof reply.employee === 'object' && '_id' in reply.employee 
-                        ? reply.employee._id 
-                        : reply.employee as Types.ObjectId
-                ),
+                employeeId:
+                    reply.employee && typeof reply.employee === "object" && "_id" in reply.employee
+                        ? toObjectIdString(reply.employee._id)
+                        : toObjectIdString(reply.employee as Types.ObjectId),
                 message: reply.message,
                 isApproved: reply.isApproved,
                 createdAt: reply.createdAt.toISOString(),
                 updatedAt: reply.updatedAt.toISOString(),
-                deletedAt: reply.deletedAt?.toISOString() || null
+                deletedAt: reply.deletedAt?.toISOString() || null,
             })),
-            
-            userAvatar: getAssetUrl(review.user.avatar),
-            userEmail: review.user.user?.email || null,
-            tourSlug: review.tour.slug || null,
-            tourHeroImage: getAssetUrl(review.tour.heroImage),
-            imageUrls: review.images.map(img => getAssetUrl(img)).filter(Boolean) as string[],
         };
 
         return reviewDetail;
