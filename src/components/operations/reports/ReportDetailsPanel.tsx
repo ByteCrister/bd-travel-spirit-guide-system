@@ -377,7 +377,7 @@ export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
 
                                             return (
                                                 <motion.a
-                                                    key={href}
+                                                    key={`${href}-${idx}`}
                                                     href={href}
                                                     target="_blank"
                                                     rel="noopener noreferrer"

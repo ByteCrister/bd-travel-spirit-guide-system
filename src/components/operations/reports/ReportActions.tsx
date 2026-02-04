@@ -17,8 +17,9 @@ import { Input } from "@/components/ui/input";
 import { MdCheckCircle, MdRestore, MdDeleteForever, MdMoreHoriz, MdCancel } from "react-icons/md";
 import { useReportsStore } from "@/store/report.store";
 import { PulseLoader } from "./PulseLoader";
+import { REPORT_STATUS, ReportListItem } from "@/types/reports.types";
 
-export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
+export const ReportActions: FC<{ item: ReportListItem }> = ({ item }) => {
     const { resolveReport, reopenReport, softDeleteReport, rejectReport } = useReportsStore();
 
     const [resolveOpen, setResolveOpen] = useState(false);
@@ -34,7 +35,7 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
         e.preventDefault();
         setActionLoading(true);
         try {
-            await resolveReport(reportId, resolutionNotes);
+            await resolveReport(item._id, resolutionNotes);
             setResolveOpen(false);
             setResolutionNotes("");
         } finally {
@@ -46,7 +47,7 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
         e.preventDefault();
         setActionLoading(true);
         try {
-            await rejectReport(reportId, rejectNotes);
+            await rejectReport(item._id, rejectNotes);
             setRejectOpen(false);
             setRejectNotes("");
         } finally {
@@ -57,7 +58,7 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
     const onReopen = async () => {
         setActionLoading(true);
         try {
-            await reopenReport(reportId);
+            await reopenReport(item._id);
         } finally {
             setActionLoading(false);
         }
@@ -66,11 +67,15 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
     const onDelete = async () => {
         setActionLoading(true);
         try {
-            await softDeleteReport(reportId);
+            await softDeleteReport(item._id);
         } finally {
             setActionLoading(false);
         }
     };
+
+    const isOpenOrInReview = [REPORT_STATUS.OPEN, REPORT_STATUS.IN_REVIEW].includes(item.status);
+    const isResolvedOrRejected = [REPORT_STATUS.RESOLVED, REPORT_STATUS.REJECTED].includes(item.status);
+
 
     return (
         <Popover>
@@ -85,7 +90,7 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
                 {/* Resolve Dialog */}
                 <Dialog open={resolveOpen} onOpenChange={setResolveOpen}>
                     <DialogTrigger asChild>
-                        <Button variant="ghost" size="sm" className="justify-start w-full">
+                        <Button variant="ghost" size="sm" className="justify-start w-full" disabled={!isOpenOrInReview}  >
                             <MdCheckCircle className="mr-2 text-emerald-600" /> Resolve
                         </Button>
                     </DialogTrigger>
@@ -116,7 +121,7 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
                 {/* Reject Dialog */}
                 <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
                     <DialogTrigger asChild>
-                        <Button variant="ghost" size="sm" className="justify-start w-full">
+                        <Button variant="ghost" size="sm" className="justify-start w-full" disabled={!isOpenOrInReview}  >
                             <MdCancel className="mr-2 text-red-600" /> Reject
                         </Button>
                     </DialogTrigger>
@@ -147,7 +152,7 @@ export const ReportActions: FC<{ reportId: string }> = ({ reportId }) => {
                 {/* Reopen Alert */}
                 <AlertDialog open={reopenConfirmOpen} onOpenChange={setReopenConfirmOpen}>
                     <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm" className="justify-start w-full">
+                        <Button variant="ghost" size="sm" className="justify-start w-full" disabled={!isResolvedOrRejected}  >
                             <MdRestore className="mr-2 text-amber-600" /> Reopen
                         </Button>
                     </AlertDialogTrigger>

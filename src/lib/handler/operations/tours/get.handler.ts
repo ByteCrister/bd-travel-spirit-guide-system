@@ -7,6 +7,12 @@ import AssetFileModel from '@/models/assets/asset-file.model';
 import { PopulatedAssetLean } from '@/types/populated-asset.types';
 import AssetModel from "@/models/assets/asset.model";
 import { TOUR_STATUS } from "@/constants/tour.const";
+import { USER_ROLE } from "@/constants/user.const";
+import { getUserIdFromSession } from "@/lib/auth/session.auth";
+import UserModel from "@/models/user.model";
+import GuideModel from "@/models/guide/guide.model";
+import EmployeeModel from "@/models/employees/employees.model";
+import { ApiError } from "@/lib/helpers/withErrorHandler";
 
 type ObjectId = Types.ObjectId;
 
@@ -51,9 +57,40 @@ const GetTourListHandler = async (req: NextRequest) => {
         [sortField]: order,
     };
 
+    // ---------- GET CURRENT USER & COMPANY CONTEXT ----------
+    const userId = await getUserIdFromSession();
+    if (!userId) {
+        throw new ApiError("Unauthorized", 401);
+    }
+
+    const user = await UserModel.findById(userId).lean();
+    if (!user) {
+        throw new ApiError("User not found", 401);
+    }
+
+    let companyId: Types.ObjectId | null = null;
+
+    if (user.role === USER_ROLE.GUIDE) {
+        const guide = await GuideModel.findOne({ user: userId }).lean();
+        companyId = guide?._id as Types.ObjectId || null;
+    }
+
+    if (user.role === USER_ROLE.ASSISTANT) {
+        const employee = await EmployeeModel.findOne({ user: userId }).lean();
+        if (employee?.companyId) {
+            companyId = employee.companyId;
+        }
+    }
+
+    // If still null, block access
+    if (!companyId) {
+        throw new ApiError("No company context found", 403);
+    }
+
     /* ---------------- Filters ---------------- */
     const filter: FilterQuery<ITour> = {
         deletedAt: { $exists: false },
+        companyId: companyId,
     };
 
     const arrayFilter = (key: string) => {

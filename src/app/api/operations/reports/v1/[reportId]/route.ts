@@ -49,7 +49,7 @@ export const GET = withErrorHandler(
 
         // Return the full report with status
         return {
-            data: fullReport,
+            data: { report: fullReport },
             status: 200
         };
     }

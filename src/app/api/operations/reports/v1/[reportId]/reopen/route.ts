@@ -99,7 +99,8 @@ export const PUT = withErrorHandler(
 
             const reportDTO = await buildTourReportResponse(
                 updatedReport._id.toString(),
-                false // exclude deleted
+                false, // exclude deleted
+                session
             );
 
             if (!reportDTO) {

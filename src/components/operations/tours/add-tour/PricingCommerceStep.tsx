@@ -248,7 +248,7 @@ export default function PricingCommerceStep() {
                                                     },
                                                 }}
                                             >
-                                                {Object.values(CURRENCY).map((currency) => (
+                                                {Object.values([CURRENCY.BDT]).map((currency) => (
                                                     <MenuItem
                                                         key={currency}
                                                         value={currency}

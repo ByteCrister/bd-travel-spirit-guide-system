@@ -33,8 +33,8 @@ import api from "@/utils/axios/axios";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import { ApiResponse } from "@/types/api.types";
 
-const URL_AFTER_API = `/mock/operations/reports`;
-// const URL_AFTER_API = `/operations/reports/v1`;
+// const URL_AFTER_API = `/mock/operations/reports`;
+const URL_AFTER_API = `/operations/reports/v1`;
 
 const DEFAULT_LIMITS = [10, 20, 50];
 const DEFAULT_LIMIT = 10;

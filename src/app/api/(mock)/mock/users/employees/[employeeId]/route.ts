@@ -31,7 +31,7 @@ export async function GET(
         target: encodedId!,
         actor: faker.database.mongodbObjectId(),
         actorModel: "User",
-        action: faker.helpers.arrayElement(["created", "updated", "deleted", "restored"]),
+        action: faker.helpers.arrayElement(["create", "update", "delete", "read"]),
         note: faker.lorem.sentence(),
         ip: faker.internet.ip(),
         userAgent: faker.internet.userAgent(),
@@ -200,7 +200,7 @@ export async function GET(
 
         // Add avatar as ObjectIdString
         avatar: faker.datatype.boolean(0.6)
-            ? faker.database.mongodbObjectId()
+            ? faker.image.avatar() // Returns a valid "https://..." URL
             : undefined,
 
         notes: faker.lorem.paragraph(),

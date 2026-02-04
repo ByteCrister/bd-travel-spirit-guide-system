@@ -480,7 +480,7 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                       <SelectValue placeholder="Select currency" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.values(CURRENCY).map((currency) => (
+                      {Object.values([CURRENCY.BDT]).map((currency) => (
                         <SelectItem key={currency} value={currency}>
                           {currencyLabels[currency]}
                         </SelectItem>

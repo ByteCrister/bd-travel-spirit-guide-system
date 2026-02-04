@@ -23,6 +23,7 @@ import { ReportDetailsPanel } from "./ReportDetailsPanel";
 import { useReportsStore } from "@/store/report.store";
 import { formatDateTime } from "@/utils/helpers/format.reports";
 import { REPORT_STATUS, ReportStatus } from "@/constants/report.const";
+import Image from "next/image";
 
 export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {
     const { toggleSelect, selectedIds, fetchReportDetail, detailsCache } = useReportsStore();
@@ -185,9 +186,21 @@ export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {
                 {/* Reporter */}
                 <TableCell>
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-xs font-semibold shadow-sm">
-                            {(item.reporter?.name ?? item.reporter?.email ?? "?")[0].toUpperCase()}
-                        </div>
+                        {item.reporter?.avatarUrl ? (
+                            <div className="relative w-8 h-8 rounded-full overflow-hidden shadow-sm">
+                                <Image
+                                    src={item.reporter.avatarUrl}
+                                    alt={item.reporter.name || "Reporter Avatar"}
+                                    width={32}
+                                    height={32}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                        ) : (
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-xs font-semibold shadow-sm">
+                                {(item.reporter?.name ?? item.reporter?.email ?? "?")[0].toUpperCase()}
+                            </div>
+                        )}
                         <span className="text-sm text-gray-700 dark:text-gray-300">
                             {item.reporter?.name ?? item.reporter?.email ?? "-"}
                         </span>
@@ -250,7 +263,7 @@ export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {
                                 )}
                             </Button>
                         </motion.div>
-                        <ReportActions reportId={item._id} />
+                        <ReportActions item={item}  />
                     </div>
                 </TableCell>
             </TableRow>

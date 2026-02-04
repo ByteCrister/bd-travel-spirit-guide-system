@@ -66,7 +66,7 @@ export default function ReviewsToolbar({
         if (toolbar.selectedRatings.length > 0) count++;
         if (toolbar.filters.dateFrom) count++;
         if (toolbar.filters.dateTo) count++;
-        if (toolbar.filters.tourId) count++;
+        if (toolbar.filters.tourTitle) count++;
         if (toolbar.filters.tripType) count++;
         if (toolbar.filters.includeDeleted) count++;
         return count;
@@ -296,6 +296,7 @@ export default function ReviewsToolbar({
                                         id="dateFrom"
                                         type="date"
                                         value={toolbar.filters.dateFrom ?? ""}
+                                        max={toolbar.filters.dateTo ?? undefined}
                                         onChange={(e) => setFilter("dateFrom", e.target.value || null)}
                                         className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                                         aria-describedby="dateFromHelp"
@@ -315,6 +316,7 @@ export default function ReviewsToolbar({
                                         id="dateTo"
                                         type="date"
                                         value={toolbar.filters.dateTo ?? ""}
+                                        min={toolbar.filters.dateFrom ?? undefined}
                                         onChange={(e) => setFilter("dateTo", e.target.value || null)}
                                         className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                                         aria-describedby="dateToHelp"
@@ -348,18 +350,18 @@ export default function ReviewsToolbar({
                                     </select>
                                 </div>
 
-                                {/* Tour ID */}
+                                {/* Tour Title */}
                                 <div className="space-y-2">
-                                    <label htmlFor="tourId" className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                                    <label htmlFor="tourTitle" className="flex items-center gap-2 text-sm font-medium text-slate-700">
                                         <FaMapMarkerAlt className="w-3.5 h-3.5 text-slate-400" />
-                                        Tour ID
+                                        Tour Title
                                     </label>
                                     <input
-                                        id="tourId"
+                                        id="tourTitle"
                                         type="text"
-                                        value={toolbar.filters.tourId ?? ""}
-                                        onChange={(e) => setFilter("tourId", e.target.value || undefined)}
-                                        placeholder="Enter tour ID"
+                                        value={toolbar.filters.tourTitle ?? ""}
+                                        onChange={(e) => setFilter("tourTitle", e.target.value || undefined)}
+                                        placeholder="Type tour title"
                                         className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
                                     />
                                 </div>

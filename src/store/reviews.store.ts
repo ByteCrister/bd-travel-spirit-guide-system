@@ -29,7 +29,8 @@ import { IndexRange, rangeForPage, subtractRanges } from "@/utils/helpers/review
    constants + helpers
    ------------------------- */
 
-const URL_AFTER_API = `/mock/operations/reviews`;
+// const URL_AFTER_API = `/mock/operations/reviews`;
+const URL_AFTER_API = `/operations/reviews/v1`;
 const CACHE_TTL_MS: number =
     Number(process.env.NEXT_PUBLIC_GUIDE_CACHE_TTL ?? REVIEWS_CACHE_TTL_MS) || REVIEWS_CACHE_TTL_MS;
 const nowMs = (): number => Date.now();
@@ -143,15 +144,13 @@ function flattenFiltersForParams(filters: ReviewFilters): Record<string, string 
 
     if (typeof filters.query === "string" && filters.query.length > 0) params.q = filters.query;
     if (filters.queryField) params.qField = filters.queryField;
-    if (filters.tourId) params.tourId = filters.tourId;
+    if (filters.tourTitle) params.tourTitle = filters.tourTitle;
     if (typeof filters.ratingMin === "number") params.ratingMin = Number(filters.ratingMin);
     if (typeof filters.ratingMax === "number") params.ratingMax = Number(filters.ratingMax);
     if (filters.isApproved === true || filters.isApproved === false) params.isApproved = filters.isApproved;
-    if (filters.hasImages === true || filters.hasImages === false) params.hasImages = filters.hasImages as boolean;
     if (filters.tripType != null) params.tripType = String(filters.tripType);
     if (filters.dateFrom) params.dateFrom = filters.dateFrom;
     if (filters.dateTo) params.dateTo = filters.dateTo;
-    if (filters.companyId) params.companyId = filters.companyId;
     if (filters.includeDeleted === true || filters.includeDeleted === false) params.includeDeleted = filters.includeDeleted;
 
     return params;

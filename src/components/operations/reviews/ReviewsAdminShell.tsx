@@ -6,11 +6,10 @@ import ReviewsToolbar from "./ReviewsToolbar";
 import ReviewsTable from "./ReviewsTable";
 import ReviewsPagination from "./ReviewsPagination";
 import { ErrorBanner } from "./primitives/ErrorBanner";
-import { TableSkeleton, ToolbarSkeleton } from "./Skeletons";
+import { TableSkeleton } from "./Skeletons";
 import { clampPages, isApiError } from "@/utils/helpers/reviews.uiHelpers";
 import type { ApiError, ReviewToolbarState } from "@/types/reviews.types";
 import { toast } from "sonner";
-import { ReviewsAdminShellSkeleton } from "./ReviewsAdminShellSkeleton";
 
 export default function ReviewsAdminShell(): JSX.Element {
     const {
@@ -157,12 +156,6 @@ export default function ReviewsAdminShell(): JSX.Element {
         }
     };
 
-    if (loading) {
-        return (
-            <ReviewsAdminShellSkeleton />
-        );
-    }
-
     return (
         <main
             className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50/50"
@@ -202,16 +195,12 @@ export default function ReviewsAdminShell(): JSX.Element {
 
                     {/* Toolbar with glass morphism effect */}
                     <div className="rounded-xl border border-slate-200/60 bg-white/80 shadow-sm backdrop-blur-sm transition-all hover:shadow-md">
-                        {mounted ? (
-                            <ReviewsToolbar
-                                toolbar={draft}
-                                onSearchChange={handleSearchChange}
-                                onApplyFilters={handleApplyFilters}
-                                onResetFilters={handleResetFilters}
-                            />
-                        ) : (
-                            <ToolbarSkeleton />
-                        )}
+                        <ReviewsToolbar
+                            toolbar={draft}
+                            onSearchChange={handleSearchChange}
+                            onApplyFilters={handleApplyFilters}
+                            onResetFilters={handleResetFilters}
+                        />
                     </div>
 
                     {/* Error state with modern styling */}

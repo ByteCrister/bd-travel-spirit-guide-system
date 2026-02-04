@@ -180,7 +180,6 @@ export const PATCH = withErrorHandler(
                 success: bulkResult.modifiedCount > 0,
                 message: successMessage,
                 resolvedCount: bulkResult.modifiedCount,
-                errors: errors.length > 0 ? errors : undefined,
             };
         });
 

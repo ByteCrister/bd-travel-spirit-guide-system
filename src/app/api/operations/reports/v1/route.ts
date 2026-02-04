@@ -25,6 +25,11 @@ import { IReport, ReportModel } from '@/models/tours/report.model';
 import { FilterQuery } from 'mongoose';
 import { Types } from 'mongoose';
 import { withErrorHandler } from '@/lib/helpers/withErrorHandler';
+import { PopulatedAssetLean } from '@/types/populated-asset.types';
+import { getUserIdFromSession } from '@/lib/auth/session.auth';
+import { USER_ROLE } from '@/constants/user.const';
+import EmployeeModel from '@/models/employees/employees.model';
+import GuideModel from '@/models/guide/guide.model';
 
 // Define a proper type for the filter query
 type ReportFilterQuery = FilterQuery<IReport> & {
@@ -45,12 +50,8 @@ type SortOptions = Record<string, 1 | -1>;
 
 // Define types for populated documents
 type PopulatedTraveler = ITraveler & {
-    user?: { email: string };
-    avatar?: {
-        file?: {
-            publicUrl: string;
-        };
-    };
+    user?: { email: string; avatar: PopulatedAssetLean };
+    avatar?: PopulatedAssetLean
 };
 
 type PopulatedTour = {
@@ -70,13 +71,11 @@ const POPULATION_CONFIG = {
     reporter: {
         path: 'reporter',
         model: TravelerModel,
-        populate: [
-            {
-                path: 'user',
-                model: UserModel,
-                select: 'email',
-            },
-            {
+        populate: {
+            path: 'user',
+            model: UserModel,
+            select: 'email avatar',
+            populate: {
                 path: 'avatar',
                 model: AssetModel,
                 populate: {
@@ -85,7 +84,7 @@ const POPULATION_CONFIG = {
                     select: 'publicUrl',
                 },
             },
-        ],
+        },
     },
     tour: {
         path: 'tour',
@@ -146,8 +145,49 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
     if (search) params.search = search;
     if (searchScope) params.searchScope = searchScope as ReportsSearchScope | undefined;
 
+    const userId = await getUserIdFromSession();
+    if (!userId) {
+        throw new Error("Unauthorized");
+    }
+
+    const user = await UserModel.findById(userId).lean();
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    let companyId: Types.ObjectId | null = null;
+
+    if (user.role === USER_ROLE.GUIDE) {
+        const guide = await GuideModel.findOne({ user: userId }).lean();
+        if (!guide) throw new Error("Guide profile not found");
+
+        companyId = guide._id as Types.ObjectId;
+    }
+
+    if (user.role === USER_ROLE.ASSISTANT) {
+        const employee = await EmployeeModel.findOne({ user: userId }).lean();
+        if (!employee) throw new Error("Employee profile not found");
+
+        const guide = await GuideModel.findById(employee.companyId).lean();
+        if (!guide) throw new Error("Guide not found for assistant");
+
+        companyId = guide._id as Types.ObjectId;
+    }
+
+    let allowedTourIds: Types.ObjectId[] = [];
+
+    if (companyId) {
+        const tours = await TourModel.find({ companyId }).select("_id").lean();
+        allowedTourIds = tours.map(t => t._id) as Types.ObjectId[];
+    }
+
+
     // Build filter query with proper typing
     const filterQuery: ReportFilterQuery = { deletedAt: null };
+
+    if (companyId) {
+        filterQuery.tour = { $in: allowedTourIds };
+    }
 
     // Status filter
     if (params.status) {
@@ -251,8 +291,8 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
             userRef.email = reporter.user?.email;
 
             // Get avatar URL
-            if (reporter.avatar?.file?.publicUrl) {
-                userRef.avatarUrl = reporter.avatar.file.publicUrl;
+            if (reporter.user?.avatar?.file?.publicUrl) {
+                userRef.avatarUrl = reporter.user.avatar.file.publicUrl;
             }
         }
 

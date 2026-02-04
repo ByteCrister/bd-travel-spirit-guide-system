@@ -105,7 +105,7 @@ export const PUT = withErrorHandler(
             /**
              * Build response DTO
              */
-            const fullReportDTO = await buildTourReportResponse(reportId);
+            const fullReportDTO = await buildTourReportResponse(reportId, true, session);
 
             if (!fullReportDTO) {
                 throw new ApiError(

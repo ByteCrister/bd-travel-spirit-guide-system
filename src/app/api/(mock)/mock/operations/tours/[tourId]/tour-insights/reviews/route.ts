@@ -1,4 +1,4 @@
-// api/mock/operations/tours/[tourId]/reviews/route.ts
+// api/mock/operations/tours/[tourId]/tour-insights/reviews/route.ts
 import { NextResponse } from "next/server";
 import { faker } from "@faker-js/faker";
 import { TRAVEL_TYPE } from "@/constants/tour.const";

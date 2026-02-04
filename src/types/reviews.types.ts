@@ -97,17 +97,14 @@ export type ReviewSearchField = "comment" | "title" | "userName" | "tourTitle" |
 export interface ReviewFilters {
     query?: string; // free text
     queryField?: ReviewSearchField;
-    tourId?: ObjectIdStr;
+    tourTitle?: string;
     ratingMin?: number;
     ratingMax?: number;
     isApproved?: boolean | null;
-    hasImages?: boolean | null;
     tripType?: TravelTypeEnum | null;
     dateFrom?: string | null; // ISO
     dateTo?: string | null; // ISO
     includeDeleted?: boolean; // admin-only toggle to see soft-deleted
-    // custom: company scoping for admin
-    companyId?: ObjectIdStr;
 }
 
 /** Sort fields and directions */
