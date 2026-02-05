@@ -193,7 +193,7 @@ export const EmployeeAddPostHandler = async (req: NextRequest) => {
         const newEmployee = new EmployeeModel(employeeData);
         await newEmployee.save({ session });
 
-        return await buildEmployeeDTO(newEmployee._id as ObjectId, false, session);
+        return await buildEmployeeDTO(newEmployee._id as ObjectId, session);
 
     });
 

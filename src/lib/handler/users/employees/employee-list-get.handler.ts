@@ -12,13 +12,14 @@ import {
     EmployeesListResponse,
     EmployeeListItemDTO,
 } from '@/types/employee.types';
-import { PAYROLL_STATUS } from '@/constants/employee.const';
+import { EmployeeStatus, EmploymentType, PAYROLL_STATUS, PayrollStatus } from '@/constants/employee.const';
 import { USER_ROLE } from '@/constants/user.const';
 import UserModel from '@/models/user.model';
 import GuideModel from '@/models/guide/guide.model';
 import { getCollectionName } from '@/lib/helpers/get-collection-name';
 import AssetModel from '@/models/assets/asset.model';
 import AssetFileModel from '@/models/assets/asset-file.model';
+import { sanitizeSearch } from '@/lib/helpers/sanitize-search';
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -63,6 +64,18 @@ function parseFilters(searchParams: URLSearchParams): EmployeesQuery['filters'] 
     return filters;
 }
 
+const normalizeToArray = <T = unknown>(value: unknown): T[] => {
+    if (!value) return [];
+
+    if (Array.isArray(value)) return value as T[];
+
+    if (typeof value === "object") {
+        return Object.values(value) as T[];
+    }
+
+    return [value as T];
+};
+
 // Helper to build Mongoose filter and sort
 /**
  * Build Mongoose filter and sort objects from query
@@ -74,11 +87,20 @@ function buildMongooseQuery(query: EmployeesQuery) {
     // Soft delete
     if (!query.filters?.includeDeleted) filter.deletedAt = null;
 
-    // Status filter
-    if (query.filters?.statuses?.length) filter.status = { $in: query.filters.statuses };
+    // Normalize ALL array-like filters
+    if (query.filters) {
+        query.filters.employmentTypes = normalizeToArray<EmploymentType>(
+            query.filters.employmentTypes
+        );
 
-    // Employment type filter
-    if (query.filters?.employmentTypes?.length) filter.employmentType = { $in: query.filters.employmentTypes };
+        query.filters.statuses = normalizeToArray<EmployeeStatus>(
+            query.filters.statuses
+        );
+
+        query.filters.paymentStatuses = normalizeToArray<PayrollStatus>(
+            query.filters.paymentStatuses
+        );
+    }
 
     // Payment status filter - handled separately in aggregation
     // (We'll filter this after computing current month payment status)
@@ -163,15 +185,10 @@ export const UserEmployeeListGetHandler = async (req: NextRequest) => {
 
     query.filters = parseFilters(searchParams);
 
-    // Ensure array types
-    if (query.filters?.employmentTypes && !Array.isArray(query.filters.employmentTypes)) {
-        query.filters.employmentTypes = [query.filters.employmentTypes];
-    }
-    if (query.filters?.statuses && !Array.isArray(query.filters.statuses)) {
-        query.filters.statuses = [query.filters.statuses];
-    }
-    if (query.filters?.paymentStatuses && !Array.isArray(query.filters.paymentStatuses)) {
-        query.filters.paymentStatuses = [query.filters.paymentStatuses];
+    // overwrite with safe value
+    if (query.filters) {
+        const sanitizedSearch = sanitizeSearch(query.filters?.search);
+        query.filters.search = sanitizedSearch;
     }
 
     // Connect to DB

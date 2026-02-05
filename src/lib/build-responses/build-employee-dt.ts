@@ -114,14 +114,11 @@ function calculateCurrentMonthPaymentStatus(
  */
 export async function buildEmployeeDTO(
     employeeId: ObjectId,
-    withDeleted = false,
     session?: ClientSession,
 ): Promise<EmployeeDetailDTO | null> {
     if (!employeeId) throw new Error("employeeId is required");
 
-    const baseQuery = withDeleted
-        ? EmployeeModel.findOneWithDeleted({ _id: employeeId }).session(session ?? null)
-        : EmployeeModel.findById(employeeId).session(session ?? null);
+    const baseQuery = EmployeeModel.findById(employeeId).session(session ?? null);
 
     const rawEmployee = await baseQuery
         .slice("salaryHistory", -10)
@@ -136,7 +133,7 @@ export async function buildEmployeeDTO(
                     select: "publicUrl",
                     options: { session },
                 },
-                ...(withDeleted ? {} : { match: { deletedAt: null } }),
+                ...({ match: { deletedAt: null } }),
             },
             options: { session },
         })
@@ -144,7 +141,7 @@ export async function buildEmployeeDTO(
             path: "documents.asset",
             select: "file deletedAt",
             populate: { path: "file", select: "publicUrl", options: { session } },
-            ...(withDeleted ? {} : { match: { deletedAt: null } }),
+            ...({ match: { deletedAt: null } }),
             options: { session }
         })
         .lean()

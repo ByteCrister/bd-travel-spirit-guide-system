@@ -376,29 +376,6 @@ const EmployeeSchema = new Schema<IEmployee, IEmployeeModel, IEmployeeMethods>(
    PRE-FIND MIDDLEWARE TO EXCLUDE DELETED DOCUMENTS
 ========================================================= */
 
-// Apply to all find queries (find, findOne, findById, etc.)
-EmployeeSchema.pre(/^find/, function (
-    this: Query<unknown, IEmployee>,
-    next
-) {
-
-    if (this.getOptions()?.withDeleted) {
-        return next();
-    }
-
-    const query = this.getQuery() as { deletedAt?: unknown };
-
-    // If deletedAt is explicitly specified, do nothing
-    if (query.deletedAt !== undefined) {
-        return next();
-    }
-
-    // Otherwise exclude soft-deleted docs
-    this.where({ deletedAt: null });
-
-    next();
-});
-
 EmployeeSchema.methods.isDeleted = function (): boolean {
     return Boolean(this.deletedAt);
 };
