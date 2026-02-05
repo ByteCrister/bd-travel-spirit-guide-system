@@ -235,6 +235,9 @@ export default function AuditLogsSection() {
     }
 
     const hasActiveFilters = auditFilters.date || auditFilters.startDate || auditFilters.endDate;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
 
     return (
         <Accordion
@@ -382,6 +385,15 @@ export default function AuditLogsSection() {
                                                             selected={date}
                                                             onSelect={setDate}
                                                             initialFocus
+                                                            disabled={(date) => {
+                                                                const d = new Date(date);
+                                                                d.setHours(0, 0, 0, 0);
+
+                                                                if (d > today) return true;       // prevent future dates
+                                                                if (endDate && d > endDate) return true;  // cannot be after end date
+                                                                return false;
+                                                            }}
+
                                                         />
                                                     </PopoverContent>
                                                 </Popover>
@@ -420,7 +432,14 @@ export default function AuditLogsSection() {
                                                                 setStartDate(date); //  set startDate
                                                             }}
                                                             initialFocus
-                                                            disabled={(date) => endDate ? date > endDate : false} // can't pick start after end
+                                                            disabled={(date) => {
+                                                                const d = new Date(date);
+                                                                d.setHours(0, 0, 0, 0);
+
+                                                                if (d > today) return true;       // prevent future dates
+                                                                if (endDate && d > endDate) return true;  // cannot be after end date
+                                                                return false;
+                                                            }}
                                                         />
 
                                                     </PopoverContent>
@@ -458,7 +477,14 @@ export default function AuditLogsSection() {
                                                                 setEndDate(date);
                                                             }}
                                                             initialFocus
-                                                            disabled={(date) => startDate ? date < startDate : false}
+                                                            disabled={(date) => {
+                                                                const d = new Date(date);
+                                                                d.setHours(0, 0, 0, 0);
+
+                                                                if (d > today) return true;        // no future dates
+                                                                if (startDate && d < startDate) return true; // not before start
+                                                                return false;
+                                                            }}
                                                         />
                                                     </PopoverContent>
                                                 </Popover>
