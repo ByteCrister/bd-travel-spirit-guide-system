@@ -13,6 +13,7 @@ import UserModel from "@/models/user.model";
 import GuideModel from "@/models/guide/guide.model";
 import EmployeeModel from "@/models/employees/employees.model";
 import { ApiError } from "@/lib/helpers/withErrorHandler";
+import { getCollectionName } from "@/lib/helpers/get-collection-name";
 
 type ObjectId = Types.ObjectId;
 
@@ -59,33 +60,52 @@ const GetTourListHandler = async (req: NextRequest) => {
 
     // ---------- GET CURRENT USER & COMPANY CONTEXT ----------
     const userId = await getUserIdFromSession();
-    if (!userId) {
-        throw new ApiError("Unauthorized", 401);
-    }
+    if (!userId) throw new ApiError('Unauthorized', 401);
 
-    const user = await UserModel.findById(userId).lean();
-    if (!user) {
-        throw new ApiError("User not found", 401);
-    }
+    const [userData] = await UserModel.aggregate([
+        { $match: { _id: new Types.ObjectId(userId) } },
+        {
+            $lookup: {
+                from: getCollectionName(GuideModel),
+                localField: '_id',
+                foreignField: 'owner.user',
+                as: 'guide',
+            },
+        },
+        {
+            $lookup: {
+                from: getCollectionName(EmployeeModel),
+                localField: '_id',
+                foreignField: 'user',
+                as: 'employee',
+            },
+        },
+        {
+            $project: {
+                _id: 1,
+                role: 1,
+                companyId: {
+                    $switch: {
+                        branches: [
+                            {
+                                case: { $eq: ['$role', USER_ROLE.GUIDE] },
+                                then: { $arrayElemAt: ['$guide._id', 0] },
+                            },
+                            {
+                                case: { $eq: ['$role', USER_ROLE.ASSISTANT] },
+                                then: { $arrayElemAt: ['$employee.companyId', 0] },
+                            },
+                        ],
+                        default: null,
+                    },
+                },
+            },
+        },
+    ]);
 
-    let companyId: Types.ObjectId | null = null;
-
-    if (user.role === USER_ROLE.GUIDE) {
-        const guide = await GuideModel.findOne({ user: userId }).lean();
-        companyId = guide?._id as Types.ObjectId || null;
-    }
-
-    if (user.role === USER_ROLE.ASSISTANT) {
-        const employee = await EmployeeModel.findOne({ user: userId }).lean();
-        if (employee?.companyId) {
-            companyId = employee.companyId;
-        }
-    }
-
-    // If still null, block access
-    if (!companyId) {
-        throw new ApiError("No company context found", 403);
-    }
+    if (!userData) throw new ApiError('User not found', 401);
+    const companyId: Types.ObjectId | null = userData.companyId || null;
+    if (!companyId) throw new ApiError('No company context found', 403);
 
     /* ---------------- Filters ---------------- */
     const filter: FilterQuery<ITour> = {

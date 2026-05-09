@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileText } from
 import { motion } from "framer-motion";
 
 type Props = {
-    pagination: {
+    pagination?: {
         page: number;
         limit: number;
         sort?: string;
@@ -28,16 +28,17 @@ const TourListPagination: React.FC<Props> = ({ pagination }) => {
         : undefined;
 
     const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
     const pages = current?.pages ?? 1;
     const total = current?.total ?? 0;
 
     const goto = (p: number) => {
-        fetchTours({ page: p, limit: pagination.limit }).catch(() => { });
+        fetchTours({ page: p, limit }).catch(() => { });
     };
 
     // Calculate range of items being displayed
-    const startItem = (page - 1) * pagination.limit + 1;
-    const endItem = Math.min(page * pagination.limit, total);
+    const startItem = (page - 1) * limit + 1;
+    const endItem = Math.min(page * limit, total);
 
     // Generate page numbers to display (max 7 buttons including first and last)
     const getPageNumbers = () => {

@@ -24,10 +24,11 @@ import ConnectDB from '@/config/db';
 import { IReport, ReportModel } from '@/models/tours/report.model';
 import { FilterQuery } from 'mongoose';
 import { Types } from 'mongoose';
-import { withErrorHandler } from '@/lib/helpers/withErrorHandler';
+import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import { PopulatedAssetLean } from '@/types/populated-asset.types';
 import { getUserIdFromSession } from '@/lib/auth/session.auth';
 import { USER_ROLE } from '@/constants/user.const';
+import { getCollectionName } from "@/lib/helpers/get-collection-name";
 import EmployeeModel from '@/models/employees/employees.model';
 import GuideModel from '@/models/guide/guide.model';
 
@@ -146,41 +147,75 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
     if (searchScope) params.searchScope = searchScope as ReportsSearchScope | undefined;
 
     const userId = await getUserIdFromSession();
-    if (!userId) {
-        throw new Error("Unauthorized");
+    if (!userId) throw new ApiError("Unauthorized", 401);
+
+    // Single aggregation to obtain companyId
+    const [userData] = await UserModel.aggregate([
+        { $match: { _id: new Types.ObjectId(userId) } },
+        {
+            $lookup: {
+                from: getCollectionName(GuideModel),
+                localField: '_id',
+                foreignField: 'owner.user',
+                as: 'guide',
+            },
+        },
+        {
+            $lookup: {
+                from: getCollectionName(EmployeeModel),
+                localField: '_id',
+                foreignField: 'user',
+                as: 'employee',
+            },
+        },
+        {
+            $lookup: {
+                from: getCollectionName(GuideModel),
+                localField: 'employee.companyId',
+                foreignField: '_id',
+                as: 'assistantGuide',
+            },
+        },
+        {
+            $project: {
+                role: 1,
+                companyId: {
+                    $switch: {
+                        branches: [
+                            {
+                                case: { $eq: ['$role', USER_ROLE.GUIDE] },
+                                then: { $arrayElemAt: ['$guide._id', 0] },
+                            },
+                            {
+                                case: { $eq: ['$role', USER_ROLE.ASSISTANT] },
+                                then: { $arrayElemAt: ['$assistantGuide._id', 0] },
+                            },
+                        ],
+                        default: null,
+                    },
+                },
+            },
+        },
+    ]);
+
+    if (!userData) throw new Error('User not found');
+    const companyId: Types.ObjectId | null = userData.companyId || null;
+
+    // Determine allowed tours (owned by the guide/company)
+    const allowedTourIds = (
+        await TourModel.find({ companyId }).select('_id').lean()
+    ).map(t => t._id) as Types.ObjectId[];
+
+    if (!allowedTourIds.length) {
+        const emptyResponse: ReportsListResponse = {
+            docs: [],
+            total: 0,
+            page: Math.max(1, params.page || 1),
+            pages: 0,
+            limit: Math.max(1, Math.min(100, params.limit || 10)),
+        };
+        return { data: emptyResponse, status: 200 };
     }
-
-    const user = await UserModel.findById(userId).lean();
-    if (!user) {
-        throw new Error("User not found");
-    }
-
-    let companyId: Types.ObjectId | null = null;
-
-    if (user.role === USER_ROLE.GUIDE) {
-        const guide = await GuideModel.findOne({ user: userId }).lean();
-        if (!guide) throw new Error("Guide profile not found");
-
-        companyId = guide._id as Types.ObjectId;
-    }
-
-    if (user.role === USER_ROLE.ASSISTANT) {
-        const employee = await EmployeeModel.findOne({ user: userId }).lean();
-        if (!employee) throw new Error("Employee profile not found");
-
-        const guide = await GuideModel.findById(employee.companyId).lean();
-        if (!guide) throw new Error("Guide not found for assistant");
-
-        companyId = guide._id as Types.ObjectId;
-    }
-
-    let allowedTourIds: Types.ObjectId[] = [];
-
-    if (companyId) {
-        const tours = await TourModel.find({ companyId }).select("_id").lean();
-        allowedTourIds = tours.map(t => t._id) as Types.ObjectId[];
-    }
-
 
     // Build filter query with proper typing
     const filterQuery: ReportFilterQuery = { deletedAt: null };

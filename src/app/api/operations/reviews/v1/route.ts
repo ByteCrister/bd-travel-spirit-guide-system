@@ -180,32 +180,67 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
     const userId = await getUserIdFromSession();
     if (!userId) throw new ApiError("Unauthorized", 401);
 
-    const user = await UserModel.findById(userId).lean();
-    if (!user) throw new ApiError("User not found", 404);
+    // Single query to get user role and companyId
+    const [userData] = await UserModel.aggregate([
+        { $match: { _id: new Types.ObjectId(userId) } },
+        {
+            $lookup: {
+                from: getCollectionName(GuideModel),
+                localField: '_id',
+                foreignField: 'owner.user',
+                as: 'guide',
+            },
+        },
+        {
+            $lookup: {
+                from: getCollectionName(EmployeeModel),
+                localField: '_id',
+                foreignField: 'user',
+                as: 'employee',
+            },
+        },
+        {
+            $lookup: {
+                from: getCollectionName(GuideModel),
+                localField: 'employee.companyId',
+                foreignField: '_id',
+                as: 'assistantGuide',
+            },
+        },
+        {
+            $project: {
+                role: 1,
+                companyId: {
+                    $switch: {
+                        branches: [
+                            {
+                                case: { $eq: ['$role', USER_ROLE.GUIDE] },
+                                then: { $arrayElemAt: ['$guide._id', 0] },
+                            },
+                            {
+                                case: { $eq: ['$role', USER_ROLE.ASSISTANT] },
+                                then: { $arrayElemAt: ['$assistantGuide._id', 0] },
+                            },
+                        ],
+                        default: null,
+                    },
+                },
+            },
+        },
+    ]);
 
-    // Determine allowed tours
-    let allowedTourIds: Types.ObjectId[] = [];
+    if (!userData) throw new ApiError('User not found', 404);
+    const companyId: Types.ObjectId | null = userData.companyId || null;
+    if (!companyId) throw new ApiError('No company context found', 403);
 
-    if (user.role === USER_ROLE.GUIDE) {
-        const guide = await GuideModel.findOne({ user: userId }).lean();
-        if (!guide) throw new ApiError("Guide profile not found", 404);
+    // Determine allowed tours (owned by the guide/company)
+    const allowedTourIds = (
+        await TourModel.find({ companyId }).select('_id').lean()
+    ).map(t => t._id) as Types.ObjectId[];
 
-        const tours = await TourModel.find({ companyId: guide._id }).select("_id").lean();
-        allowedTourIds = tours.map(t => t._id as Types.ObjectId);
+    if (!allowedTourIds.length) {
+        return { data: { docs: [], total: 0, page: 1, pages: 0 }, status: 200 };
     }
-
-    if (user.role === USER_ROLE.ASSISTANT) {
-        const employee = await EmployeeModel.findOne({ user: userId }).lean();
-        if (!employee) throw new ApiError("Employee profile not found", 404);
-
-        const guide = await GuideModel.findById(employee.companyId).lean();
-        if (!guide) throw new ApiError("Guide not found for assistant", 404);
-
-        const tours = await TourModel.find({ companyId: guide._id }).select("_id").lean();
-        allowedTourIds = tours.map(t => t._id as Types.ObjectId);
-    }
-
-    if (!allowedTourIds.length) return { data: { docs: [], total: 0, page: 1, pages: 0 }, status: 200 };
 
     // Build filter
     const filter: FilterQuery<IReview> = { tour: { $in: allowedTourIds } };
