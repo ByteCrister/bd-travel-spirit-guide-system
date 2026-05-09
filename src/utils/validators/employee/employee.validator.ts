@@ -7,7 +7,8 @@ import {
     SalaryPaymentMode,
 } from "@/constants/employee.const";
 import { CURRENCY, Currency } from "@/constants/tour.const";
-import { DayOfWeek, EmergencyContactDTO, ContactInfoDTO, ShiftDTO, DocumentDTO, CreateEmployeePayload } from "@/types/employee.types";
+import { DayOfWeek, EmergencyContactDTO, ContactInfoDTO, ShiftDTO, DocumentDTO, CreateEmployeePayload, PaymentCardDTO } from "@/types/employee.types";
+import { CARD_BRAND } from "@/constants/payment.const";
 
 // Phone validation regex for Bangladesh
 export const phoneRegex = /^(?:\+88|88)?(01[3-9]\d{8})$/;
@@ -78,6 +79,26 @@ export const documentValidationSchema: yup.ObjectSchema<DocumentDTO> = yup.objec
     uploadedAt: yup.string().required(),
 });
 
+export const paymentCardValidationSchema: yup.ObjectSchema<PaymentCardDTO> = yup.object({
+    brand: yup.mixed<PaymentCardDTO["brand"]>().oneOf(Object.values(CARD_BRAND)).required("Card brand is required"),
+    last4: yup
+        .string()
+        .matches(/^\d{4}$/, "Last 4 must be exactly 4 digits")
+        .required("Last 4 digits are required"),
+    expMonth: yup
+        .number()
+        .integer()
+        .min(1, "Expiry month must be between 1 and 12")
+        .max(12, "Expiry month must be between 1 and 12")
+        .required("Expiry month is required"),
+    expYear: yup
+        .number()
+        .integer()
+        .min(new Date().getFullYear(), "Expiry year cannot be in the past")
+        .required("Expiry year is required"),
+    cardholderName: yup.string().trim().optional(),
+});
+
 // Main validation schema
 export const createEmployeeValidationSchema = yup.object({
     name: yup.string()
@@ -113,6 +134,23 @@ export const createEmployeeValidationSchema = yup.object({
         .mixed<SalaryPaymentMode>()
         .oneOf(Object.values(SALARY_PAYMENT_MODE))
         .required("Payment mode is required"),
+    paymentCard: yup
+        .mixed<PaymentCardDTO>()
+        .test("valid-payment-card", "Invalid payment card", async function (value) {
+            if (!value) return true;
+            const hasAnyValue = Boolean(
+                value.last4 || value.expMonth || value.expYear || value.cardholderName
+            );
+            if (!hasAnyValue) return true;
+            try {
+                await paymentCardValidationSchema.validate(value, { abortEarly: false });
+                return true;
+            } catch (error) {
+                const err = error as yup.ValidationError;
+                return this.createError({ message: err.errors[0] ?? "Invalid payment card" });
+            }
+        })
+        .optional(),
     dateOfJoining: yup
         .date()
         .min(new Date(), "Date cannot be in the past")
@@ -138,6 +176,7 @@ export type CreateEmployeeFormValues = {
     salary: number | null;
     currency: Currency;
     paymentMode: SalaryPaymentMode; // auto | manual
+    paymentCard?: PaymentCardDTO;
     dateOfJoining: Date;
     contactInfo: ContactInfoDTO;
     shifts: ShiftDTO[];
@@ -156,6 +195,7 @@ export const transformToCreateEmployeePayload = (
         salary: values.salary,
         currency: values.currency,
         paymentMode: values.paymentMode,
+        paymentCard: values.paymentCard?.last4 ? values.paymentCard : undefined,
         employmentType: values.employmentType
             ? EMPLOYMENT_TYPE[values.employmentType as keyof typeof EMPLOYMENT_TYPE]
             : EMPLOYMENT_TYPE.FULL_TIME, // default

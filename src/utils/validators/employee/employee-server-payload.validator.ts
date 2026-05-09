@@ -9,6 +9,7 @@ import {
 import { CURRENCY, Currency } from "@/constants/tour.const";
 import { DayOfWeek, EmergencyContactDTO, ContactInfoDTO, ShiftDTO, DocumentDTO } from "@/types/employee.types";
 import { Types } from "mongoose";
+import { paymentCardValidationSchema } from "./employee.validator";
 
 const objectIdSchema = yup
     .string()
@@ -113,6 +114,7 @@ export const updateEmployeeServerSchema = yup.object({
         .mixed<SalaryPaymentMode>()
         .oneOf(Object.values(SALARY_PAYMENT_MODE))
         .required("Payment mode is required"),
+    paymentCard: paymentCardValidationSchema.optional(),
     /**
   * dateOfJoining
   * - Accepts Date | ISO string | timestamp

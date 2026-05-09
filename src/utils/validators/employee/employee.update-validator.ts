@@ -9,6 +9,7 @@ import {
     contactInfoValidationSchema,
     shiftValidationSchema,
     documentValidationSchema,
+    paymentCardValidationSchema,
 } from "./employee.validator";
 import {
     EMPLOYEE_STATUS,
@@ -122,6 +123,18 @@ export const validateUpdateEmployeePayload = async (
     if (payload.paymentMode) {
         if (!Object.values(SALARY_PAYMENT_MODE).includes(payload.paymentMode as SALARY_PAYMENT_MODE)) {
             showToast.error("Invalid payment mode");
+            hasError = true;
+        }
+    }
+
+    /* ---------------- Payment card ---------------- */
+    if (payload.paymentCard) {
+        try {
+            await paymentCardValidationSchema.validate(payload.paymentCard, {
+                abortEarly: false,
+            });
+        } catch (err) {
+            showYupError(err);
             hasError = true;
         }
     }

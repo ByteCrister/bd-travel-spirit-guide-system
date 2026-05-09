@@ -194,38 +194,52 @@ export const UserEmployeeListGetHandler = async (req: NextRequest) => {
     // Connect to DB
     await ConnectDB();
 
-    // Resolve company scope based on user role
-    const user = await UserModel.findById(userId).select('role').lean();
-    if (!user) throw new ApiError('User not found', 404);
+    // ────────── One aggregation to get role, guide id, and employee companyId ──────────
+    const [userCtx] = await UserModel.aggregate([
+        { $match: { _id: new Types.ObjectId(userId) } },
+        {
+            $lookup: {
+                from: getCollectionName(GuideModel),
+                localField: '_id',
+                foreignField: 'owner.user',
+                as: 'guide',
+            },
+        },
+        {
+            $lookup: {
+                from: getCollectionName(EmployeeModel),
+                localField: '_id',
+                foreignField: 'user',
+                as: 'employee',
+            },
+        },
+        {
+            $project: {
+                role: 1,
+                guideId: { $arrayElemAt: ['$guide._id', 0] },
+                employeeCompanyId: { $arrayElemAt: ['$employee.companyId', 0] },
+                hasGuide: { $gt: [{ $size: '$guide' }, 0] },
+                hasEmployee: { $gt: [{ $size: '$employee' }, 0] },
+            },
+        },
+    ]);
+
+    if (!userCtx) throw new ApiError('User not found', 404);
 
     let companyId: Types.ObjectId | null = null;
 
-    if (user.role === USER_ROLE.GUIDE) {
-        const guide = await GuideModel
-            .findOne({ "owner.user": new Types.ObjectId(userId) })
-            .select("_id")
-            .lean();
-
-        if (!guide) throw new ApiError('Guide profile not found', 404);
-
-        companyId = guide._id as Types.ObjectId;
+    if (userCtx.role === USER_ROLE.GUIDE) {
+        if (!userCtx.hasGuide) throw new ApiError('Guide profile not found', 404);
+        companyId = userCtx.guideId;
+    } else if (userCtx.role === USER_ROLE.ASSISTANT) {
+        if (!userCtx.hasEmployee) throw new ApiError('Employee profile not found', 404);
+        if (!userCtx.employeeCompanyId) throw new ApiError('Assistant is not linked to a company', 403);
+        companyId = userCtx.employeeCompanyId;
+    } else {
+        throw new ApiError('Unauthorized role', 403);
     }
 
-    if (user.role === USER_ROLE.ASSISTANT) {
-        const employee = await EmployeeModel.findOne({ user: userId })
-            .select('companyId')
-            .lean();
-
-        if (!employee?.companyId) {
-            throw new ApiError('Assistant is not linked to a company', 403);
-        }
-
-        companyId = employee.companyId;
-    }
-
-    if (!companyId) {
-        throw new ApiError('Unauthorized company access', 403);
-    }
+    if (!companyId) throw new ApiError('No company context found', 403);
 
 
     const { filter, sort } = buildMongooseQuery(query);

@@ -21,6 +21,7 @@ import { CreateEmployeeFormValues, createEmployeeValidationSchema } from "@/util
 import { CreateEmployeePayload, ShiftDTO, DayOfWeek, DocumentDTO } from "@/types/employee.types";
 import { EMPLOYMENT_TYPE, SALARY_PAYMENT_MODE, SalaryPaymentMode } from "@/constants/employee.const";
 import { CURRENCY } from "@/constants/tour.const";
+import { CARD_BRAND } from "@/constants/payment.const";
 import {
     fileToDocumentDTO,
     fileToAvatarBase64,
@@ -65,6 +66,13 @@ const getInitialValues = (): CreateEmployeeFormValues => ({
     salary: null,
     currency: CURRENCY.BDT,
     paymentMode: SALARY_PAYMENT_MODE.AUTO,
+    paymentCard: {
+        brand: CARD_BRAND.UNKNOWN,
+        last4: "",
+        expMonth: new Date().getMonth() + 1,
+        expYear: new Date().getFullYear(),
+        cardholderName: "",
+    },
     dateOfJoining: new Date(),
     contactInfo: { phone: "", email: "", emergencyContact: { name: "", phone: "", relation: "" } },
     shifts: [],
@@ -194,6 +202,9 @@ export default function AddEmployeePage() {
                 salary: values.salary,
                 currency: values.currency,
                 paymentMode: values.paymentMode,
+                paymentCard: values.paymentCard?.last4
+                    ? values.paymentCard
+                    : undefined,
                 dateOfJoining: values.dateOfJoining.toISOString(),
                 contactInfo: values.contactInfo,
                 shifts: values.shifts,
@@ -227,6 +238,17 @@ export default function AddEmployeePage() {
                 onSubmit={handleSubmit}
             >
                 {({ values, errors, touched, setFieldValue, isSubmitting }) => (
+                    (() => {
+                        const paymentCardTouched =
+                            typeof touched.paymentCard === "object" && touched.paymentCard
+                                ? (touched.paymentCard as Partial<Record<"brand" | "last4" | "expMonth" | "expYear" | "cardholderName", boolean>>)
+                                : {};
+                        const paymentCardErrors =
+                            typeof errors.paymentCard === "object" && errors.paymentCard
+                                ? (errors.paymentCard as Partial<Record<"brand" | "last4" | "expMonth" | "expYear" | "cardholderName", string>>)
+                                : {};
+
+                        return (
                     <Form>
                         <motion.div
                             variants={containerVariants}
@@ -522,6 +544,111 @@ export default function AddEmployeePage() {
                                                     </div>
                                                     <FormMessage>{touched.paymentMode && errors.paymentMode}</FormMessage>
                                                 </FormItem>
+                                            </div>
+
+                                            <div className="md:col-span-2">
+                                                <div className="bg-white/80 backdrop-blur-sm border-2 border-green-300 rounded-xl p-5 space-y-4 shadow-inner">
+                                                    <h4 className="font-semibold text-gray-700 flex items-center gap-2">
+                                                        <div className="p-1.5 bg-green-100 rounded-lg">
+                                                            <CreditCard className="h-4 w-4 text-green-600" />
+                                                        </div>
+                                                        Payment Card (optional)
+                                                    </h4>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <FormItem>
+                                                            <FormLabel>Card Brand</FormLabel>
+                                                            <Field name="paymentCard.brand">
+                                                                {({ field }: FieldProps<string>) => (
+                                                                    <Select
+                                                                        value={field.value || CARD_BRAND.UNKNOWN}
+                                                                        onValueChange={(v) => setFieldValue("paymentCard.brand", v)}
+                                                                    >
+                                                                        <SelectTrigger className="bg-white/80 border-green-300 focus:border-green-500">
+                                                                            <SelectValue placeholder="Select card brand" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            {Object.values(CARD_BRAND).map((brand) => (
+                                                                                <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                )}
+                                                            </Field>
+                                                            <FormMessage>{paymentCardTouched.brand && paymentCardErrors.brand}</FormMessage>
+                                                        </FormItem>
+
+                                                        <FormItem>
+                                                            <FormLabel>Last 4 digits</FormLabel>
+                                                            <Field name="paymentCard.last4">
+                                                                {({ field }: FieldProps<string>) => (
+                                                                    <Input
+                                                                        {...field}
+                                                                        value={field.value ?? ""}
+                                                                        maxLength={4}
+                                                                        placeholder="1234"
+                                                                        onChange={(e) => {
+                                                                            const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 4);
+                                                                            setFieldValue("paymentCard.last4", onlyDigits);
+                                                                        }}
+                                                                        className="bg-white/80 border-green-300 focus:border-green-500"
+                                                                    />
+                                                                )}
+                                                            </Field>
+                                                            <FormMessage>{paymentCardTouched.last4 && paymentCardErrors.last4}</FormMessage>
+                                                        </FormItem>
+
+                                                        <FormItem>
+                                                            <FormLabel>Expiry Month</FormLabel>
+                                                            <Field name="paymentCard.expMonth">
+                                                                {({ field }: FieldProps<number>) => (
+                                                                    <Input
+                                                                        {...field}
+                                                                        type="number"
+                                                                        min={1}
+                                                                        max={12}
+                                                                        value={field.value ?? ""}
+                                                                        onChange={(e) => setFieldValue("paymentCard.expMonth", Number(e.target.value || 1))}
+                                                                        className="bg-white/80 border-green-300 focus:border-green-500"
+                                                                    />
+                                                                )}
+                                                            </Field>
+                                                            <FormMessage>{paymentCardTouched.expMonth && paymentCardErrors.expMonth}</FormMessage>
+                                                        </FormItem>
+
+                                                        <FormItem>
+                                                            <FormLabel>Expiry Year</FormLabel>
+                                                            <Field name="paymentCard.expYear">
+                                                                {({ field }: FieldProps<number>) => (
+                                                                    <Input
+                                                                        {...field}
+                                                                        type="number"
+                                                                        min={new Date().getFullYear()}
+                                                                        value={field.value ?? ""}
+                                                                        onChange={(e) => setFieldValue("paymentCard.expYear", Number(e.target.value || new Date().getFullYear()))}
+                                                                        className="bg-white/80 border-green-300 focus:border-green-500"
+                                                                    />
+                                                                )}
+                                                            </Field>
+                                                            <FormMessage>{paymentCardTouched.expYear && paymentCardErrors.expYear}</FormMessage>
+                                                        </FormItem>
+                                                    </div>
+
+                                                    <FormItem>
+                                                        <FormLabel>Cardholder Name</FormLabel>
+                                                        <Field name="paymentCard.cardholderName">
+                                                            {({ field }: FieldProps<string>) => (
+                                                                <Input
+                                                                    {...field}
+                                                                    value={field.value ?? ""}
+                                                                    placeholder="Name on card"
+                                                                    className="bg-white/80 border-green-300 focus:border-green-500"
+                                                                />
+                                                            )}
+                                                        </Field>
+                                                        <FormMessage>{paymentCardTouched.cardholderName && paymentCardErrors.cardholderName}</FormMessage>
+                                                    </FormItem>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -919,6 +1046,8 @@ export default function AddEmployeePage() {
                             </div>
                         </motion.div>
                     </Form>
+                        );
+                    })()
                 )}
             </Formik>
         </div>

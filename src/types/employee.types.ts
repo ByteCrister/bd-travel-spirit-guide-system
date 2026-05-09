@@ -9,6 +9,7 @@ import {
 } from "@/constants/employee.const";
 import { AuditLog } from "./current-user.types";
 import { Currency } from "@/constants/tour.const";
+import { CardBrand } from "@/constants/payment.const";
 
 /* ---------------------------------------------------------------------
   1. PRIMITIVE / UTILITY TYPES
@@ -114,6 +115,7 @@ export interface EmployeeListItemDTO {
   salary: number;
   currency: string;
   paymentMode: SalaryPaymentMode; // auto | manual
+  paymentCard?: PaymentCardDTO;
   currentMonthPayment?: CurrentMonthPaymentStatusDTO; // current month payment status
 
   // Dates
@@ -155,6 +157,7 @@ export interface EmployeeDetailDTO {
   currency: Currency;
   salaryHistory: SalaryHistoryDTO[];
   paymentMode: SalaryPaymentMode; // auto | manual
+  paymentCard?: PaymentCardDTO;
   currentMonthPayment?: CurrentMonthPaymentStatusDTO; // current month payment status
 
   // Dates
@@ -190,6 +193,7 @@ export interface CreateEmployeePayload {
   salary: number | null;
   currency: Currency;
   paymentMode: SalaryPaymentMode; // auto | manual
+  paymentCard?: PaymentCardDTO;
   dateOfJoining: ISODateString;
   contactInfo: ContactInfoDTO; // phone is required
   shifts: ShiftDTO[];
@@ -350,4 +354,12 @@ export interface SalaryPaymentRetryResponse {
   message: string;
   payment: CurrentMonthPaymentStatusDTO;
   employee?: EmployeeDetailDTO; // Optional full employee data
+}
+
+export interface PaymentCardDTO {
+  brand: CardBrand;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+  cardholderName?: string;
 }

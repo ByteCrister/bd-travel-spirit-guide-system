@@ -9,6 +9,7 @@ import {
     ContactInfoDTO,
     ShiftDTO,
     DocumentDTO,
+    PaymentCardDTO,
 } from "@/types/employee.types";
 import { EMPLOYEE_STATUS, EMPLOYMENT_TYPE, EMPLOYEE_ROLE, EmployeeStatus, EmploymentType, SALARY_PAYMENT_MODE, SalaryPaymentMode } from "@/constants/employee.const";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,7 @@ import {
     getFileExtension,
 } from "@/utils/helpers/file-conversion";
 import { CURRENCY } from "@/constants/tour.const";
+import { CARD_BRAND } from "@/constants/payment.const";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Image from "next/image";
 import ConfirmationDialog from "./ConfirmationDialog";
@@ -88,6 +90,7 @@ type UpdateEmployeeForm = Partial<
         | "salary"
         | "currency"
         | "paymentMode"
+        | "paymentCard"
     >
 >;
 
@@ -164,6 +167,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                     salary: d.salary,
                     currency: d.currency,
                     paymentMode: d.paymentMode,
+                    paymentCard: d.paymentCard,
                     dateOfJoining: d.dateOfJoining,
                     dateOfLeaving: d.dateOfLeaving,
                     contactInfo: d.contactInfo,
@@ -212,6 +216,13 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
         setField("contactInfo", next);
     };
     const setShifts = (value: ShiftDTO[] | undefined) => setField("shifts", value);
+    const getPaymentCardDraft = (): PaymentCardDTO => ({
+        brand: form?.paymentCard?.brand ?? detail?.paymentCard?.brand ?? CARD_BRAND.UNKNOWN,
+        last4: form?.paymentCard?.last4 ?? detail?.paymentCard?.last4 ?? "",
+        expMonth: form?.paymentCard?.expMonth ?? detail?.paymentCard?.expMonth ?? 1,
+        expYear: form?.paymentCard?.expYear ?? detail?.paymentCard?.expYear ?? new Date().getFullYear(),
+        cardholderName: form?.paymentCard?.cardholderName ?? detail?.paymentCard?.cardholderName ?? "",
+    });
 
     /* -------------------------
        File handling helpers
@@ -294,6 +305,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                 status: (form.status ?? detail.status) as UpdateEmployeePayload["status"],
                 employmentType: (form.employmentType ?? detail.employmentType) as UpdateEmployeePayload["employmentType"],
                 paymentMode: form.paymentMode,
+                paymentCard: form.paymentCard ?? detail.paymentCard,
                 contactInfo: form.contactInfo ?? detail.contactInfo,
                 shifts: form.shifts ?? detail.shifts,
                 notes: form.notes ?? detail.notes ?? "",
@@ -317,6 +329,10 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                 name: updated.user.name,
                 status: updated.status,
                 employmentType: updated.employmentType,
+                salary: updated.salary,
+                currency: updated.currency,
+                paymentMode: updated.paymentMode,
+                paymentCard: updated.paymentCard,
                 contactInfo: updated.contactInfo,
                 shifts: updated.shifts,
                 notes: updated.notes,
@@ -949,6 +965,84 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                                                 ))}
                                             </SelectContent>
                                         </Select>
+                                    </FormRow>
+
+                                    <FormRow label="Card Brand" icon={CreditCard}>
+                                        <Select
+                                            value={(form?.paymentCard?.brand ?? detail.paymentCard?.brand) ?? CARD_BRAND.UNKNOWN}
+                                            onValueChange={(value) =>
+                                                setField("paymentCard", {
+                                                    ...getPaymentCardDraft(),
+                                                    brand: value as PaymentCardDTO["brand"],
+                                                })
+                                            }
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select card brand" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.values(CARD_BRAND).map((brand) => (
+                                                    <SelectItem key={brand} value={brand}>
+                                                        {brand}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormRow>
+
+                                    <FormRow label="Card Last 4" icon={CreditCard}>
+                                        <Input
+                                            maxLength={4}
+                                            value={form?.paymentCard?.last4 ?? detail.paymentCard?.last4 ?? ""}
+                                            onChange={(e) => {
+                                                const nextLast4 = e.target.value.replace(/\D/g, "").slice(0, 4);
+                                                setField("paymentCard", {
+                                                    ...getPaymentCardDraft(),
+                                                    last4: nextLast4,
+                                                });
+                                            }}
+                                        />
+                                    </FormRow>
+
+                                    <FormRow label="Exp. Month" icon={Calendar}>
+                                        <Input
+                                            type="number"
+                                            min={1}
+                                            max={12}
+                                            value={form?.paymentCard?.expMonth ?? detail.paymentCard?.expMonth ?? ""}
+                                            onChange={(e) =>
+                                                setField("paymentCard", {
+                                                    ...getPaymentCardDraft(),
+                                                    expMonth: Number(e.target.value || 1),
+                                                })
+                                            }
+                                        />
+                                    </FormRow>
+
+                                    <FormRow label="Exp. Year" icon={Calendar}>
+                                        <Input
+                                            type="number"
+                                            min={new Date().getFullYear()}
+                                            value={form?.paymentCard?.expYear ?? detail.paymentCard?.expYear ?? ""}
+                                            onChange={(e) =>
+                                                setField("paymentCard", {
+                                                    ...getPaymentCardDraft(),
+                                                    expYear: Number(e.target.value || new Date().getFullYear()),
+                                                })
+                                            }
+                                        />
+                                    </FormRow>
+
+                                    <FormRow label="Cardholder Name" icon={User}>
+                                        <Input
+                                            value={form?.paymentCard?.cardholderName ?? detail.paymentCard?.cardholderName ?? ""}
+                                            onChange={(e) =>
+                                                setField("paymentCard", {
+                                                    ...getPaymentCardDraft(),
+                                                    cardholderName: e.target.value,
+                                                })
+                                            }
+                                        />
                                     </FormRow>
 
                                     <FormRow label="Effective From">
