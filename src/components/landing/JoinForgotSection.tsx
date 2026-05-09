@@ -30,6 +30,11 @@ const errorMap: Record<string, string> = {
     USER_NOT_EXIST_WITH_THIS_GOOGLE_EMAIL: "No account found for this Google email. Please sign up first.",
 };
 
+const URLS = {
+    VALIDATE_USER: `/auth/user/v1/validate`,
+    FORGOT_PASSWORD: `/support/password-requests/v1`
+}
+
 export type JoinFormState = {
     email: string;
     password: string;
@@ -88,7 +93,7 @@ export default function JoinForgotSection() {
 
         try {
 
-            await api.post("/auth/user/v1/validate", {
+            await api.post(URLS.VALIDATE_USER, {
                 email: join.email,
                 password: join.password,
             });
@@ -138,8 +143,8 @@ export default function JoinForgotSection() {
         try {
             setIsSubmitting(true);
 
-            // Make API call using your axios instance
-            await api.post("/operations/password-requests/v1", {
+            // Make API call
+            await api.post(URLS.FORGOT_PASSWORD, {
                 email: forgot.email,
                 description: forgot.reason,
             });

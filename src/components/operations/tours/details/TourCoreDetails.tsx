@@ -519,6 +519,12 @@ export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
                                             </Badge>
                                         </div>
                                         <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                                            <span className="text-muted-foreground font-medium">Tour Code:</span>
+                                            <Badge variant="secondary" className="font-mono tracking-wide">
+                                                {tour.tourCode || "N/A"}
+                                            </Badge>
+                                        </div>
+                                        <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
                                             <span className="text-muted-foreground font-medium">Tags:</span>
                                             <div className="flex gap-1 flex-wrap justify-end max-w-xs">
                                                 {tour.tags && tour.tags.length > 0 ? (

@@ -1,5 +1,5 @@
 // src/lib/build-responses/build-tour-details.ts
-import { TOUR_STATUS } from "@/constants/tour.const";
+import { TOUR_DISCOUNT_TYPE, TOUR_STATUS } from "@/constants/tour.const";
 import TourModel, { IAttraction, IDestinationBlock, ITour } from "@/models/tours/tour.model";
 import { PopulatedAssetLean } from "@/types/populated-asset.types";
 import { TourDetailDTO } from "@/types/tour.types";
@@ -150,6 +150,7 @@ export async function buildTourDetailDTO(
             id: tour._id.toString(),
             title: tour.title,
             slug: tour.slug,
+            tourCode: tour.uniqueTourCode,
             status: tour.status,
             summary: tour.summary,
             heroImage: tour.heroImage?.file?.publicUrl.toString() ?? undefined,
@@ -316,7 +317,9 @@ function calculatePriceSummary(tour: TourLeanPopulated): TourDetailDTO['priceSum
     );
 
     const discountedAmount = activeDiscount
-        ? baseAmount * (1 - (activeDiscount.value / 100))
+        ? activeDiscount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE
+            ? baseAmount * (1 - (activeDiscount.value / 100))
+            : Math.max(0, baseAmount - activeDiscount.value)
         : undefined;
 
     return {

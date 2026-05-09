@@ -9,6 +9,7 @@ import {
     PAYMENT_METHOD,
     SEASON,
     TOUR_DISCOUNT,
+    TOUR_DISCOUNT_TYPE,
     TRANSPORT_MODE,
     TRAVEL_TYPE,
 } from "@/constants/tour.const";
@@ -310,13 +311,27 @@ export const Step4PricingSchema = Yup.object().shape({
         .of(
             Yup.object().shape({
                 type: Yup.string()
-                    .oneOf(Object.values(TOUR_DISCOUNT), createNestedErrorMessage("Pricing", "Discounts", "Type", "is required"))
+                    .oneOf(Object.values(TOUR_DISCOUNT_TYPE), createNestedErrorMessage("Pricing", "Discounts", "Type", "is invalid"))
                     .required(createNestedErrorMessage("Pricing", "Discounts", "Type", "is required")),
+                discount: Yup.string()
+                    .oneOf(Object.values(TOUR_DISCOUNT), createNestedErrorMessage("Pricing", "Discounts", "Discount", "is invalid"))
+                    .required(createNestedErrorMessage("Pricing", "Discounts", "Discount", "is required")),
                 value: Yup.number()
                     .min(0, createNestedErrorMessage("Pricing", "Discounts", "Value", "must be positive"))
-                    .max(100, createNestedErrorMessage("Pricing", "Discounts", "Value", "cannot exceed 100%")),
-                code: Yup.string().when("type", {
-                    is: (type: string) => type === TOUR_DISCOUNT.PROMO,
+                    .test(
+                        "percentage-max",
+                        createNestedErrorMessage("Pricing", "Discounts", "Value", "cannot exceed 100 for percentage discounts"),
+                        function (value) {
+                            if (value === undefined || value === null) return true;
+                            const { type } = this.parent;
+                            if (type === TOUR_DISCOUNT_TYPE.PERCENTAGE) {
+                                return value <= 100;
+                            }
+                            return true;
+                        }
+                    ),
+                code: Yup.string().when("discount", {
+                    is: (discount: string) => discount === TOUR_DISCOUNT.PROMO,
                     then: () =>
                         Yup.string().required(createNestedErrorMessage("Pricing", "Discounts", "Code", "is required for promo discounts")),
                     otherwise: () => Yup.string().optional(),

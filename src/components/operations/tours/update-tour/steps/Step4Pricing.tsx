@@ -15,7 +15,7 @@ import {
   DepartureDTO,
   PriceDTO,
 } from '@/types/tour.types';
-import { CURRENCY, TOUR_DISCOUNT, PAYMENT_METHOD, Currency, TourDiscount, PaymentMethod } from '@/constants/tour.const';
+import { CURRENCY, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, PAYMENT_METHOD, Currency, TourDiscount, PaymentMethod, TourDiscountType } from '@/constants/tour.const';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import { Step4PricingSchema } from '@/utils/validators/tour/add-tour.validator';
 
@@ -86,11 +86,17 @@ interface Step4PricingProps {
   onUpdateSuccess?: () => void;
 }
 
-const discountTypeLabels: Record<TourDiscount, string> = {
+const discountCategoryLabels: Record<TourDiscount, string> = {
+  [TOUR_DISCOUNT.FIXED]: 'Fixed',
   [TOUR_DISCOUNT.SEASONAL]: 'Seasonal',
   [TOUR_DISCOUNT.EARLY_BIRD]: 'Early Bird',
   [TOUR_DISCOUNT.GROUP]: 'Group',
   [TOUR_DISCOUNT.PROMO]: 'Promo Code',
+};
+
+const discountValueTypeLabels: Record<TourDiscountType, string> = {
+  [TOUR_DISCOUNT_TYPE.PERCENTAGE]: 'Percentage (%)',
+  [TOUR_DISCOUNT_TYPE.FLAT_AMOUNT]: 'Flat Amount',
 };
 
 const currencyLabels: Record<Currency, string> = {
@@ -106,6 +112,29 @@ const paymentMethodLabels: Record<PaymentMethod, string> = {
   [PAYMENT_METHOD.STRIPE]: 'Stripe',
   [PAYMENT_METHOD.CASH]: 'Cash',
   [PAYMENT_METHOD.BANK_TRANSFER]: 'Bank Transfer',
+};
+
+const normalizeDiscount = (discount: Partial<DiscountDTO>): DiscountDTO => {
+  const discountValues = new Set<string>(Object.values(TOUR_DISCOUNT) as string[]);
+  const discountTypeValues = new Set<string>(Object.values(TOUR_DISCOUNT_TYPE) as string[]);
+
+  const rawType = discount.type as string | undefined;
+  const migratedCategory = rawType && discountValues.has(rawType)
+    ? (rawType as TourDiscount)
+    : (discount.discount ?? TOUR_DISCOUNT.SEASONAL);
+
+  const migratedType = rawType && discountTypeValues.has(rawType)
+    ? (rawType as TourDiscountType)
+    : TOUR_DISCOUNT_TYPE.PERCENTAGE;
+
+  return {
+    type: migratedType,
+    discount: migratedCategory,
+    value: Number(discount.value ?? 0),
+    code: discount.code ?? '',
+    validFrom: discount.validFrom,
+    validUntil: discount.validUntil,
+  };
 };
 
 // Animation variants
@@ -185,7 +214,7 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
   const formik = useFormik<UpdateTourPricingDTO>({
     initialValues: {
       basePrice: initialData.basePrice ?? { amount: 0, currency: CURRENCY.BDT },
-      discounts: initialData.discounts ?? [],
+      discounts: initialData.discounts?.map((discount) => normalizeDiscount(discount)) ?? [],
       duration: initialData.duration ?? { days: 1, nights: 0 },
       operatingWindows: initialData.operatingWindows ?? [],
       departures: initialData.departures ?? [],
@@ -240,7 +269,8 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
   // Discounts management
   const addDiscount = () => {
     const newDiscount: DiscountDTO = {
-      type: TOUR_DISCOUNT.SEASONAL,
+      type: TOUR_DISCOUNT_TYPE.PERCENTAGE,
+      discount: TOUR_DISCOUNT.SEASONAL,
       value: 0,
       code: '',
     };
@@ -619,7 +649,8 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                                       <div className="flex items-center gap-3 flex-1 text-left">
                                         <TrendingDown className="h-4 w-4 text-amber-600" />
                                         <span className="font-semibold text-slate-800">
-                                          {discountTypeLabels[discount.type]}: {formatNumberForDisplay(discount.value)}%
+                                          {discountCategoryLabels[discount.discount]}: {formatNumberForDisplay(discount.value)}
+                                          {discount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE ? '%' : ` ${formik.values.basePrice?.currency ?? CURRENCY.BDT}`}
                                         </span>
                                         {discount.code && (
                                           <Badge variant="outline" className="ml-2 border-amber-300 text-amber-700 bg-amber-50">
@@ -642,7 +673,7 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                     <AccordionContent className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label>Discount Type *</Label>
+                          <Label>Discount Value Type *</Label>
                           <Select
                             value={discount.type}
                             onValueChange={(value) => updateDiscount(index, 'type', value)}
@@ -651,9 +682,9 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                               <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                             <SelectContent>
-                              {Object.values(TOUR_DISCOUNT).map((type) => (
+                              {Object.values(TOUR_DISCOUNT_TYPE).map((type) => (
                                 <SelectItem key={type} value={type}>
-                                  {discountTypeLabels[type]}
+                                  {discountValueTypeLabels[type]}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -664,7 +695,31 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                         </div>
 
                         <div className="space-y-2">
-                          <Label>Discount Value (%) *</Label>
+                          <Label>Discount Category *</Label>
+                          <Select
+                            value={discount.discount}
+                            onValueChange={(value) => updateDiscount(index, 'discount', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select discount" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.values(TOUR_DISCOUNT).map((type) => (
+                                <SelectItem key={type} value={type}>
+                                  {discountCategoryLabels[type]}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {getNestedError(`discounts[${index}].discount`) && (
+                            <p className="text-sm text-destructive">{getNestedError(`discounts[${index}].discount`)}</p>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>
+                            Discount Value {discount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE ? "(%)" : `(${formik.values.basePrice?.currency ?? CURRENCY.BDT})`} *
+                          </Label>
                           <div className="relative">
                             <Input
                               type="text"
@@ -682,7 +737,11 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                               className={getNestedError(`discounts[${index}].value`) ? "border-destructive" : ""}
                             />
                             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                              <Percent className="h-4 w-4 text-muted-foreground" />
+                              {discount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE ? (
+                                <Percent className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <FaBangladeshiTakaSign className="h-4 w-4 text-muted-foreground" />
+                              )}
                             </div>
                           </div>
                           {getNestedError(`discounts[${index}].value`) && (
@@ -691,7 +750,7 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                         </div>
                       </div>
 
-                      {discount.type === TOUR_DISCOUNT.PROMO && (
+                      {discount.discount === TOUR_DISCOUNT.PROMO && (
                         <div className="space-y-2">
                           <Label>Promo Code *</Label>
                           <Input

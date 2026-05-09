@@ -32,6 +32,7 @@ import {
     CURRENCY,
     PAYMENT_METHOD,
     TOUR_DISCOUNT,
+    TOUR_DISCOUNT_TYPE,
 } from "@/constants/tour.const";
 import { useState } from "react";
 import {
@@ -324,10 +325,14 @@ export default function PricingCommerceStep() {
                                                         <Grid container spacing={2} alignItems="center">
                                                             <Grid size={{ xs: 12, sm: 3 }}>
                                                                 <FormControl fullWidth size="small">
-                                                                    <InputLabel sx={{ fontWeight: 500 }}>Type</InputLabel>
+                                                                    <InputLabel sx={{ fontWeight: 500 }}>Value Type</InputLabel>
                                                                     <Select
-                                                                        value={discount.type}
-                                                                        label="Type"
+                                                                        value={
+                                                                            Object.values(TOUR_DISCOUNT_TYPE).includes(discount.type as (typeof TOUR_DISCOUNT_TYPE)[keyof typeof TOUR_DISCOUNT_TYPE])
+                                                                                ? discount.type
+                                                                                : TOUR_DISCOUNT_TYPE.PERCENTAGE
+                                                                        }
+                                                                        label="Value Type"
                                                                         onChange={(e) =>
                                                                             setFieldValue(
                                                                                 `discounts[${index}].type`,
@@ -341,7 +346,7 @@ export default function PricingCommerceStep() {
                                                                             },
                                                                         }}
                                                                     >
-                                                                        {Object.values(TOUR_DISCOUNT).map((type) => (
+                                                                        {Object.values(TOUR_DISCOUNT_TYPE).map((type) => (
                                                                             <MenuItem
                                                                                 key={type}
                                                                                 value={type}
@@ -364,7 +369,7 @@ export default function PricingCommerceStep() {
                                                                     fullWidth
                                                                     size="small"
                                                                     type="number"
-                                                                    label="Value %"
+                                                                    label={discount.type === TOUR_DISCOUNT_TYPE.FLAT_AMOUNT ? `Value (${values.basePrice.currency})` : "Value %"}
                                                                     value={discount.value}
                                                                     onChange={(e) =>
                                                                         setFieldValue(
@@ -373,7 +378,11 @@ export default function PricingCommerceStep() {
                                                                         )
                                                                     }
                                                                     InputProps={{
-                                                                        inputProps: { min: 0, max: 100, step: 0.1 },
+                                                                        inputProps: {
+                                                                            min: 0,
+                                                                            max: discount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE ? 100 : undefined,
+                                                                            step: 0.1,
+                                                                        },
                                                                     }}
                                                                     sx={{
                                                                         "& .MuiOutlinedInput-root": {
@@ -381,6 +390,41 @@ export default function PricingCommerceStep() {
                                                                         },
                                                                     }}
                                                                 />
+                                                            </Grid>
+
+                                                            <Grid size={{ xs: 12, sm: 2 }}>
+                                                                <FormControl fullWidth size="small">
+                                                                    <InputLabel sx={{ fontWeight: 500 }}>Discount</InputLabel>
+                                                                    <Select
+                                                                        value={
+                                                                            Object.values(TOUR_DISCOUNT).includes(discount.discount as (typeof TOUR_DISCOUNT)[keyof typeof TOUR_DISCOUNT])
+                                                                                ? discount.discount
+                                                                                : TOUR_DISCOUNT.SEASONAL
+                                                                        }
+                                                                        label="Discount"
+                                                                        onChange={(e) =>
+                                                                            setFieldValue(
+                                                                                `discounts[${index}].discount`,
+                                                                                e.target.value
+                                                                            )
+                                                                        }
+                                                                        sx={{
+                                                                            borderRadius: 1.5,
+                                                                            "& .MuiOutlinedInput-root": {
+                                                                                borderRadius: 1.5,
+                                                                            },
+                                                                        }}
+                                                                    >
+                                                                        {Object.values(TOUR_DISCOUNT).map((discountType) => (
+                                                                            <MenuItem
+                                                                                key={discountType}
+                                                                                value={discountType}
+                                                                            >
+                                                                                {discountType}
+                                                                            </MenuItem>
+                                                                        ))}
+                                                                    </Select>
+                                                                </FormControl>
                                                             </Grid>
 
                                                             <Grid size={{ xs: 12, sm: 3 }}>
@@ -396,7 +440,7 @@ export default function PricingCommerceStep() {
                                                                         )
                                                                     }
                                                                     disabled={
-                                                                        discount.type !== TOUR_DISCOUNT.PROMO
+                                                                        discount.discount !== TOUR_DISCOUNT.PROMO
                                                                     }
                                                                     sx={{
                                                                         "& .MuiOutlinedInput-root": {
@@ -488,7 +532,8 @@ export default function PricingCommerceStep() {
                                             variant="outlined"
                                             onClick={() =>
                                                 push({
-                                                    type: TOUR_DISCOUNT.SEASONAL,
+                                                    type: TOUR_DISCOUNT_TYPE.PERCENTAGE,
+                                                    discount: TOUR_DISCOUNT.SEASONAL,
                                                     value: 0,
                                                 })
                                             }

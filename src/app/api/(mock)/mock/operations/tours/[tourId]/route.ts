@@ -18,6 +18,7 @@ import {
     AGE_SUITABILITY,
     MODERATION_STATUS,
     TOUR_DISCOUNT,
+    TOUR_DISCOUNT_TYPE,
     MEALS_PROVIDED
 } from '@/constants/tour.const';
 
@@ -152,7 +153,8 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
 
     // Generate discounts (0-2)
     const discounts = Array.from({ length: faker.number.int({ min: 0, max: 2 }) }).map(() => ({
-        type: faker.helpers.arrayElement(Object.values(TOUR_DISCOUNT)),
+        type: faker.helpers.arrayElement(Object.values(TOUR_DISCOUNT_TYPE)),
+        discount: faker.helpers.arrayElement(Object.values(TOUR_DISCOUNT)),
         value: faker.number.int({ min: 5, max: 25 }),
         code: faker.string.alphanumeric(8).toUpperCase(),
         validFrom: faker.date.past({ years: 1 }).toISOString(),
@@ -308,7 +310,9 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
     });
 
     const discountedAmount = activeDiscount
-        ? basePriceAmount * (1 - (activeDiscount.value / 100))
+        ? activeDiscount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE
+            ? basePriceAmount * (1 - (activeDiscount.value / 100))
+            : Math.max(0, basePriceAmount - activeDiscount.value)
         : undefined;
 
     // Generate hero image and gallery
@@ -400,6 +404,7 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         id: tourId,
         title: faker.lorem.words(4),
         slug: faker.helpers.slugify(faker.lorem.words(4)).toLowerCase(),
+        tourCode: faker.string.alphanumeric(10).toUpperCase(),
         status,
         summary: faker.lorem.paragraphs(2),
         heroImage,

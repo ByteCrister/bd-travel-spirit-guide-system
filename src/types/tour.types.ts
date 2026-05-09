@@ -15,6 +15,7 @@ import {
     Season,
     AccommodationType,
     TourDiscount,
+    TourDiscountType,
     MealsProvided,
 } from "@/constants/tour.const";
 
@@ -40,7 +41,8 @@ export interface PriceDTO {
 }
 
 export interface DiscountDTO {
-    type: TourDiscount;
+    type: TourDiscountType;
+    discount: TourDiscount;
     value: number;
     code?: string;
     validFrom?: string;
@@ -198,6 +200,7 @@ export interface TourDetailDTO {
     id: string;
     title: string;
     slug: string;
+    tourCode: string;
     status: TourStatus;
     summary: string;
     heroImage?: string; // Actual cloudinary asset urls using Asset model ID
@@ -318,6 +321,7 @@ export interface TourListItemDTO {
     id: string;
     title: string;
     slug: string;
+    tourCode?: string;
     status: TourStatus;
     summary: string;
     heroImage?: string;

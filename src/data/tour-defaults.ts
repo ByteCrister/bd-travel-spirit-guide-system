@@ -1,4 +1,4 @@
-import { AGE_SUITABILITY, AUDIENCE_TYPE, DIFFICULTY_LEVEL, DISTRICT, DIVISION, PAYMENT_METHOD, SEASON, TOUR_CATEGORIES, TRANSPORT_MODE, TRAVEL_TYPE } from "@/constants/tour.const";
+import { AGE_SUITABILITY, AUDIENCE_TYPE, DIFFICULTY_LEVEL, DISTRICT, DIVISION, PAYMENT_METHOD, SEASON, TOUR_CATEGORIES, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, TRANSPORT_MODE, TRAVEL_TYPE } from "@/constants/tour.const";
 import { CreateTourDTO } from "@/types/tour.types";
 
 export const GUIDE_DEFAULT: CreateTourDTO = {
@@ -73,7 +73,8 @@ export const GUIDE_DEFAULT: CreateTourDTO = {
     },
     "discounts": [
         {
-            "type": "promo",
+            "type": TOUR_DISCOUNT_TYPE.PERCENTAGE,
+            "discount": TOUR_DISCOUNT.PROMO,
             "value": 10,
             "code": "SAVE41",
             "validFrom": "2026-01-20",
@@ -490,7 +491,8 @@ export const GUIDE_DEFAULT_1: CreateTourDTO = {
     },
     "discounts": [
         {
-            "type": "promo",
+            "type": TOUR_DISCOUNT_TYPE.PERCENTAGE,
+            "discount": TOUR_DISCOUNT.PROMO,
             "value": 10,
             "code": "SAVE41",
             "validFrom": "2026-01-20",

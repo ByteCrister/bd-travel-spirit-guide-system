@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 import { validateUpdatedYupSchema } from "@/utils/validators/common/update-updated-yup-schema";
 import { Step4PricingSchema } from "@/utils/validators/tour/add-tour.validator";
 import TourModel from "@/models/tours/tour.model";
-import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { MODERATION_STATUS, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, TOUR_STATUS } from "@/constants/tour.const";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 
 /**
@@ -68,6 +68,12 @@ export const PATCH = withErrorHandler(async (
             // Convert string dates to Date objects for MongoDB
             const discounts = validatedData.discounts.map(discount => ({
                 ...discount,
+                type: Object.values(TOUR_DISCOUNT_TYPE).includes(discount.type as (typeof TOUR_DISCOUNT_TYPE)[keyof typeof TOUR_DISCOUNT_TYPE])
+                    ? discount.type
+                    : TOUR_DISCOUNT_TYPE.PERCENTAGE,
+                discount: Object.values(TOUR_DISCOUNT).includes(discount.discount as (typeof TOUR_DISCOUNT)[keyof typeof TOUR_DISCOUNT])
+                    ? discount.discount
+                    : TOUR_DISCOUNT.SEASONAL,
                 validFrom: discount.validFrom ? new Date(discount.validFrom) : undefined,
                 validUntil: discount.validUntil ? new Date(discount.validUntil) : undefined,
             }));

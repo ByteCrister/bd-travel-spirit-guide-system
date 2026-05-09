@@ -64,6 +64,7 @@ import {
     PriceDTO,
 } from "@/types/tour.types";
 import { FaBangladeshiTakaSign } from "react-icons/fa6";
+import { TOUR_DISCOUNT_TYPE } from "@/constants/tour.const";
 
 // Type definitions
 type FieldType =
@@ -275,9 +276,12 @@ const renderDetailedSection = ({
                     {discounts.map((discount, idx) => (
                         <div key={idx} className="border rounded-lg p-3">
                             <div className="flex items-center justify-between">
-                                <h4 className="font-medium text-gray-900">{discount.type}</h4>
+                                <h4 className="font-medium text-gray-900">{discount.discount}</h4>
                                 <Badge variant="outline" className="bg-emerald-50 text-emerald-700">
-                                    {discount.value}%
+                                    {discount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE
+                                        ? `${discount.value}%`
+                                        : `${discount.value} ${values.basePrice.currency}`
+                                    }
                                 </Badge>
                             </div>
                             {discount.code && (

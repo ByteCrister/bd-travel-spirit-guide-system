@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PAYMENT_METHOD, PaymentMethod } from "@/constants/tour.const"
+import { PAYMENT_METHOD, PaymentMethod, TOUR_DISCOUNT_TYPE } from "@/constants/tour.const"
 import { TourDetailDTO } from "@/types/tour.types"
 import { Banknote, Clock, CreditCard, Wallet, Tag, Calendar, TrendingDown } from "lucide-react"
 import { motion } from "framer-motion";
@@ -25,6 +25,13 @@ const PricingInfo = ({ tour }: PricingInfoProps) => {
             default: return <CreditCard className="h-4 w-4" />
         }
     }
+
+    const formatDiscountValue = (type: string, value: number) => {
+        if (type === TOUR_DISCOUNT_TYPE.FLAT_AMOUNT) {
+            return `${value} ${tour.basePrice.currency} off`;
+        }
+        return `${value}% off`;
+    };
 
     return (
         <Card className="border-2 shadow-lg">
@@ -99,10 +106,12 @@ const PricingInfo = ({ tour }: PricingInfoProps) => {
                                             className="flex justify-between items-center p-4 bg-background rounded-lg border-2 border-yellow-300 dark:border-yellow-800 hover:shadow-md transition-shadow"
                                         >
                                             <div className="flex-1">
-                                                <div className="font-semibold text-base mb-1">{discount.type}</div>
+                                                <div className="font-semibold text-base mb-1">
+                                                    {discount.discount}
+                                                </div>
                                                 <div className="text-sm text-muted-foreground flex items-center gap-1">
                                                     <Tag className="h-3 w-3" />
-                                                    {discount.value}% off
+                                                    {formatDiscountValue(discount.type, discount.value)}
                                                 </div>
                                             </div>
                                             {discount.code && (
