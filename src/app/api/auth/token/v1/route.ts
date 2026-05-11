@@ -1,6 +1,6 @@
 // api/auth/token
-import GuideAppTokenPatchHandler from "@/lib/handlers/guide-application/token/token-patch.handler";
-import GuideAppTokenPostHandler from "@/lib/handlers/guide-application/token/token-post.handler";
+import GuideAppTokenPatchHandler from "@/lib/handler/auth/token/token-patch.handler";
+import GuideAppTokenPostHandler from "@/lib/handler/auth/token/token-post.handler";
 import { withErrorHandler } from "@/lib/helpers/withErrorHandler";
 
 /**
