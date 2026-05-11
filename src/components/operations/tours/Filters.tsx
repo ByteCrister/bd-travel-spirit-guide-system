@@ -32,9 +32,9 @@ import {
     Currency,
     TourStatus,
     ModerationStatus,
-} from "@/constants/tour.const";
+} from "@/constants/tour/tour.const";
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
-import { TourFilterOptions } from "@/types/tour.types";
+import { TourFilterOptions } from "@/types/tour/tour.types";
 import { Badge } from "@/components/ui/badge";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import { motion, AnimatePresence } from "framer-motion";

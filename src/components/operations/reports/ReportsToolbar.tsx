@@ -3,14 +3,14 @@
 import type { FC, ChangeEvent } from "react";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { REPORT_STATUS, REPORT_REASON, REPORT_PRIORITY } from "@/types/reports.types";
-import type { ReportsQueryParams, ReportsSearchScope, ReportsSortField } from "@/types/reports.types";
+import { REPORT_STATUS, REPORT_REASON, REPORT_PRIORITY } from "@/types/tour/reports.types";
+import type { ReportsQueryParams, ReportsSearchScope, ReportsSortField } from "@/types/tour/reports.types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useReportsStore } from "@/store/report.store";
-import { ReportPriority, ReportReason, ReportStatus } from "@/constants/report.const";
+import { ReportPriority, ReportReason, ReportStatus } from "@/constants/tour/report.const";
 import { cn } from "@/lib/utils";
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback"; // Import the custom hook
 import {

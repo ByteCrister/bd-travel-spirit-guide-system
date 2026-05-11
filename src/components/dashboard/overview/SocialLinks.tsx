@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useGuideOverviewStore } from "@/store/guide-overview.store";
 import { EditableGuideOverview, GuideSocialEntry } from "@/types/overview.types";
-import { GUIDE_SOCIAL_PLATFORM } from "@/constants/guide.const";
+import { GUIDE_SOCIAL_PLATFORM } from "@/constants/guide/guide.const";
 import {
     Plus,
     Trash2,

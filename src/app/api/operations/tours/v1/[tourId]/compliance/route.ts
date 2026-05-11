@@ -5,12 +5,12 @@ import { withTransaction } from '@/lib/helpers/withTransaction';
 import { validateUpdatedYupSchema } from '@/utils/validators/common/update-updated-yup-schema';
 import { Step5ComplianceSchema } from '@/utils/validators/tour/add-tour.validator';
 import TourModel, { ITour } from '@/models/tours/tour.model';
-import { UpdateTourComplianceDTO } from '@/types/tour.types';
+import { UpdateTourComplianceDTO } from '@/types/tour/tour.types';
 import {
     TOUR_STATUS,
     MODERATION_STATUS,
     AGE_SUITABILITY
-} from '@/constants/tour.const';
+} from '@/constants/tour/tour.const';
 import mongoose from 'mongoose';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
 

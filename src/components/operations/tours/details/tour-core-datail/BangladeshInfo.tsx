@@ -2,8 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AUDIENCE_TYPE, AudienceType, TRAVEL_TYPE, TravelType } from "@/constants/tour.const";
-import { TourDetailDTO } from "@/types/tour.types";
+import { AUDIENCE_TYPE, AudienceType, TRAVEL_TYPE, TravelType } from "@/constants/tour/tour.const";
+import { TourDetailDTO } from "@/types/tour/tour.types";
 import { Briefcase, Building, Castle, CheckCircle, Coffee, Compass, Globe, Heart, Map, MapPin, Mountain, Package, Shield, User, Users, Waves, XCircle, Phone, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 

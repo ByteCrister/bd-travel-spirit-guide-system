@@ -2,12 +2,12 @@
 import { NextRequest } from "next/server";
 import { ClientSession } from "mongoose";
 import { ApiError } from "@/lib/helpers/withErrorHandler";
-import { USER_ROLE } from "@/constants/user.const";
-import { EMPLOYEE_STATUS, EMPLOYMENT_TYPE } from "@/constants/employee.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
+import { EMPLOYEE_STATUS, EMPLOYMENT_TYPE } from "@/constants/employee/employee.const";
 
 // Import models
 import UserModel, { IUserDoc } from "@/models/user.model";
-import { CreateEmployeePayload } from "@/types/employee.types";
+import { CreateEmployeePayload } from "@/types/employee/employee.types";
 import { Types } from "mongoose";
 import EmployeeModel, { IEmployee } from "@/models/employees/employees.model";
 import ConnectDB from "@/config/db";
@@ -17,7 +17,7 @@ import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
 import { buildEmployeeDTO } from "@/lib/build-responses/build-employee-dt";
 import { EmployeeWelcome } from "@/lib/html/employee-welcome.html";
 import { mailer } from "@/config/node-mailer";
-import { ASSET_TYPE } from "@/constants/asset.const";
+import { ASSET_TYPE } from "@/constants/common/asset.const";
 import { createEmployeeValidationSchema } from "@/utils/validators/employee/employee.validator";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import GuideModel from "@/models/guide/guide.model";

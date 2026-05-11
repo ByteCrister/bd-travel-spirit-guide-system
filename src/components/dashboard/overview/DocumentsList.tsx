@@ -23,7 +23,7 @@ import {
     GUIDE_DOCUMENT_CATEGORY,
     GuideDocumentType,
     GuideDocumentCategory,
-} from "@/constants/guide.const";
+} from "@/constants/guide/guide.const";
 import { GuideDocument } from "@/types/overview.types";
 import { processUploadFile } from "@/utils/helpers/fileUpload.overview";
 import { toast } from "sonner";

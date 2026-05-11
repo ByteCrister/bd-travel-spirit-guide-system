@@ -6,10 +6,10 @@ import mongoose, { Types } from "mongoose";
 import { uploadAssets } from "@/lib/cloudinary/upload.cloudinary";
 import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
 import { Base64Asset } from "@/lib/cloudinary/upload.cloudinary";
-import { UpdateDestinationImgDTO } from "@/types/tour.types";
+import { UpdateDestinationImgDTO } from "@/types/tour/tour.types";
 import TourModel from "@/models/tours/tour.model";
-import { ASSET_TYPE } from "@/constants/asset.const";
-import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { ASSET_TYPE } from "@/constants/common/asset.const";
+import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 

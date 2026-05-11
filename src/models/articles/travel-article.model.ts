@@ -10,7 +10,7 @@ import {
   FaqCategory,
   FOOD_RECO_SPICE_TYPE,
   FoodRecoSpiceType
-} from "@/constants/article.const";
+} from "@/constants/tour/article.const";
 import {
   DISTRICT,
   District,
@@ -18,7 +18,7 @@ import {
   Division,
   TOUR_CATEGORIES,
   TourCategories
-} from "@/constants/tour.const";
+} from "@/constants/tour/tour.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import { SlugService } from "@/lib/helpers/slug-services";
 import { Query } from "mongoose";

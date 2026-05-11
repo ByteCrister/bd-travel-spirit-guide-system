@@ -5,8 +5,8 @@ import { withTransaction } from '@/lib/helpers/withTransaction';
 import { validateUpdatedYupSchema } from '@/utils/validators/common/update-updated-yup-schema';
 import { Step1BangladeshSchema } from '@/utils/validators/tour/add-tour.validator';
 import TourModel, { ITour } from '@/models/tours/tour.model';
-import { UpdateTourBangladeshFieldsDTO } from '@/types/tour.types';
-import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour.const';
+import { UpdateTourBangladeshFieldsDTO } from '@/types/tour/tour.types';
+import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour/tour.const';
 import { Types } from 'mongoose';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
 /**

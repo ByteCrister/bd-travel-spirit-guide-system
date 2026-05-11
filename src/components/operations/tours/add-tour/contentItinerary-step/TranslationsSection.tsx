@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { motion, AnimatePresence } from "framer-motion";
-import { CreateTourDTO } from "@/types/tour.types";
+import { CreateTourDTO } from "@/types/tour/tour.types";
 import { useState } from "react";
 import {
     Globe,

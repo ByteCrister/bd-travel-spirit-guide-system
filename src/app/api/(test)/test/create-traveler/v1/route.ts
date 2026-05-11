@@ -6,9 +6,9 @@ import ConnectDB from "@/config/db";
 import UserModel from "@/models/user.model";
 import { TravelerModel } from "@/models/travelers/traveler.model";
 
-import { ACCOUNT_STATUS, USER_ROLE, UserRole } from "@/constants/user.const";
-import { Division, District } from "@/constants/tour.const";
-import { ASSET_TYPE } from "@/constants/asset.const";
+import { ACCOUNT_STATUS, USER_ROLE, UserRole } from "@/constants/current-user/user.const";
+import { Division, District } from "@/constants/tour/tour.const";
+import { ASSET_TYPE } from "@/constants/common/asset.const";
 
 import { uploadAssets, Base64Asset } from "@/lib/cloudinary/upload.cloudinary";
 

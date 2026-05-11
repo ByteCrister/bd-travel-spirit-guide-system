@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import httpStatus from "http-status";
 import UserModel, { IUser, IUserDoc } from "@/models/user.model";
-import { USER_ROLE, UserRole } from "@/constants/user.const"
+import { USER_ROLE, UserRole } from "@/constants/current-user/user.const"
 import { ApiError } from "../helpers/withErrorHandler";
 
 /**

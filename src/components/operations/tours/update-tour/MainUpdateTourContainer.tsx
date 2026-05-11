@@ -26,7 +26,7 @@ import {
   tourDetailLoadingKey,
   useTourDetailStore
 } from '@/store/tour-detail.store';
-import { TourDetailDTO } from '@/types/tour.types';
+import { TourDetailDTO } from '@/types/tour/tour.types';
 import LoadingUpdateTourContainer from './loading-skeletons/LoadingUpdateTourContainer';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
 import { formatValidationErrors, validateTourDataStepByStep } from '@/utils/validators/tour/validateTour';

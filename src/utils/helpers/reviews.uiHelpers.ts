@@ -1,5 +1,5 @@
 // lib/reviews/uiHelpers.ts
-import { ApiError } from "@/types/reviews.types";
+import { ApiError } from "@/types/tour/reviews.types";
 import { formatDistanceToNowStrict, parseISO } from "date-fns";
 
 export function formatRelativeDate(iso: string): string {

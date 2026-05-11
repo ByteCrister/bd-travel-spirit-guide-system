@@ -1,5 +1,5 @@
-import { AGE_SUITABILITY, AUDIENCE_TYPE, DIFFICULTY_LEVEL, DISTRICT, DIVISION, PAYMENT_METHOD, SEASON, TOUR_CATEGORIES, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, TRANSPORT_MODE, TRAVEL_TYPE } from "@/constants/tour.const";
-import { CreateTourDTO } from "@/types/tour.types";
+import { AGE_SUITABILITY, AUDIENCE_TYPE, DIFFICULTY_LEVEL, DISTRICT, DIVISION, PAYMENT_METHOD, SEASON, TOUR_CATEGORIES, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, TRANSPORT_MODE, TRAVEL_TYPE } from "@/constants/tour/tour.const";
+import { CreateTourDTO } from "@/types/tour/tour.types";
 
 export const GUIDE_DEFAULT: CreateTourDTO = {
     "title": "",

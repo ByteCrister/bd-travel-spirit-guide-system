@@ -1,4 +1,4 @@
-import { Currency, CURRENCY } from "@/constants/tour.const";
+import { Currency, CURRENCY } from "@/constants/tour/tour.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import restoredSuffix from "@/lib/helpers/restore-suffix";
 import { Schema, Model, Types } from "mongoose";

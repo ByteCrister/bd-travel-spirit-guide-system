@@ -1,6 +1,6 @@
 "use client";
 
-import type { ApiError } from "@/types/reviews.types";
+import type { ApiError } from "@/types/tour/reviews.types";
 import { JSX, useState } from "react";
 import { HiExclamationCircle, HiOutlineX, HiRefresh, HiChevronDown } from "react-icons/hi";
 

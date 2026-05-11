@@ -1,9 +1,9 @@
 // types/current-user.types.ts
 
-import { USER_ROLE } from "@/constants/user.const";
-import { EmployeeDetailDTO } from "./employee.types";
-import { EmployeeRole } from "@/constants/employee.const";
-import { AuditAction } from "@/constants/audit-action.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
+import { EmployeeDetailDTO } from "./employee/employee.types";
+import { EmployeeRole } from "@/constants/employee/employee.const";
+import { AuditAction } from "@/constants/current-user/audit-action.const";
 import { Guide } from "./guide.types";
 
 /**
@@ -16,6 +16,8 @@ export type AdminRole = `${USER_ROLE.GUIDE}` | `${USER_ROLE.ASSISTANT}`;
  */
 export interface IBaseUser {
     _id: string;
+    name: string;
+    owner_id: string; // employees -> owner id | (guide id) or just guide id for guides
     email: string;
     role: AdminRole;
     createdAt: string; // ISO
@@ -146,14 +148,16 @@ export interface CurrentUserState {
     updateCompanyNameMeta?: RequestMeta;
     updateCompanyLogoMeta?: RequestMeta;
     updateOwnerProfileMeta?: RequestMeta;
-
+    updateAvatarMeta?: RequestMeta;
+    
     // Abort controllers to cancel inflight requests
     _abortBase?: AbortController | null;
     _abortFull?: AbortController | null;
     _abortAudits?: AbortController | null;
-
+    
     // Abort controllers for update operations
     _abortUpdateName?: AbortController | null;
+    _abortUpdateAvatar?: AbortController | null;
     _abortUpdatePassword?: AbortController | null;
     _abortUpdateCompanyName?: AbortController | null;
     _abortUpdateCompanyLogo?: AbortController | null;
@@ -182,6 +186,7 @@ export interface CurrentUserState {
     updateCompanyName: (data: { companyName: string }) => Promise<CurrentUser | null>;
     updateCompanyLogo: (data: { logoUrl: string }) => Promise<CurrentUser | null>;
     updateOwnerProfile: (data: OwnerProfileUpdateData) => Promise<CurrentUser | null>;
+    updateAvatar: (data: { avatarBase64: string }) => Promise<CurrentUser | null>;
 
     markStale: (scope: "base" | "full" | "audits") => void;
     clearUser: () => void;

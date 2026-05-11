@@ -2,7 +2,7 @@ import { sha256, base64ToBuffer, assertValidDataUrl, isCloudinaryUrl, isBase64Da
 import AssetModel from "@/models/assets/asset.model";
 import { uploadAssets } from "@/lib/cloudinary/upload.cloudinary";
 import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
-import { ASSET_TYPE, AssetType } from "@/constants/asset.const";
+import { ASSET_TYPE, AssetType } from "@/constants/common/asset.const";
 import { Types, ClientSession } from "mongoose";
 import AssetFileModel, { IAssetFile } from "@/models/assets/asset-file.model";
 import { MongoServerError } from "mongodb";

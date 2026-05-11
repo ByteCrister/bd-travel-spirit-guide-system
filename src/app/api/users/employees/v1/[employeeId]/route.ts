@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { buildEmployeeDTO } from "@/lib/build-responses/build-employee-dt";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
-import { ASSET_TYPE } from "@/constants/asset.const";
+import { ASSET_TYPE } from "@/constants/common/asset.const";
 import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
 import { resolveDocuments } from "@/lib/cloudinary/resolve.cloudinary";
 import { uploadAssets } from "@/lib/cloudinary/upload.cloudinary";
@@ -10,15 +10,15 @@ import { isCloudinaryUrl } from "@/lib/helpers/document-conversions";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import EmployeeModel, { IEmployee } from "@/models/employees/employees.model";
 import UserModel from "@/models/user.model";
-import { UpdateEmployeePayload } from "@/types/employee.types";
+import { UpdateEmployeePayload } from "@/types/employee/employee.types";
 import { isValidObjectId, Types } from "mongoose";
-import { USER_ROLE, UserRole } from "@/constants/user.const";
+import { USER_ROLE, UserRole } from "@/constants/current-user/user.const";
 import ConnectDB from "@/config/db";
 import { updateEmployeeServerSchema } from "@/utils/validators/employee/employee-server-payload.validator";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import AssetModel from "@/models/assets/asset.model";
 import AssetFileModel from "@/models/assets/asset-file.model";
-import { PopulatedAssetLean } from "@/types/populated-asset.types";
+import { PopulatedAssetLean } from "@/types/common/populated-asset.types";
 
 interface Params {
     params: Promise<{ employeeId: string }>

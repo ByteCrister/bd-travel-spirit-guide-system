@@ -2,13 +2,13 @@
 import { NextRequest } from "next/server";
 import mongoose, { Types, FilterQuery } from "mongoose";
 import ConnectDB from "@/config/db";
-import { ReviewSearchField } from "@/types/reviews.types";
+import { ReviewSearchField } from "@/types/tour/reviews.types";
 import { IReview, ReviewModel } from "@/models/tours/review.model";
 import { withErrorHandler, ApiError } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import UserModel from "@/models/user.model";
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import TourModel from "@/models/tours/tour.model";
 import GuideModel from "@/models/guide/guide.model";
 import EmployeeModel from "@/models/employees/employees.model";

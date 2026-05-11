@@ -9,12 +9,12 @@ import EmployeeModel from "@/models/employees/employees.model";
 import { FilterQuery, PipelineStage } from "mongoose";
 import { authRateLimit } from "@/lib/upstash-redis/auth-rate-limit";
 import { withTransaction } from "@/lib/helpers/withTransaction";
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import { Types } from "mongoose";
-import { REQUEST_STATUS, RequestStatus } from "@/constants/reset-password-request.const";
+import { REQUEST_STATUS, RequestStatus } from "@/constants/employee/reset-password-request.const";
 import GuideModel from "@/models/guide/guide.model";
 import GuideForgotPasswordModel from "@/models/guide/guide-forgot-password.model";
-import { FORGOT_PASSWORD_STATUS } from "@/constants/guide-forgot-password.const";
+import { FORGOT_PASSWORD_STATUS } from "@/constants/guide/guide-forgot-password.const";
 
 /* -----------------------------------------
    Query params

@@ -3,8 +3,8 @@
 
 import { useFormik } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { UpdateTourComplianceDTO } from '@/types/tour.types';
-import { AGE_SUITABILITY } from '@/constants/tour.const';
+import { UpdateTourComplianceDTO } from '@/types/tour/tour.types';
+import { AGE_SUITABILITY } from '@/constants/tour/tour.const';
 import { Step5ComplianceSchema } from '@/utils/validators/tour/add-tour.validator';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import { motion, AnimatePresence, Variants } from 'framer-motion';

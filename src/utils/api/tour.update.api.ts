@@ -9,10 +9,10 @@ import {
     TourDetailDTO,
     DepartureDTO,
     CreateTourDTO,
-} from '@/types/tour.types';
+} from '@/types/tour/tour.types';
 import api from '../axios/axios';
 import { useTourDetailStore } from '@/store/tour-detail.store';
-import { ApiResponse } from '@/types/api.types';
+import { ApiResponse } from '@/types/common/api.types';
 import { showToast } from '@/components/global/showToast';
 import { extractErrorMessage } from '../axios/extractErrorMessage';
 import { encodeId } from '../helpers/mongodb-id-conversions';

@@ -6,7 +6,7 @@ import ConnectDB from '@/config/db';
 import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import { withTransaction } from '@/lib/helpers/withTransaction';
 import TourModel, { ITour } from '@/models/tours/tour.model';
-import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour.const';
+import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour/tour.const';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
 
 /**

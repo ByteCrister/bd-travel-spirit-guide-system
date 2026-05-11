@@ -4,7 +4,7 @@
 
 import type { FC } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import type { ReportsCacheEntry, ReportListItem } from "@/types/reports.types";
+import type { ReportsCacheEntry, ReportListItem } from "@/types/tour/reports.types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";

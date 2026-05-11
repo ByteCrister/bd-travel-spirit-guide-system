@@ -1,6 +1,6 @@
 // tour-detail-review.type.ts
 
-import { TravelType } from "@/constants/tour.const";
+import { TravelType } from "@/constants/tour/tour.const";
 
 /**
  * Minimal info about an employee replying to a review

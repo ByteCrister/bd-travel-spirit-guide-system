@@ -7,7 +7,7 @@ import { Skeleton } from "./primitives/Skeleton";
 
 import {
     EmployeesQuery,
-} from "@/types/employee.types";
+} from "@/types/employee/employee.types";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,7 @@ import {
     EmploymentType,
     PAYROLL_STATUS,
     PayrollStatus,
-} from "@/constants/employee.const";
+} from "@/constants/employee/employee.const";
 
 import { motion, AnimatePresence } from "framer-motion";
 

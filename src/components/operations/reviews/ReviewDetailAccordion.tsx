@@ -12,7 +12,7 @@ import type {
     ObjectIdStr,
     ApiError,
     ReviewReplyDTO,
-} from "@/types/reviews.types";
+} from "@/types/tour/reviews.types";
 
 import { DetailSkeleton } from "./Skeletons";
 import { ErrorBanner } from "./primitives/ErrorBanner";

@@ -27,7 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
   UpdateTourContentItineraryDTO,
-} from '@/types/tour.types';
+} from '@/types/tour/tour.types';
 import { Step2ContentSchema } from '@/utils/validators/tour/add-tour.validator';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import Step2Destinations from './step2-contentItinerary/Step2Destinations';

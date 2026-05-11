@@ -3,8 +3,8 @@ import { faker } from "@faker-js/faker";
 import mongoose from "mongoose";
 
 import ConnectDB from "@/config/db";
-import { TRAVEL_TYPE, TravelType } from "@/constants/tour.const";
-import { ASSET_TYPE } from "@/constants/asset.const";
+import { TRAVEL_TYPE, TravelType } from "@/constants/tour/tour.const";
+import { ASSET_TYPE } from "@/constants/common/asset.const";
 
 import { ReviewModel } from "@/models/tours/review.model";
 import { uploadAssets, Base64Asset } from "@/lib/cloudinary/upload.cloudinary";

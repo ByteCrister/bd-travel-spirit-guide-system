@@ -6,7 +6,7 @@ import {
     GuideSocialPlatform,
     GuideStatus,
     SubscriptionStatus,
-} from "@/constants/guide.const";
+} from "@/constants/guide/guide.const";
 
 /* Editable wrapper */
 export type Editable<T> = {

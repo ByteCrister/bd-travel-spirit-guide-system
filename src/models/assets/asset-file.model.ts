@@ -1,6 +1,6 @@
 // models/asset-file.model.ts
 import { Schema, Document, Model, ClientSession, Types } from "mongoose";
-import { STORAGE_PROVIDER, StorageProvider } from "@/constants/asset.const";
+import { STORAGE_PROVIDER, StorageProvider } from "@/constants/common/asset.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 
 export interface IAssetFile extends Document {

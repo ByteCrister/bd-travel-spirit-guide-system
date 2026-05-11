@@ -6,11 +6,11 @@ import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
 import ConnectDB from "@/config/db";
 import { validateUpdatedYupSchema } from "@/utils/validators/common/update-updated-yup-schema";
 import { Step2ContentSchema } from "@/utils/validators/tour/add-tour.validator";
-import { UpdateTourContentItineraryDTO } from "@/types/tour.types";
+import { UpdateTourContentItineraryDTO } from "@/types/tour/tour.types";
 import TourModel, { ITour } from "@/models/tours/tour.model";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
-import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 

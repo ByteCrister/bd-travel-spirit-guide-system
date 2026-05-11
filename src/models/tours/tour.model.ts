@@ -35,7 +35,7 @@ import {
   AccommodationType,
   TourDiscountType,
   TOUR_DISCOUNT_TYPE,
-} from "@/constants/tour.const";
+} from "@/constants/tour/tour.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import { HydratedDocument, Query } from "mongoose";
 import { FilterQuery } from "mongoose";

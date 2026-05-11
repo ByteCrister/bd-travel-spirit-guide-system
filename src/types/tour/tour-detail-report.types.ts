@@ -1,5 +1,5 @@
 // tour-detail-report.types.ts
-import {  REPORT_REASON, ReportPriority, ReportReason, ReportStatus } from "@/constants/report.const";
+import {  REPORT_REASON, ReportPriority, ReportReason, ReportStatus } from "@/constants/tour/report.const";
 import { ReportAttachment, ReportTimelineEntry, SubmissionContext, UserSummary, TourSummary } from "./report.types";
 
 /**

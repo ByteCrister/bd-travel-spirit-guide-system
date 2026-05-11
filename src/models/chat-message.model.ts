@@ -1,4 +1,4 @@
-import { MODERATION_STATUS, ModerationStatusType } from '@/constants/chatmessage.const';
+import { MODERATION_STATUS, ModerationStatusType } from '@/constants/chat/chatmessage.const';
 import { defineModel } from '@/lib/helpers/defineModel';
 import mongoose, { Schema, Document } from 'mongoose';
 

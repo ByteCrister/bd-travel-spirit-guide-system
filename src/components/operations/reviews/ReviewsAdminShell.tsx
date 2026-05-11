@@ -8,7 +8,7 @@ import ReviewsPagination from "./ReviewsPagination";
 import { ErrorBanner } from "./primitives/ErrorBanner";
 import { TableSkeleton } from "./Skeletons";
 import { clampPages, isApiError } from "@/utils/helpers/reviews.uiHelpers";
-import type { ApiError, ReviewToolbarState } from "@/types/reviews.types";
+import type { ApiError, ReviewToolbarState } from "@/types/tour/reviews.types";
 import { toast } from "sonner";
 
 export default function ReviewsAdminShell(): JSX.Element {

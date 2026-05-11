@@ -8,14 +8,14 @@ import {
     TOUR_STATUS,
     MODERATION_STATUS,
     CURRENCY,
-} from "@/constants/tour.const";
+} from "@/constants/tour/tour.const";
 
 import {
     TourListItemDTO,
     TourFilterOptions,
     CompanyKpisDTO,
     TourSortOption,
-} from "@/types/tour.types";
+} from "@/types/tour/tour.types";
 
 faker.seed(2025);
 

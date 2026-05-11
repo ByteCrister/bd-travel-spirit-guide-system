@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { MdCheckCircle, MdRestore, MdDeleteForever, MdMoreHoriz, MdCancel } from "react-icons/md";
 import { useReportsStore } from "@/store/report.store";
 import { PulseLoader } from "./PulseLoader";
-import { REPORT_STATUS, ReportListItem } from "@/types/reports.types";
+import { REPORT_STATUS, ReportListItem } from "@/types/tour/reports.types";
 
 export const ReportActions: FC<{ item: ReportListItem }> = ({ item }) => {
     const { resolveReport, reopenReport, softDeleteReport, rejectReport } = useReportsStore();

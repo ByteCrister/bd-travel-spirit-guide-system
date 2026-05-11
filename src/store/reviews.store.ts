@@ -20,10 +20,10 @@ import {
     REVIEWS_CACHE_TTL_MS,
     LS_KEYS,
     ApiError,
-} from "@/types/reviews.types";
+} from "@/types/tour/reviews.types";
 
 import api from "@/utils/axios/axios";
-import { ApiResponse } from "@/types/api.types";
+import { ApiResponse } from "@/types/common/api.types";
 
 /* -------------------------
    constants + helpers

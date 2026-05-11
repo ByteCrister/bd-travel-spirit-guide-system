@@ -5,8 +5,8 @@ import {
     ReviewListItemDTO,
     ReviewSummaryDTO,
     TourReviewsResponseDTO,
-} from "@/types/tour-detail-review.type";
-import { TravelType } from "@/constants/tour.const";
+} from "@/types/tour/tour-detail-review.type";
+import { TravelType } from "@/constants/tour/tour.const";
 import { TravelerModel } from "@/models/travelers/traveler.model";
 import EmployeeModel from "@/models/employees/employees.model";
 import AssetModel from "@/models/assets/asset.model";

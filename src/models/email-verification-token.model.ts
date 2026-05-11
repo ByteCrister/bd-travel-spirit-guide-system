@@ -5,7 +5,7 @@ import {
     EMAIL_VERIFICATION_PURPOSE_VALUES,
     EMAIL_VERIFICATION_EXPIRY,
     EmailVerificationPurpose,
-} from '@/constants/email-verification-purpose.const';
+} from '@/constants/common/email-verification-purpose.const';
 import { defineModel } from '@/lib/helpers/defineModel';
 
 /* =======================

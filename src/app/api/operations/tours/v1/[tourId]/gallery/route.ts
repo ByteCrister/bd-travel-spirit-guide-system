@@ -4,13 +4,13 @@ import mongoose, { Types } from 'mongoose';
 import { resolveDocuments } from '@/lib/cloudinary/resolve.cloudinary';
 import { withTransaction } from '@/lib/helpers/withTransaction';
 import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
-import { ASSET_TYPE } from '@/constants/asset.const';
+import { ASSET_TYPE } from '@/constants/common/asset.const';
 import { isCloudinaryUrl as isCloudinaryUrlHelper, isBase64DataUrl as isBase64DataUrlHelper } from '@/lib/helpers/document-conversions';
 import ConnectDB from '@/config/db';
-import { TourDetailDTO, UpdateTourGalleryDTO } from '@/types/tour.types';
+import { TourDetailDTO, UpdateTourGalleryDTO } from '@/types/tour/tour.types';
 import TourModel from '@/models/tours/tour.model';
 import { buildTourDetailDTO } from '@/lib/build-responses/build-tour-details';
-import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour.const';
+import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour/tour.const';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
 
 

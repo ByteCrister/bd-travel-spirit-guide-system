@@ -3,11 +3,11 @@ import { NextRequest } from "next/server";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import mongoose from "mongoose";
-import { UpdateTourBasicInfoDTO } from "@/types/tour.types";
+import { UpdateTourBasicInfoDTO } from "@/types/tour/tour.types";
 import { Step0BasicInfoSchema } from "@/utils/validators/tour/add-tour.validator";
 import { validateUpdatedYupSchema } from "@/utils/validators/common/update-updated-yup-schema";
 import TourModel from "@/models/tours/tour.model";
-import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 
 /**

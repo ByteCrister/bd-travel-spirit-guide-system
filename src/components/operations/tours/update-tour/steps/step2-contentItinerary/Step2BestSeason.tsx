@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormikContext } from "formik";
-import { UpdateTourContentItineraryDTO } from "@/types/tour.types";
+import { UpdateTourContentItineraryDTO } from "@/types/tour/tour.types";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,7 @@ import {
     Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Season, SEASON } from "@/constants/tour.const";
+import { Season, SEASON } from "@/constants/tour/tour.const";
 
 // Season configuration matching your enum
 const SEASON_CONFIG = {

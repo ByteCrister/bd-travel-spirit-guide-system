@@ -5,7 +5,7 @@
 import type { FC } from "react";
 import { useMemo } from "react";
 import { motion, Variants } from "framer-motion";
-import type { ReportFull } from "@/types/reports.types";
+import type { ReportFull } from "@/types/tour/reports.types";
 import { Card } from "@/components/ui/card";
 import { useReportsStore } from "@/store/report.store";
 import { PulseLoader } from "./PulseLoader";

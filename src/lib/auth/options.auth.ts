@@ -7,7 +7,7 @@ import { Types } from "mongoose";
 import type { JWT as DefaultJWT } from "next-auth/jwt";
 import ConnectDB from "@/config/db";
 import UserModel from "@/models/user.model";
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 
 interface MyJWT extends DefaultJWT {
     id: string;

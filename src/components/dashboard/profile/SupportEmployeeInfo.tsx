@@ -2,7 +2,7 @@
 
 import { motion, Variants } from "framer-motion";
 import { IEmployeeInfo } from "@/types/current-user.types";
-import { PAYROLL_STATUS, PayrollStatus, SalaryPaymentMode } from "@/constants/employee.const";
+import { PAYROLL_STATUS, PayrollStatus, SalaryPaymentMode } from "@/constants/employee/employee.const";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {

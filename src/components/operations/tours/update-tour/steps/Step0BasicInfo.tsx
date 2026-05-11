@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { UpdateTourBasicInfoDTO } from '@/types/tour.types';
+import { UpdateTourBasicInfoDTO } from '@/types/tour/tour.types';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import { Step0BasicInfoSchema } from '@/utils/validators/tour/add-tour.validator';
 import { motion, AnimatePresence, Variants } from 'framer-motion';

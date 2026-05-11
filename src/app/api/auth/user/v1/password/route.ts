@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { withErrorHandler, HandlerResult, ApiError } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import UserModel from "@/models/user.model";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
 

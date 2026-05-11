@@ -14,7 +14,7 @@ import {
     GUIDE_DOCUMENT_CATEGORY,
     GUIDE_DOCUMENT_TYPE,
     type GuideSocialPlatform,
-} from "@/constants/guide.const";
+} from "@/constants/guide/guide.const";
 
 let _mockOverview: GuideOverview | null = null;
 

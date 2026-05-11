@@ -23,8 +23,8 @@ import {
     FormHelperText,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-import { CreateTourDTO } from "@/types/tour.types";
-import { PAYMENT_METHOD } from "@/constants/tour.const";
+import { CreateTourDTO } from "@/types/tour/tour.types";
+import { PAYMENT_METHOD } from "@/constants/tour/tour.const";
 import {
     FileText,
     XCircle,

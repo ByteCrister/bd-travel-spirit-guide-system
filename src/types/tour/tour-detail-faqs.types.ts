@@ -1,6 +1,6 @@
 // types/tour-detail-faqs.types.ts
 
-import { ModerationStatus } from "@/constants/tour.const";
+import { ModerationStatus } from "@/constants/tour/tour.const";
 
 /**
  * Lightweight user info for FAQ context

@@ -4,8 +4,8 @@ import mongoose from "mongoose";
 import ConnectDB from "@/config/db";
 import ResetPasswordRequestModel from "@/models/employees/reset-password-request.model";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
-import { ResetPasswordRequestPopulated } from "@/types/employee-password-request.types.server";
-import { ResetPasswordRequestDTO } from "@/types/password-reset.types";
+import { ResetPasswordRequestPopulated } from "@/types/employee/employee-password-request.types.server";
+import { ResetPasswordRequestDTO } from "@/types/employee/password-reset.types";
 
 /**
  * Get specific employees password request details

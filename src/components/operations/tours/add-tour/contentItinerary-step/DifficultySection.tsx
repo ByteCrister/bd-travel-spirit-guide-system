@@ -12,10 +12,10 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { motion } from "framer-motion";
-import { CreateTourDTO } from "@/types/tour.types";
+import { CreateTourDTO } from "@/types/tour/tour.types";
 import {
     DIFFICULTY_LEVEL,
-} from "@/constants/tour.const";
+} from "@/constants/tour/tour.const";
 import { Mountain, TrendingUp } from "lucide-react";
 
 export default function DifficultySection() {

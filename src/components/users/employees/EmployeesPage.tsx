@@ -5,7 +5,7 @@ import {
     EmployeesListResponse,
     EmployeesQuery,
     EmployeeSortKey,
-} from "@/types/employee.types";
+} from "@/types/employee/employee.types";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { EmployeeSummary } from "./EmployeeSummary";

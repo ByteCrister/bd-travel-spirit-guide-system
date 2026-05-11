@@ -9,7 +9,7 @@ import EmployeeModel from "@/models/employees/employees.model";
 import { ReviewModel } from "@/models/tours/review.model";
 import { buildTourReviewDTO } from "@/lib/build-responses/build-tour-review-dto";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
-import { EMPLOYEE_ROLE } from "@/constants/employee.const";
+import { EMPLOYEE_ROLE } from "@/constants/employee/employee.const";
 
 // Validation schema for request body
 const ReplySchema = z.object({

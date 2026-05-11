@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { UpdateTourContentItineraryDTO } from '@/types/tour.types';
+import { UpdateTourContentItineraryDTO } from '@/types/tour/tour.types';
 
 const Step2Translations = () => {
   const { values, setFieldValue } = useFormikContext<UpdateTourContentItineraryDTO>();

@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
     ExclusionDTO,
     UpdateTourContentItineraryDTO,
-} from '@/types/tour.types';
+} from '@/types/tour/tour.types';
 import { useFormikContext } from 'formik';
 import { Plus, Trash2, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';

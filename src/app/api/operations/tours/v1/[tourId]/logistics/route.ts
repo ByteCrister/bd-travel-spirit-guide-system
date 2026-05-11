@@ -2,12 +2,12 @@
 import { NextRequest } from "next/server";
 import { withErrorHandler, ApiError } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
-import { UpdateTourLogisticsDTO } from "@/types/tour.types";
+import { UpdateTourLogisticsDTO } from "@/types/tour/tour.types";
 import mongoose from "mongoose";
 import { validateUpdatedYupSchema } from "@/utils/validators/common/update-updated-yup-schema";
 import { Step3LogisticsSchema } from "@/utils/validators/tour/add-tour.validator";
 import TourModel from "@/models/tours/tour.model";
-import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 
 /**

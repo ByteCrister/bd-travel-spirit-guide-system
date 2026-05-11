@@ -10,8 +10,8 @@ import {
     ShiftDTO,
     DocumentDTO,
     PaymentCardDTO,
-} from "@/types/employee.types";
-import { EMPLOYEE_STATUS, EMPLOYMENT_TYPE, EMPLOYEE_ROLE, EmployeeStatus, EmploymentType, SALARY_PAYMENT_MODE, SalaryPaymentMode } from "@/constants/employee.const";
+} from "@/types/employee/employee.types";
+import { EMPLOYEE_STATUS, EMPLOYMENT_TYPE, EMPLOYEE_ROLE, EmployeeStatus, EmploymentType, SALARY_PAYMENT_MODE, SalaryPaymentMode } from "@/constants/employee/employee.const";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,8 +53,8 @@ import {
     filesToDocumentDTOs,
     getFileExtension,
 } from "@/utils/helpers/file-conversion";
-import { CURRENCY } from "@/constants/tour.const";
-import { CARD_BRAND } from "@/constants/payment.const";
+import { CURRENCY } from "@/constants/tour/tour.const";
+import { CARD_BRAND } from "@/constants/payment/payment.const";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Image from "next/image";
 import ConfirmationDialog from "./ConfirmationDialog";

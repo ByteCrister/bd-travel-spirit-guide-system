@@ -12,7 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, MapPin, TrendingUp, Eye, Heart, Share2, Calendar, Clock } from "lucide-react";
-import { TourListItemDTO } from "@/types/tour.types";
+import { TourListItemDTO } from "@/types/tour/tour.types";
 import { useTourDetailStore } from "@/store/tour-detail.store";
 import TourTableSkeleton from "./skeletons/TourTableSkeleton";
 import { useRouter } from "next/navigation";

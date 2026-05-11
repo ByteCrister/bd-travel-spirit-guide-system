@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 import validator from 'validator';
 import { defineModel } from "@/lib/helpers/defineModel";
-import { USER_ROLE, UserRole } from "@/constants/user.const";
+import { USER_ROLE, UserRole } from "@/constants/current-user/user.const";
 import { Types } from "mongoose";
 
 const passwordRegex = /^(?=.{6,}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).+$/

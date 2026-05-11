@@ -4,7 +4,7 @@
 // Note: single super-admin in the system — admin metadata removed
 // Pagination model: page-based (button) pagination only
 
-import { RequestStatus } from "@/constants/reset-password-request.const";
+import { RequestStatus } from "@/constants/employee/reset-password-request.const";
 
 
 /* -------------------------------------------------------------------------- */

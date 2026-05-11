@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { faker } from "@faker-js/faker";
 import type { SubscriptionHistoryEntry } from "@/types/overview.types";
-import { SUBSCRIPTION_STATUS } from "@/constants/guide.const";
+import { SUBSCRIPTION_STATUS } from "@/constants/guide/guide.const";
 
 /**
  * In-memory full history seed (simulate hundreds of entries).

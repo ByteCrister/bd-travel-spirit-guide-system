@@ -2,7 +2,7 @@
    Populated sub-documents (lean-safe)
 ------------------------------------------ */
 
-import { RequestStatus } from "@/constants/reset-password-request.const";
+import { RequestStatus } from "@/constants/employee/reset-password-request.const";
 import { Types } from "mongoose";
 
 export interface PopulatedUserLite {

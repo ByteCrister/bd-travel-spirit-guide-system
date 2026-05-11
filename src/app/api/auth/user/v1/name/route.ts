@@ -4,7 +4,7 @@ import { withErrorHandler, HandlerResult, ApiError } from "@/lib/helpers/withErr
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import { Types } from "mongoose";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import { IOwnerGuideInfo, IEmployeeInfo } from "@/types/current-user.types";
 import UserModel, { IUserDoc } from "@/models/user.model";
 import { buildEmployeeDTO } from "@/lib/build-responses/build-employee-dt";

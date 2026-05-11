@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TourDetailDTO } from "@/types/tour.types";
+import { TourDetailDTO } from "@/types/tour/tour.types";
 import { FileText, Users, TrendingUp, CheckCircle2, XCircle, Percent } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";

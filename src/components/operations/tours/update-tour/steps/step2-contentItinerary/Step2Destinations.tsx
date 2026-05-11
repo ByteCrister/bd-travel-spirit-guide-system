@@ -36,8 +36,8 @@ import {
     DestinationBlockDTO,
     AttractionDTO,
     ActivityDTO,
-} from '@/types/tour.types';
-import { CURRENCY } from '@/constants/tour.const';
+} from '@/types/tour/tour.types';
+import { CURRENCY } from '@/constants/tour/tour.const';
 import { MapPickerDialog } from '@/components/global/MapPickerDialog';
 import { FaBangladeshiTakaSign } from 'react-icons/fa6';
 

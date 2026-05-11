@@ -1,8 +1,8 @@
 'use client';
 
-import { DIFFICULTY_LEVEL, DifficultyLevel } from '@/constants/tour.const';
+import { DIFFICULTY_LEVEL, DifficultyLevel } from '@/constants/tour/tour.const';
 import { useFormikContext } from 'formik';
-import { UpdateTourContentItineraryDTO } from '@/types/tour.types';
+import { UpdateTourContentItineraryDTO } from '@/types/tour/tour.types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Mountain,

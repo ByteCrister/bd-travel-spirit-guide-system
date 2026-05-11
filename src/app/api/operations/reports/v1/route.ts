@@ -4,7 +4,7 @@ import {
     ReportStatus,
     ReportPriority,
     ReportReason,
-} from '@/constants/report.const';
+} from '@/constants/tour/report.const';
 import {
     ReportsQueryParams,
     ReportsListResponse,
@@ -14,7 +14,7 @@ import {
     SortDirection,
     ReportsSortField,
     ReportsSearchScope,
-} from '@/types/reports.types';
+} from '@/types/tour/reports.types';
 import { ITraveler, TravelerModel } from '@/models/travelers/traveler.model';
 import UserModel from '@/models/user.model';
 import AssetModel from '@/models/assets/asset.model';
@@ -25,9 +25,9 @@ import { IReport, ReportModel } from '@/models/tours/report.model';
 import { FilterQuery } from 'mongoose';
 import { Types } from 'mongoose';
 import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
-import { PopulatedAssetLean } from '@/types/populated-asset.types';
+import { PopulatedAssetLean } from '@/types/common/populated-asset.types';
 import { getUserIdFromSession } from '@/lib/auth/session.auth';
-import { USER_ROLE } from '@/constants/user.const';
+import { USER_ROLE } from '@/constants/current-user/user.const';
 import { getCollectionName } from "@/lib/helpers/get-collection-name";
 import EmployeeModel from '@/models/employees/employees.model';
 import GuideModel from '@/models/guide/guide.model';

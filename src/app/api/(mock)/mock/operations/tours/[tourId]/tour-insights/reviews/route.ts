@@ -1,8 +1,8 @@
 // api/mock/operations/tours/[tourId]/tour-insights/reviews/route.ts
 import { NextResponse } from "next/server";
 import { faker } from "@faker-js/faker";
-import { TRAVEL_TYPE } from "@/constants/tour.const";
-import { TourReviewsResponseDTO, ReviewReplyDTO } from "@/types/tour-detail-review.type";
+import { TRAVEL_TYPE } from "@/constants/tour/tour.const";
+import { TourReviewsResponseDTO, ReviewReplyDTO } from "@/types/tour/tour-detail-review.type";
 
 /** Helper: generate a consistent avatar for each user/employee */
 function getAvatar(userId: string) {

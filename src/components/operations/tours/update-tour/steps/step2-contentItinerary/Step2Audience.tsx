@@ -1,7 +1,7 @@
 "use client";
 
-import { AUDIENCE_TYPE, AudienceType } from '@/constants/tour.const';
-import { UpdateTourContentItineraryDTO } from '@/types/tour.types';
+import { AUDIENCE_TYPE, AudienceType } from '@/constants/tour/tour.const';
+import { UpdateTourContentItineraryDTO } from '@/types/tour/tour.types';
 import { useFormikContext } from 'formik';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

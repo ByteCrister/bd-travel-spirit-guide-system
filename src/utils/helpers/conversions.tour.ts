@@ -1,4 +1,4 @@
-import { DISTRICT, District, DIVISION, Division } from "@/constants/tour.const";
+import { DISTRICT, District, DIVISION, Division } from "@/constants/tour/tour.const";
 
 // Get formatted display name
 export function getDisplayName(district: District): string {

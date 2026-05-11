@@ -3,7 +3,7 @@ import { Types, ClientSession } from "mongoose";
 import AssetModel from "@/models/assets/asset.model";
 import AssetFileModel, { IAssetFile } from "@/models/assets/asset-file.model";
 import { getDocumentStorageProvider } from "@/lib/storage-providers";
-import { STORAGE_PROVIDER, ASSET_TYPE, VISIBILITY } from "@/constants/asset.const";
+import { STORAGE_PROVIDER, ASSET_TYPE, VISIBILITY } from "@/constants/common/asset.const";
 import { assertValidDataUrl, base64ToBuffer, sha256 } from "@/lib/helpers/document-conversions";
 import pLimit from "p-limit";
 import { isMongoDuplicateKeyError } from "../helpers/asset-checksum-error";

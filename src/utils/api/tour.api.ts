@@ -4,7 +4,7 @@ import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import {
     // RequestReapprovalDTO,
     TourDetailDTO,
-} from "@/types/tour.types";
+} from "@/types/tour/tour.types";
 import { useTourDetailStore } from "@/store/tour-detail.store";
 import { showToast } from "@/components/global/showToast";
 

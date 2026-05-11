@@ -7,10 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 // Import types and constants
-import { CreateTourDTO } from '@/types/tour.types';
+import { CreateTourDTO } from '@/types/tour/tour.types';
 import {
     TOUR_STATUS
-} from '@/constants/tour.const';
+} from '@/constants/tour/tour.const';
 
 // Import form steps
 import { validationSchemas } from '@/utils/validators/tour/add-tour.validator';

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Calendar, Mail, Crown, Headphones, User } from "lucide-react";
 import { format } from "date-fns";
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import { motion } from "framer-motion";
 import { Guide } from "@/types/guide.types";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Field, FieldArray, useFormikContext } from "formik";
-import { CreateTourDTO } from "@/types/tour.types";
+import { CreateTourDTO } from "@/types/tour/tour.types";
 import { useState } from "react";
 // import HeroAndGalleryUpload from "./ImageUpload/HeroAndGalleryUpload";
 import { AnimatePresence, motion } from "framer-motion";

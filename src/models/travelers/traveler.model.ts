@@ -1,6 +1,6 @@
 // traveler.model.ts
-import { DISTRICT, DIVISION } from "@/constants/tour.const";
-import { ACCOUNT_STATUS, AccountStatus } from "@/constants/user.const";
+import { DISTRICT, DIVISION } from "@/constants/tour/tour.const";
+import { ACCOUNT_STATUS, AccountStatus } from "@/constants/current-user/user.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import mongoose, { Schema, Document, Types, Query } from "mongoose";
 

@@ -28,10 +28,10 @@ import {
     ReportFull,
     ReportDetailResponse,
     ReportActionResponse,
-} from "@/types/reports.types";
+} from "@/types/tour/reports.types";
 import api from "@/utils/axios/axios";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
-import { ApiResponse } from "@/types/api.types";
+import { ApiResponse } from "@/types/common/api.types";
 
 // const URL_AFTER_API = `/mock/operations/reports`;
 const URL_AFTER_API = `/operations/reports/v1`;

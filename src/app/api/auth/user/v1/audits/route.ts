@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 import { withErrorHandler, HandlerResult, ApiError } from "@/lib/helpers/withErrorHandler";
 import AuditModel, { IAuditDoc, IAuditModel } from "@/models/audit.model";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import { AuditListApiResponse, AuditLog, AuditQueryParams } from "@/types/current-user.types";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
 

@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { faker } from "@faker-js/faker";
-import { MODERATION_STATUS, ModerationStatus } from "@/constants/tour.const";
+import { MODERATION_STATUS, ModerationStatus } from "@/constants/tour/tour.const";
 
 /**
  * Mock moderation statuses used by the frontend types.

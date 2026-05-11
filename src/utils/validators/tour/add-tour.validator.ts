@@ -12,8 +12,8 @@ import {
     TOUR_DISCOUNT_TYPE,
     TRANSPORT_MODE,
     TRAVEL_TYPE,
-} from "@/constants/tour.const";
-import { OperatingWindowDTO } from "@/types/tour.types";
+} from "@/constants/tour/tour.const";
+import { OperatingWindowDTO } from "@/types/tour/tour.types";
 import * as Yup from "yup";
 
 export const BD_PHONE_REGEX = /^(\+8801|01)[3-9][0-9]{8}$/;

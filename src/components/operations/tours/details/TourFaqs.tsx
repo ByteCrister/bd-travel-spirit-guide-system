@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiChevronLeft, FiChevronRight, FiRefreshCw, FiSearch, FiThumbsUp, FiThumbsDown, FiX } from "react-icons/fi";
 import clsx from "clsx";
 
-import type { TourFAQDTO } from "@/types/tour-detail-faqs.types";
+import type { TourFAQDTO } from "@/types/tour/tour-detail-faqs.types";
 import { useTourDetailStore } from "@/store/tour-detail.store";
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 

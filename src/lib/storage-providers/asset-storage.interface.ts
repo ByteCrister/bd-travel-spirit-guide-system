@@ -1,6 +1,6 @@
 // src/lib/storage-providers/asset-storage.interface.ts
 
-import { AssetType } from "@/constants/asset.const";
+import { AssetType } from "@/constants/common/asset.const";
 import { CloudinaryApiResource } from "../cloudinary/cloudinary.types";
 
 /**

@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import {
     TravelType,
     TRAVEL_TYPE as TravelTypeEnum,
-} from "@/constants/tour.const";
+} from "@/constants/tour/tour.const";
 
 /* =========================
    Core domain types

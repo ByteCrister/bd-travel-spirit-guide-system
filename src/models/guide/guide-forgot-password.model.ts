@@ -4,7 +4,7 @@ import { defineModel } from "@/lib/helpers/defineModel";
 import {
     FORGOT_PASSWORD_STATUS,
     ForgotPasswordStatus,
-} from "@/constants/guide-forgot-password.const";
+} from "@/constants/guide/guide-forgot-password.const";
 
 /**
  * -----------------------------

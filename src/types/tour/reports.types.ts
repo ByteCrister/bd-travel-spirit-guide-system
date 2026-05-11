@@ -12,7 +12,7 @@ import {
     ReportStatus,
     ReportReason,
     ReportPriority,
-} from "@/constants/report.const";
+} from "@/constants/tour/report.const";
 
 /* -------------------------------------------------------------------------- */
 /* Core domain shapes (frontend-friendly)                                     */

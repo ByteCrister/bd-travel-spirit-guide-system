@@ -23,7 +23,7 @@ import { useResetRequestsStore } from "@/store/reset-requests.store";
 import DenyDialog from "./DenyDialog";
 import UpdatePasswordDialog from "./UpdatePasswordDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { REQUEST_STATUS } from "@/constants/reset-password-request.const";
+import { REQUEST_STATUS } from "@/constants/employee/reset-password-request.const";
 
 interface RequestDetailsDrawerProps {
     open: boolean;

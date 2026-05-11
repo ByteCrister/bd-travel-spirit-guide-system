@@ -1,5 +1,5 @@
 // models/travelComment.model.ts
-import { COMMENT_STATUS, CommentStatus } from "@/constants/articleComment.const";
+import { COMMENT_STATUS, CommentStatus } from "@/constants/tour/article-comment.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import { ClientSession, FilterQuery, Model } from "mongoose";
 import { Schema, Types, Document } from "mongoose";

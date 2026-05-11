@@ -1,7 +1,7 @@
 // app/api/mock/tours/[tourId]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { faker } from '@faker-js/faker';
-import { TourDetailDTO } from '@/types/tour.types';
+import { TourDetailDTO } from '@/types/tour/tour.types';
 import {
     TOUR_STATUS,
     TRAVEL_TYPE,
@@ -20,7 +20,7 @@ import {
     TOUR_DISCOUNT,
     TOUR_DISCOUNT_TYPE,
     MEALS_PROVIDED
-} from '@/constants/tour.const';
+} from '@/constants/tour/tour.const';
 
 interface MockApiResponse {
     success: boolean;

@@ -1,6 +1,6 @@
 // api/operations/reviews/v1/[reviewId]/replies/[replyId]/route.ts
 
-import { EMPLOYEE_ROLE } from "@/constants/employee.const";
+import { EMPLOYEE_ROLE } from "@/constants/employee/employee.const";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { buildTourReviewDTO } from "@/lib/build-responses/build-tour-review-dto";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";

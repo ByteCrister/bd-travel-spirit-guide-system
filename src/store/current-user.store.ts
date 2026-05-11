@@ -9,10 +9,11 @@ import {
     AuditListApiResponse,
     AuditDateFilter,
     AuditQueryParams,
+    IOwnerGuideInfo,
 } from "@/types/current-user.types";
 import { showToast } from "@/components/global/showToast";
-import { USER_ROLE } from "@/constants/user.const";
-import { ApiResponse } from "@/types/api.types";
+import { USER_ROLE } from "@/constants/current-user/user.const";
+import { ApiResponse } from "@/types/common/api.types";
 import api from "@/utils/axios/axios";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 
@@ -77,16 +78,19 @@ export const useCurrentUserStore = create<CurrentUserState>((set, get) => ({
     baseMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
     fullMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
     auditsMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
+    updateAvatarMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
 
     // Abort controllers
     _abortBase: null,
     _abortFull: null,
     _abortAudits: null,
     _abortUpdateName: null,
+    _abortUpdateAvatar: null,
     _abortUpdatePassword: null,
     _abortUpdateCompanyName: null,
     _abortUpdateCompanyLogo: null,
     _abortUpdateOwnerProfile: null,
+
 
     /**
      * Fetch base user info (/auth/me)
@@ -880,6 +884,99 @@ export const useCurrentUserStore = create<CurrentUserState>((set, get) => ({
         }
     },
 
+    updateAvatar: async (data) => {
+        const { baseUser, fullUser, updateAvatarMeta, _abortUpdateAvatar } = get();
+
+        // Guard: user must be loaded and must be a guide
+        if (!baseUser || !fullUser) {
+            showToast.error("User not loaded", "Please refresh the page and try again");
+            return null;
+        }
+        if (baseUser.role !== USER_ROLE.GUIDE) {
+            showToast.error("Unauthorized", "Only guides can update their avatar");
+            return null;
+        }
+
+        if (updateAvatarMeta?.inFlight) return null;
+
+        if (_abortUpdateAvatar) _abortUpdateAvatar.abort();
+        const controller = new AbortController();
+
+        set({
+            _abortUpdateAvatar: controller,
+            updateAvatarMeta: {
+                loading: true,
+                inFlight: true,
+                error: null,
+                lastFetchedAt: updateAvatarMeta?.lastFetchedAt ?? null,
+                stale: false,
+            },
+        });
+
+        try {
+            const res = await api.patch<ApiResponse<{ avatarUrl: string }>>(
+                `${URL_AFTER_API}/owner/avatar`,
+                { avatarBase64: data.avatarBase64 },
+                { signal: controller.signal }
+            );
+
+            if (!res.data?.data) throw new Error("Invalid response body");
+
+            const { avatarUrl } = res.data.data;
+
+            // Update fullUser: Guide has owner.avatar, so patch that field
+            const updatedFullUser: CurrentUser = {
+                ...fullUser,
+                owner: {
+                    ...(fullUser as IOwnerGuideInfo).owner,
+                    avatar: avatarUrl,
+                },
+            } as CurrentUser;
+
+            set({
+                fullUser: updatedFullUser,
+                updateAvatarMeta: {
+                    loading: false,
+                    inFlight: false,
+                    error: null,
+                    lastFetchedAt: Date.now(),
+                    stale: false,
+                },
+                _abortUpdateAvatar: null,
+            });
+
+            return updatedFullUser;
+        } catch (err: unknown) {
+            if (isAbortLikeError(err)) {
+                set({
+                    updateAvatarMeta: {
+                        loading: false,
+                        inFlight: false,
+                        error: null,
+                        lastFetchedAt: get().updateAvatarMeta?.lastFetchedAt ?? null,
+                        stale: false,
+                    },
+                    _abortUpdateAvatar: null,
+                });
+                return null;
+            }
+
+            const message = extractErrorMessage(err);
+            set({
+                updateAvatarMeta: {
+                    loading: false,
+                    inFlight: false,
+                    error: message,
+                    lastFetchedAt: get().updateAvatarMeta?.lastFetchedAt ?? null,
+                    stale: false,
+                },
+                _abortUpdateAvatar: null,
+            });
+            showToast.error("Failed to update avatar", message);
+            return null;
+        }
+    },
+
     /**
      * Mark a slice as stale to allow refetch
      */
@@ -899,6 +996,7 @@ export const useCurrentUserStore = create<CurrentUserState>((set, get) => ({
             _abortFull,
             _abortAudits,
             _abortUpdateName,
+            _abortUpdateAvatar,
             _abortUpdatePassword,
             _abortUpdateCompanyName,
             _abortUpdateCompanyLogo,
@@ -909,6 +1007,7 @@ export const useCurrentUserStore = create<CurrentUserState>((set, get) => ({
         try { _abortFull?.abort(); } catch { }
         try { _abortAudits?.abort(); } catch { }
         try { _abortUpdateName?.abort(); } catch { }
+        try { _abortUpdateAvatar?.abort(); } catch { }
         try { _abortUpdatePassword?.abort(); } catch { }
         try { _abortUpdateCompanyName?.abort(); } catch { }
         try { _abortUpdateCompanyLogo?.abort(); } catch { }
@@ -928,6 +1027,7 @@ export const useCurrentUserStore = create<CurrentUserState>((set, get) => ({
             fullMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
             auditsMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
             updateNameMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
+            updateAvatarMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
             updatePasswordMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
             updateCompanyNameMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
             updateCompanyLogoMeta: { loading: false, inFlight: false, error: null, lastFetchedAt: null, stale: true },
@@ -937,6 +1037,7 @@ export const useCurrentUserStore = create<CurrentUserState>((set, get) => ({
             _abortFull: null,
             _abortAudits: null,
             _abortUpdateName: null,
+            _abortUpdateAvatar: null,
             _abortUpdatePassword: null,
             _abortUpdateCompanyName: null,
             _abortUpdateCompanyLogo: null,

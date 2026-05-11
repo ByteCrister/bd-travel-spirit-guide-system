@@ -2,7 +2,7 @@
 
 import { CloudinaryAssetProvider } from "../cloudinary/asset-provider.cloudinary";
 import { AssetStorageProvider } from "./asset-storage.interface";
-import { STORAGE_PROVIDER, StorageProvider } from "@/constants/asset.const";
+import { STORAGE_PROVIDER, StorageProvider } from "@/constants/common/asset.const";
 // import { S3DocProvider } from "./s3-doc.provider";
 // import { LocalDocProvider } from "./local-doc.provider";
 // import { GCSDocProvider } from "./gcs-doc.provider";

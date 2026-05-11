@@ -1,6 +1,6 @@
 // types/guide.types.ts
 
-import { GuideDocumentCategory, GuideSocialPlatform, GuideStatus } from "@/constants/guide.const";
+import { GuideDocumentCategory, GuideSocialPlatform, GuideStatus } from "@/constants/guide/guide.const";
 
 // this type will be used to get user info
 export interface UserPreview {

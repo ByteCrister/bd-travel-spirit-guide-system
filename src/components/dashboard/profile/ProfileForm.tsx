@@ -33,16 +33,29 @@ import {
   Facebook,
   Instagram,
   Twitter,
-  MessageCircle
+  MessageCircle,
+  ClipboardList,
+  Calendar,
+  Phone,
+  ExternalLink,
+  Shield,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fileToBase64, isAllowedExtension } from "@/utils/helpers/file-conversion";
 import { IMAGE_EXTENSIONS } from "@/utils/helpers/file-conversion";
-import { GUIDE_SOCIAL_PLATFORM, GuideSocialPlatform } from "@/constants/guide.const";
+import {
+  GUIDE_SOCIAL_PLATFORM,
+  GuideSocialPlatform,
+  GUIDE_DOCUMENT_CATEGORY,
+  type GuideDocumentCategory,
+  GUIDE_STATUS,
+  type GuideStatus,
+} from "@/constants/guide/guide.const";
 import { GuideSocialLink } from "@/types/guide.types";
 import { showToast } from "@/components/global/showToast";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import Image from "next/image";
+import AvatarUpload from "./AvatarUpload";
 
 interface ProfileFormProps {
   fullUser: IOwnerGuideInfo | null;
@@ -51,14 +64,49 @@ interface ProfileFormProps {
   updateCompanyName: (data: { companyName: string }) => Promise<CurrentUser | null>;
   updateCompanyLogo: (data: { logoUrl: string }) => Promise<CurrentUser | null>;
   updateOwnerProfile: (data: OwnerProfileUpdateData) => Promise<CurrentUser | null>;
+  updateAvatar: (data: { avatarBase64: string }) => Promise<CurrentUser | null>;
+  updateAvatarMeta?: RequestMeta;
   updateNameMeta?: RequestMeta;
   updateCompanyNameMeta?: RequestMeta;
   updateCompanyLogoMeta?: RequestMeta;
   updateOwnerProfileMeta?: RequestMeta;
 }
 
+const DOCUMENT_CATEGORY_LABEL: Record<GuideDocumentCategory, string> = {
+  [GUIDE_DOCUMENT_CATEGORY.GOVERNMENT_ID]: "Government ID",
+  [GUIDE_DOCUMENT_CATEGORY.BUSINESS_LICENSE]: "Business license",
+  [GUIDE_DOCUMENT_CATEGORY.PROFESSIONAL_PHOTO]: "Professional photo",
+  [GUIDE_DOCUMENT_CATEGORY.CERTIFICATION]: "Certification",
+};
+
+function formatGuideTimestamp(value: Date | string | undefined | null): string {
+  if (value == null) return "—";
+  const d = typeof value === "string" ? new Date(value) : value;
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleString();
+}
+
+function formatStatusLabel(status: GuideStatus): string {
+  return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function statusBadgeClass(status: GuideStatus): string {
+  switch (status) {
+    case GUIDE_STATUS.APPROVED:
+      return "bg-emerald-50 text-emerald-800 border-emerald-200";
+    case GUIDE_STATUS.PENDING:
+      return "bg-amber-50 text-amber-900 border-amber-200";
+    case GUIDE_STATUS.REJECTED:
+      return "bg-red-50 text-red-800 border-red-200";
+    case GUIDE_STATUS.SUSPENDED:
+      return "bg-orange-50 text-orange-900 border-orange-200";
+    default:
+      return "bg-slate-50 text-slate-800 border-slate-200";
+  }
+}
+
 interface SocialLinkForm {
-  platform: GuideSocialLink;
+  platform: GuideSocialLink["platform"];
   url: string;
 }
 
@@ -77,6 +125,8 @@ export default function ProfileForm({
   updateCompanyName,
   updateCompanyLogo,
   updateOwnerProfile,
+  updateAvatar,
+  updateAvatarMeta,
   updateNameMeta,
   updateCompanyNameMeta,
   updateCompanyLogoMeta,
@@ -109,7 +159,9 @@ export default function ProfileForm({
   });
 
   // UI State
-  const [activeSection, setActiveSection] = useState<'personal' | 'company' | 'profile'>('personal');
+  const [activeSection, setActiveSection] = useState<
+    "overview" | "personal" | "company" | "profile"
+  >("overview");
   const [showSuccess, setShowSuccess] = useState<{ type: string, message: string } | null>(null);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [logoProcessing, setLogoProcessing] = useState(false);
@@ -143,10 +195,22 @@ export default function ProfileForm({
 
       // Social Links
       if (fullUser.social && Array.isArray(fullUser.social)) {
-        setSocialLinks(fullUser.social.map(link => ({
-          platform: link.platform,
-          url: link.url
-        })));
+        setSocialLinks(
+          fullUser.social.map((link) => {
+            const raw = String(link.platform);
+            const values = Object.values(GUIDE_SOCIAL_PLATFORM) as GuideSocialPlatform[];
+            let platform: GuideSocialPlatform;
+            if (values.includes(raw as GuideSocialPlatform)) {
+              platform = raw as GuideSocialPlatform;
+            } else if (raw in GUIDE_SOCIAL_PLATFORM) {
+              platform =
+                GUIDE_SOCIAL_PLATFORM[raw as keyof typeof GUIDE_SOCIAL_PLATFORM];
+            } else {
+              platform = GUIDE_SOCIAL_PLATFORM.FACEBOOK;
+            }
+            return { platform, url: link.url };
+          })
+        );
       }
     }
   }, [fullUser]);
@@ -372,10 +436,11 @@ export default function ProfileForm({
 
   // Navigation tabs
   const navigationTabs = [
-    { id: 'personal', label: 'Personal', icon: User },
-    { id: 'company', label: 'Company', icon: Building2 },
-    { id: 'profile', label: 'Profile Details', icon: FileText },
-  ];
+    { id: "overview", label: "Full guide record", icon: ClipboardList },
+    { id: "personal", label: "Personal", icon: User },
+    { id: "company", label: "Company", icon: Building2 },
+    { id: "profile", label: "Profile Details", icon: FileText },
+  ] as const;
 
   return (
     <div className="space-y-8">
@@ -438,7 +503,9 @@ export default function ProfileForm({
                   <Button
                     key={tab.id}
                     variant={isActive ? "default" : "ghost"}
-                    onClick={() => setActiveSection(tab.id as "personal" | "company" | "profile")}
+                    onClick={() =>
+                      setActiveSection(tab.id as "overview" | "personal" | "company" | "profile")
+                    }
                     className={`flex items-center gap-2 ${isActive ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'}`}
                   >
                     <Icon className="h-4 w-4" />
@@ -470,8 +537,298 @@ export default function ProfileForm({
         )}
       </AnimatePresence>
 
-      {/* Personal Information Section */}
       <AnimatePresence mode="wait">
+        {activeSection === "overview" && fullUser && (
+          <motion.div
+            key="overview"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="border border-slate-200 shadow-sm bg-white">
+              <CardHeader className="pb-6 border-b border-slate-200 bg-slate-50">
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200">
+                    <ClipboardList className="h-6 w-6 text-slate-700" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-semibold text-slate-900">
+                      Full guide record
+                    </CardTitle>
+                    <CardDescription className="text-sm mt-1.5 text-slate-600">
+                      Read-only snapshot of your guide profile as stored on the server (matches your
+                      Guide profile type).
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-8">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-slate-700" />
+                    <h3 className="text-lg font-semibold text-slate-900">Status and review</h3>
+                  </div>
+                  <dl className="grid gap-3 sm:grid-cols-2 text-sm">
+                    <div className="space-y-1">
+                      <dt className="text-muted-foreground">Application status</dt>
+                      <dd>
+                        <Badge
+                          variant="outline"
+                          className={`font-medium capitalize ${statusBadgeClass(fullUser.status)}`}
+                        >
+                          {formatStatusLabel(fullUser.status)}
+                        </Badge>
+                      </dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-muted-foreground flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5" />
+                        Reviewed at
+                      </dt>
+                      <dd className="font-medium text-slate-900">
+                        {formatGuideTimestamp(fullUser.reviewedAt)}
+                      </dd>
+                    </div>
+                    <div className="space-y-1 sm:col-span-2">
+                      <dt className="text-muted-foreground">Review comment</dt>
+                      <dd className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-slate-800 whitespace-pre-wrap">
+                        {fullUser.reviewComment?.trim()
+                          ? fullUser.reviewComment
+                          : "—"}
+                      </dd>
+                    </div>
+                    <div className="space-y-1 sm:col-span-2">
+                      <dt className="text-muted-foreground">Reviewer</dt>
+                      <dd className="font-medium text-slate-900">
+                        {fullUser.reviewer ? (
+                          <span>
+                            {fullUser.reviewer.name}
+                            {fullUser.reviewer.email ? (
+                              <span className="text-muted-foreground font-normal">
+                                {" "}
+                                ({fullUser.reviewer.email})
+                              </span>
+                            ) : null}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-muted-foreground">Guide created</dt>
+                      <dd className="font-medium text-slate-900">
+                        {formatGuideTimestamp(fullUser.createdAt)}
+                      </dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-muted-foreground">Last updated</dt>
+                      <dd className="font-medium text-slate-900">
+                        {formatGuideTimestamp(fullUser.updatedAt)}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-slate-700" />
+                    <h3 className="text-lg font-semibold text-slate-900">Owner (on file)</h3>
+                  </div>
+                  <dl className="grid gap-3 sm:grid-cols-2 text-sm">
+                    <div className="space-y-1">
+                      <dt className="text-muted-foreground">Name</dt>
+                      <dd className="font-medium text-slate-900">{fullUser.owner.name}</dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-muted-foreground">Email</dt>
+                      <dd className="font-medium text-slate-900">{fullUser.owner.email}</dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-muted-foreground flex items-center gap-1.5">
+                        <Phone className="h-3.5 w-3.5" />
+                        Phone
+                      </dt>
+                      <dd className="font-medium text-slate-900">
+                        {fullUser.owner.phone?.trim() ? fullUser.owner.phone : "—"}
+                      </dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-muted-foreground">Account member since</dt>
+                      <dd className="font-medium text-slate-900">
+                        {formatGuideTimestamp(fullUser.owner.createdAt)}
+                      </dd>
+                    </div>
+                    <div className="space-y-1 sm:col-span-2">
+                      <dt className="text-muted-foreground">Avatar URL</dt>
+                      <dd className="break-all font-mono text-xs text-slate-700">
+                        {fullUser.owner.avatar?.trim() ? fullUser.owner.avatar : "—"}
+                      </dd>
+                    </div>
+                  </dl>
+                  {fullUser.owner.avatar ? (
+                    <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                      <Image
+                        src={fullUser.owner.avatar}
+                        alt="Owner avatar"
+                        fill
+                        className="object-cover"
+                        sizes="80px"
+                        unoptimized
+                      />
+                    </div>
+                  ) : null}
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-slate-700" />
+                    <h3 className="text-lg font-semibold text-slate-900">Company (on file)</h3>
+                  </div>
+                  <dl className="grid gap-3 sm:grid-cols-2 text-sm">
+                    <div className="space-y-1 sm:col-span-2">
+                      <dt className="text-muted-foreground">Company name</dt>
+                      <dd className="font-medium text-slate-900">{fullUser.companyName}</dd>
+                    </div>
+                    <div className="space-y-1 sm:col-span-2">
+                      <dt className="text-muted-foreground">Bio</dt>
+                      <dd className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-slate-800 whitespace-pre-wrap">
+                        {fullUser.bio?.trim() ? fullUser.bio : "—"}
+                      </dd>
+                    </div>
+                    <div className="space-y-1 sm:col-span-2">
+                      <dt className="text-muted-foreground">Logo URL</dt>
+                      <dd className="break-all font-mono text-xs text-slate-700">
+                        {fullUser.logoUrl?.trim() ? fullUser.logoUrl : "—"}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-slate-700" />
+                    <h3 className="text-lg font-semibold text-slate-900">Address (on file)</h3>
+                  </div>
+                  <dl className="grid gap-2 text-sm">
+                    {(["country", "division", "city", "zip", "street"] as const).map((key) => (
+                      <div key={key} className="grid gap-1 sm:grid-cols-[140px_1fr] sm:gap-3">
+                        <dt className="text-muted-foreground capitalize">{key}</dt>
+                        <dd className="font-medium text-slate-900">
+                          {fullUser.address?.[key]?.trim() ? fullUser.address[key] : "—"}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-5 w-5 text-slate-700" />
+                    <h3 className="text-lg font-semibold text-slate-900">Social links (on file)</h3>
+                  </div>
+                  {fullUser.social && fullUser.social.length > 0 ? (
+                    <ul className="space-y-2 text-sm">
+                      {fullUser.social.map((s, i) => (
+                        <li
+                          key={`${s.platform}-${i}`}
+                          className="flex flex-wrap items-center gap-2 rounded-md border border-slate-200 px-3 py-2"
+                        >
+                          <span className="font-medium capitalize">{s.platform}</span>
+                          <a
+                            href={s.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
+                          >
+                            {s.url}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No social links on file.</p>
+                  )}
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-slate-700" />
+                    <h3 className="text-lg font-semibold text-slate-900">Verification documents</h3>
+                  </div>
+                  {fullUser.documents?.length ? (
+                    <ul className="divide-y divide-slate-200 rounded-md border border-slate-200">
+                      {fullUser.documents.map((doc, i) => (
+                        <li key={`${doc.category}-${i}`} className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <p className="font-medium text-slate-900">
+                              {DOCUMENT_CATEGORY_LABEL[doc.category] ?? doc.category}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Uploaded {formatGuideTimestamp(doc.uploadedAt)}
+                            </p>
+                          </div>
+                          {doc.AssetUrl ? (
+                            <a
+                              href={doc.AssetUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline shrink-0"
+                            >
+                              Open file
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">File unavailable</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No documents on file.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {activeSection === "overview" && !fullUser && (
+          <motion.div
+            key="overview-empty"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="border border-slate-200 shadow-sm bg-white">
+              <CardContent className="p-8 flex items-center gap-3 text-muted-foreground">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Loading guide profile…</span>
+                  </>
+                ) : (
+                  <span>Guide profile could not be loaded.</span>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Personal Information Section */}
         {activeSection === 'personal' && (
           <motion.div
             key="personal"
@@ -547,6 +904,14 @@ export default function ProfileForm({
                     </AlertDescription>
                   </Alert>
                 </div>
+
+                <Separator />
+
+                <AvatarUpload
+                  currentAvatarUrl={fullUser?.owner?.avatar}
+                  updateAvatar={updateAvatar}
+                  meta={updateAvatarMeta}
+                />
 
                 {/* Save Button */}
                 <div className="pt-4 border-t border-slate-200">
@@ -860,22 +1225,20 @@ export default function ProfileForm({
                           {getSocialIcon(link.platform)}
                           <Select
                             value={link.platform}
-                            onValueChange={(value) => updateSocialLink(index, 'platform', value as keyof typeof GUIDE_SOCIAL_PLATFORM)}
+                            onValueChange={(value) => updateSocialLink(index, 'platform', value)}
                           >
                             <SelectTrigger className="w-32">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {
-                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                Object.entries(GUIDE_SOCIAL_PLATFORM).map(([key, _]) => (
-                                  <SelectItem key={key} value={key}>
-                                    <div className="flex items-center gap-2">
-                                      {getSocialIcon(key as GuideSocialPlatform)}
-                                      <span>{key}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
+                              {Object.entries(GUIDE_SOCIAL_PLATFORM).map(([key, val]) => (
+                                <SelectItem key={key} value={val}>
+                                  <div className="flex items-center gap-2">
+                                    {getSocialIcon(val as GuideSocialPlatform)}
+                                    <span>{key}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>
@@ -909,16 +1272,14 @@ export default function ProfileForm({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {
-                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                            Object.entries(GUIDE_SOCIAL_PLATFORM).map(([key, _]) => (
-                              <SelectItem key={key} value={key}>
-                                <div className="flex items-center gap-2">
-                                  {getSocialIcon(key as GuideSocialPlatform)}
-                                  <span>{key}</span>
-                                </div>
-                              </SelectItem>
-                            ))}
+                          {Object.entries(GUIDE_SOCIAL_PLATFORM).map(([key, val]) => (
+                            <SelectItem key={key} value={val}>
+                              <div className="flex items-center gap-2">
+                                {getSocialIcon(val as GuideSocialPlatform)}
+                                <span>{key}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <Input

@@ -3,7 +3,7 @@ import {
     EMAIL_VERIFICATION_PURPOSE,
     EMAIL_VERIFICATION_PURPOSE_VALUES,
     EmailVerificationPurpose,
-} from '@/constants/email-verification-purpose.const';
+} from '@/constants/common/email-verification-purpose.const';
 import { ApiError, HandlerResult } from '@/lib/helpers/withErrorHandler';
 import { withTransaction } from '@/lib/helpers/withTransaction';
 import { ClientSession } from 'mongoose';

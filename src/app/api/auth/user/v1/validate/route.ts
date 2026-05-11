@@ -6,7 +6,7 @@ import { compare } from "bcryptjs";
 import { authRateLimit } from "@/lib/upstash-redis/auth-rate-limit";
 import { Types } from "mongoose";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 
 /**
  * Validate users email and password before logged in with next auth

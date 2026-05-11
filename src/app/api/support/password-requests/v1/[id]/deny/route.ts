@@ -9,10 +9,10 @@ import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import ConnectDB from "@/config/db";
 import { withTransaction } from "@/lib/helpers/withTransaction";
-import { USER_ROLE } from "@/constants/user.const";
-import { DenyResetRequestPayload, ResetPasswordRequestDTO } from "@/types/password-reset.types";
-import { ResetPasswordRequestPopulated } from "@/types/employee-password-request.types.server";
-import { REQUEST_STATUS } from "@/constants/reset-password-request.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
+import { DenyResetRequestPayload, ResetPasswordRequestDTO } from "@/types/employee/password-reset.types";
+import { ResetPasswordRequestPopulated } from "@/types/employee/employee-password-request.types.server";
+import { REQUEST_STATUS } from "@/constants/employee/reset-password-request.const";
 
 /**
  * Post deny action for employee's password update request

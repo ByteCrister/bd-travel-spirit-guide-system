@@ -1,5 +1,5 @@
 // models/transaction.model.ts
-import { TRANSACTION_STATUS, TransactionStatus } from "@/constants/transaction.const";
+import { TRANSACTION_STATUS, TransactionStatus } from "@/constants/payment/transaction.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import mongoose, { Schema, Document } from "mongoose";
 

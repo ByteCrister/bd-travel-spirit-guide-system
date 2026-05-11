@@ -2,7 +2,7 @@ import {
     ReportFull,
     UserRef,
     TourRef,
-} from '@/types/reports.types';
+} from '@/types/tour/reports.types';
 import { ITraveler, TravelerModel } from '@/models/travelers/traveler.model';
 import UserModel from '@/models/user.model';
 import AssetModel from '@/models/assets/asset.model';
@@ -10,7 +10,7 @@ import AssetFileModel from '@/models/assets/asset-file.model';
 import TourModel from '@/models/tours/tour.model';
 import { IReport, ReportModel } from '@/models/tours/report.model';
 import { Types, ClientSession, FilterQuery } from 'mongoose';
-import { PopulatedAssetLean } from '@/types/populated-asset.types';
+import { PopulatedAssetLean } from '@/types/common/populated-asset.types';
 
 
 // Define types for populated documents

@@ -22,8 +22,8 @@ import api from '@/utils/axios/axios';
 import { fileToBase64, IMAGE_EXTENSIONS, isAllowedExtension } from '@/utils/helpers/file-conversion';
 import { showToast } from '@/components/global/showToast';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
-import { DestinationBlockDTO, TourDetailDTO } from '@/types/tour.types';
-import { ApiResponse } from '@/types/api.types';
+import { DestinationBlockDTO, TourDetailDTO } from '@/types/tour/tour.types';
+import { ApiResponse } from '@/types/common/api.types';
 
 const getDestinationUrl = (tourId: string) => {
   return `/operations/tours/v1/${tourId}/destinations/images-bulk`;

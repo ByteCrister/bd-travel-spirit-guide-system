@@ -6,7 +6,7 @@ import {
     PAYMENT_PURPOSE,
     PaymentOwnerType,
     PaymentPurpose,
-} from "@/constants/payment.const";
+} from "@/constants/payment/payment.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 
 /* ---------------------------------------------

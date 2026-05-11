@@ -6,7 +6,7 @@ import { buildTourReviewDTO } from "@/lib/build-responses/build-tour-review-dto"
 import ConnectDB from "@/config/db";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import EmployeeModel from "@/models/employees/employees.model";
-import { EMPLOYEE_ROLE } from "@/constants/employee.const";
+import { EMPLOYEE_ROLE } from "@/constants/employee/employee.const";
 import { ReviewModel } from "@/models/tours/review.model";
 import { Types } from "mongoose";
 

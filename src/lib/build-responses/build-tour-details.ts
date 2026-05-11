@@ -1,8 +1,8 @@
 // src/lib/build-responses/build-tour-details.ts
-import { TOUR_DISCOUNT_TYPE, TOUR_STATUS } from "@/constants/tour.const";
+import { TOUR_DISCOUNT_TYPE, TOUR_STATUS } from "@/constants/tour/tour.const";
 import TourModel, { IAttraction, IDestinationBlock, ITour } from "@/models/tours/tour.model";
-import { PopulatedAssetLean } from "@/types/populated-asset.types";
-import { TourDetailDTO } from "@/types/tour.types";
+import { PopulatedAssetLean } from "@/types/common/populated-asset.types";
+import { TourDetailDTO } from "@/types/tour/tour.types";
 import { ClientSession, Types } from "mongoose";
 import "@/models/assets/asset.model";
 import AssetModel from "@/models/assets/asset.model";

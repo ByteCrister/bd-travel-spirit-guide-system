@@ -25,7 +25,7 @@ import {
 import ReviewDetailAccordion from "./ReviewDetailAccordion";
 import ConfirmDialog from "./primitives/ConfirmDialog";
 import { useReviewsStore } from "@/store/reviews.store";
-import type { ApiError, ReviewListItemDTO } from "@/types/reviews.types";
+import type { ApiError, ReviewListItemDTO } from "@/types/tour/reviews.types";
 import {
     formatFullDate,
     formatRelativeDate,

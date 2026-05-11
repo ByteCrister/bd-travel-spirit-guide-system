@@ -7,8 +7,8 @@ import type {
     ReviewFilters,
     ReviewSortField,
     SortDirection,
-} from "@/types/reviews.types";
-import { TRAVEL_TYPE } from "@/constants/tour.const";
+} from "@/types/tour/reviews.types";
+import { TRAVEL_TYPE } from "@/constants/tour/tour.const";
 
 export type ObjectIdStr = string;
 

@@ -7,21 +7,21 @@ import {
   TourDetailDTO,
   TourFilterOptions,
   TourListItemDTO,
-} from "@/types/tour.types";
+} from "@/types/tour/tour.types";
 import {
   ReviewListItemDTO,
   ReviewSummaryDTO,
   TourReviewsResponseDTO,
-} from "@/types/tour-detail-review.type";
+} from "@/types/tour/tour-detail-review.type";
 import {
   TourReportListItemDTO,
   TourReportsResponseDTO,
-} from "@/types/tour-detail-report.types";
-import { GetTourFaqsResponse, TourFAQDTO } from "@/types/tour-detail-faqs.types";
+} from "@/types/tour/tour-detail-report.types";
+import { GetTourFaqsResponse, TourFAQDTO } from "@/types/tour/tour-detail-faqs.types";
 import api from "@/utils/axios/axios";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
-import { TOUR_STATUS } from "@/constants/tour.const";
-import { ApiResponse } from "@/types/api.types";
+import { TOUR_STATUS } from "@/constants/tour/tour.const";
+import { ApiResponse } from "@/types/common/api.types";
 
 // const URL_AFTER_API = "/mock/operations/tours";
 const URL_AFTER_API = "/operations/tours/v1";

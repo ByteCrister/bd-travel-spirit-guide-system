@@ -9,13 +9,13 @@ import {
     PayrollStatus,
     SALARY_PAYMENT_MODE,
     SalaryPaymentMode,
-} from "@/constants/employee.const";
+} from "@/constants/employee/employee.const";
 
-import { Currency } from "@/constants/tour.const";
-import { DayOfWeek } from "@/types/employee.types";
+import { Currency } from "@/constants/tour/tour.const";
+import { DayOfWeek } from "@/types/employee/employee.types";
 import { defineModel } from "@/lib/helpers/defineModel";
 import { ClientSession } from "mongoose";
-import { CARD_BRAND, CardBrand } from "@/constants/payment.const";
+import { CARD_BRAND, CardBrand } from "@/constants/payment/payment.const";
 
 /* =========================================================
    PAYROLL

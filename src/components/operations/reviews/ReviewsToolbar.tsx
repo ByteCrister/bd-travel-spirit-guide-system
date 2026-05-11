@@ -20,8 +20,8 @@ import type {
     ReviewToolbarState,
     ReviewSearchField,
     ReviewSortField,
-} from "@/types/reviews.types";
-import { TRAVEL_TYPE } from "@/constants/tour.const";
+} from "@/types/tour/reviews.types";
+import { TRAVEL_TYPE } from "@/constants/tour/tour.const";
 
 interface Props {
     toolbar: ReviewToolbarState;

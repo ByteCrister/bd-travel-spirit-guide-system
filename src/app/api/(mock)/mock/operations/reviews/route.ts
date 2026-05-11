@@ -8,7 +8,7 @@ import {
   toListDTO,
   DEFAULT_TOTAL,
 } from "./_mockDB";
-import type { Paginated, ReviewFilters, ReviewSortField, SortDirection, ReviewListItemDTO } from "@/types/reviews.types";
+import type { Paginated, ReviewFilters, ReviewSortField, SortDirection, ReviewListItemDTO } from "@/types/tour/reviews.types";
 
 seedIfNeeded(DEFAULT_TOTAL);
 

@@ -14,7 +14,7 @@ import {
     GuideDocumentCategory,
     GuideSocialPlatform,
     GuideStatus,
-} from "@/constants/guide.const";
+} from "@/constants/guide/guide.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import mongoose from "mongoose";
 import { withTransaction } from "@/lib/helpers/withTransaction";

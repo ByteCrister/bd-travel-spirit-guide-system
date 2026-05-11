@@ -1,6 +1,6 @@
 // api/test/create-faqs/route.ts
 import { Types } from "mongoose";
-import { MODERATION_STATUS } from "@/constants/tour.const";
+import { MODERATION_STATUS } from "@/constants/tour/tour.const";
 import { withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { TourFAQModel } from "@/models/tours/tourFAQ.model";
 import ConnectDB from "@/config/db";

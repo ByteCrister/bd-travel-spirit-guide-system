@@ -2,8 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TRANSPORT_MODE, TransportMode } from "@/constants/tour.const";
-import { TourDetailDTO } from "@/types/tour.types"
+import { TRANSPORT_MODE, TransportMode } from "@/constants/tour/tour.const";
+import { TourDetailDTO } from "@/types/tour/tour.types"
 import { Bus, Calendar, Car, Compass, Home, Navigation, Plane, Ship, Train, Utensils, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";

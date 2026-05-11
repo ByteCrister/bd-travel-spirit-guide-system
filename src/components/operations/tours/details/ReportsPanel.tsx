@@ -28,7 +28,7 @@ import {
     XCircle,
     Eye,
 } from "lucide-react";
-import { REPORT_PRIORITY, REPORT_REASON, REPORT_STATUS } from "@/constants/report.const";
+import { REPORT_PRIORITY, REPORT_REASON, REPORT_STATUS } from "@/constants/tour/report.const";
 import { format } from "date-fns";
 import { useTourDetailStore } from "@/store/tour-detail.store";
 

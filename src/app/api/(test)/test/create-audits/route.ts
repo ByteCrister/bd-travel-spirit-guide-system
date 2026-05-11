@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { faker } from "@faker-js/faker";
 import ConnectDB from "@/config/db";
 import AuditModel, { ICreateAuditParams } from "@/models/audit.model";
-import { AUDIT_ACTION } from "@/constants/audit-action.const";
+import { AUDIT_ACTION } from "@/constants/current-user/audit-action.const";
 
 // POST /api/test-audits
 export const POST = async (req: NextRequest) => {

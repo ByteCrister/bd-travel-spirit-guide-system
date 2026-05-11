@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TourDetailDTO } from "@/types/tour.types";
+import { TourDetailDTO } from "@/types/tour/tour.types";
 import { CheckCircle, Package, XCircle, Info } from "lucide-react";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";

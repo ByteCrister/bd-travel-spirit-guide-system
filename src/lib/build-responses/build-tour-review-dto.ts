@@ -1,6 +1,6 @@
 import { Types, ClientSession, HydratedDocument, Query } from "mongoose";
-import { ReviewDetailDTO } from "@/types/reviews.types";
-import { PopulatedAssetLean } from "@/types/populated-asset.types";
+import { ReviewDetailDTO } from "@/types/tour/reviews.types";
+import { PopulatedAssetLean } from "@/types/common/populated-asset.types";
 import { IReview, ReviewModel } from "@/models/tours/review.model";
 import TourModel from "@/models/tours/tour.model";
 import AssetModel from "@/models/assets/asset.model";

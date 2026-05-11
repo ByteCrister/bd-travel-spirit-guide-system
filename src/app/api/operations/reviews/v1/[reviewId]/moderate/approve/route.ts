@@ -8,7 +8,7 @@ import { withErrorHandler, ApiError } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import EmployeeModel from "@/models/employees/employees.model";
-import { EMPLOYEE_ROLE } from "@/constants/employee.const";
+import { EMPLOYEE_ROLE } from "@/constants/employee/employee.const";
 
 // Export the wrapped handler
 export const POST = withErrorHandler(async (request: NextRequest, { params }: { params: Promise<{ reviewId: string }> }) => {

@@ -5,10 +5,10 @@ import {
     EmploymentType,
     SALARY_PAYMENT_MODE,
     SalaryPaymentMode,
-} from "@/constants/employee.const";
-import { CURRENCY, Currency } from "@/constants/tour.const";
-import { DayOfWeek, EmergencyContactDTO, ContactInfoDTO, ShiftDTO, DocumentDTO, CreateEmployeePayload, PaymentCardDTO } from "@/types/employee.types";
-import { CARD_BRAND } from "@/constants/payment.const";
+} from "@/constants/employee/employee.const";
+import { CURRENCY, Currency } from "@/constants/tour/tour.const";
+import { DayOfWeek, EmergencyContactDTO, ContactInfoDTO, ShiftDTO, DocumentDTO, CreateEmployeePayload, PaymentCardDTO } from "@/types/employee/employee.types";
+import { CARD_BRAND } from "@/constants/payment/payment.const";
 
 // Phone validation regex for Bangladesh
 export const phoneRegex = /^(?:\+88|88)?(01[3-9]\d{8})$/;

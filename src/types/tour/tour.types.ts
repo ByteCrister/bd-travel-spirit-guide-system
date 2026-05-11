@@ -17,7 +17,7 @@ import {
     TourDiscount,
     TourDiscountType,
     MealsProvided,
-} from "@/constants/tour.const";
+} from "@/constants/tour/tour.const";
 
 /* =============== SUB TYPES (Mirroring Model Structure) =============== */
 

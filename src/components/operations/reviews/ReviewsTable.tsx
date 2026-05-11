@@ -17,7 +17,7 @@ import {
     formatRelativeDate,
 } from "@/utils/helpers/reviews.uiHelpers";
 import ReviewsTableRow from "./ReviewsTableRow";
-import type { ReviewsListCache } from "@/types/reviews.types";
+import type { ReviewsListCache } from "@/types/tour/reviews.types";
 
 interface Props {
     entry: ReviewsListCache | null;

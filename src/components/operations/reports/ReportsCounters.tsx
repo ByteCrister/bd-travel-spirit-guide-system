@@ -4,8 +4,8 @@
 import type { FC } from "react";
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { REPORT_STATUS, REPORT_PRIORITY } from "@/types/reports.types";
-import type { ReportListItem } from "@/types/reports.types";
+import { REPORT_STATUS, REPORT_PRIORITY } from "@/types/tour/reports.types";
+import type { ReportListItem } from "@/types/tour/reports.types";
 import { Card } from "@/components/ui/card";
 import { MdReport, MdPriorityHigh } from "react-icons/md";
 import { HiCheckCircle, HiClock, HiExclamationCircle, HiXCircle } from "react-icons/hi";

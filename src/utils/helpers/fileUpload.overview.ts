@@ -1,5 +1,5 @@
 // src/lib/fileUpload.ts
-import { GUIDE_DOCUMENT_TYPE, GuideDocumentCategory, GuideDocumentType } from "@/constants/guide.const";
+import { GUIDE_DOCUMENT_TYPE, GuideDocumentCategory, GuideDocumentType } from "@/constants/guide/guide.const";
 import type { GuideDocument } from "@/types/overview.types";
 
 /**

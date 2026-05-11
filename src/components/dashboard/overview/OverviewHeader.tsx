@@ -7,7 +7,7 @@ import { Editable } from "@/types/overview.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Building2, Crown, AlertTriangle } from "lucide-react";
-import { GUIDE_STATUS, GuideStatus } from "@/constants/guide.const";
+import { GUIDE_STATUS, GuideStatus } from "@/constants/guide/guide.const";
 import { useGuideOverviewStore } from "@/store/guide-overview.store";
 import { toast } from "sonner";
 

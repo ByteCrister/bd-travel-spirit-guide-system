@@ -6,8 +6,8 @@ import type {
     ReportsQueryParams,
     ReportFull,
     ReportsSortField,
-} from "@/types/reports.types";
-import { REPORT_PRIORITY, REPORT_REASON, REPORT_STATUS } from "@/constants/report.const";
+} from "@/types/tour/reports.types";
+import { REPORT_PRIORITY, REPORT_REASON, REPORT_STATUS } from "@/constants/tour/report.const";
 
 // Utilities to pick enum-like values
 const priorityValues = Object.values(REPORT_PRIORITY) as Array<ReportFull["priority"]>;

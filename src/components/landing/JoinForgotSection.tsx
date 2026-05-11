@@ -15,7 +15,7 @@ import { signIn } from "next-auth/react";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import { showToast } from "@/components/global/showToast";
 
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 // Types
 export type AdminRole = USER_ROLE.GUIDE | USER_ROLE.ASSISTANT;
 

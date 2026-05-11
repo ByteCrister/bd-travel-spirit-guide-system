@@ -17,8 +17,8 @@ import {
     Alert,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { CreateTourDTO } from "@/types/tour.types";
-import { AGE_SUITABILITY } from "@/constants/tour.const";
+import { CreateTourDTO } from "@/types/tour/tour.types";
+import { AGE_SUITABILITY } from "@/constants/tour/tour.const";
 import {
     Shield,
     Users,

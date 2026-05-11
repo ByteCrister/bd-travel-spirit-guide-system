@@ -28,8 +28,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ItineraryEntryDTO, UpdateTourContentItineraryDTO } from "@/types/tour.types";
-import { MealsProvided, TransportMode } from "@/constants/tour.const";
+import { ItineraryEntryDTO, UpdateTourContentItineraryDTO } from "@/types/tour/tour.types";
+import { MealsProvided, TransportMode } from "@/constants/tour/tour.const";
 // Mock constants - replace with your actual imports
 const MEALS_PROVIDED = {
   BREAKFAST: "Breakfast",

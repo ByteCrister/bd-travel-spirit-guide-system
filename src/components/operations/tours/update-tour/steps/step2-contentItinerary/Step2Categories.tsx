@@ -1,8 +1,8 @@
 "use client";
 
-import { TOUR_CATEGORIES, TourCategories } from '@/constants/tour.const';
+import { TOUR_CATEGORIES, TourCategories } from '@/constants/tour/tour.const';
 import { useFormikContext } from 'formik';
-import { UpdateTourContentItineraryDTO } from '@/types/tour.types';
+import { UpdateTourContentItineraryDTO } from '@/types/tour/tour.types';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

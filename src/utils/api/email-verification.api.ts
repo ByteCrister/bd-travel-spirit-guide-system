@@ -1,9 +1,9 @@
 // utils/api/email-verification.api.ts
 
-import { ApiResponse } from "@/types/api.types";
+import { ApiResponse } from "@/types/common/api.types";
 import api from "../axios/axios";
 import { extractErrorMessage } from "../axios/extractErrorMessage";
-import { EmailVerificationPurpose } from "@/constants/email-verification-purpose.const";
+import { EmailVerificationPurpose } from "@/constants/common/email-verification-purpose.const";
 
 interface ResponseTypes {
     success: boolean;

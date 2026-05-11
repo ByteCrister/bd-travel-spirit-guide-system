@@ -6,7 +6,7 @@
 import type { FC } from "react";
 import { useState, useId } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { ReportListItem } from "@/types/reports.types";
+import type { ReportListItem } from "@/types/tour/reports.types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import { ReportActions } from "./ReportActions";
 import { ReportDetailsPanel } from "./ReportDetailsPanel";
 import { useReportsStore } from "@/store/report.store";
 import { formatDateTime } from "@/utils/helpers/format.reports";
-import { REPORT_STATUS, ReportStatus } from "@/constants/report.const";
+import { REPORT_STATUS, ReportStatus } from "@/constants/tour/report.const";
 import Image from "next/image";
 
 export const ReportRow: FC<{ item: ReportListItem }> = ({ item }) => {

@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCurrentUserStore } from "@/store/current-user.store";
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import { ShieldQuestion, User } from "lucide-react";
 interface SidebarProps {
   isMobile?: boolean;

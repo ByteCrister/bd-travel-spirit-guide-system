@@ -10,7 +10,7 @@ import mongoose, {
     ClientSession,
     Model,
 } from "mongoose";
-import { TRAVEL_TYPE, TravelType } from "@/constants/tour.const";
+import { TRAVEL_TYPE, TravelType } from "@/constants/tour/tour.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import TourModel from "./tour.model";
 

@@ -1,4 +1,4 @@
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import { CurrentUser, IBaseUser, IEmployeeInfo } from "@/types/current-user.types";
 import { Guide } from "@/types/guide.types";
 
@@ -28,7 +28,7 @@ const userProfilePreview = {
             return this.fullUser.fullName;
         }
 
-        return "User";
+        return this.baseUser?.name ?? "User";
     },
 
     getAvatar(): string | undefined {

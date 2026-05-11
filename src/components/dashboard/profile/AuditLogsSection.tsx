@@ -42,7 +42,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AuditDateFilter, AuditLog } from "@/types/current-user.types";
 import { useCurrentUserStore } from "@/store/current-user.store";
-import { AUDIT_ACTION, AuditAction } from "@/constants/audit-action.const";
+import { AUDIT_ACTION, AuditAction } from "@/constants/current-user/audit-action.const";
 
 const filterVariants: Variants = {
     hidden: { height: 0, opacity: 0 },

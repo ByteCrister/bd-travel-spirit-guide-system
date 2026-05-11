@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { TourDetailDTO } from "@/types/tour.types"
+import { TourDetailDTO } from "@/types/tour/tour.types"
 import {
     MapPin,
     Navigation,

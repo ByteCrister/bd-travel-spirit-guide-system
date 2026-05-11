@@ -2,8 +2,8 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PAYMENT_METHOD, PaymentMethod, TOUR_DISCOUNT_TYPE } from "@/constants/tour.const"
-import { TourDetailDTO } from "@/types/tour.types"
+import { PAYMENT_METHOD, PaymentMethod, TOUR_DISCOUNT_TYPE } from "@/constants/tour/tour.const"
+import { TourDetailDTO } from "@/types/tour/tour.types"
 import { Banknote, Clock, CreditCard, Wallet, Tag, Calendar, TrendingDown } from "lucide-react"
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";

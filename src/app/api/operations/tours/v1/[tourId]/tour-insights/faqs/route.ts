@@ -6,13 +6,13 @@ import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import { getCollectionName } from "@/lib/helpers/get-collection-name";
 import {
     GetTourFaqsResponse,
-} from "@/types/tour-detail-faqs.types";
+} from "@/types/tour/tour-detail-faqs.types";
 import { TourFAQModel, ITourFAQ } from "@/models/tours/tourFAQ.model";
 import { TravelerModel } from "@/models/travelers/traveler.model";
 import UserModel from "@/models/user.model";
 import AssetModel from "@/models/assets/asset.model";
 import AssetFileModel from "@/models/assets/asset-file.model";
-import { ModerationStatus } from "@/constants/tour.const";
+import { ModerationStatus } from "@/constants/tour/tour.const";
 import { PipelineStage } from "mongoose";
 
 /* -------------------------------------------------------------------------- */

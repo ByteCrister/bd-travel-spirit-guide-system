@@ -1,5 +1,5 @@
 // next-auth.d.ts
-import { USER_ROLE } from "@/constants/user.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import { DefaultUser, DefaultSession } from "next-auth";
 
 declare module "next-auth" {

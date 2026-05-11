@@ -17,9 +17,9 @@ import { Progress } from '@/components/ui/progress';
 import { showToast } from '@/components/global/showToast';
 import api from '@/utils/axios/axios';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
-import { TourDetailDTO } from '@/types/tour.types';
+import { TourDetailDTO } from '@/types/tour/tour.types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ApiResponse } from '@/types/api.types';
+import { ApiResponse } from '@/types/common/api.types';
 
 
 interface HeroImageUpdateProps {

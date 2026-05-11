@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { UpdateTourBangladeshFieldsDTO } from '@/types/tour.types';
+import { UpdateTourBangladeshFieldsDTO } from '@/types/tour/tour.types';
 import {
   TRAVEL_TYPE,
   DIVISION,
@@ -12,7 +12,7 @@ import {
   Division,
   District,
   AccommodationType,
-} from '@/constants/tour.const';
+} from '@/constants/tour/tour.const';
 import { Step1BangladeshSchema } from '@/utils/validators/tour/add-tour.validator';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import { ComboBox } from '@/components/ui/combobox';

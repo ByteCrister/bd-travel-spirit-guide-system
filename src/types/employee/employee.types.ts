@@ -6,10 +6,10 @@ import {
   EmploymentType,
   PayrollStatus,
   SalaryPaymentMode,
-} from "@/constants/employee.const";
-import { AuditLog } from "./current-user.types";
-import { Currency } from "@/constants/tour.const";
-import { CardBrand } from "@/constants/payment.const";
+} from "@/constants/employee/employee.const";
+import { AuditLog } from "../current-user.types";
+import { Currency } from "@/constants/tour/tour.const";
+import { CardBrand } from "@/constants/payment/payment.const";
 
 /* ---------------------------------------------------------------------
   1. PRIMITIVE / UTILITY TYPES

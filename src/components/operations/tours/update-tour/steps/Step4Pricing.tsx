@@ -14,8 +14,8 @@ import {
   OperatingWindowDTO,
   DepartureDTO,
   PriceDTO,
-} from '@/types/tour.types';
-import { CURRENCY, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, PAYMENT_METHOD, Currency, TourDiscount, PaymentMethod, TourDiscountType } from '@/constants/tour.const';
+} from '@/types/tour/tour.types';
+import { CURRENCY, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, PAYMENT_METHOD, Currency, TourDiscount, PaymentMethod, TourDiscountType } from '@/constants/tour/tour.const';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import { Step4PricingSchema } from '@/utils/validators/tour/add-tour.validator';
 

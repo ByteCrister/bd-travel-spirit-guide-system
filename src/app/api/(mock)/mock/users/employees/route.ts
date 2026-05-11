@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 import {
   EmployeeListItemDTO,
   EmployeesListResponse,
-} from "@/types/employee.types";
+} from "@/types/employee/employee.types";
 import {
   EMPLOYEE_STATUS,
   EmployeeStatus,
@@ -12,8 +12,8 @@ import {
   EmploymentType,
   SALARY_PAYMENT_MODE,
   SalaryPaymentMode,
-} from "@/constants/employee.const";
-import { CURRENCY } from "@/constants/tour.const";
+} from "@/constants/employee/employee.const";
+import { CURRENCY } from "@/constants/tour/tour.const";
 import { calculateCurrentMonthPayment } from "@/lib/helpers/payment-calculator";
 
 /**

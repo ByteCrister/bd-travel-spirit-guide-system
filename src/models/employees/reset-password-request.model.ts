@@ -1,7 +1,7 @@
 // models/reset-password-request.model.ts
 import { Schema, Document, Types, Model, ClientSession } from "mongoose";
 import { defineModel } from "@/lib/helpers/defineModel";
-import { REQUEST_STATUS, RequestStatus } from "@/constants/reset-password-request.const";
+import { REQUEST_STATUS, RequestStatus } from "@/constants/employee/reset-password-request.const";
 
 /* =========================================================
    INTERFACES

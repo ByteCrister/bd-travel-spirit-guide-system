@@ -47,7 +47,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { CreateTourDTO } from "@/types/tour.types";
+import { CreateTourDTO } from "@/types/tour/tour.types";
 import {
     DestinationBlockDTO,
     ItineraryEntryDTO,
@@ -62,9 +62,9 @@ import {
     EmergencyContactsDTO,
     TranslationBlockDTO,
     PriceDTO,
-} from "@/types/tour.types";
+} from "@/types/tour/tour.types";
 import { FaBangladeshiTakaSign } from "react-icons/fa6";
-import { TOUR_DISCOUNT_TYPE } from "@/constants/tour.const";
+import { TOUR_DISCOUNT_TYPE } from "@/constants/tour/tour.const";
 
 // Type definitions
 type FieldType =

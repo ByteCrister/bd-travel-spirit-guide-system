@@ -5,7 +5,7 @@ import { withTransaction } from "@/lib/helpers/withTransaction";
 import TourModel from "@/models/tours/tour.model";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 import { Types } from "mongoose";
-import { TOUR_STATUS } from "@/constants/tour.const";
+import { TOUR_STATUS } from "@/constants/tour/tour.const";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";

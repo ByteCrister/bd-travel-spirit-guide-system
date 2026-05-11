@@ -5,9 +5,9 @@ import {
     EmploymentType,
     SALARY_PAYMENT_MODE,
     SalaryPaymentMode,
-} from "@/constants/employee.const";
-import { CURRENCY, Currency } from "@/constants/tour.const";
-import { DayOfWeek, EmergencyContactDTO, ContactInfoDTO, ShiftDTO, DocumentDTO } from "@/types/employee.types";
+} from "@/constants/employee/employee.const";
+import { CURRENCY, Currency } from "@/constants/tour/tour.const";
+import { DayOfWeek, EmergencyContactDTO, ContactInfoDTO, ShiftDTO, DocumentDTO } from "@/types/employee/employee.types";
 import { Types } from "mongoose";
 import { paymentCardValidationSchema } from "./employee.validator";
 

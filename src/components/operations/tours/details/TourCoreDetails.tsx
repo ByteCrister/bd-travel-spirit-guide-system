@@ -17,7 +17,7 @@ import ComputedInfo from "./tour-core-datail/ComputedInfo";
 import ItineraryInfo from "./tour-core-datail/ItineraryInfo";
 import DestinationsInfo from "./tour-core-datail/DestinationsInfo";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
+import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import TourDetailLoading from "./skeletons/TourDetailLoading";

@@ -2,8 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour.const";
-import { TourDetailDTO } from "@/types/tour.types"
+import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
+import { TourDetailDTO } from "@/types/tour/tour.types"
 import { Building, Calendar, Eye, Heart, Share2, Star, Tag, Image as ImageIcon, Sparkles, TrendingUp, User, Clock } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";

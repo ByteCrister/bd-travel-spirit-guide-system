@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { TourDetailDTO } from "@/types/tour.types";
+import { TourDetailDTO } from "@/types/tour/tour.types";
 import {
   Step0BasicInfoSchema,
   Step1BangladeshSchema,

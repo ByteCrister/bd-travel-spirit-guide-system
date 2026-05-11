@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 import {
     EmployeeDetailDTO,
     PayrollRecordDTO,
-} from "@/types/employee.types";
+} from "@/types/employee/employee.types";
 import { AuditLog } from "@/types/current-user.types";
 import {
     EMPLOYEE_STATUS,
@@ -12,7 +12,7 @@ import {
     SALARY_PAYMENT_MODE,
     SalaryPaymentMode,
     PAYROLL_STATUS,
-} from "@/constants/employee.const";
+} from "@/constants/employee/employee.const";
 import { decodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { calculateCurrentMonthPayment, getActualPaymentStatus } from "@/lib/helpers/payment-calculator";
 

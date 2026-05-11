@@ -37,13 +37,13 @@ import {
 } from "react-icons/md";
 import { motion, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { CreateTourDTO } from "@/types/tour.types";
+import { CreateTourDTO } from "@/types/tour/tour.types";
 import {
     TRAVEL_TYPE,
     ACCOMMODATION_TYPE,
     DIVISION,
     DISTRICT,
-} from "@/constants/tour.const";
+} from "@/constants/tour/tour.const";
 import { getDistrictsByDivision } from "@/utils/helpers/conversions.tour";
 
 const MotionDiv = motion.div;

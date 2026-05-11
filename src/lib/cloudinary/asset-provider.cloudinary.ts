@@ -2,7 +2,7 @@
 
 import cloudinary from "@/config/cloudinary";
 import { AssetStorageProvider, UploadedAsset } from "../storage-providers/asset-storage.interface";
-import { ASSET_TYPE, AssetType } from "@/constants/asset.const";
+import { ASSET_TYPE, AssetType } from "@/constants/common/asset.const";
 // import { v4 as uuidv4 } from "uuid";
 import { CloudinaryApiResource, CloudinaryUploadError, CloudinaryUploadResult } from "./cloudinary.types";
 

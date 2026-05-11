@@ -8,7 +8,7 @@ import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import { withTransaction } from '@/lib/helpers/withTransaction';
 import { getUserIdFromSession } from '@/lib/auth/session.auth';
 import { ReportModel } from '@/models/tours/report.model';
-import { REPORT_STATUS } from '@/constants/report.const';
+import { REPORT_STATUS } from '@/constants/tour/report.const';
 
 /**
  * PATCH /api/operations/reports/v1/bulk-resolve

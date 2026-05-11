@@ -14,7 +14,7 @@ import {
 import { Delete as DeleteIcon, AddPhotoAlternate as AddPhotoIcon } from "@mui/icons-material";
 import Image from "next/image";
 import { useRef, ChangeEvent, useState } from "react";
-import { CreateTourDTO } from "@/types/tour.types";
+import { CreateTourDTO } from "@/types/tour/tour.types";
 import { fileToBase64 } from "@/utils/helpers/file-conversion";
 import { showToast } from "@/components/global/showToast";
 

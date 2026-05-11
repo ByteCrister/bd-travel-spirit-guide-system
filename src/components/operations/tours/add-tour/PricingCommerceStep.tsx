@@ -27,13 +27,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { CreateTourDTO } from "@/types/tour.types";
+import { CreateTourDTO } from "@/types/tour/tour.types";
 import {
     CURRENCY,
     PAYMENT_METHOD,
     TOUR_DISCOUNT,
     TOUR_DISCOUNT_TYPE,
-} from "@/constants/tour.const";
+} from "@/constants/tour/tour.const";
 import { useState } from "react";
 import {
     Plus,

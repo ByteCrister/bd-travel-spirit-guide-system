@@ -4,7 +4,7 @@ import {
     ShiftDTO,
     DocumentDTO,
     ContactInfoDTO,
-} from "@/types/employee.types";
+} from "@/types/employee/employee.types";
 import {
     contactInfoValidationSchema,
     shiftValidationSchema,
@@ -15,8 +15,8 @@ import {
     EMPLOYEE_STATUS,
     EMPLOYMENT_TYPE,
     SALARY_PAYMENT_MODE,
-} from "@/constants/employee.const";
-import { CURRENCY } from "@/constants/tour.const";
+} from "@/constants/employee/employee.const";
+import { CURRENCY } from "@/constants/tour/tour.const";
 import { showToast } from "@/components/global/showToast";
 
 /* ------------------------------------------------------------------

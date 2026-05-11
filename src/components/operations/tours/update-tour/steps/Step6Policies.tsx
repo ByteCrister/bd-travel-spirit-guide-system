@@ -4,8 +4,8 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { UpdateTourPoliciesDTO, CancellationRuleDTO } from '@/types/tour.types';
-import { PAYMENT_METHOD, PaymentMethod } from '@/constants/tour.const';
+import { UpdateTourPoliciesDTO, CancellationRuleDTO } from '@/types/tour/tour.types';
+import { PAYMENT_METHOD, PaymentMethod } from '@/constants/tour/tour.const';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 import { Step6PolicySchema } from '@/utils/validators/tour/add-tour.validator';
 import { motion, AnimatePresence } from 'framer-motion';

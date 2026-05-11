@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { PayrollStatus } from "@/constants/employee.const";
+import { PayrollStatus } from "@/constants/employee/employee.const";
 
 interface PaymentStatusBadgeProps {
   status: PayrollStatus;

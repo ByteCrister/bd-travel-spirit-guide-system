@@ -11,9 +11,9 @@ import {
     SortOrder,
     EmployeesListResponse,
     EmployeeListItemDTO,
-} from '@/types/employee.types';
-import { EmployeeStatus, EmploymentType, PAYROLL_STATUS, PayrollStatus } from '@/constants/employee.const';
-import { USER_ROLE } from '@/constants/user.const';
+} from '@/types/employee/employee.types';
+import { EmployeeStatus, EmploymentType, PAYROLL_STATUS, PayrollStatus } from '@/constants/employee/employee.const';
+import { USER_ROLE } from '@/constants/current-user/user.const';
 import UserModel from '@/models/user.model';
 import GuideModel from '@/models/guide/guide.model';
 import { getCollectionName } from '@/lib/helpers/get-collection-name';

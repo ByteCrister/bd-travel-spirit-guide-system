@@ -8,7 +8,7 @@ import { ClientSession, Types } from "mongoose";
 import { Guide } from "@/types/guide.types";
 import { buildGuideDto } from "@/lib/build-responses/buildGuideOwner-dt";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
-import { GUIDE_STATUS } from "@/constants/guide.const";
+import { GUIDE_STATUS } from "@/constants/guide/guide.const";
 
 interface CompanyNameUpdatePayload {
     companyName: string;

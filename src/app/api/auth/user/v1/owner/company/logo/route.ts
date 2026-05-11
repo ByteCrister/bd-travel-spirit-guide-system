@@ -6,12 +6,12 @@ import { withTransaction } from "@/lib/helpers/withTransaction";
 import GuideModel, { IGuide } from "@/models/guide/guide.model";
 import { Types } from "mongoose";
 import { Guide } from "@/types/guide.types";
-import { ASSET_TYPE } from "@/constants/asset.const";
+import { ASSET_TYPE } from "@/constants/common/asset.const";
 import { isBase64DataUrl, isCloudinaryUrl } from "@/lib/helpers/document-conversions";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { resolveDocuments } from "@/lib/cloudinary/resolve.cloudinary";
 import { buildGuideDto } from "@/lib/build-responses/buildGuideOwner-dt";
-import { GUIDE_STATUS } from "@/constants/guide.const";
+import { GUIDE_STATUS } from "@/constants/guide/guide.const";
 
 interface CompanyLogoUpdatePayload {
     logoUrl: string;

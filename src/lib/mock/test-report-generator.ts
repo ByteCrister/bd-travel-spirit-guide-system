@@ -1,6 +1,6 @@
 // utils/test-report-generator.ts
 import { Types } from "mongoose";
-import { REPORT_REASON, REPORT_PRIORITY, REPORT_STATUS } from "@/constants/report.const";
+import { REPORT_REASON, REPORT_PRIORITY, REPORT_STATUS } from "@/constants/tour/report.const";
 
 export interface TestReportData {
     reporter?: Types.ObjectId;
