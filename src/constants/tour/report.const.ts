@@ -10,7 +10,7 @@ export enum REPORT_STATUS {
   RESOLVED = "resolved",
   REJECTED = "rejected",
 }
-export type ReportStatus = EnumValues<typeof REPORT_STATUS>;
+export type ReportStatus = `${REPORT_STATUS}`;
 
 /**
  * Standardized reasons for reporting
