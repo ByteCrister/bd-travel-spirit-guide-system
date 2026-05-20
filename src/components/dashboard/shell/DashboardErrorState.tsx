@@ -1,7 +1,17 @@
 'use client';
 
 import { AlertTriangle, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
+const brand = {
+    primary: '#006666',
+    danger: '#FF2157',
+    surface: '#E7E5E4',
+    text: '#1E2938',
+    muted: '#6B7A8D',
+    shadowOut: '8px 8px 16px #c8c6c4, -8px -8px 16px #ffffff',
+    shadowIn: 'inset 4px 4px 8px #c8c6c4, inset -4px -4px 8px #ffffff',
+    border: 'rgba(255,33,87,0.12)',
+};
 
 type DashboardErrorStateProps = {
     message: string;
@@ -10,38 +20,63 @@ type DashboardErrorStateProps = {
 
 export function DashboardErrorState({ message, onRetry }: DashboardErrorStateProps) {
     return (
-        <div className="relative overflow-hidden rounded-3xl border border-rose-200/60 bg-gradient-to-br from-white via-rose-50/40 to-red-50/30 px-6 py-16 text-center shadow-lg shadow-rose-100/50 dark:border-rose-900/30 dark:from-slate-900 dark:via-rose-950/20 dark:to-slate-900 dark:shadow-rose-900/20">
-            {/* Glossy sheen */}
+        <div
+            className="relative overflow-hidden rounded-3xl px-6 py-16 text-center"
+            style={{
+                background: brand.surface,
+                boxShadow: brand.shadowOut,
+                border: `1px solid ${brand.border}`,
+            }}
+        >
+            {/* Danger top accent */}
             <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/5"
-                aria-hidden
-            />
-            {/* Subtle bg orb */}
-            <div
-                className="pointer-events-none absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-rose-200/30 blur-3xl dark:bg-rose-900/20"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[3px]"
+                style={{ background: `linear-gradient(90deg, ${brand.danger}, #ff6688, ${brand.danger})` }}
                 aria-hidden
             />
 
             <div className="relative flex flex-col items-center gap-6">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 shadow-inner shadow-rose-100 dark:border-rose-800/50 dark:bg-rose-950/50">
-                    <AlertTriangle className="h-8 w-8 text-rose-500 dark:text-rose-400" aria-hidden />
+                {/* Icon */}
+                <div
+                    className="flex h-16 w-16 items-center justify-center rounded-2xl"
+                    style={{
+                        background: 'rgba(255,33,87,0.08)',
+                        boxShadow: brand.shadowIn,
+                    }}
+                >
+                    <AlertTriangle className="h-8 w-8" style={{ color: brand.danger }} aria-hidden />
                 </div>
 
                 <div className="max-w-md space-y-2">
-                    <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-slate-50">
+                    <h2
+                        className="text-xl font-bold tracking-tight"
+                        style={{ color: brand.text, fontFamily: 'var(--font-space-mono)' }}
+                    >
                         Something went wrong
                     </h2>
-                    <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">{message}</p>
+                    <p
+                        className="text-sm leading-relaxed"
+                        style={{ color: brand.muted, fontFamily: 'var(--font-jetbrains-mono)' }}
+                    >
+                        {message}
+                    </p>
                 </div>
 
-                <Button
-                    size="lg"
+                <button
                     onClick={onRetry}
-                    className="rounded-full bg-slate-900 px-8 shadow-lg shadow-slate-900/20 hover:bg-slate-800 hover:shadow-xl dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                    className="flex h-11 items-center gap-2 rounded-full px-8 text-xs font-bold transition-all"
+                    style={{
+                        background: brand.surface,
+                        boxShadow: brand.shadowOut,
+                        border: `1px solid rgba(255,33,87,0.2)`,
+                        color: brand.danger,
+                        fontFamily: 'var(--font-space-mono)',
+                        letterSpacing: '0.08em',
+                    }}
                 >
-                    <RotateCcw className="mr-2 h-4 w-4" />
+                    <RotateCcw className="h-3.5 w-3.5" />
                     Try again
-                </Button>
+                </button>
             </div>
         </div>
     );

@@ -23,7 +23,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { IBookingPopulated } from '@/types/tour/booking.types';
-import { playfair, inter } from '@/styles/fonts';
+import { spaceMono, jetbrainsMono } from '@/styles/fonts';
 import { format } from 'date-fns';
 import BookingStatusBadge from './BookingStatusBadge';
 import {
@@ -39,25 +39,32 @@ interface BookingDetailSheetProps {
     onClose: () => void;
 }
 
-// ─── Status guards ────────────────────────────────────────────────────────────
 const TERMINAL_STATUSES = ['cancelled', 'refunded', 'completed', 'no-show'] as const;
-
 function canCancelBooking(status: string) {
     return !TERMINAL_STATUSES.includes(status as (typeof TERMINAL_STATUSES)[number]);
 }
-
 function canRefundBooking(status: string, totalPaid: number) {
     return !['refunded', 'cancelled'].includes(status) && totalPaid > 0;
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// Shared neumorphic input style
+const neuInput = [
+    'bg-[#E7E5E4] border-0 text-[#1E2938] placeholder:text-[#1E2938]/35',
+    'shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+    'focus-visible:ring-0 focus-visible:ring-offset-0',
+    'focus-visible:shadow-[inset_4px_4px_8px_#c0bebb,inset_-2px_-2px_4px_#ffffff,0_0_0_2px_#006666]',
+    'rounded-xl transition-shadow duration-200',
+].join(' ');
+
 function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
     return (
         <div className="flex items-start gap-3">
-            <div className="mt-0.5 text-slate-400 shrink-0">{icon}</div>
+            <div className="mt-0.5 text-[#1E2938]/30 shrink-0">{icon}</div>
             <div className="flex-1 min-w-0">
-                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-medium mb-0.5">{label}</p>
-                <div className="text-sm text-slate-700">{value}</div>
+                <p className="text-[9px] uppercase tracking-[0.15em] text-[#1E2938]/35 font-medium mb-0.5" style={spaceMono.style}>
+                    {label}
+                </p>
+                <div className="text-sm text-[#1E2938]/75" style={jetbrainsMono.style}>{value}</div>
             </div>
         </div>
     );
@@ -66,7 +73,10 @@ function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: strin
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <div className="space-y-4">
-            <h4 className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold border-b border-slate-100 pb-2">
+            <h4
+                className="text-[9px] uppercase tracking-[0.18em] text-[#1E2938]/35 font-semibold pb-2 border-b border-[#1E2938]/5"
+                style={spaceMono.style}
+            >
                 {title}
             </h4>
             {children}
@@ -74,7 +84,40 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     );
 }
 
-// ─── Cancel AlertDialog ───────────────────────────────────────────────────────
+// Neumorphic action button
+function NeuActionBtn({
+    onClick, disabled, variant, children,
+}: {
+    onClick?: () => void; disabled?: boolean; variant: 'danger' | 'neutral'; children: React.ReactNode;
+}) {
+    const colors = variant === 'danger'
+        ? 'text-[#FF2157] hover:text-[#FF2157]'
+        : 'text-[#1E2938]/55 hover:text-[#1E2938]/80';
+
+    return (
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            className={cn(
+                'flex-1 h-10 px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs font-medium transition-all duration-150',
+                'bg-[#E7E5E4]',
+                disabled
+                    ? 'opacity-30 cursor-not-allowed shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]'
+                    : [
+                        'shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff]',
+                        'hover:shadow-[5px_5px_10px_#c8c6c4,-4px_-4px_8px_#ffffff]',
+                        'active:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                    ].join(' '),
+                colors,
+            )}
+            style={spaceMono.style}
+        >
+            {children}
+        </button>
+    );
+}
+
+// Cancel dialog
 function CancelDialog({ bookingId, disabled }: { bookingId: string; disabled: boolean }) {
     const [reason, setReason] = useState('');
     const [open, setOpen] = useState(false);
@@ -91,63 +134,75 @@ function CancelDialog({ bookingId, disabled }: { bookingId: string; disabled: bo
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
-                <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={disabled}
-                    className={cn(
-                        'flex-1 rounded-xl gap-1.5 text-xs shadow-sm border transition-all',
-                        disabled
-                            ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed'
-                            : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
-                    )}
-                >
+                <NeuActionBtn variant="danger" disabled={disabled} onClick={() => setOpen(true)}>
                     <XCircle size={13} />
                     Cancel booking
-                </Button>
+                </NeuActionBtn>
             </AlertDialogTrigger>
-
-            <AlertDialogContent className="bg-white border-slate-200 rounded-2xl shadow-xl max-w-md">
+            <AlertDialogContent className={cn(
+                'rounded-2xl border-0 max-w-md p-6',
+                'bg-[#E7E5E4]',
+                'shadow-[12px_12px_24px_#c8c6c4,-8px_-8px_16px_#ffffff]',
+            )}>
                 <AlertDialogHeader>
-                    <AlertDialogTitle className="text-slate-800 text-base font-bold flex items-center gap-2">
-                        <span className="w-7 h-7 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0">
-                            <XCircle size={14} className="text-rose-600" />
+                    <AlertDialogTitle className="text-[#1E2938] text-base font-bold flex items-center gap-2" style={spaceMono.style}>
+                        <span className={cn(
+                            'w-7 h-7 rounded-lg flex items-center justify-center shrink-0',
+                            'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                        )}>
+                            <XCircle size={14} className="text-[#FF2157]" />
                         </span>
                         Cancel this booking?
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="text-slate-500 text-sm mt-1">
-                        This action will mark the booking as <span className="font-semibold text-rose-600">cancelled</span>.
-                        Please provide a reason — it will be recorded against the booking.
+                    <AlertDialogDescription className="text-[#1E2938]/50 text-sm mt-1" style={jetbrainsMono.style}>
+                        This will mark the booking as{' '}
+                        <span className="font-semibold text-[#FF2157]">cancelled</span>.
+                        Please provide a reason.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
-                {/* Reason textarea */}
-                <div className="py-1">
+                <div className="py-2">
                     <Textarea
                         placeholder="Reason for cancellation…"
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                         rows={3}
-                        className="resize-none bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 text-sm focus-visible:ring-rose-300 focus-visible:border-rose-300 rounded-xl"
+                        className={cn(neuInput, 'resize-none text-sm')}
+                        style={jetbrainsMono.style}
                     />
                     {reason.length === 0 && (
-                        <p className="text-[11px] text-rose-500 mt-1.5">A reason is required to proceed.</p>
+                        <p className="text-[10px] text-[#FF2157] mt-1.5" style={jetbrainsMono.style}>
+                            A reason is required to proceed.
+                        </p>
                     )}
                 </div>
 
                 <AlertDialogFooter className="gap-2">
                     <AlertDialogCancel
                         onClick={() => setReason('')}
-                        className="rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 text-xs h-9"
+                        className={cn(
+                            'rounded-xl border-0 text-[#1E2938]/55 text-xs h-9 px-4',
+                            'bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_5px_#ffffff]',
+                            'hover:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                        )}
+                        style={spaceMono.style}
                     >
                         Go back
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleConfirm}
                         disabled={!reason.trim() || isCancelling}
-                        className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs h-9 px-4 disabled:opacity-50"
+                        className={cn(
+                            'rounded-xl border-0 text-white text-xs h-9 px-4 transition-all',
+                            'bg-[#FF2157]',
+                            'shadow-[3px_3px_8px_rgba(255,33,87,0.35)]',
+                            'hover:shadow-[4px_4px_10px_rgba(255,33,87,0.5)]',
+                            'active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]',
+                            'disabled:opacity-40 disabled:cursor-not-allowed',
+                        )}
+                        style={spaceMono.style}
                     >
-                        {isCancelling ? 'Cancelling…' : 'Yes, cancel booking'}
+                        {isCancelling ? 'Cancelling…' : 'Yes, cancel'}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
@@ -155,17 +210,11 @@ function CancelDialog({ bookingId, disabled }: { bookingId: string; disabled: bo
     );
 }
 
-// ─── Refund AlertDialog ───────────────────────────────────────────────────────
+// Refund dialog
 function RefundDialog({
-    bookingId,
-    totalPaid,
-    currency,
-    disabled,
+    bookingId, totalPaid, currency, disabled,
 }: {
-    bookingId: string;
-    totalPaid: number;
-    currency: string;
-    disabled: boolean;
+    bookingId: string; totalPaid: number; currency: string; disabled: boolean;
 }) {
     const [refundAmount, setRefundAmount] = useState('');
     const [reason, setReason] = useState('');
@@ -179,10 +228,7 @@ function RefundDialog({
 
     const handleConfirm = async () => {
         if (!canSubmit) return;
-        await refundBooking(bookingId, {
-            refundAmount: parsed,
-            reason: reason.trim() || undefined,
-        });
+        await refundBooking(bookingId, { refundAmount: parsed, reason: reason.trim() || undefined });
         setRefundAmount('');
         setReason('');
         setOpen(false);
@@ -191,82 +237,89 @@ function RefundDialog({
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
-                <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={disabled}
-                    className={cn(
-                        'flex-1 rounded-xl gap-1.5 text-xs shadow-sm border transition-all',
-                        disabled
-                            ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed'
-                            : 'bg-violet-50 hover:bg-violet-100 text-violet-700 border-violet-200'
-                    )}
-                >
+                <NeuActionBtn variant="neutral" disabled={disabled} onClick={() => setOpen(true)}>
                     <RotateCcw size={13} />
                     Refund
-                </Button>
+                </NeuActionBtn>
             </AlertDialogTrigger>
-
-            <AlertDialogContent className="bg-white border-slate-200 rounded-2xl shadow-xl max-w-md">
+            <AlertDialogContent className={cn(
+                'rounded-2xl border-0 max-w-md p-6',
+                'bg-[#E7E5E4]',
+                'shadow-[12px_12px_24px_#c8c6c4,-8px_-8px_16px_#ffffff]',
+            )}>
                 <AlertDialogHeader>
-                    <AlertDialogTitle className="text-slate-800 text-base font-bold flex items-center gap-2">
-                        <span className="w-7 h-7 rounded-lg bg-violet-50 border border-violet-200 flex items-center justify-center shrink-0">
-                            <RotateCcw size={14} className="text-violet-600" />
+                    <AlertDialogTitle className="text-[#1E2938] text-base font-bold flex items-center gap-2" style={spaceMono.style}>
+                        <span className={cn(
+                            'w-7 h-7 rounded-lg flex items-center justify-center shrink-0',
+                            'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                        )}>
+                            <RotateCcw size={14} className="text-[#006666]" />
                         </span>
                         Process a refund?
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="text-slate-500 text-sm mt-1">
-                        Leave the amount blank to refund the full paid amount of{' '}
-                        <span className="font-semibold text-slate-700">
+                    <AlertDialogDescription className="text-[#1E2938]/50 text-sm mt-1" style={jetbrainsMono.style}>
+                        Leave blank to refund the full{' '}
+                        <span className="font-semibold text-[#1E2938]/70">
                             {currency} {totalPaid.toLocaleString()}
                         </span>
-                        , or enter a partial amount below.
+                        , or enter a partial amount.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
-                {/* Form fields */}
-                <div className="space-y-3 py-1">
-                    {/* Amount */}
+                <div className="space-y-3 py-2">
                     <div className="relative">
-                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-medium pointer-events-none">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#1E2938]/40 text-xs pointer-events-none" style={jetbrainsMono.style}>
                             {currency}
                         </span>
                         <Input
                             type="number"
                             min={1}
                             max={totalPaid}
-                            placeholder={`Full amount (${totalPaid.toLocaleString()})`}
+                            placeholder={`Full (${totalPaid.toLocaleString()})`}
                             value={refundAmount}
                             onChange={(e) => setRefundAmount(e.target.value)}
-                            className="pl-12 bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 text-sm focus-visible:ring-violet-300 focus-visible:border-violet-300 rounded-xl"
+                            className={cn(neuInput, 'pl-12 text-sm h-10')}
+                            style={jetbrainsMono.style}
                         />
                     </div>
                     {!amountValid && (
-                        <p className="text-[11px] text-rose-500">
+                        <p className="text-[10px] text-[#FF2157]" style={jetbrainsMono.style}>
                             Amount must be between 1 and {totalPaid.toLocaleString()}.
                         </p>
                     )}
-
-                    {/* Reason */}
                     <Input
                         placeholder="Reason (optional)…"
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
-                        className="bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 text-sm focus-visible:ring-violet-300 focus-visible:border-violet-300 rounded-xl"
+                        className={cn(neuInput, 'text-sm h-10')}
+                        style={jetbrainsMono.style}
                     />
                 </div>
 
                 <AlertDialogFooter className="gap-2">
                     <AlertDialogCancel
                         onClick={() => { setRefundAmount(''); setReason(''); }}
-                        className="rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 text-xs h-9"
+                        className={cn(
+                            'rounded-xl border-0 text-[#1E2938]/55 text-xs h-9 px-4',
+                            'bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_5px_#ffffff]',
+                            'hover:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                        )}
+                        style={spaceMono.style}
                     >
                         Go back
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleConfirm}
                         disabled={!canSubmit}
-                        className="rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs h-9 px-4 disabled:opacity-50"
+                        className={cn(
+                            'rounded-xl border-0 text-white text-xs h-9 px-4 transition-all',
+                            'bg-[#006666]',
+                            'shadow-[3px_3px_8px_rgba(0,102,102,0.35)]',
+                            'hover:shadow-[4px_4px_10px_rgba(0,102,102,0.5)]',
+                            'active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]',
+                            'disabled:opacity-40 disabled:cursor-not-allowed',
+                        )}
+                        style={spaceMono.style}
                     >
                         {isRefunding ? 'Processing…' : 'Confirm refund'}
                     </AlertDialogAction>
@@ -276,7 +329,7 @@ function RefundDialog({
     );
 }
 
-// ─── Main sheet ───────────────────────────────────────────────────────────────
+// Main sheet
 export function BookingDetailSheet({ booking, open, onClose }: BookingDetailSheetProps) {
     if (!booking) return null;
 
@@ -289,7 +342,6 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
     const showRefund = canRefundBooking(booking.status, booking.totalPaid);
     const showFooter = showCancel || showRefund;
 
-    // Reason for disabling (tooltip-style label shown under the button row)
     const statusNote =
         booking.status === 'cancelled' ? 'This booking has already been cancelled.' :
         booking.status === 'refunded'  ? 'This booking has already been refunded.' :
@@ -301,50 +353,73 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
         <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
             <SheetContent
                 side="right"
-                className="w-full sm:max-w-[480px] bg-white border-l border-slate-200 p-0 flex flex-col"
-                style={inter.style}
+                className={cn(
+                    'w-full sm:max-w-[480px] border-0 p-0 flex flex-col',
+                    'bg-[#E7E5E4]',
+                    // Deep inset left shadow for sheet panel effect
+                    'shadow-[-12px_0_32px_rgba(0,0,0,0.12)]',
+                )}
+                style={jetbrainsMono.style}
             >
-                {/* ── Header ───────────────────────────────────────────────── */}
-                <SheetHeader className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-slate-100 px-6 py-4 shrink-0">
+                {/* ── Header ─────────────────────────────────────────────── */}
+                <SheetHeader className={cn(
+                    'sticky top-0 z-10 px-6 py-4 shrink-0 border-b border-[#1E2938]/5',
+                    'bg-[#E7E5E4]',
+                    'shadow-[0_2px_8px_rgba(0,0,0,0.04)]',
+                )}>
                     <div className="flex items-start justify-between gap-3">
                         <div>
-                            <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">Booking reference</p>
-                            <SheetTitle className="text-xl font-bold text-slate-800 tracking-tight" style={playfair.style}>
+                            <p className="text-[9px] uppercase tracking-[0.18em] text-[#1E2938]/35 mb-1" style={spaceMono.style}>
+                                Booking reference
+                            </p>
+                            <SheetTitle className="text-xl font-bold text-[#006666] tracking-tight" style={spaceMono.style}>
                                 #{booking.bookingReference}
                             </SheetTitle>
                         </div>
                         <div className="flex items-center gap-2">
                             <BookingStatusBadge status={booking.status} animate />
-                            <Button
-                                variant="ghost"
-                                size="icon"
+                            <button
                                 onClick={onClose}
-                                className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                                className={cn(
+                                    'h-8 w-8 rounded-lg flex items-center justify-center',
+                                    'text-[#1E2938]/35 hover:text-[#1E2938]/70',
+                                    'bg-[#E7E5E4]',
+                                    'shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_4px_#ffffff]',
+                                    'hover:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                    'transition-all duration-150',
+                                )}
                             >
-                                <X size={16} />
-                            </Button>
+                                <X size={15} />
+                            </button>
                         </div>
                     </div>
                 </SheetHeader>
 
-                {/* ── Scrollable body ───────────────────────────────────────── */}
-                <div className="flex-1 overflow-y-auto px-6 py-5 space-y-7">
+                {/* ── Scrollable body ─────────────────────────────────────── */}
+                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-7">
+
                     {/* Tour */}
                     <Section title="Tour">
-                        <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-3">
+                        <div className={cn(
+                            'rounded-xl p-4 space-y-3',
+                            'bg-[#E7E5E4]',
+                            'shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+                        )}>
                             <div>
-                                <p className="text-sm font-semibold text-slate-800 leading-tight">{booking.tour.title}</p>
+                                <p className="text-sm font-semibold text-[#1E2938]/80 leading-tight" style={spaceMono.style}>
+                                    {booking.tour.title}
+                                </p>
                                 {booking.tour.summary && (
-                                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">{booking.tour.summary}</p>
+                                    <p className="text-xs text-[#1E2938]/45 mt-1 line-clamp-2">{booking.tour.summary}</p>
                                 )}
                             </div>
-                            <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500">
+                            <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-[#1E2938]/45">
                                 <span className="flex items-center gap-1"><MapPin size={11} /> {booking.tour.district}</span>
                                 <span className="flex items-center gap-1"><Calendar size={11} /> {booking.tour.duration.days}D / {booking.tour.duration.nights ?? 0}N</span>
-                                <span className="flex items-center gap-1 uppercase text-[10px] tracking-wide">{booking.tour.status}</span>
+                                <span className="flex items-center gap-1 uppercase text-[9px] tracking-wide" style={spaceMono.style}>{booking.tour.status}</span>
                             </div>
-                            <div className="text-xs text-slate-500">
-                                Code: <span className="font-mono text-slate-600">{booking.uniqueTourCode}</span>
+                            <div className="text-xs text-[#1E2938]/40" style={jetbrainsMono.style}>
+                                Code: <span className="text-[#006666]">{booking.uniqueTourCode}</span>
                             </div>
                         </div>
                     </Section>
@@ -357,14 +432,14 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                             value={
                                 <span className="flex items-center gap-2">
                                     {booking.traveler.name}
-                                    {booking.traveler.isVerified && <CheckCircle2 size={12} className="text-emerald-500" />}
+                                    {booking.traveler.isVerified && <CheckCircle2 size={12} className="text-[#00A63D]" />}
                                 </span>
                             }
                         />
                         <DetailRow
                             icon={<Mail size={13} />}
                             label="Email"
-                            value={<a href={`mailto:${booking.traveler.email}`} className="text-indigo-600 hover:underline">{booking.traveler.email}</a>}
+                            value={<a href={`mailto:${booking.traveler.email}`} className="text-[#006666] hover:underline">{booking.traveler.email}</a>}
                         />
                         {booking.traveler.phone && (
                             <DetailRow icon={<Phone size={13} />} label="Phone" value={booking.traveler.phone} />
@@ -384,7 +459,7 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                         <DetailRow
                             icon={<AlertTriangle size={13} />}
                             label="Account status"
-                            value={<span className="capitalize text-slate-500">{booking.traveler.accountStatus}</span>}
+                            value={<span className="capitalize text-[#1E2938]/50">{booking.traveler.accountStatus}</span>}
                         />
                     </Section>
 
@@ -411,45 +486,59 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
 
                     {/* Payment */}
                     <Section title="Payment">
-                        <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-3">
+                        <div className={cn(
+                            'rounded-xl p-4 space-y-3',
+                            'bg-[#E7E5E4]',
+                            'shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+                        )}>
                             <div className="flex items-center justify-between">
-                                <span className="text-xs text-slate-500">Method</span>
-                                <span className="text-sm font-medium text-slate-700 capitalize">
+                                <span className="text-xs text-[#1E2938]/40" style={spaceMono.style}>Method</span>
+                                <span className="text-sm font-medium text-[#1E2938]/70 capitalize" style={jetbrainsMono.style}>
                                     {paymentMethodLabel[booking.payment.method] ?? booking.payment.method}
                                 </span>
                             </div>
                             {booking.payment.transactionId && (
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs text-slate-500">Transaction ID</span>
-                                    <span className="text-xs font-mono text-slate-600">{booking.payment.transactionId}</span>
+                                    <span className="text-xs text-[#1E2938]/40" style={spaceMono.style}>Transaction ID</span>
+                                    <span className="text-xs text-[#006666]" style={jetbrainsMono.style}>{booking.payment.transactionId}</span>
                                 </div>
                             )}
                             <div className="flex items-center justify-between">
-                                <span className="text-xs text-slate-500">Status</span>
+                                <span className="text-xs text-[#1E2938]/40" style={spaceMono.style}>Status</span>
                                 <BookingStatusBadge status={booking.payment.status} size="sm" />
                             </div>
                             {booking.payment.paidAt && (
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs text-slate-500">Paid at</span>
-                                    <span className="text-xs text-slate-600">{format(new Date(booking.payment.paidAt), 'MMM dd, yyyy')}</span>
+                                    <span className="text-xs text-[#1E2938]/40" style={spaceMono.style}>Paid at</span>
+                                    <span className="text-xs text-[#1E2938]/60" style={jetbrainsMono.style}>
+                                        {format(new Date(booking.payment.paidAt), 'MMM dd, yyyy')}
+                                    </span>
                                 </div>
                             )}
-                            <Separator className="bg-slate-200" />
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-600">Total paid</span>
-                                <span className="text-lg font-bold text-slate-800" style={playfair.style}>
+                            <div className="pt-1 border-t border-[#1E2938]/5 flex items-center justify-between">
+                                <span className="text-xs font-medium text-[#1E2938]/50" style={spaceMono.style}>Total paid</span>
+                                <span className="text-lg font-bold text-[#006666]" style={spaceMono.style}>
                                     {booking.tour.basePrice.currency} {booking.totalPaid.toLocaleString()}
                                 </span>
                             </div>
                         </div>
 
                         {booking.discounts.length > 0 && (
-                            <div className="space-y-2">
-                                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-medium">Applied discounts</p>
+                            <div className="space-y-2 mt-3">
+                                <p className="text-[9px] uppercase tracking-[0.18em] text-[#1E2938]/35 font-medium" style={spaceMono.style}>
+                                    Applied discounts
+                                </p>
                                 {booking.discounts.map((d, idx) => (
-                                    <div key={idx} className="flex items-center justify-between rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
-                                        <span className="text-xs text-slate-600 capitalize">{d.discount}</span>
-                                        <span className="text-xs font-medium text-emerald-600">
+                                    <div
+                                        key={idx}
+                                        className={cn(
+                                            'flex items-center justify-between rounded-lg px-3 py-2',
+                                            'bg-[#E7E5E4]',
+                                            'shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                        )}
+                                    >
+                                        <span className="text-xs text-[#1E2938]/60 capitalize" style={jetbrainsMono.style}>{d.discount}</span>
+                                        <span className="text-xs font-medium text-[#00A63D]" style={jetbrainsMono.style}>
                                             {d.type === 'percentage' ? `-${d.value}%` : `-৳${d.value}`}
                                         </span>
                                     </div>
@@ -461,7 +550,11 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                     {/* Cancellation record */}
                     {booking.cancellation && (
                         <Section title="Cancellation">
-                            <div className="rounded-xl bg-rose-50 border border-rose-200 p-4 space-y-3">
+                            <div className={cn(
+                                'rounded-xl p-4 space-y-3',
+                                'bg-[#E7E5E4]',
+                                'shadow-[inset_3px_3px_6px_rgba(255,33,87,0.08),inset_-2px_-2px_5px_#ffffff]',
+                            )}>
                                 <DetailRow
                                     icon={<Calendar size={13} />}
                                     label="Cancelled at"
@@ -470,7 +563,7 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                                 <DetailRow
                                     icon={<Hash size={13} />}
                                     label="Reason"
-                                    value={<span className="text-slate-600">{booking.cancellation.reason}</span>}
+                                    value={<span className="text-[#1E2938]/60">{booking.cancellation.reason}</span>}
                                 />
                                 {booking.cancellation.refundAmount && (
                                     <DetailRow
@@ -484,9 +577,13 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                     )}
                 </div>
 
-                {/* ── Sticky footer with action dialogs ────────────────────── */}
+                {/* ── Sticky footer ──────────────────────────────────────── */}
                 {showFooter && (
-                    <div className="shrink-0 border-t border-slate-100 bg-white/90 backdrop-blur-sm px-6 pt-4 pb-5 space-y-2">
+                    <div className={cn(
+                        'shrink-0 px-6 pt-4 pb-5 space-y-2 border-t border-[#1E2938]/5',
+                        'bg-[#E7E5E4]',
+                        'shadow-[0_-4px_12px_rgba(0,0,0,0.04)]',
+                    )}>
                         <div className="flex gap-2">
                             <RefundDialog
                                 bookingId={booking._id}
@@ -500,7 +597,9 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                             />
                         </div>
                         {statusNote && (
-                            <p className="text-[11px] text-slate-400 text-center">{statusNote}</p>
+                            <p className="text-[10px] text-[#1E2938]/35 text-center" style={jetbrainsMono.style}>
+                                {statusNote}
+                            </p>
                         )}
                     </div>
                 )}

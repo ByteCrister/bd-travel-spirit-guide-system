@@ -3,40 +3,17 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
+    Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-    AlertCircle,
-    Calendar as CalendarIcon,
-    ChevronDown,
-    Filter,
-    Loader2,
-    RefreshCw,
-    Shield,
-    X,
-    Clock,
-    Activity,
-    TrendingUp,
-    CalendarDays,
-    FileText,
-    Database,
+    AlertCircle, Calendar as CalendarIcon, ChevronDown, Filter, Loader2,
+    RefreshCw, Shield, X, Clock, Activity, TrendingUp, CalendarDays, FileText, Database,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -44,636 +21,437 @@ import { AuditDateFilter, AuditLog } from "@/types/current-user.types";
 import { useCurrentUserStore } from "@/store/current-user.store";
 import { AUDIT_ACTION, AuditAction } from "@/constants/current-user/audit-action.const";
 
+// Shared neumorphic button
+const NeuBtn = ({
+    onClick, disabled, children, variant = "raised", className = "",
+}: {
+    onClick?: () => void; disabled?: boolean; children: React.ReactNode;
+    variant?: "raised" | "inset" | "primary"; className?: string;
+}) => {
+    const shadows = {
+        raised: "shadow-[4px_4px_10px_rgba(0,0,0,0.13),-3px_-3px_8px_rgba(255,255,255,0.8)] hover:shadow-[5px_5px_12px_rgba(0,0,0,0.16),-4px_-4px_10px_rgba(255,255,255,0.88)] active:shadow-[inset_3px_3px_7px_rgba(0,0,0,0.12),inset_-2px_-2px_5px_rgba(255,255,255,0.65)]",
+        inset: "shadow-[inset_3px_3px_7px_rgba(0,0,0,0.1),inset_-3px_-3px_7px_rgba(255,255,255,0.7)]",
+        primary: "bg-[#006666] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.2),-2px_-2px_6px_rgba(255,255,255,0.4)] hover:bg-[#005555] active:shadow-[inset_3px_3px_8px_rgba(0,0,0,0.25)]",
+    };
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            className={`px-3 py-2 rounded-xl text-xs font-semibold font-[var(--font-space-mono)]
+                bg-[#E7E5E4] text-[#1E2938]/70 ${shadows[variant]}
+                disabled:opacity-40 transition-all duration-150 ${className}`}
+        >
+            {children}
+        </button>
+    );
+};
+
 const filterVariants: Variants = {
     hidden: { height: 0, opacity: 0 },
-    visible: {
-        height: "auto",
-        opacity: 1,
-        transition: {
-            height: { duration: 0.25, ease: "easeInOut" },
-            opacity: { duration: 0.2, delay: 0.1 },
-        },
-    },
-    exit: {
-        height: 0,
-        opacity: 0,
-        transition: {
-            height: { duration: 0.2, ease: "easeInOut" },
-            opacity: { duration: 0.15 },
-        },
-    },
+    visible: { height: "auto", opacity: 1, transition: { height: { duration: 0.25 }, opacity: { duration: 0.2, delay: 0.1 } } },
+    exit: { height: 0, opacity: 0, transition: { height: { duration: 0.2 }, opacity: { duration: 0.15 } } },
+};
+
+const ACTION_COLORS: Record<string, string> = {
+    create: "text-[#00A63D]",
+    update: "text-[#006666]",
+    delete: "text-[#FF2157]",
+    read: "text-[#1E2938]/50",
+};
+
+const ACTION_ICONS: Record<string, React.ReactNode> = {
+    create: <TrendingUp className="h-3 w-3" />,
+    update: <Activity className="h-3 w-3" />,
+    delete: <X className="h-3 w-3" />,
+    read: <Shield className="h-3 w-3" />,
 };
 
 export default function AuditLogsSection() {
     const {
-        audits,
-        auditsMeta,
-        auditFilters,
-        fetchUserAudits,
-        setAuditDateFilter,
-        resetAuditFilters,
-        loadMoreAudits,
+        audits, auditsMeta, auditFilters,
+        fetchUserAudits, setAuditDateFilter, resetAuditFilters, loadMoreAudits,
     } = useCurrentUserStore();
 
     const [date, setDate] = useState<Date>();
     const [startDate, setStartDate] = useState<Date>();
     const [endDate, setEndDate] = useState<Date>();
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-
     const debounceRef = useRef<number | null>(null);
 
     useEffect(() => {
-        if (auditFilters.date) {
-            const parsedDate = new Date(auditFilters.date);
-            if (!isNaN(parsedDate.getTime())) {
-                setDate(parsedDate);
-            }
-        } else {
-            setDate(undefined);
-        }
-
-        if (auditFilters.startDate) {
-            const parsedStartDate = new Date(auditFilters.startDate);
-            if (!isNaN(parsedStartDate.getTime())) {
-                setStartDate(parsedStartDate);
-            }
-        } else {
-            setStartDate(undefined);
-        }
-
-        if (auditFilters.endDate) {
-            const parsedEndDate = new Date(auditFilters.endDate);
-            if (!isNaN(parsedEndDate.getTime())) {
-                setEndDate(parsedEndDate);
-            }
-        } else {
-            setEndDate(undefined);
-        }
+        if (auditFilters.date) { const d = new Date(auditFilters.date); if (!isNaN(d.getTime())) setDate(d); } else setDate(undefined);
+        if (auditFilters.startDate) { const d = new Date(auditFilters.startDate); if (!isNaN(d.getTime())) setStartDate(d); } else setStartDate(undefined);
+        if (auditFilters.endDate) { const d = new Date(auditFilters.endDate); if (!isNaN(d.getTime())) setEndDate(d); } else setEndDate(undefined);
     }, [auditFilters.date, auditFilters.startDate, auditFilters.endDate]);
 
-    const handleAccordionChange = useCallback(
-        async (value: string) => {
-            if (value === "audits") {
-                if (auditsMeta.stale || audits.length === 0) {
-                    await fetchUserAudits();
-                }
-            }
-        },
-        [audits.length, auditsMeta.stale, fetchUserAudits]
-    );
+    const handleAccordionChange = useCallback(async (value: string) => {
+        if (value === "audits" && (auditsMeta.stale || audits.length === 0)) await fetchUserAudits();
+    }, [audits.length, auditsMeta.stale, fetchUserAudits]);
 
     const applyFilters = useCallback(async () => {
         const filters: AuditDateFilter = {};
-        if (date) {
-            filters.date = date.toISOString();
-        } else {
-            if (startDate) {
-                filters.startDate = startDate.toISOString();
-            }
-            if (endDate) {
-                filters.endDate = endDate.toISOString();
-            }
-        }
-
+        if (date) filters.date = date.toISOString();
+        else { if (startDate) filters.startDate = startDate.toISOString(); if (endDate) filters.endDate = endDate.toISOString(); }
         setAuditDateFilter(filters);
         await fetchUserAudits({ ...filters, force: true });
         setIsFilterOpen(false);
     }, [date, startDate, endDate, setAuditDateFilter, fetchUserAudits]);
 
     const clearFilters = useCallback(async () => {
-        setDate(undefined);
-        setStartDate(undefined);
-        setEndDate(undefined);
+        setDate(undefined); setStartDate(undefined); setEndDate(undefined);
         resetAuditFilters();
         await fetchUserAudits({ force: true });
         setIsFilterOpen(false);
     }, [resetAuditFilters, fetchUserAudits]);
 
     const handleScroll = useCallback(() => {
-        if (debounceRef.current) {
-            clearTimeout(debounceRef.current);
-        }
-
+        if (debounceRef.current) clearTimeout(debounceRef.current);
         debounceRef.current = window.setTimeout(() => {
-            const scrollTop = document.documentElement.scrollTop;
-            const scrollHeight = document.documentElement.scrollHeight;
-            const clientHeight = document.documentElement.clientHeight;
-
-            if (
-                scrollTop + clientHeight >= scrollHeight - 100 &&
-                !auditsMeta.loading &&
-                auditFilters.hasMore
-            ) {
-                loadMoreAudits();
-            }
+            const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+            if (scrollTop + clientHeight >= scrollHeight - 100 && !auditsMeta.loading && auditFilters.hasMore) loadMoreAudits();
         }, 200);
     }, [auditsMeta.loading, auditFilters.hasMore, loadMoreAudits]);
 
     useEffect(() => {
         window.addEventListener("scroll", handleScroll);
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            if (debounceRef.current) {
-                clearTimeout(debounceRef.current);
-            }
-        };
+        return () => { window.removeEventListener("scroll", handleScroll); if (debounceRef.current) clearTimeout(debounceRef.current); };
     }, [handleScroll]);
 
-    const getActionColor = (action: AuditAction) => {
-        switch (action.toLowerCase()) {
-            case AUDIT_ACTION.CREATE:
-                return "bg-slate-100 text-slate-800 border-slate-300";
-            case AUDIT_ACTION.UPDATE:
-                return "bg-slate-100 text-slate-700 border-slate-300";
-            case AUDIT_ACTION.DELETE:
-                return "bg-slate-100 text-slate-800 border-slate-300";
-            case AUDIT_ACTION.READ:
-            default:
-                return "bg-slate-50 text-slate-600 border-slate-200";
-        }
-    };
-
-    const getActionIcon = (action: AuditAction) => {
-        switch (action.toLowerCase()) {
-            case AUDIT_ACTION.CREATE:
-                return <TrendingUp className="h-3 w-3" />;
-            case AUDIT_ACTION.UPDATE:
-                return <Activity className="h-3 w-3" />;
-            case AUDIT_ACTION.DELETE:
-                return <X className="h-3 w-3" />;
-            case AUDIT_ACTION.READ:
-            default:
-                return <Shield className="h-3 w-3" />;
-        }
-    };
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const hasActiveFilters = auditFilters.date || auditFilters.startDate || auditFilters.endDate;
 
     if (auditsMeta.error) {
         return (
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-6 bg-slate-50 border border-slate-200 rounded-lg"
-            >
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                className="p-6 rounded-2xl bg-[#E7E5E4]
+                    shadow-[6px_6px_16px_rgba(0,0,0,0.13),-5px_-5px_14px_rgba(255,255,255,0.85)]">
                 <div className="flex items-center gap-3 mb-3">
-                    <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200">
-                        <AlertCircle className="h-5 w-5 text-slate-700" />
+                    <div className="p-3 rounded-xl bg-[#E7E5E4]
+                        shadow-[4px_4px_10px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.8)]">
+                        <AlertCircle className="h-5 w-5 text-[#FF2157]" />
                     </div>
-                    <h3 className="font-semibold text-slate-900">Error Loading Audit Logs</h3>
+                    <h3 className="font-bold text-[#1E2938] font-[var(--font-space-mono)]">Error Loading Audit Logs</h3>
                 </div>
-                <p className="text-sm text-slate-600 mb-4">{auditsMeta.error}</p>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fetchUserAudits({ force: true })}
-                    className="group border-slate-300"
-                >
-                    <RefreshCw className="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
-                    Retry
-                </Button>
+                <p className="text-sm text-[#1E2938]/60 mb-4 font-[var(--font-jetbrains-mono)]">{auditsMeta.error}</p>
+                <NeuBtn onClick={() => fetchUserAudits({ force: true })}>
+                    <span className="flex items-center gap-1.5"><RefreshCw className="h-3.5 w-3.5" /> Retry</span>
+                </NeuBtn>
             </motion.div>
         );
     }
 
-    const hasActiveFilters = auditFilters.date || auditFilters.startDate || auditFilters.endDate;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+    const DatePickerBtn = ({ value, label }: { value?: Date; label: string }) => (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-[var(--font-jetbrains-mono)]
+            text-[#1E2938]/60 bg-[#E7E5E4]
+            shadow-[inset_3px_3px_7px_rgba(0,0,0,0.1),inset_-3px_-3px_7px_rgba(255,255,255,0.7)]
+            min-w-[140px]">
+            <CalendarIcon className="h-3.5 w-3.5 text-[#006666]" />
+            {value ? format(value, "MMM d, yyyy") : <span className="text-[#1E2938]/30">{label}</span>}
+        </div>
+    );
 
     return (
-        <Accordion
-            type="single"
-            collapsible
-            className="w-full"
-            onValueChange={handleAccordionChange}
-            defaultValue="" // Changed from "audits" to "" to initially close
-        >
-            <AccordionItem value="audits" className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
-                <AccordionTrigger className="hover:no-underline px-6 py-5 hover:bg-slate-50 transition-colors data-[state=open]:border-b data-[state=open]:border-slate-200">
-                    <div className="flex items-center gap-4">
-                        <div className="h-11 w-11 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200">
-                            <Shield className="h-5 w-5 text-slate-700" />
-                        </div>
-                        <div className="text-left">
-                            <h3 className="font-semibold text-base text-slate-900">Audit Logs</h3>
-                            <p className="text-sm text-slate-500 mt-0.5">
-                                Track your account activity and changes
-                            </p>
-                        </div>
-                    </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-6 pb-6 pt-6">
-                    {/* Filters */}
-                    <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                        <div className="flex items-center justify-between mb-3">
-                            <h4 className="font-medium flex items-center gap-2 text-sm text-slate-900">
-                                <Filter className="h-4 w-4 text-slate-600" />
-                                Filters
-                            </h4>
-                            <div className="flex items-center gap-2">
-                                <AnimatePresence>
-                                    {hasActiveFilters && (
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.9 }}
-                                        >
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={clearFilters}
-                                                className="h-8 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                                            >
-                                                <X className="h-3 w-3 mr-1" />
-                                                Clear
-                                            </Button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                                <Button
-                                    variant={isFilterOpen ? "secondary" : "outline"}
-                                    size="sm"
-                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                                    className="h-8 text-xs border-slate-300"
-                                >
-                                    {isFilterOpen ? "Hide" : "Show"}
-                                    <ChevronDown
-                                        className={cn(
-                                            "h-3.5 w-3.5 ml-1 transition-transform duration-200",
-                                            isFilterOpen && "rotate-180"
-                                        )}
-                                    />
-                                </Button>
+        <Accordion type="single" collapsible className="w-full" onValueChange={handleAccordionChange} defaultValue="">
+            <AccordionItem value="audits" className="border-0">
+                {/* Trigger */}
+                <div className="rounded-2xl bg-[#E7E5E4]
+                    shadow-[8px_8px_20px_rgba(0,0,0,0.15),-6px_-6px_16px_rgba(255,255,255,0.88)]">
+                    <AccordionTrigger className="hover:no-underline px-6 py-5 rounded-2xl hover:bg-transparent
+                        data-[state=open]:rounded-b-none">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 rounded-xl bg-[#E7E5E4]
+                                shadow-[4px_4px_10px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.8)]">
+                                <Shield className="h-5 w-5 text-[#006666]" />
+                            </div>
+                            <div className="text-left">
+                                <h3 className="font-bold text-[#1E2938] font-[var(--font-space-mono)]">Audit Logs</h3>
+                                <p className="text-xs text-[#1E2938]/50 font-[var(--font-jetbrains-mono)] mt-0.5">
+                                    Track your account activity
+                                </p>
                             </div>
                         </div>
+                    </AccordionTrigger>
 
-                        {/* Active filters display */}
-                        <AnimatePresence>
-                            {hasActiveFilters && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="mb-3 overflow-hidden"
-                                >
-                                    <div className="flex flex-wrap gap-2 pt-2">
+                    <AccordionContent className="px-6 pb-6 pt-2">
+                        {/* Filter panel */}
+                        <div className="mb-6 p-4 rounded-xl bg-[#E7E5E4]
+                            shadow-[inset_4px_4px_10px_rgba(0,0,0,0.1),inset_-4px_-4px_10px_rgba(255,255,255,0.7)]">
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest
+                                    text-[#1E2938]/60 font-[var(--font-space-mono)]">
+                                    <Filter className="h-3.5 w-3.5" /> Filters
+                                </span>
+                                <div className="flex items-center gap-2">
+                                    <AnimatePresence>
+                                        {hasActiveFilters && (
+                                            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
+                                                <NeuBtn onClick={clearFilters}>
+                                                    <span className="flex items-center gap-1"><X className="h-3 w-3" /> Clear</span>
+                                                </NeuBtn>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                    <NeuBtn onClick={() => setIsFilterOpen(!isFilterOpen)}>
+                                        <span className="flex items-center gap-1">
+                                            {isFilterOpen ? "Hide" : "Show"}
+                                            <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", isFilterOpen && "rotate-180")} />
+                                        </span>
+                                    </NeuBtn>
+                                </div>
+                            </div>
+
+                            {/* Active filter badges */}
+                            <AnimatePresence>
+                                {hasActiveFilters && (
+                                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                                        className="flex flex-wrap gap-2 mb-3 overflow-hidden">
                                         {auditFilters.date && (
-                                            <Badge
-                                                variant="secondary"
-                                                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 border-slate-300 text-xs"
-                                            >
+                                            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs
+                                                text-[#006666] font-[var(--font-jetbrains-mono)]
+                                                bg-[#E7E5E4] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.09),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
                                                 <CalendarIcon className="h-3 w-3" />
                                                 {format(new Date(auditFilters.date), "MMM d, yyyy")}
-                                            </Badge>
+                                            </span>
                                         )}
                                         {auditFilters.startDate && (
-                                            <Badge
-                                                variant="secondary"
-                                                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 border-slate-300 text-xs"
-                                            >
-                                                <CalendarIcon className="h-3 w-3" />
+                                            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs
+                                                text-[#006666] font-[var(--font-jetbrains-mono)]
+                                                bg-[#E7E5E4] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.09),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
                                                 From: {format(new Date(auditFilters.startDate), "MMM d, yyyy")}
-                                            </Badge>
+                                            </span>
                                         )}
                                         {auditFilters.endDate && (
-                                            <Badge
-                                                variant="secondary"
-                                                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 border-slate-300 text-xs"
-                                            >
-                                                <CalendarIcon className="h-3 w-3" />
+                                            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs
+                                                text-[#006666] font-[var(--font-jetbrains-mono)]
+                                                bg-[#E7E5E4] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.09),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
                                                 To: {format(new Date(auditFilters.endDate), "MMM d, yyyy")}
-                                            </Badge>
+                                            </span>
                                         )}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
-                        <AnimatePresence>
-                            {isFilterOpen && (
-                                <motion.div
-                                    variants={filterVariants}
-                                    initial="hidden"
-                                    animate="visible"
-                                    exit="exit"
-                                    className="overflow-hidden"
-                                >
-                                    <div className="space-y-4 pt-3">
-                                        <Separator className="bg-slate-200" />
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                            {/* Single Date */}
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-medium flex items-center gap-1.5 text-slate-700">
-                                                    <CalendarIcon className="h-3 w-3 text-slate-500" />
-                                                    Specific Date
-                                                </label>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className={cn(
-                                                                "w-full justify-start text-left font-normal h-9 bg-white hover:bg-slate-50 border-slate-300 text-sm",
-                                                                !date && "text-slate-500"
-                                                            )}
-                                                        >
-                                                            <CalendarIcon className="mr-2 h-3.5 w-3.5" />
-                                                            {date ? format(date, "PPP") : "Pick a date"}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-0" align="start">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={date}
-                                                            onSelect={setDate}
-                                                            initialFocus
-                                                            disabled={(date) => {
-                                                                const d = new Date(date);
-                                                                d.setHours(0, 0, 0, 0);
-
-                                                                if (d > today) return true;       // prevent future dates
-                                                                if (endDate && d > endDate) return true;  // cannot be after end date
-                                                                return false;
-                                                            }}
-
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
-
-                                            {/* Start Date */}
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-medium flex items-center gap-1.5 text-slate-700">
-                                                    <CalendarDays className="h-3 w-3 text-slate-500" />
-                                                    Start Date
-                                                </label>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className={cn(
-                                                                "w-full justify-start text-left font-normal h-9 bg-white hover:bg-slate-50 border-slate-300 text-sm",
-                                                                !startDate && "text-slate-500"
-                                                            )}
-                                                        >
-                                                            <CalendarIcon className="mr-2 h-3.5 w-3.5" />
-                                                            {startDate ? format(startDate, "PPP") : "Start date"}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-0" align="start">
-                                                        {/* Start Date */}
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={startDate} // highlight startDate
-                                                            onSelect={(date) => {
-                                                                if (!date) return;
-                                                                // auto-adjust endDate if startDate goes beyond it
-                                                                if (endDate && date > endDate) {
-                                                                    setEndDate(date);
-                                                                }
-                                                                setStartDate(date); //  set startDate
-                                                            }}
-                                                            initialFocus
-                                                            disabled={(date) => {
-                                                                const d = new Date(date);
-                                                                d.setHours(0, 0, 0, 0);
-
-                                                                if (d > today) return true;       // prevent future dates
-                                                                if (endDate && d > endDate) return true;  // cannot be after end date
-                                                                return false;
-                                                            }}
-                                                        />
-
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
-
-                                            {/* End Date */}
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-medium flex items-center gap-1.5 text-slate-700">
-                                                    <CalendarDays className="h-3 w-3 text-slate-500" />
-                                                    End Date
-                                                </label>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className={cn(
-                                                                "w-full justify-start text-left font-normal h-9 bg-white hover:bg-slate-50 border-slate-300 text-sm",
-                                                                !endDate && "text-slate-500"
-                                                            )}
-                                                        >
-                                                            <CalendarIcon className="mr-2 h-3.5 w-3.5" />
-                                                            {endDate ? format(endDate, "PPP") : "End date"}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-0" align="start">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={endDate}
-                                                            onSelect={(date) => {
-                                                                if (!date) return; // <-- handle undefined
-                                                                if (startDate && date < startDate) {
-                                                                    setStartDate(date); // auto-adjust startDate if endDate goes before it
-                                                                }
-                                                                setEndDate(date);
-                                                            }}
-                                                            initialFocus
-                                                            disabled={(date) => {
-                                                                const d = new Date(date);
-                                                                d.setHours(0, 0, 0, 0);
-
-                                                                if (d > today) return true;        // no future dates
-                                                                if (startDate && d < startDate) return true; // not before start
-                                                                return false;
-                                                            }}
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex gap-2 pt-2">
-                                            <Button
-                                                onClick={applyFilters}
-                                                disabled={auditsMeta.loading}
-                                                className="flex-1 h-9 bg-slate-900 hover:bg-slate-800 text-white text-sm"
-                                            >
-                                                {auditsMeta.loading && (
-                                                    <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                                                )}
-                                                Apply Filters
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setIsFilterOpen(false)}
-                                                className="flex-1 h-9 border-slate-300 text-sm"
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Audit Logs Table */}
-                    <div className="rounded-lg border border-slate-200 overflow-hidden bg-white">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-slate-50 hover:bg-slate-50 border-b border-slate-200">
-                                    <TableHead className="font-semibold text-slate-700 text-xs">Action</TableHead>
-                                    <TableHead className="font-semibold text-slate-700 text-xs">Target</TableHead>
-                                    <TableHead className="font-semibold text-slate-700 text-xs">Changes</TableHead>
-                                    <TableHead className="font-semibold text-slate-700 text-xs">IP Address</TableHead>
-                                    <TableHead className="font-semibold text-slate-700 text-xs">
-                                        <div className="flex items-center gap-1.5">
-                                            <Clock className="h-3 w-3" />
-                                            Timestamp
-                                        </div>
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {auditsMeta.loading && audits.length === 0 ? (
-                                    Array.from({ length: 5 }).map((_, i) => (
-                                        <TableRow key={i}>
-                                            <TableCell colSpan={5}>
-                                                <Skeleton className="h-14 w-full rounded bg-slate-100" />
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : audits.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-16">
-                                            <div className="flex flex-col items-center gap-3">
-                                                <div className="h-14 w-14 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200">
-                                                    <FileText className="h-6 w-6 text-slate-400" />
+                            <AnimatePresence>
+                                {isFilterOpen && (
+                                    <motion.div variants={filterVariants} initial="hidden" animate="visible" exit="exit" className="overflow-hidden">
+                                        <div className="space-y-4 pt-3 border-t border-[#1E2938]/8 mt-2">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                {/* Specific Date */}
+                                                <div className="space-y-1.5">
+                                                    <label className="flex items-center gap-1.5 text-xs font-semibold
+                                                        text-[#1E2938]/50 font-[var(--font-space-mono)]">
+                                                        <CalendarIcon className="h-3 w-3" /> Specific Date
+                                                    </label>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <button type="button" className="w-full">
+                                                                <DatePickerBtn value={date} label="Pick a date" />
+                                                            </button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0" align="start">
+                                                            <Calendar mode="single" selected={date} onSelect={setDate} initialFocus
+                                                                disabled={(d) => { const n = new Date(d); n.setHours(0,0,0,0); return n > today; }} />
+                                                        </PopoverContent>
+                                                    </Popover>
                                                 </div>
-                                                <div>
-                                                    <p className="font-medium text-slate-900 text-sm">No audit logs found</p>
-                                                    <p className="text-xs text-slate-500 mt-1">
-                                                        Activity records will appear here when available
+                                                {/* Start Date */}
+                                                <div className="space-y-1.5">
+                                                    <label className="flex items-center gap-1.5 text-xs font-semibold
+                                                        text-[#1E2938]/50 font-[var(--font-space-mono)]">
+                                                        <CalendarDays className="h-3 w-3" /> Start Date
+                                                    </label>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <button type="button" className="w-full">
+                                                                <DatePickerBtn value={startDate} label="Start date" />
+                                                            </button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0" align="start">
+                                                            <Calendar mode="single" selected={startDate}
+                                                                onSelect={(d) => { if (!d) return; if (endDate && d > endDate) setEndDate(d); setStartDate(d); }}
+                                                                initialFocus
+                                                                disabled={(d) => { const n = new Date(d); n.setHours(0,0,0,0); return n > today || (!!endDate && n > endDate); }} />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </div>
+                                                {/* End Date */}
+                                                <div className="space-y-1.5">
+                                                    <label className="flex items-center gap-1.5 text-xs font-semibold
+                                                        text-[#1E2938]/50 font-[var(--font-space-mono)]">
+                                                        <CalendarDays className="h-3 w-3" /> End Date
+                                                    </label>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <button type="button" className="w-full">
+                                                                <DatePickerBtn value={endDate} label="End date" />
+                                                            </button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0" align="start">
+                                                            <Calendar mode="single" selected={endDate}
+                                                                onSelect={(d) => { if (!d) return; if (startDate && d < startDate) setStartDate(d); setEndDate(d); }}
+                                                                initialFocus
+                                                                disabled={(d) => { const n = new Date(d); n.setHours(0,0,0,0); return n > today || (!!startDate && n < startDate); }} />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2 pt-2">
+                                                <NeuBtn variant="primary" onClick={applyFilters} disabled={auditsMeta.loading} className="flex-1 flex items-center justify-center gap-2">
+                                                    {auditsMeta.loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                                                    Apply Filters
+                                                </NeuBtn>
+                                                <NeuBtn onClick={() => setIsFilterOpen(false)} className="flex-1 text-center">Cancel</NeuBtn>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Table */}
+                        <div className="rounded-xl overflow-hidden bg-[#E7E5E4]
+                            shadow-[inset_4px_4px_10px_rgba(0,0,0,0.1),inset_-4px_-4px_10px_rgba(255,255,255,0.7)]">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="hover:bg-transparent border-b border-[#1E2938]/8">
+                                        {["Action", "Target", "Changes", "IP Address", "Timestamp"].map((h) => (
+                                            <TableHead key={h} className="text-xs font-bold uppercase tracking-widest
+                                                text-[#1E2938]/40 font-[var(--font-space-mono)] py-3">
+                                                {h === "Timestamp" ? (
+                                                    <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" />{h}</span>
+                                                ) : h}
+                                            </TableHead>
+                                        ))}
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {auditsMeta.loading && audits.length === 0 ? (
+                                        Array.from({ length: 5 }).map((_, i) => (
+                                            <TableRow key={i} className="border-b border-[#1E2938]/5">
+                                                <TableCell colSpan={5}>
+                                                    <Skeleton className="h-10 w-full rounded-lg bg-[#1E2938]/8" />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : audits.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-center py-16">
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <div className="p-4 rounded-xl bg-[#E7E5E4]
+                                                        shadow-[4px_4px_10px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.8)]">
+                                                        <FileText className="h-6 w-6 text-[#1E2938]/30" />
+                                                    </div>
+                                                    <p className="font-bold text-[#1E2938]/50 text-sm font-[var(--font-space-mono)]">
+                                                        No audit logs found
                                                     </p>
                                                 </div>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    audits.map((log: AuditLog, index: number) => (
-                                        <motion.tr
-                                            key={log._id}
-                                            initial={{ opacity: 0, y: 8 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.03 }}
-                                            className="group hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"
-                                        >
-                                            <TableCell className="py-3.5">
-                                                <Badge
-                                                    className={cn(
-                                                        "font-medium transition-all duration-200 flex items-center gap-1.5 w-fit text-xs",
-                                                        getActionColor(log.action)
-                                                    )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        audits.map((log: AuditLog, index: number) => {
+                                            const actionKey = log.action.toLowerCase();
+                                            return (
+                                                <motion.tr
+                                                    key={log._id}
+                                                    initial={{ opacity: 0, y: 6 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: index * 0.02 }}
+                                                    className="border-b border-[#1E2938]/5 last:border-0 hover:bg-[#1E2938]/3 transition-colors"
                                                 >
-                                                    {getActionIcon(log.action)}
-                                                    {log.action}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="py-3.5">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="h-8 w-8 rounded bg-slate-100 flex items-center justify-center border border-slate-200">
-                                                        <Database className="h-3.5 w-3.5 text-slate-600" />
-                                                    </div>
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <span className="text-xs font-medium text-slate-900">{log.targetModel}</span>
-                                                        <span className="text-xs text-slate-500 font-mono">{log.target}</span>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="py-3.5">
-                                                {log.changes ? (
-                                                    <div className="text-xs space-y-1">
-                                                        {Object.keys(log.changes.before || {}).length > 0 && (
-                                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                                                                <Activity className="h-3 w-3" />
-                                                                Modified
+                                                    <TableCell className="py-3.5">
+                                                        <span className={`flex items-center gap-1.5 w-fit px-2.5 py-1.5 rounded-lg text-xs font-bold
+                                                            font-[var(--font-space-mono)] bg-[#E7E5E4]
+                                                            shadow-[2px_2px_5px_rgba(0,0,0,0.1),-2px_-2px_4px_rgba(255,255,255,0.7)]
+                                                            ${ACTION_COLORS[actionKey] || "text-[#1E2938]/50"}`}>
+                                                            {ACTION_ICONS[actionKey] || <Shield className="h-3 w-3" />}
+                                                            {log.action}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell className="py-3.5">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="p-1.5 rounded-lg bg-[#E7E5E4]
+                                                                shadow-[2px_2px_5px_rgba(0,0,0,0.1),-2px_-2px_4px_rgba(255,255,255,0.7)]">
+                                                                <Database className="h-3.5 w-3.5 text-[#006666]" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-xs font-bold text-[#1E2938] font-[var(--font-space-mono)]">{log.targetModel}</p>
+                                                                <p className="text-xs text-[#1E2938]/40 font-[var(--font-jetbrains-mono)]">{log.target}</p>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="py-3.5">
+                                                        {log.changes ? (
+                                                            <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs
+                                                                text-[#006666] font-[var(--font-jetbrains-mono)]
+                                                                bg-[#E7E5E4] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
+                                                                <Activity className="h-3 w-3" /> Modified
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-xs text-[#1E2938]/40 font-[var(--font-jetbrains-mono)]">
+                                                                {log.note || "—"}
                                                             </span>
                                                         )}
-                                                        {log.note && (
-                                                            <span className="block text-slate-600 mt-1">
-                                                                {log.note}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-xs text-slate-500">{log.note || "—"}</span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="py-3.5">
-                                                <code className="text-xs px-2 py-1 rounded bg-slate-100 font-mono text-slate-700 border border-slate-200">
-                                                    {log.ip || "—"}
-                                                </code>
-                                            </TableCell>
-                                            <TableCell className="text-xs text-slate-600 py-3.5 font-mono">
-                                                {format(new Date(log.createdAt), "MMM d, yyyy HH:mm")}
-                                            </TableCell>
-                                        </motion.tr>
-                                    ))
-                                )}
+                                                    </TableCell>
+                                                    <TableCell className="py-3.5">
+                                                        <code className="px-2 py-1 rounded-lg text-xs font-[var(--font-jetbrains-mono)]
+                                                            text-[#1E2938]/60 bg-[#E7E5E4]
+                                                            shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
+                                                            {log.ip || "—"}
+                                                        </code>
+                                                    </TableCell>
+                                                    <TableCell className="py-3.5 text-xs text-[#1E2938]/50 font-[var(--font-jetbrains-mono)]">
+                                                        {format(new Date(log.createdAt), "MMM d, yyyy HH:mm")}
+                                                    </TableCell>
+                                                </motion.tr>
+                                            );
+                                        })
+                                    )}
 
-                                {auditsMeta.loading && audits.length > 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-6 border-t border-slate-100">
-                                            <div className="flex items-center justify-center gap-2 text-slate-600">
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                <span className="text-sm">Loading more...</span>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
+                                    {auditsMeta.loading && audits.length > 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-center py-5">
+                                                <span className="flex items-center justify-center gap-2 text-xs text-[#1E2938]/50 font-[var(--font-jetbrains-mono)]">
+                                                    <Loader2 className="h-4 w-4 animate-spin" /> Loading more…
+                                                </span>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
 
-                                {!auditsMeta.loading && auditFilters.hasMore && audits.length > 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-4 border-t border-slate-100">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => loadMoreAudits()}
-                                                className="group h-8 text-xs border-slate-300"
-                                            >
-                                                <ChevronDown className="h-3.5 w-3.5 mr-1.5 group-hover:translate-y-0.5 transition-transform" />
-                                                Load More
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
+                                    {!auditsMeta.loading && auditFilters.hasMore && audits.length > 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-center py-4">
+                                                <NeuBtn onClick={() => loadMoreAudits()}>
+                                                    <span className="flex items-center gap-1.5">
+                                                        <ChevronDown className="h-3.5 w-3.5" /> Load More
+                                                    </span>
+                                                </NeuBtn>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
 
-                    {/* Stats */}
-                    {audits.length > 0 && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2 }}
-                            className="mt-4 flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200"
-                        >
-                            <div className="flex items-center gap-2 text-xs">
-                                <Database className="h-3.5 w-3.5 text-slate-600" />
-                                <span className="text-slate-600">
-                                    Showing <span className="font-semibold text-slate-900">{audits.length}</span> {audits.length === 1 ? 'record' : 'records'}
+                        {/* Stats footer */}
+                        {audits.length > 0 && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+                                className="mt-4 flex items-center justify-between px-4 py-3 rounded-xl
+                                    bg-[#E7E5E4]
+                                    shadow-[inset_3px_3px_7px_rgba(0,0,0,0.09),inset_-3px_-3px_7px_rgba(255,255,255,0.65)]">
+                                <span className="flex items-center gap-2 text-xs text-[#1E2938]/50 font-[var(--font-jetbrains-mono)]">
+                                    <Database className="h-3.5 w-3.5 text-[#006666]" />
+                                    <span className="font-bold text-[#1E2938]">{audits.length}</span> records shown
                                 </span>
-                            </div>
-                            {auditsMeta.total && (
-                                <div className="flex items-center gap-2 text-xs">
-                                    <span className="text-slate-600">
-                                        Total: <span className="font-semibold text-slate-900">{auditsMeta.total}</span>
+                                {auditsMeta.total && (
+                                    <span className="text-xs text-[#1E2938]/50 font-[var(--font-jetbrains-mono)]">
+                                        Total: <span className="font-bold text-[#1E2938]">{auditsMeta.total}</span>
                                     </span>
-                                </div>
-                            )}
-                        </motion.div>
-                    )}
-                </AccordionContent>
+                                )}
+                            </motion.div>
+                        )}
+                    </AccordionContent>
+                </div>
             </AccordionItem>
         </Accordion>
     );

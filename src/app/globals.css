@@ -120,3 +120,92 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* ========================================
+   NEUMORPHIC THIN SCROLLBAR SYSTEM
+======================================== */
+
+:root {
+  --scrollbar-size: 6px;
+  --scrollbar-radius: 999px;
+
+  /* Light mode */
+  --scrollbar-track: #dcd9d6;
+  --scrollbar-thumb: #b5b1ad;
+  --scrollbar-thumb-hover: #006666;
+
+  /* Neumorphism shadows */
+  --scrollbar-shadow-light: rgba(255, 255, 255, 0.9);
+  --scrollbar-shadow-dark: rgba(0, 0, 0, 0.12);
+}
+
+.dark {
+  --scrollbar-track: #1b1b1b;
+  --scrollbar-thumb: #3f3f46;
+  --scrollbar-thumb-hover: #00b3b3;
+
+  --scrollbar-shadow-light: rgba(255, 255, 255, 0.04);
+  --scrollbar-shadow-dark: rgba(0, 0, 0, 0.45);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Chrome / Edge / Safari */
+*::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--scrollbar-radius);
+
+  /* Soft inset neumorphism */
+  box-shadow:
+    inset 2px 2px 4px var(--scrollbar-shadow-dark),
+    inset -2px -2px 4px var(--scrollbar-shadow-light);
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: var(--scrollbar-radius);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--scrollbar-thumb) 88%, white),
+    var(--scrollbar-thumb)
+  );
+
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+
+  /* Raised neumorphic thumb */
+  box-shadow:
+    2px 2px 5px var(--scrollbar-shadow-dark),
+    -2px -2px 5px var(--scrollbar-shadow-light);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: color-mix(
+    in srgb,
+    var(--scrollbar-thumb-hover) 80%,
+    black
+  );
+
+  box-shadow:
+    inset 2px 2px 4px var(--scrollbar-shadow-dark),
+    inset -2px -2px 4px var(--scrollbar-shadow-light);
+}
+
+/* Corner */
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}

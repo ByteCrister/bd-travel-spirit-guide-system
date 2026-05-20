@@ -3,25 +3,27 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FiHome,
-  FiUsers,
-  FiHeadphones,
-  FiFileText,
-  FiImage,
-  FiGift,
-  FiMenu,
-  FiX,
-  FiChevronRight,
-  FiBookOpen,
-} from "react-icons/fi";
-import { FaComments } from "react-icons/fa";
+  Home,
+  Users,
+  Headphones,
+  FileText,
+  Image,
+  Gift,
+  Menu,
+  X,
+  ChevronRight,
+  BookOpen,
+  ShieldQuestion,
+  User,
+  MessageSquare,
+  Compass,
+} from "lucide-react";
 import { NavLink } from "./NavLink";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCurrentUserStore } from "@/store/current-user.store";
 import { USER_ROLE } from "@/constants/current-user/user.const";
-import { ShieldQuestion, User } from "lucide-react";
+
 interface SidebarProps {
   isMobile?: boolean;
   onClose?: () => void;
@@ -46,90 +48,93 @@ interface NavItem {
 const navigationGroups: NavGroup[] = [
   {
     title: "Overview",
-    icon: FiHome,
+    icon: Home,
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: FiHome },
+      { href: "/dashboard", label: "Dashboard", icon: Home },
       { href: "/dashboard/profile", label: "Profile", icon: User },
     ],
   },
   {
     title: "Operations",
-    icon: FiFileText,
+    icon: FileText,
     items: [
-      { href: "/operations/tours", label: "Tours", icon: FiFileText },
-      { href: "/operations/bookings", label: "Bookings", icon: FiBookOpen },
-      { href: "/operations/reports", label: "Reports", icon: FiFileText },
-      { href: "/operations/reviews", label: "Reviews", icon: FaComments },
+      { href: "/operations/tours", label: "Tours", icon: FileText },
+      { href: "/operations/bookings", label: "Bookings", icon: BookOpen },
+      { href: "/operations/reports", label: "Reports", icon: FileText },
+      { href: "/operations/reviews", label: "Reviews", icon: MessageSquare },
     ],
   },
   {
     title: "Support",
-    icon: FiHeadphones,
+    icon: Headphones,
     items: [
-      { href: "/support/travelers", label: "Customer Support", icon: FiHeadphones },
-      { href: "/support/faqs", label: "FAQs", icon: FiFileText },
-      { href: "/support/reset-password-requests", label: "Password Requests", icon: ShieldQuestion, adminOnly: true },
+      { href: "/support/travelers", label: "Customer Support", icon: Headphones },
+      { href: "/support/faqs", label: "FAQs", icon: FileText },
+      {
+        href: "/support/reset-password-requests",
+        label: "Password Requests",
+        icon: ShieldQuestion,
+        adminOnly: true,
+      },
     ],
   },
   {
     title: "Users",
-    icon: FiUsers,
+    icon: Users,
     items: [
-      { href: "/users/employees", label: "Employees", icon: FiUsers, adminOnly: true },
+      { href: "/users/employees", label: "Employees", icon: Users, adminOnly: true },
     ],
   },
   {
     title: "Social",
-    icon: FiGift,
+    icon: Gift,
     items: [
-      { href: "/social/advertising", label: "Advertising", icon: FiImage },
-      { href: "/social/notifications", label: "Notifications", icon: FiGift },
+      { href: "/social/advertising", label: "Advertising", icon: Image },
+      { href: "/social/notifications", label: "Notifications", icon: Gift },
     ],
   },
 ];
-
 
 export function Sidebar({
   isMobile = false,
   onClose,
   isOpen = false,
   isCollapsed,
-  setIsCollapsed }: SidebarProps) {
+  setIsCollapsed,
+}: SidebarProps) {
   const pathname = usePathname();
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(
+    navigationGroups.map(g => g.title)
+  );
   const [hasAutoCollapsed, setHasAutoCollapsed] = useState(false);
 
-  // ? matching is the current user is admin or not
   const { baseUser } = useCurrentUserStore();
-  const isGuide = baseUser?.role === USER_ROLE.GUIDE
+  const isGuide = baseUser?.role === USER_ROLE.GUIDE;
 
   useEffect(() => {
-    // find the group that matches the current route
-    const activeGroup = navigationGroups.find(group =>
-      group.items.some(item => pathname.startsWith(item.href))
+    const activeGroup = navigationGroups.find((group) =>
+      group.items.some((item) => pathname.startsWith(item.href))
     );
-
+    // if (activeGroup) setExpandedGroups([activeGroup.title]);
     if (activeGroup) {
-      setExpandedGroups([activeGroup.title]);
+      setExpandedGroups(prev =>
+        prev.includes(activeGroup.title) ? prev : [...prev, activeGroup.title]
+      );
     }
-    // auto-collapse logic
+
     if (pathname.startsWith("/customer-support") && !hasAutoCollapsed) {
-      if (isMobile && isOpen && onClose) {
-        onClose();
-      } else if (!isMobile && !isCollapsed) {
-        setIsCollapsed(true);
-      }
+      if (isMobile && isOpen && onClose) onClose();
+      else if (!isMobile && !isCollapsed) setIsCollapsed(true);
       setHasAutoCollapsed(true);
     } else if (!pathname.startsWith("/customer-support")) {
       setHasAutoCollapsed(false);
     }
-
-  }, [hasAutoCollapsed, isCollapsed, isMobile, isOpen, onClose, pathname, setIsCollapsed])
+  }, [hasAutoCollapsed, isCollapsed, isMobile, isOpen, onClose, pathname, setIsCollapsed]);
 
   const toggleGroup = (groupTitle: string) => {
-    setExpandedGroups(prev =>
+    setExpandedGroups((prev) =>
       prev.includes(groupTitle)
-        ? prev.filter(title => title !== groupTitle)
+        ? prev.filter((t) => t !== groupTitle)
         : [...prev, groupTitle]
     );
   };
@@ -139,238 +144,276 @@ export function Sidebar({
     collapsed: { width: 80 },
   };
 
-
   const mobileVariants = {
     open: { x: 0, opacity: 1 },
     closed: { x: "-100%", opacity: 0 },
   };
 
   return (
-    <>
-      {/* Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={isMobile ? (isOpen ? "open" : "closed") : (isCollapsed ? "collapsed" : "expanded")}
-        variants={isMobile ? mobileVariants : sidebarVariants}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+    <motion.aside
+      initial={false}
+      animate={
+        isMobile
+          ? isOpen
+            ? "open"
+            : "closed"
+          : isCollapsed
+            ? "collapsed"
+            : "expanded"
+      }
+      variants={isMobile ? mobileVariants : sidebarVariants}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className={cn(
+        "fixed left-0 top-0 z-50 flex h-screen flex-col",
+        "font-[family-name:var(--font-jetbrains-mono)]",
+        // Neumorphic surface
+        "bg-[#E7E5E4]",
+        "border-r border-[#d0cecc]",
+        // Outer shadow to create raised effect
+        "shadow-[4px_0_16px_rgba(0,0,0,0.08),-2px_0_6px_rgba(255,255,255,0.8)]",
+        isMobile ? "w-80" : "w-80 lg:relative lg:z-auto"
+      )}
+      role="navigation"
+      aria-label="Main navigation"
+    >
+      {/* Header */}
+      <div
         className={cn(
-          "fixed left-0 top-0 z-50 flex h-screen flex-col",
-          // subtle gradient background for modern feel
-          "bg-gradient-to-b from-white/95 to-slate-50/90 dark:from-slate-900/95 dark:to-slate-950/90",
-          "backdrop-blur-xl",
-          "border-r border-slate-200/60 dark:border-slate-800/60",
-          "shadow-lg shadow-blue-500/5",
-          isMobile ? "w-80" : "w-80 lg:relative lg:z-auto"
+          "border-b border-[#d0cecc] p-4",
+          isCollapsed
+            ? "flex flex-col items-center gap-3"
+            : "flex items-center justify-between"
         )}
-        role="navigation"
-        aria-label="Main navigation"
       >
-        {/* Header */}
-        <div className={cn(
-          "border-b border-slate-200/60 dark:border-slate-700/60 p-4",
-          isCollapsed ? "flex flex-col items-center gap-3" : "flex items-center justify-between"
-        )}>
-          <AnimatePresence mode="wait">
-            {!isCollapsed ? (
-              <motion.div
-                key="expanded"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center gap-3"
+        <AnimatePresence mode="wait">
+          {!isCollapsed ? (
+            <motion.div
+              key="expanded"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center gap-3"
+            >
+              {/* Brand icon — neumorphic inset pill */}
+              <div
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-xl",
+                  "bg-[#E7E5E4]",
+                  "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]"
+                )}
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden shadow-lg shadow-blue-500/25">
-                  <Image
-                    src="/images/website_logo/logo_1_airplane.png"
-                    alt="Website Logo"
-                    width={42}
-                    height={42}
-                    className="object-contain"
-                  />
-                </div>
+                <Compass className="h-5 w-5 text-[#006666]" strokeWidth={2} />
+              </div>
 
-                <div>
-                  <h1 className="font-display text-lg font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
-                    BD Travel Spirit
-                  </h1>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">Admin Dashboard</p>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="collapsed"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
-                className="flex h-12 w-12 items-center justify-center rounded-xl shadow-lg shadow-blue-500/25"
-              >
-                <Image
-                  src="/images/website_logo/logo_1_airplane.png"
-                  alt="Website Logo"
-                  width={42}
-                  height={42}
-                  className="object-contain"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Toggle Button */}
-          {!isMobile && (
-            <motion.button
-              onClick={() => setIsCollapsed(!isCollapsed)}
+              <div>
+                <h1
+                  className="font-[family-name:var(--font-space-mono)] text-base font-bold tracking-tight text-[#1E2938]"
+                >
+                  BD Travel Spirit
+                </h1>
+                <p className="text-[10px] tracking-widest uppercase text-[#006666] font-semibold">
+                  Admin Dashboard
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="collapsed"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 transition-all duration-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500/20",
-                isCollapsed && "mt-2"
+                "flex h-12 w-12 items-center justify-center rounded-xl",
+                "bg-[#E7E5E4]",
+                "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]"
               )}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              {isCollapsed ? <FiMenu className="h-4 w-4" /> : <FiX className="h-4 w-4" />}
-            </motion.button>
+              <Compass className="h-6 w-6 text-[#006666]" strokeWidth={2} />
+            </motion.div>
           )}
+        </AnimatePresence>
 
-          {/* Mobile Close Button */}
-          {isMobile && (
-            <motion.button
-              onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 transition-all duration-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Close sidebar"
-            >
-              <FiX className="h-4 w-4" />
-            </motion.button>
-          )}
-        </div>
+        {/* Toggle Button */}
+        {!isMobile && (
+          <motion.button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-lg",
+              "bg-[#E7E5E4] text-[#1E2938]",
+              "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]",
+              "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+              "transition-all duration-200 focus:outline-none",
+              isCollapsed && "mt-2"
+            )}
+            whileTap={{ scale: 0.95 }}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isCollapsed ? (
+              <Menu className="h-4 w-4" />
+            ) : (
+              <X className="h-4 w-4" />
+            )}
+          </motion.button>
+        )}
 
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4">
-          <div className={cn("space-y-2", isCollapsed && "space-y-3")}>
-            {navigationGroups.map((group) => {
-              // filter items based on adminOnly flag
-              const visibleItems = group.items.filter(item => {
-                if (item.adminOnly) return isGuide;
-                return true;
-              });
+        {isMobile && (
+          <motion.button
+            onClick={onClose}
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-lg",
+              "bg-[#E7E5E4] text-[#1E2938]",
+              "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]",
+              "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+              "transition-all duration-200 focus:outline-none"
+            )}
+            whileTap={{ scale: 0.95 }}
+            aria-label="Close sidebar"
+          >
+            <X className="h-4 w-4" />
+          </motion.button>
+        )}
+      </div>
 
-              // hide entire group if no visible items
-              if (visibleItems.length === 0) return null;
-              return (
-                <div key={group.title}>
-                  {/* Group Header */}
-                  <motion.button
-                    onClick={() => toggleGroup(group.title)}
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-[#c8c6c4] scrollbar-track-transparent">
+        <div className={cn("space-y-2", isCollapsed && "space-y-3")}>
+          {navigationGroups.map((group) => {
+            const visibleItems = group.items.filter((item) => {
+              if (item.adminOnly) return isGuide;
+              return true;
+            });
+            if (visibleItems.length === 0) return null;
+
+            const isExpanded = expandedGroups.includes(group.title);
+
+            return (
+              <div key={group.title}>
+                {/* Group Header */}
+                <motion.button
+                  onClick={() => toggleGroup(group.title)}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-bold tracking-widest uppercase transition-all duration-200",
+                    "font-[family-name:var(--font-space-mono)]",
+                    isExpanded
+                      ? [
+                        "text-[#006666]",
+                        "shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.75)]",
+                        "bg-[#E7E5E4]",
+                      ]
+                      : [
+                        "text-[#1E2938]/60",
+                        "bg-[#E7E5E4]",
+                        "shadow-[2px_2px_6px_rgba(0,0,0,0.1),-2px_-2px_6px_rgba(255,255,255,0.85)]",
+                        "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.7)]",
+                        "hover:text-[#1E2938]",
+                      ],
+                    isCollapsed && "justify-center px-2 py-3"
+                  )}
+                  whileTap={{ scale: 0.97 }}
+                  aria-expanded={isExpanded}
+                  aria-controls={`nav-group-${group.title.toLowerCase()}`}
+                >
+                  <group.icon
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                      "font-display tracking-wide text-slate-500 dark:text-slate-400", // group titles modern font
-                      "hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-950 dark:hover:to-indigo-900",
-                      "hover:text-blue-600 dark:hover:text-blue-400",
-                      expandedGroups.includes(group.title) &&
-                      "bg-blue-50/60 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 shadow-sm",
-                      isCollapsed && "justify-center px-2 py-3"
+                      "flex-shrink-0 transition-colors duration-200",
+                      isCollapsed ? "h-5 w-5" : "h-4 w-4",
+                      isExpanded ? "text-[#006666]" : "text-[#1E2938]/50"
                     )}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    aria-expanded={expandedGroups.includes(group.title)}
-                    aria-controls={`nav-group-${group.title.toLowerCase()}`}
-                  >
-                    <group.icon
-                      className={cn(
-                        "h-5 w-5 flex-shrink-0 text-slate-400 transition-colors duration-200",
-                        "group-hover:text-blue-500",
-                        isCollapsed && "h-6 w-6"
-                      )}
-                    />
-                    <AnimatePresence>
-                      {!isCollapsed && (
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="flex flex-1 items-center justify-between"
-                        >
-                          <span>{group.title}</span>
-                          <motion.div
-                            animate={{ rotate: expandedGroups.includes(group.title) ? 90 : 0 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <FiChevronRight className="h-4 w-4" />
-                          </motion.div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.button>
-
-                  {/* Group Items */}
+                  />
                   <AnimatePresence>
-                    {(!isCollapsed && expandedGroups.includes(group.title)) && (
+                    {!isCollapsed && (
                       <motion.div
-                        id={`nav-group-${group.title.toLowerCase()}`}
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.2, ease: "easeInOut" }}
-                        className="ml-6 mt-1 space-y-1"
-                        role="group"
-                        aria-label={`${group.title} navigation items`}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex flex-1 items-center justify-between"
                       >
-                        {group.items.map((item) => (
-                          <NavLink
-                            key={item.href}
-                            href={item.href}
-                            icon={item.icon}
-                            label={item.label}
-                            onClick={isMobile ? onClose : undefined}
-                          />
-                        ))}
+                        <span>{group.title}</span>
+                        <motion.div
+                          animate={{ rotate: isExpanded ? 90 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <ChevronRight className="h-3.5 w-3.5" />
+                        </motion.div>
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
-              )
-            }
-            )}
-          </div>
-        </nav>
+                </motion.button>
 
-        {/* Footer */}
-        <div className="border-t border-slate-200/60 dark:border-slate-700/60 p-4">
-          <AnimatePresence>
-            {!isCollapsed ? (
-              <motion.div
-                key="expanded-footer"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.2 }}
-                className="text-center"
-              >
-                <p className="text-xs text-slate-600 dark:text-slate-400">
-                  Travel Spirit Admin v1.0
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="collapsed-footer"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
-                className="flex justify-center"
-              >
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                  <span className="text-xs font-bold">TS</span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {/* Group Items */}
+                <AnimatePresence>
+                  {!isCollapsed && isExpanded && (
+                    <motion.div
+                      id={`nav-group-${group.title.toLowerCase()}`}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2, ease: "easeInOut" }}
+                      className="ml-5 mt-1.5 space-y-1 border-l-2 border-[#006666]/20 pl-3"
+                      role="group"
+                      aria-label={`${group.title} navigation items`}
+                    >
+                      {visibleItems.map((item) => (
+                        <NavLink
+                          key={item.href}
+                          href={item.href}
+                          icon={item.icon}
+                          label={item.label}
+                          onClick={isMobile ? onClose : undefined}
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </div>
-      </motion.aside>
-    </>
+      </nav>
+
+      {/* Footer */}
+      <div className="border-t border-[#d0cecc] p-4">
+        <AnimatePresence>
+          {!isCollapsed ? (
+            <motion.div
+              key="expanded-footer"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="text-center"
+            >
+              <p className="font-[family-name:var(--font-space-mono)] text-[10px] tracking-widest text-[#1E2938]/40 uppercase">
+                Travel Spirit Admin v1.0
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="collapsed-footer"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+              className="flex justify-center"
+            >
+              <div
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-lg",
+                  "bg-[#E7E5E4]",
+                  "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]"
+                )}
+              >
+                <span className="font-[family-name:var(--font-space-mono)] text-[10px] font-bold text-[#006666]">
+                  TS
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.aside>
   );
 }

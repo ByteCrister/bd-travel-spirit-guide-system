@@ -14,11 +14,11 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { IBookingPopulated } from '@/types/tour/booking.types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { spaceMono, jetbrainsMono } from '@/styles/fonts';
 
 interface BookingsTableProps {
     bookings: IBookingPopulated[];
@@ -26,41 +26,63 @@ interface BookingsTableProps {
     onViewDetail?: (booking: IBookingPopulated) => void;
 }
 
-// ─── Status config map ────────────────────────────────────────────────────────
-const STATUS_CONFIG: Record<string, { color: string; bg: string; border: string; dot: string; Icon: React.ElementType }> = {
-    confirmed:  { color: 'text-emerald-700', bg: 'bg-emerald-50',  border: 'border-emerald-200', dot: 'bg-emerald-500', Icon: BadgeCheck },
-    pending:    { color: 'text-amber-700',   bg: 'bg-amber-50',    border: 'border-amber-200',   dot: 'bg-amber-400',   Icon: Hourglass },
-    cancelled:  { color: 'text-rose-700',    bg: 'bg-rose-50',     border: 'border-rose-200',    dot: 'bg-rose-500',    Icon: Ban },
-    refunded:   { color: 'text-sky-700',     bg: 'bg-sky-50',      border: 'border-sky-200',     dot: 'bg-sky-500',     Icon: RefreshCw },
-    completed:  { color: 'text-violet-700',  bg: 'bg-violet-50',   border: 'border-violet-200',  dot: 'bg-violet-500',  Icon: CheckCircle2 },
+// Brand colors from skill
+const STATUS_CONFIG: Record<string, {
+    textColor: string; bg: string; dotColor: string; Icon: React.ElementType
+}> = {
+    confirmed:  { textColor: 'text-[#00A63D]', bg: 'bg-[#00A63D]/10', dotColor: 'bg-[#00A63D]', Icon: BadgeCheck },
+    pending:    { textColor: 'text-[#FE9900]', bg: 'bg-[#FE9900]/10', dotColor: 'bg-[#FE9900]', Icon: Hourglass },
+    cancelled:  { textColor: 'text-[#FF2157]', bg: 'bg-[#FF2157]/10', dotColor: 'bg-[#FF2157]', Icon: Ban },
+    refunded:   { textColor: 'text-[#1E2938]/55', bg: 'bg-[#1E2938]/6', dotColor: 'bg-[#1E2938]/50', Icon: RefreshCw },
+    completed:  { textColor: 'text-[#006666]', bg: 'bg-[#006666]/10', dotColor: 'bg-[#006666]', Icon: CheckCircle2 },
 };
 
-// ─── Inline status pill ───────────────────────────────────────────────────────
+// Inset pill (neumorphic badge)
 function StatusPill({ status }: { status: string }) {
     const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.pending;
     return (
-        <span className={cn(
-            'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border',
-            cfg.color, cfg.bg, cfg.border
-        )}>
-            <span className={cn('w-1.5 h-1.5 rounded-full', cfg.dot)} />
-            <span className="capitalize">{status}</span>
+        <span
+            className={cn(
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium',
+                'shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_3px_rgba(255,255,255,0.8)]',
+                cfg.bg, cfg.textColor,
+            )}
+            style={jetbrainsMono.style}
+        >
+            <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', cfg.dotColor)} />
+            <span className="capitalize tracking-wide">{status}</span>
         </span>
     );
 }
 
-// ─── Skeleton row ─────────────────────────────────────────────────────────────
 function SkeletonRow() {
     return (
-        <tr className="border-b border-slate-100/80">
+        <tr>
             <td className="px-4 py-4 w-10">
-                <div className="h-5 w-5 bg-slate-100 rounded-md animate-pulse mx-auto" />
+                <div className={cn(
+                    'h-6 w-6 rounded-lg mx-auto',
+                    'bg-[#E7E5E4] shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff] animate-pulse',
+                )} />
             </td>
             {[90, 160, 180, 60, 100, 90, 80].map((w, i) => (
                 <td key={i} className="px-4 py-4">
-                    <div className="space-y-1.5">
-                        <div className="h-3.5 bg-slate-100 rounded-full animate-pulse" style={{ width: `${w}px` }} />
-                        {i < 3 && <div className="h-2.5 bg-slate-50 rounded-full animate-pulse" style={{ width: `${w * 0.6}px` }} />}
+                    <div className="space-y-2">
+                        <div
+                            className={cn(
+                                'h-3 rounded-full animate-pulse',
+                                'bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c4,inset_-1px_-1px_2px_#ffffff]',
+                            )}
+                            style={{ width: `${w}px` }}
+                        />
+                        {i < 3 && (
+                            <div
+                                className={cn(
+                                    'h-2.5 rounded-full animate-pulse',
+                                    'bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c4,inset_-1px_-1px_2px_#ffffff]',
+                                )}
+                                style={{ width: `${w * 0.6}px` }}
+                            />
+                        )}
                     </div>
                 </td>
             ))}
@@ -69,20 +91,21 @@ function SkeletonRow() {
     );
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
 function EmptyState() {
     return (
         <tr>
             <td colSpan={9} className="py-20 text-center">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="relative">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center shadow-inner">
-                            <Calendar size={22} className="text-slate-300" />
-                        </div>
+                    <div className={cn(
+                        'w-14 h-14 rounded-2xl flex items-center justify-center',
+                        'bg-[#E7E5E4]',
+                        'shadow-[inset_4px_4px_8px_#c8c6c4,inset_-3px_-3px_6px_#ffffff]',
+                    )}>
+                        <Calendar size={20} className="text-[#1E2938]/25" />
                     </div>
                     <div className="space-y-1">
-                        <p className="text-sm font-medium text-slate-600">No bookings found</p>
-                        <p className="text-xs text-slate-400">Adjust your filters to see results</p>
+                        <p className="text-sm font-medium text-[#1E2938]/60" style={spaceMono.style}>No bookings found</p>
+                        <p className="text-xs text-[#1E2938]/35" style={jetbrainsMono.style}>Adjust your filters to see results</p>
                     </div>
                 </div>
             </td>
@@ -90,60 +113,77 @@ function EmptyState() {
     );
 }
 
-// ─── Detail field ─────────────────────────────────────────────────────────────
 function Field({ label, value, mono = false }: { label: string; value: React.ReactNode; mono?: boolean }) {
     return (
-        <div className="grid grid-cols-[120px_1fr] gap-2 py-1.5 border-b border-slate-100/80 last:border-0">
-            <span className="text-[10.5px] text-slate-400 uppercase tracking-wider font-medium pt-0.5 truncate">{label}</span>
-            <span className={cn('text-xs text-slate-700 text-right break-all', mono && 'font-mono text-slate-500')}>{value}</span>
+        <div className="grid grid-cols-[120px_1fr] gap-2 py-2 border-b border-[#1E2938]/5 last:border-0">
+            <span
+                className="text-[10px] text-[#1E2938]/40 uppercase tracking-wider font-medium pt-0.5 truncate"
+                style={spaceMono.style}
+            >
+                {label}
+            </span>
+            <span
+                className={cn('text-xs text-[#1E2938]/75 text-right break-all', mono && 'text-[#006666]')}
+                style={mono ? jetbrainsMono.style : undefined}
+            >
+                {value}
+            </span>
         </div>
     );
 }
 
-// ─── Section header inside accordion ─────────────────────────────────────────
-function SectionHeader({ icon: Icon, label, iconColor }: { icon: React.ElementType; label: string; iconColor: string }) {
+function SectionHeader({ icon: Icon, label, accentColor }: { icon: React.ElementType; label: string; accentColor: string }) {
     return (
         <span className="flex items-center gap-2">
-            <span className={cn('w-5 h-5 rounded-md flex items-center justify-center', iconColor.replace('text-', 'bg-').replace('-500', '-100'))}>
-                <Icon size={11} className={iconColor} />
+            <span className={cn(
+                'w-5 h-5 rounded-md flex items-center justify-center',
+                'bg-[#E7E5E4] shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+            )}>
+                <Icon size={11} className={accentColor} />
             </span>
-            <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest">{label}</span>
+            <span className="text-[10px] font-semibold text-[#1E2938]/55 uppercase tracking-widest" style={spaceMono.style}>
+                {label}
+            </span>
         </span>
     );
 }
 
-// ─── Expanded accordion detail ────────────────────────────────────────────────
 function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
     const paymentMethodLabel: Record<string, string> = {
         bkash: 'bKash', nagad: 'Nagad', card: 'Card',
         stripe: 'Stripe', cash: 'Cash', bank_transfer: 'Bank Transfer',
     };
 
-    const accordionTriggerClass =
-        'px-5 py-2.5 hover:no-underline hover:bg-slate-50/80 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-slate-300 transition-colors';
-    const accordionItemClass = 'border-slate-100/80';
+    const triggerCls = 'px-5 py-3 hover:no-underline [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-[#1E2938]/25 hover:bg-[#E7E5E4]/60 transition-colors';
+    const itemCls = 'border-[#1E2938]/5';
 
     return (
-        <div className="rounded-xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
-            <Accordion type="multiple" defaultValue={['booking', 'tour']} className="w-full divide-y divide-slate-100">
+        <div className={cn(
+            'rounded-2xl overflow-hidden',
+            'bg-[#E7E5E4]',
+            'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-2px_-2px_6px_#ffffff]',
+        )}>
+            <Accordion type="multiple" defaultValue={['booking', 'tour']} className="w-full divide-y divide-[#1E2938]/5">
 
-                {/* ── Booking Info ─────────────────────────────────────────── */}
-                <AccordionItem value="booking" className={accordionItemClass}>
-                    <AccordionTrigger className={accordionTriggerClass}>
-                        <SectionHeader icon={Hash} label="Booking Info" iconColor="text-indigo-500" />
+                {/* Booking Info */}
+                <AccordionItem value="booking" className={itemCls}>
+                    <AccordionTrigger className={triggerCls}>
+                        <SectionHeader icon={Hash} label="Booking Info" accentColor="text-[#006666]" />
                     </AccordionTrigger>
-                    <AccordionContent className="px-5 pb-4 pt-1 bg-slate-50/40">
-                        <Field label="Reference" value={<span className="font-mono font-semibold text-indigo-600">#{booking.bookingReference}</span>} />
+                    <AccordionContent className="px-5 pb-4 pt-1">
+                        <Field label="Reference" value={<span className="font-semibold text-[#006666]" style={jetbrainsMono.style}>#{booking.bookingReference}</span>} />
                         <Field label="Tour Code" value={booking.uniqueTourCode} mono />
                         <Field label="Status" value={<StatusPill status={booking.status} />} />
                         <Field label="Participants" value={`${booking.totalParticipants} traveler${booking.totalParticipants > 1 ? 's' : ''}`} />
                         <Field label="Total Paid" value={
-                            <span className="font-bold text-slate-800">{booking.tour.basePrice.currency} {booking.totalPaid.toLocaleString()}</span>
+                            <span className="font-bold text-[#1E2938]/80" style={jetbrainsMono.style}>
+                                {booking.tour.basePrice.currency} {booking.totalPaid.toLocaleString()}
+                            </span>
                         } />
                         <Field label="Booked At" value={format(new Date(booking.bookedAt), "MMM dd, yyyy 'at' h:mm a")} />
                         {booking.expiresAt && (
                             <Field label="Expires At" value={
-                                <span className="flex items-center gap-1 justify-end text-amber-600">
+                                <span className="flex items-center gap-1 justify-end text-[#FE9900]">
                                     <Clock size={10} />
                                     {format(new Date(booking.expiresAt), "MMM dd, yyyy 'at' h:mm a")}
                                 </span>
@@ -154,15 +194,15 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                     </AccordionContent>
                 </AccordionItem>
 
-                {/* ── Tour Details ─────────────────────────────────────────── */}
-                <AccordionItem value="tour" className={accordionItemClass}>
-                    <AccordionTrigger className={accordionTriggerClass}>
-                        <SectionHeader icon={MapPin} label="Tour Details" iconColor="text-emerald-500" />
+                {/* Tour Details */}
+                <AccordionItem value="tour" className={itemCls}>
+                    <AccordionTrigger className={triggerCls}>
+                        <SectionHeader icon={MapPin} label="Tour Details" accentColor="text-[#00A63D]" />
                     </AccordionTrigger>
-                    <AccordionContent className="px-5 pb-4 pt-1 bg-slate-50/40">
-                        <Field label="Title" value={<span className="font-medium text-slate-800 text-right">{booking.tour.title}</span>} />
+                    <AccordionContent className="px-5 pb-4 pt-1">
+                        <Field label="Title" value={<span className="font-medium text-[#1E2938]/80 text-right">{booking.tour.title}</span>} />
                         {booking.tour.summary && (
-                            <Field label="Summary" value={<span className="line-clamp-2 text-slate-500">{booking.tour.summary}</span>} />
+                            <Field label="Summary" value={<span className="line-clamp-2 text-[#1E2938]/50">{booking.tour.summary}</span>} />
                         )}
                         <Field label="Tour Code" value={booking.tour.uniqueTourCode} mono />
                         <Field label="Location" value={`${booking.tour.district}, ${booking.tour.division}`} />
@@ -172,34 +212,37 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                     </AccordionContent>
                 </AccordionItem>
 
-                {/* ── Traveler ─────────────────────────────────────────────── */}
-                <AccordionItem value="traveler" className={accordionItemClass}>
-                    <AccordionTrigger className={accordionTriggerClass}>
-                        <SectionHeader icon={Users} label="Traveler" iconColor="text-violet-500" />
+                {/* Traveler */}
+                <AccordionItem value="traveler" className={itemCls}>
+                    <AccordionTrigger className={triggerCls}>
+                        <SectionHeader icon={Users} label="Traveler" accentColor="text-[#006666]" />
                     </AccordionTrigger>
-                    <AccordionContent className="px-5 pb-4 pt-2 bg-slate-50/40">
-                        {/* Traveler card */}
-                        <div className="flex items-center gap-3 mb-3 p-3 rounded-xl bg-white border border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                            <Avatar className="w-9 h-9 rounded-xl border border-slate-100 shrink-0">
-                                <AvatarFallback className="bg-gradient-to-br from-violet-100 to-indigo-100 text-violet-700 text-xs font-bold rounded-xl">
+                    <AccordionContent className="px-5 pb-4 pt-2">
+                        {/* Traveler card — inset neumorphic */}
+                        <div className={cn(
+                            'flex items-center gap-3 mb-4 p-3 rounded-xl',
+                            'bg-[#E7E5E4]',
+                            'shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                        )}>
+                            <Avatar className="w-9 h-9 rounded-xl shrink-0 shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_4px_#ffffff]">
+                                <AvatarFallback className="bg-[#006666]/10 text-[#006666] text-xs font-bold rounded-xl">
                                     {booking.traveler.name?.charAt(0).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="min-w-0">
-                                <p className="text-xs font-semibold text-slate-800 flex items-center gap-1.5 truncate">
+                                <p className="text-xs font-semibold text-[#1E2938]/80 flex items-center gap-1.5 truncate" style={spaceMono.style}>
                                     {booking.traveler.name}
-                                    {booking.traveler.isVerified && (
-                                        <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />
-                                    )}
+                                    {booking.traveler.isVerified && <CheckCircle2 size={11} className="text-[#00A63D] shrink-0" />}
                                 </p>
-                                <p className="text-[10.5px] text-slate-400 truncate">{booking.traveler.email}</p>
+                                <p className="text-[10px] text-[#1E2938]/40 truncate" style={jetbrainsMono.style}>{booking.traveler.email}</p>
                             </div>
                             <span className={cn(
-                                'ml-auto shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full capitalize',
+                                'ml-auto shrink-0 text-[9px] font-medium px-2 py-0.5 rounded-full capitalize',
+                                'shadow-[inset_1px_1px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]',
                                 booking.traveler.accountStatus === 'active'
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                                    : 'bg-slate-50 text-slate-500 border border-slate-100'
-                            )}>
+                                    ? 'bg-[#00A63D]/10 text-[#00A63D]'
+                                    : 'bg-[#1E2938]/6 text-[#1E2938]/40',
+                            )} style={jetbrainsMono.style}>
                                 {booking.traveler.accountStatus}
                             </span>
                         </div>
@@ -208,8 +251,8 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                         {booking.traveler.phone && <Field label="Phone" value={booking.traveler.phone} />}
                         <Field label="Verified" value={
                             booking.traveler.isVerified
-                                ? <span className="text-emerald-600 font-medium flex items-center gap-1 justify-end"><CheckCircle2 size={11} /> Verified</span>
-                                : <span className="text-slate-400 flex items-center gap-1 justify-end"><X size={11} /> Not verified</span>
+                                ? <span className="text-[#00A63D] font-medium flex items-center gap-1 justify-end"><CheckCircle2 size={11} /> Verified</span>
+                                : <span className="text-[#1E2938]/35 flex items-center gap-1 justify-end"><X size={11} /> Not verified</span>
                         } />
                         {booking.traveler.address && (
                             <>
@@ -225,12 +268,12 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                     </AccordionContent>
                 </AccordionItem>
 
-                {/* ── Payment ──────────────────────────────────────────────── */}
-                <AccordionItem value="payment" className={accordionItemClass}>
-                    <AccordionTrigger className={accordionTriggerClass}>
-                        <SectionHeader icon={CreditCard} label="Payment" iconColor="text-amber-500" />
+                {/* Payment */}
+                <AccordionItem value="payment" className={itemCls}>
+                    <AccordionTrigger className={triggerCls}>
+                        <SectionHeader icon={CreditCard} label="Payment" accentColor="text-[#FE9900]" />
                     </AccordionTrigger>
-                    <AccordionContent className="px-5 pb-4 pt-1 bg-slate-50/40">
+                    <AccordionContent className="px-5 pb-4 pt-1">
                         <Field label="Method" value={<span className="capitalize">{paymentMethodLabel[booking.payment.method] ?? booking.payment.method}</span>} />
                         <Field label="Status" value={<StatusPill status={booking.payment.status} />} />
                         {booking.payment.transactionId && (
@@ -239,88 +282,42 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                         {booking.payment.paidAt && (
                             <Field label="Paid At" value={format(new Date(booking.payment.paidAt), "MMM dd, yyyy 'at' h:mm a")} />
                         )}
-                        <div className="mt-3 p-3 rounded-xl bg-white border border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex items-center justify-between">
-                            <span className="text-[11px] text-slate-400 uppercase tracking-wide font-medium">Total Paid</span>
-                            <span className="text-base font-bold text-slate-800 font-mono tracking-tight">
+                        <div className={cn(
+                            'mt-3 p-3 rounded-xl flex items-center justify-between',
+                            'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                        )}>
+                            <span className="text-xs text-[#1E2938]/45" style={spaceMono.style}>Total paid</span>
+                            <span className="text-base font-bold text-[#006666]" style={spaceMono.style}>
                                 {booking.tour.basePrice.currency} {booking.totalPaid.toLocaleString()}
                             </span>
                         </div>
                     </AccordionContent>
                 </AccordionItem>
 
-                {/* ── Discounts ─────────────────────────────────────────────── */}
-                {booking.discounts.length > 0 && (
-                    <AccordionItem value="discounts" className={accordionItemClass}>
-                        <AccordionTrigger className={accordionTriggerClass}>
-                            <SectionHeader icon={Tag} label={`Discounts (${booking.discounts.length})`} iconColor="text-sky-500" />
-                        </AccordionTrigger>
-                        <AccordionContent className="px-5 pb-4 pt-2 bg-slate-50/40">
-                            <div className="space-y-2">
-                                {booking.discounts.map((d, idx) => (
-                                    <div key={idx} className="flex items-center justify-between rounded-xl bg-white border border-slate-200/80 px-3.5 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                                        <div>
-                                            <p className="text-xs font-semibold text-slate-700 capitalize">{d.discount}</p>
-                                            <p className="text-[10px] text-slate-400 capitalize mt-0.5">{d.type}</p>
-                                        </div>
-                                        <span className="text-sm font-bold text-emerald-600">
-                                            {d.type === 'percentage' ? `-${d.value}%` : `-৳${d.value.toLocaleString()}`}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                )}
-
-                {/* ── Cancellation ──────────────────────────────────────────── */}
-                {booking.cancellation && (
-                    <AccordionItem value="cancellation" className={accordionItemClass}>
-                        <AccordionTrigger className={cn(accordionTriggerClass, 'hover:bg-rose-50/60')}>
-                            <SectionHeader icon={AlertTriangle} label="Cancellation" iconColor="text-rose-500" />
-                        </AccordionTrigger>
-                        <AccordionContent className="px-5 pb-4 pt-2 bg-rose-50/30">
-                            <div className="rounded-xl border border-rose-100 bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                                <div className="h-1 w-full bg-gradient-to-r from-rose-400 to-rose-300" />
-                                <div className="p-3">
-                                    <Field label="Cancelled At" value={format(new Date(booking.cancellation.cancelledAt), "MMM dd, yyyy 'at' h:mm a")} />
-                                    <Field label="Cancelled By" value={booking.cancellation.cancelledBy} mono />
-                                    <Field label="Reason" value={booking.cancellation.reason} />
-                                    {booking.cancellation.refundAmount && (
-                                        <Field label="Refund Amount" value={<span className="font-bold text-rose-600">৳{booking.cancellation.refundAmount.toLocaleString()}</span>} />
-                                    )}
-                                    {booking.cancellation.refundStatus && (
-                                        <Field label="Refund Status" value={<StatusPill status={booking.cancellation.refundStatus} />} />
-                                    )}
-                                </div>
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                )}
-
             </Accordion>
         </div>
     );
 }
 
-// ─── Column header cell ───────────────────────────────────────────────────────
-function ColHeader({ label, sortable = false, align = 'left' }: { label: string; sortable?: boolean; align?: 'left' | 'center' | 'right' }) {
+function ColHeader({ label, sortable = false, align = 'left' }: {
+    label: string; sortable?: boolean; align?: 'left' | 'center' | 'right'
+}) {
     return (
         <th className={cn(
-            'px-4 py-3.5 text-[10.5px] uppercase tracking-widest font-semibold text-slate-400 whitespace-nowrap select-none',
+            'px-4 py-3.5 text-[9.5px] uppercase tracking-[0.14em] font-semibold text-[#1E2938]/40 whitespace-nowrap select-none',
             align === 'center' && 'text-center',
             align === 'right' && 'text-right',
-        )}>
+        )} style={spaceMono.style}>
             {sortable ? (
-                <button className="inline-flex items-center gap-1 hover:text-slate-600 transition-colors group">
+                <button className="inline-flex items-center gap-1 hover:text-[#006666] transition-colors group">
                     {label}
-                    <ArrowUpDown size={9} className="text-slate-300 group-hover:text-slate-400 transition-colors" />
+                    <ArrowUpDown size={9} className="text-[#1E2938]/25 group-hover:text-[#006666]/50 transition-colors" />
                 </button>
             ) : label}
         </th>
     );
 }
 
-// ─── Main table ───────────────────────────────────────────────────────────────
 export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTableProps) {
     const [hoveredRow, setHoveredRow] = useState<string | null>(null);
     const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
@@ -328,18 +325,24 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
     const toggleExpand = (id: string) => setExpandedRowId((prev) => (prev === id ? null : id));
 
     return (
-        <div className="relative rounded-2xl border border-slate-200/80 bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_16px_rgba(0,0,0,0.04)]">
-
-            {/* Top accent bar */}
-            <div className="h-[3px] w-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500" />
+        <div className={cn(
+            'relative rounded-2xl overflow-hidden',
+            'bg-[#E7E5E4]',
+            'shadow-[8px_8px_16px_#c8c6c4,-6px_-6px_12px_#ffffff]',
+        )}>
+            {/* Teal top accent line */}
+            <div className="h-[3px] w-full bg-[#006666]" />
 
             <div className="overflow-x-auto">
-                <table className="w-full border-separate border-spacing-0">
+                <table className="w-full border-separate border-spacing-0" style={spaceMono.style}>
 
-                    {/* ── Header ──────────────────────────────────────────────── */}
+                    {/* Header */}
                     <thead>
-                        <tr className="bg-slate-50/80">
-                            <th className="px-4 py-3.5 w-10 border-b border-slate-100" />
+                        <tr className={cn(
+                            'bg-[#E7E5E4]',
+                            'shadow-[0_2px_4px_rgba(0,0,0,0.04)]',
+                        )}>
+                            <th className="px-4 py-3.5 w-10 border-b border-[#1E2938]/5" />
                             <ColHeader label="Reference" sortable />
                             <ColHeader label="Traveler" />
                             <ColHeader label="Tour" />
@@ -347,12 +350,10 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                             <ColHeader label="Payment" sortable />
                             <ColHeader label="Status" />
                             <ColHeader label="Booked" sortable />
-                            <th className="px-4 py-3.5 w-12 border-b border-slate-100" />
+                            <th className="px-4 py-3.5 w-12 border-b border-[#1E2938]/5" />
                         </tr>
-                        {/* Header bottom border - handled via border-b on each th */}
                     </thead>
 
-                    {/* ── Body ────────────────────────────────────────────────── */}
                     <tbody>
                         {isLoading
                             ? [...Array(8)].map((_, i) => <SkeletonRow key={i} />)
@@ -360,7 +361,6 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                 ? <EmptyState />
                                 : bookings.map((booking, idx) => (
                                     <>
-                                        {/* ── Data row ────────────────────────── */}
                                         <motion.tr
                                             key={booking._id}
                                             initial={{ opacity: 0, y: 4 }}
@@ -369,12 +369,12 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                             onMouseEnter={() => setHoveredRow(booking._id)}
                                             onMouseLeave={() => setHoveredRow(null)}
                                             className={cn(
-                                                'border-b border-slate-100/80 transition-colors duration-100 cursor-default group',
+                                                'border-b border-[#1E2938]/5 transition-colors duration-100 cursor-default group',
                                                 expandedRowId === booking._id
-                                                    ? 'bg-indigo-50/30'
+                                                    ? 'bg-[#006666]/5'
                                                     : hoveredRow === booking._id
-                                                        ? 'bg-slate-50/80'
-                                                        : 'bg-white'
+                                                        ? 'bg-[#1E2938]/3'
+                                                        : 'bg-transparent',
                                             )}
                                         >
                                             {/* Expand toggle */}
@@ -382,10 +382,10 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                 <button
                                                     onClick={() => toggleExpand(booking._id)}
                                                     className={cn(
-                                                        'h-6 w-6 rounded-lg flex items-center justify-center mx-auto transition-all duration-200',
+                                                        'h-7 w-7 rounded-lg flex items-center justify-center mx-auto transition-all duration-200',
                                                         expandedRowId === booking._id
-                                                            ? 'bg-indigo-100 text-indigo-600'
-                                                            : 'text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 group-hover:text-slate-400'
+                                                            ? 'bg-[#E7E5E4] text-[#006666] shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]'
+                                                            : 'text-[#1E2938]/25 hover:text-[#006666] shadow-[2px_2px_4px_#c8c6c4,-1px_-1px_3px_#ffffff] hover:shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_4px_#ffffff]',
                                                     )}
                                                     aria-label={expandedRowId === booking._id ? 'Collapse' : 'Expand'}
                                                 >
@@ -399,29 +399,37 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                             {/* Reference */}
                                             <td className="px-4 py-3.5">
                                                 <div className="flex flex-col gap-0.5">
-                                                    <span className="text-[11.5px] font-mono font-semibold text-indigo-600 tracking-wide">
+                                                    <span
+                                                        className="text-[11.5px] font-semibold text-[#006666] tracking-wide"
+                                                        style={jetbrainsMono.style}
+                                                    >
                                                         #{booking.bookingReference}
                                                     </span>
-                                                    <span className="text-[10px] text-slate-400 font-mono">{booking.uniqueTourCode}</span>
+                                                    <span className="text-[10px] text-[#1E2938]/35" style={jetbrainsMono.style}>
+                                                        {booking.uniqueTourCode}
+                                                    </span>
                                                 </div>
                                             </td>
 
                                             {/* Traveler */}
                                             <td className="px-4 py-3.5">
                                                 <div className="flex items-center gap-2.5">
-                                                    <Avatar className="w-7 h-7 rounded-lg shrink-0 ring-1 ring-slate-200/80">
-                                                        <AvatarFallback className="bg-gradient-to-br from-violet-100 to-indigo-100 text-indigo-700 text-[10px] font-bold rounded-lg">
+                                                    <Avatar className={cn(
+                                                        'w-7 h-7 rounded-lg shrink-0',
+                                                        'shadow-[2px_2px_5px_#c8c6c4,-1px_-1px_3px_#ffffff]',
+                                                    )}>
+                                                        <AvatarFallback className="bg-[#006666]/10 text-[#006666] text-[10px] font-bold rounded-lg">
                                                             {booking.traveler.name?.charAt(0).toUpperCase()}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div className="flex flex-col gap-0.5 min-w-0">
-                                                        <span className="text-xs text-slate-800 font-medium leading-none flex items-center gap-1">
+                                                        <span className="text-xs text-[#1E2938]/75 font-medium leading-none flex items-center gap-1" style={spaceMono.style}>
                                                             <span className="truncate max-w-[120px]">{booking.traveler.name}</span>
                                                             {booking.traveler.isVerified && (
-                                                                <CheckCircle2 size={10} className="text-emerald-500 shrink-0" />
+                                                                <CheckCircle2 size={10} className="text-[#00A63D] shrink-0" />
                                                             )}
                                                         </span>
-                                                        <span className="text-[10px] text-slate-400 truncate max-w-[120px]">
+                                                        <span className="text-[10px] text-[#1E2938]/35 truncate max-w-[120px]" style={jetbrainsMono.style}>
                                                             {booking.traveler.email}
                                                         </span>
                                                     </div>
@@ -431,13 +439,13 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                             {/* Tour */}
                                             <td className="px-4 py-3.5 max-w-[200px]">
                                                 <div className="flex flex-col gap-0.5">
-                                                    <span className="text-xs text-slate-800 font-medium line-clamp-1">
+                                                    <span className="text-xs text-[#1E2938]/75 font-medium line-clamp-1" style={spaceMono.style}>
                                                         {booking.tour.title}
                                                     </span>
-                                                    <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                                                    <span className="text-[10px] text-[#1E2938]/35 flex items-center gap-1" style={jetbrainsMono.style}>
                                                         <MapPin size={9} className="shrink-0" />
                                                         <span className="truncate">{booking.tour.district ?? booking.tour.division}</span>
-                                                        <span className="text-slate-300">·</span>
+                                                        <span className="text-[#1E2938]/20">·</span>
                                                         <span className="shrink-0">{booking.tour.duration.days}D/{booking.tour.duration.nights ?? 0}N</span>
                                                     </span>
                                                 </div>
@@ -445,7 +453,11 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
 
                                             {/* Participants */}
                                             <td className="px-4 py-3.5 text-center">
-                                                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-medium">
+                                                <div className={cn(
+                                                    'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium',
+                                                    'bg-[#E7E5E4] text-[#1E2938]/55',
+                                                    'shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                                )} style={jetbrainsMono.style}>
                                                     <Users size={9} />
                                                     {booking.totalParticipants}
                                                 </div>
@@ -454,7 +466,7 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                             {/* Payment */}
                                             <td className="px-4 py-3.5">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="text-xs text-slate-800 font-semibold font-mono">
+                                                    <span className="text-xs font-semibold text-[#1E2938]/75" style={jetbrainsMono.style}>
                                                         {booking.tour.basePrice.currency} {booking.totalPaid.toLocaleString()}
                                                     </span>
                                                     <StatusPill status={booking.payment.status} />
@@ -469,10 +481,10 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                             {/* Booked at */}
                                             <td className="px-4 py-3.5">
                                                 <div className="flex flex-col gap-0.5">
-                                                    <span className="text-xs text-slate-600">
+                                                    <span className="text-xs text-[#1E2938]/60" style={jetbrainsMono.style}>
                                                         {format(new Date(booking.bookedAt), 'MMM dd, yyyy')}
                                                     </span>
-                                                    <span className="text-[10px] text-slate-400">
+                                                    <span className="text-[10px] text-[#1E2938]/35" style={jetbrainsMono.style}>
                                                         {format(new Date(booking.bookedAt), 'h:mm a')}
                                                     </span>
                                                 </div>
@@ -488,22 +500,27 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                             exit={{ opacity: 0, scale: 0.8 }}
                                                             transition={{ duration: 0.12 }}
                                                         >
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
+                                                            <button
                                                                 onClick={() => onViewDetail?.(booking)}
-                                                                className="h-7 w-7 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                                                                className={cn(
+                                                                    'h-7 w-7 rounded-lg flex items-center justify-center',
+                                                                    'text-[#1E2938]/35 hover:text-[#006666]',
+                                                                    'bg-[#E7E5E4]',
+                                                                    'shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_4px_#ffffff]',
+                                                                    'hover:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                                                    'transition-all duration-150',
+                                                                )}
                                                                 title="View full details"
                                                             >
-                                                                <ChevronRight size={14} />
-                                                            </Button>
+                                                                <ChevronRight size={13} />
+                                                            </button>
                                                         </motion.div>
                                                     )}
                                                 </AnimatePresence>
                                             </td>
                                         </motion.tr>
 
-                                        {/* ── Expanded detail row ──────────────── */}
+                                        {/* Expanded detail row */}
                                         <AnimatePresence>
                                             {expandedRowId === booking._id && (
                                                 <motion.tr
@@ -512,7 +529,6 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                     animate={{ opacity: 1 }}
                                                     exit={{ opacity: 0 }}
                                                     transition={{ duration: 0.15 }}
-                                                    className="bg-slate-50/60"
                                                 >
                                                     <td colSpan={9} className="p-0">
                                                         <motion.div
@@ -520,7 +536,7 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                             animate={{ height: 'auto' }}
                                                             exit={{ height: 0 }}
                                                             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                                                            className="overflow-hidden border-b border-slate-200/80"
+                                                            className="overflow-hidden border-b border-[#1E2938]/5"
                                                         >
                                                             <div className="max-w-4xl mx-auto p-4 py-5">
                                                                 <BookingAccordionDetail booking={booking} />

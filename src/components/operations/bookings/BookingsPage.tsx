@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
     useBookings,
     useBookingsPagination,
@@ -14,7 +13,7 @@ import {
     useBookingActions,
 } from '@/store/booking.store';
 import type { IBookingPopulated, BookingsFilterState } from '@/types/tour/booking.types';
-import { jakarta } from '@/styles/fonts';
+import { spaceMono, jetbrainsMono } from '@/styles/fonts';
 import { cn } from '@/lib/utils';
 import { BookingSummaryCards } from './BookingSummaryCards';
 import { BookingsFilters } from './BookingsFilters';
@@ -24,7 +23,6 @@ import { BookingDetailSheet } from './BookingDetailSheet';
 import { Breadcrumbs } from '@/components/global/Breadcrumbs';
 
 export function BookingsPage() {
-    // ── Store state ──────────────────────────────────────────────────────────
     const bookings = useBookings();
     const pagination = useBookingsPagination();
     const filters = useBookingsFilters();
@@ -32,113 +30,113 @@ export function BookingsPage() {
     const summary = useBookingsSummary();
     const error = useBookingsError();
 
-    const {
-        setFilters,
-        resetFilters,
-        fetchBookings,
-        fetchSummary,
-    } = useBookingActions();
+    const { setFilters, resetFilters, fetchBookings, fetchSummary } = useBookingActions();
 
-    // ── Detail sheet state ───────────────────────────────────────────────────
     const [selectedBooking, setSelectedBooking] = useState<IBookingPopulated | null>(null);
     const [sheetOpen, setSheetOpen] = useState(false);
 
-    // ── Initial data load ────────────────────────────────────────────────────
     useEffect(() => {
         fetchBookings();
         fetchSummary();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // ── Re-fetch whenever filters change (skip first render) ─────────────────
     const isFirstRender = useRef(true);
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
+        if (isFirstRender.current) { isFirstRender.current = false; return; }
         fetchBookings();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters]);
 
-    // ── Handlers ─────────────────────────────────────────────────────────────
-    const handleFilterChange = (newFilters: Partial<BookingsFilterState>) => {
-        setFilters(newFilters);
-    };
+    const handleFilterChange = (newFilters: Partial<BookingsFilterState>) => setFilters(newFilters);
+    const handleReset = () => resetFilters();
+    const handlePageChange = (page: number) => setFilters({ page });
+    const handleViewDetail = (booking: IBookingPopulated) => { setSelectedBooking(booking); setSheetOpen(true); };
+    const handleRefresh = () => { fetchBookings(true); fetchSummary(true); };
 
-    const handleReset = () => {
-        resetFilters();
-    };
-
-    const handlePageChange = (page: number) => {
-        setFilters({ page });
-    };
-
-    const handleViewDetail = (booking: IBookingPopulated) => {
-        setSelectedBooking(booking);
-        setSheetOpen(true);
-    };
-
-    const handleRefresh = () => {
-        fetchBookings(true);
-        fetchSummary(true);
-    };
-
-    // ── Render ───────────────────────────────────────────────────────────────
     return (
-        <div className="min-h-screen bg-slate-50 px-6 py-8 space-y-6" style={jakarta.style}>
-
-            {/* ── Breadcrumbs ───────────────────────────────────────────────── */}
+        // Neumorphic page background — the monochromatic stone surface
+        <div
+            className="min-h-screen bg-[#E7E5E4] px-6 py-8 space-y-6"
+            style={spaceMono.style}
+        >
+            {/* ── Breadcrumbs ─────────────────────────────────────────────── */}
             <Breadcrumbs
                 items={[
                     { label: 'Operations', href: '/operations' },
                     { label: 'Bookings', href: '/operations/bookings' },
                 ]}
-                className="text-xs"
+                className="text-[10px] text-[#1E2938]/40 uppercase tracking-widest"
             />
 
-            {/* ── Page header ─────────────────────────────────────────────── */}
+            {/* ── Page header ──────────────────────────────────────────────── */}
             <motion.div
-                initial={{ opacity: 0, y: -16 }}
+                initial={{ opacity: 0, y: -12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                 className="flex items-center justify-between flex-wrap gap-4"
             >
-                <div>
-                    <div className="flex items-center gap-3 mb-1">
-                        <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center shrink-0">
-                            <BookOpen size={17} className="text-indigo-600" />
-                        </div>
-                        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+                <div className="flex items-center gap-4">
+                    {/* Icon — neumorphic outset raised circle */}
+                    <div className={cn(
+                        'w-10 h-10 rounded-2xl flex items-center justify-center shrink-0',
+                        'bg-[#E7E5E4]',
+                        'shadow-[5px_5px_10px_#c8c6c4,-4px_-4px_8px_#ffffff]',
+                    )}>
+                        <BookOpen size={17} className="text-[#006666]" />
+                    </div>
+
+                    <div>
+                        <h1
+                            className="text-2xl font-bold text-[#1E2938] tracking-tight leading-none"
+                            style={spaceMono.style}
+                        >
                             Bookings
                         </h1>
+                        <p
+                            className="text-[10px] text-[#1E2938]/40 uppercase tracking-[0.14em] mt-1"
+                            style={jetbrainsMono.style}
+                        >
+                            Manage and monitor all tour bookings
+                        </p>
                     </div>
-                    <p className="text-xs text-slate-400 ml-12 font-sans">
-                        Manage and monitor all tour bookings
-                    </p>
                 </div>
 
-                <Button
-                    variant="ghost"
-                    size="sm"
+                {/* Refresh — neumorphic raised button that presses on click */}
+                <button
                     onClick={handleRefresh}
                     disabled={isLoading}
-                    className="h-9 px-3.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-white gap-2 text-xs font-sans shadow-sm"
+                    className={cn(
+                        'h-9 px-4 rounded-xl inline-flex items-center gap-2 text-xs font-medium transition-all duration-150',
+                        'bg-[#E7E5E4] text-[#1E2938]/55',
+                        isLoading
+                            ? 'shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff] cursor-not-allowed opacity-70'
+                            : [
+                                'shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff]',
+                                'hover:shadow-[5px_5px_10px_#c8c6c4,-4px_-4px_8px_#ffffff] hover:text-[#006666]',
+                                'active:shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                            ].join(' '),
+                    )}
+                    style={jetbrainsMono.style}
                 >
                     <RefreshCw size={13} className={cn(isLoading && 'animate-spin')} />
                     Refresh
-                </Button>
+                </button>
             </motion.div>
 
             {/* ── Summary cards ────────────────────────────────────────────── */}
             {summary ? (
                 <BookingSummaryCards summary={summary} />
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
                     {Array.from({ length: 6 }).map((_, i) => (
                         <div
                             key={i}
-                            className="h-28 rounded-2xl bg-white border border-slate-200 animate-pulse"
+                            className={cn(
+                                'h-28 rounded-2xl animate-pulse',
+                                'bg-[#E7E5E4]',
+                                'shadow-[inset_4px_4px_8px_#c8c6c4,inset_-3px_-3px_6px_#ffffff]',
+                            )}
                         />
                     ))}
                 </div>
@@ -157,7 +155,12 @@ export function BookingsPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl bg-rose-50 border border-rose-200 px-4 py-3 text-sm text-rose-600 font-sans"
+                    className={cn(
+                        'rounded-xl px-4 py-3 text-xs text-[#FF2157]',
+                        'bg-[#E7E5E4]',
+                        'shadow-[inset_3px_3px_6px_rgba(255,33,87,0.12),inset_-2px_-2px_5px_#ffffff]',
+                    )}
+                    style={jetbrainsMono.style}
                 >
                     {error}
                 </motion.div>

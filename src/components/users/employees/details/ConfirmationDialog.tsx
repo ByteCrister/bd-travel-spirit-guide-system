@@ -21,6 +21,12 @@ interface ConfirmationDialogProps {
   employeeName: string;
 }
 
+// Neumorphic shadow constants – tweak these to adjust extrusion depth
+const NEU_RAISED =
+  "8px 8px 16px #B0AEAD, -8px -8px 16px #FFFFFF";
+const NEU_PRESSED =
+  "inset 4px 4px 8px #B0AEAD, inset -4px -4px 8px #FFFFFF";
+
 export default function ConfirmationDialog({
   open,
   onOpenChange,
@@ -100,7 +106,7 @@ export default function ConfirmationDialog({
         "This will soft delete the employee record. The record can be restored later if needed.",
       infoBg: "bg-amber-50 border-amber-200",
       infoText: "text-amber-800",
-      buttonBg: "bg-red-600 hover:bg-red-700 disabled:bg-red-300",
+      accentColor: "#FF2157", // danger token
       buttonIcon: Flame,
       buttonText: "Delete Record",
       loadingText: "Deleting...",
@@ -115,7 +121,7 @@ export default function ConfirmationDialog({
         "This will restore the employee record and make it active again in the system.",
       infoBg: "bg-green-50 border-green-200",
       infoText: "text-green-800",
-      buttonBg: "bg-green-600 hover:bg-green-700 disabled:bg-green-300",
+      accentColor: "#00A63D", // success token
       buttonIcon: RotateCcw,
       buttonText: "Restore Record",
       loadingText: "Restoring...",
@@ -134,13 +140,21 @@ export default function ConfirmationDialog({
         if (!isOpen) handleCancel();
       }}
     >
-      <AlertDialogContent className="sm:max-w-md">
+      <AlertDialogContent
+        className="sm:max-w-md p-6 border-0"
+        style={{
+          background: "#E7E5E4", // surface token
+          boxShadow: NEU_RAISED,
+          borderRadius: "1.5rem",
+          fontFamily: "'Space Mono', monospace",
+        }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={mode}
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.2 }}
           >
             <form
@@ -148,8 +162,10 @@ export default function ConfirmationDialog({
                 e.preventDefault();
                 handleConfirm();
               }}
+              className="space-y-6"
             >
               <AlertDialogHeader>
+                {/* Icon circle – convex neumorphic look */}
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -159,26 +175,38 @@ export default function ConfirmationDialog({
                     stiffness: 200,
                   }}
                   className={`mx-auto mb-4 w-16 h-16 rounded-full ${current.iconBg} flex items-center justify-center`}
+                  style={{
+                    boxShadow: NEU_RAISED,
+                  }}
                 >
                   <Icon className={`h-8 w-8 ${current.iconColor}`} />
                 </motion.div>
 
-                <AlertDialogTitle className="text-center text-xl">
+                <AlertDialogTitle
+                  className="text-center text-xl font-bold"
+                  style={{ color: "#1E2938" }}
+                >
                   {current.title}
                 </AlertDialogTitle>
 
                 <AlertDialogDescription asChild>
                   <div className="space-y-3 text-center">
-                    <span className="text-muted-foreground">
+                    <span
+                      className="text-sm"
+                      style={{ color: "#1E2938", opacity: 0.7 }}
+                    >
                       {current.description}
                     </span>
 
                     {employeeName && (
                       <div
-                        className={`mt-3 p-3 ${current.infoBg} rounded-lg border`}
+                        className={`mt-3 p-3 ${current.infoBg} rounded-xl border`}
+                        style={{
+                          boxShadow: "inset 2px 2px 4px rgba(0,0,0,0.05), inset -2px -2px 4px rgba(255,255,255,0.5)",
+                        }}
                       >
                         <div
-                          className={`text-sm ${current.infoText} font-medium`}
+                          className={`text-sm font-medium ${current.infoText}`}
                         >
                           Employee: {employeeName}
                         </div>
@@ -188,62 +216,116 @@ export default function ConfirmationDialog({
                 </AlertDialogDescription>
               </AlertDialogHeader>
 
-              {mode === 'delete' && (<div className="mt-6 space-y-4">
-                <div>
-                  <label
-                    htmlFor="reason"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Reason *
-                  </label>
-
-                  <textarea
-                    id="reason"
-                    value={reason}
-                    onChange={handleReasonChange}
-                    onBlur={handleBlur}
-                    placeholder={current.placeholder}
-                    rows={4}
-                    disabled={isLoading}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${error && touched
-                        ? "border-red-300 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-blue-500"
-                      } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                  />
-
-                  <div className="flex justify-between mt-1">
-                    {error && touched && (
-                      <p className="text-sm text-red-600">{error}</p>
-                    )}
-                    <p
-                      className={`text-sm ml-auto ${reason.length > 500
-                          ? "text-red-600"
-                          : "text-gray-500"
-                        }`}
+              {mode === "delete" && (
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="reason"
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#1E2938" }}
                     >
-                      {reason.length}/500
-                    </p>
+                      Reason *
+                    </label>
+
+                    <textarea
+                      id="reason"
+                      value={reason}
+                      onChange={handleReasonChange}
+                      onBlur={handleBlur}
+                      placeholder={current.placeholder}
+                      rows={4}
+                      disabled={isLoading}
+                      className="w-full px-4 py-3 rounded-xl resize-none transition-shadow duration-200"
+                      style={{
+                        background: "#E7E5E4",
+                        border: "none",
+                        boxShadow: error && touched
+                          ? "inset 4px 4px 8px #B0AEAD, inset -4px -4px 8px #FFFFFF, 0 0 0 2px #FF2157"
+                          : NEU_PRESSED,
+                        color: "#1E2938",
+                        outline: "none",
+                      }}
+                      onFocus={(e) => {
+                        if (!error || !touched) {
+                          e.currentTarget.style.boxShadow = "inset 4px 4px 8px #B0AEAD, inset -4px -4px 8px #FFFFFF, 0 0 0 2px #006666";
+                        }
+                      }}
+                    />
+
+                    <div className="flex justify-between mt-1.5">
+                      {error && touched && (
+                        <p className="text-sm" style={{ color: "#FF2157" }}>
+                          {error}
+                        </p>
+                      )}
+                      <p
+                        className={`text-sm ml-auto ${
+                          reason.length > 500
+                            ? "text-red-600"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {reason.length}/500
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>)}
+              )}
 
-
-              <AlertDialogFooter className="sm:flex-row sm:justify-center gap-2 mt-6">
+              <AlertDialogFooter className="flex-row justify-center gap-3 mt-4 sm:mt-6">
                 <AlertDialogCancel
                   type="button"
                   onClick={handleCancel}
                   disabled={isLoading}
-                  className="sm:w-auto"
+                  className="sm:w-auto inline-flex items-center justify-center rounded-xl px-5 py-2.5 font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2"
+                  style={{
+                    background: "#E7E5E4",
+                    boxShadow: NEU_RAISED,
+                    color: "#1E2938",
+                    border: "none",
+                    opacity: isLoading ? 0.5 : 1,
+                    cursor: isLoading ? "not-allowed" : "pointer",
+                  }}
+                  onMouseDown={(e) => {
+                    if (!isLoading) {
+                      e.currentTarget.style.boxShadow = NEU_PRESSED;
+                    }
+                  }}
+                  onMouseUp={(e) => {
+                    e.currentTarget.style.boxShadow = NEU_RAISED;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = NEU_RAISED;
+                  }}
                 >
                   <X className="mr-2 h-4 w-4" />
                   Cancel
                 </AlertDialogCancel>
 
-                {/* IMPORTANT: normal submit button, not AlertDialogAction */}
+                {/* Primary action button – neumorphic with semantic color */}
                 <button
                   type="submit"
                   disabled={isLoading || !!error}
-                  className={`${current.buttonBg} text-white sm:w-auto inline-flex items-center justify-center rounded-md px-4 py-2`}
+                  className="inline-flex items-center justify-center rounded-xl px-5 py-2.5 font-bold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2"
+                  style={{
+                    background: "#E7E5E4",
+                    boxShadow: isLoading ? NEU_PRESSED : NEU_RAISED,
+                    color: current.accentColor,
+                    border: "none",
+                    opacity: isLoading || !!error ? 0.7 : 1,
+                    cursor: isLoading || !!error ? "not-allowed" : "pointer",
+                  }}
+                  onMouseDown={(e) => {
+                    if (!isLoading && !error) {
+                      e.currentTarget.style.boxShadow = NEU_PRESSED;
+                    }
+                  }}
+                  onMouseUp={(e) => {
+                    e.currentTarget.style.boxShadow = NEU_RAISED;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = NEU_RAISED;
+                  }}
                 >
                   {isLoading ? (
                     <>
@@ -254,7 +336,7 @@ export default function ConfirmationDialog({
                           repeat: Infinity,
                           ease: "linear",
                         }}
-                        className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"
+                        className="mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full"
                       />
                       {current.loadingText}
                     </>

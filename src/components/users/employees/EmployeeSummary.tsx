@@ -3,13 +3,7 @@
 import React from "react";
 import { CountUp } from "./primitives/CountUp";
 import { Skeleton } from "./primitives/Skeleton";
-import {
-    Users,
-    UserCheck,
-    UserMinus,
-    UserX,
-    LucideIcon,
-} from "lucide-react";
+import { Users, UserCheck, UserMinus, UserX, LucideIcon } from "lucide-react";
 
 interface EmployeeSummaryProps {
     summary: {
@@ -32,87 +26,71 @@ interface CardProps {
 
 type Tone = "primary" | "success" | "warning" | "danger" | "muted";
 
-const TONE_STYLES: Record<
-    Tone,
-    { bg: string; text: string; iconBg: string; ring?: string }
-> = {
-    primary: {
-        bg: "bg-gradient-to-br from-primary/5 to-primary/2",
-        text: "text-primary dark:text-primary-300",
-        iconBg: "bg-primary/10 text-primary",
-        ring: "ring-1 ring-primary/10",
-    },
-    success: {
-        bg: "bg-gradient-to-br from-emerald-50 to-emerald-25",
-        text: "text-emerald-600",
-        iconBg: "bg-emerald-50 text-emerald-600",
-        ring: "ring-1 ring-emerald-50",
-    },
-    warning: {
-        bg: "bg-gradient-to-br from-amber-50 to-amber-25",
-        text: "text-amber-600",
-        iconBg: "bg-amber-50 text-amber-600",
-        ring: "ring-1 ring-amber-50",
-    },
-    danger: {
-        bg: "bg-gradient-to-br from-red-50 to-red-25",
-        text: "text-destructive",
-        iconBg: "bg-destructive/10 text-destructive",
-        ring: "ring-1 ring-destructive/10",
-    },
-    muted: {
-        bg: "bg-background",
-        text: "text-muted-foreground",
-        iconBg: "bg-muted/10 text-muted-foreground",
-    },
+const TONE_COLOR: Record<Tone, string> = {
+    primary: "text-[#006666]",
+    success: "text-[#00A63D]",
+    warning: "text-[#FE9900]",
+    danger: "text-[#FF2157]",
+    muted: "text-[#1E2938]/40",
 };
 
-const StatCard: React.FC<CardProps> = ({
-    icon: Icon,
-    label,
-    value,
-    loading,
-    tone,
-}) => {
+const StatCard: React.FC<CardProps> = ({ icon: Icon, label, value, loading, tone }) => {
     const safeTone: Tone = (tone ?? "muted") as Tone;
-    const styles = TONE_STYLES[safeTone];
+    const accentColor = TONE_COLOR[safeTone];
 
     return (
         <div
-            className={`flex flex-col justify-between gap-4 rounded-2xl border border-border/60 p-4 shadow-sm transition-shadow duration-150 hover:shadow-md focus-within:shadow-md ${styles.bg} ${styles.ring ?? ""
-                }`}
+            className={[
+                "relative flex flex-col gap-3 rounded-2xl p-4",
+                "bg-[#E7E5E4]",
+                "shadow-[6px_6px_12px_#c9c7c5,-6px_-6px_12px_#ffffff]",
+                "transition-all duration-200",
+                "hover:shadow-[8px_8px_16px_#c9c7c5,-8px_-8px_16px_#ffffff]",
+                "focus-within:shadow-[inset_2px_2px_6px_#c9c7c5,inset_-2px_-2px_6px_#ffffff]",
+                "outline-none",
+            ].join(" ")}
             role="group"
             aria-label={`${label} statistic`}
             tabIndex={0}
         >
-            <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                    <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-lg ${styles.iconBg} shadow-sm`}
-                        aria-hidden="true"
-                    >
-                        <Icon className="h-5 w-5" />
-                    </div>
-
-                    <div className="flex flex-col">
-                        <span className={`text-sm font-medium ${styles.text}`}>{label}</span>
-                        <span className="mt-0.5 text-xs text-muted-foreground/80">Overview</span>
-                    </div>
-                </div>
-
-                <div className="flex items-center">
-                    <div className="hidden h-10 w-px bg-border/50 md:block" />
-                </div>
+            {/* Icon chip — inset pressed look */}
+            <div
+                className={[
+                    "flex h-9 w-9 items-center justify-center rounded-xl",
+                    "bg-[#E7E5E4]",
+                    "shadow-[inset_2px_2px_5px_#c9c7c5,inset_-2px_-2px_5px_#ffffff]",
+                    accentColor,
+                ].join(" ")}
+                aria-hidden="true"
+            >
+                <Icon className="h-4 w-4" />
             </div>
 
-            <div className="mt-2 flex items-baseline justify-between gap-3">
-                <div className="text-2xl font-semibold leading-none">
-                    {loading ? <Skeleton className="h-8 w-20 rounded-md" /> : <CountUp value={value} />}
-                </div>
+            {/* Label */}
+            <div>
+                <p
+                    className="text-[11px] font-semibold uppercase tracking-widest text-[#1E2938]/50 font-[family-name:var(--font-space-mono,'Space_Mono',monospace)]"
+                >
+                    {label}
+                </p>
+                <p className="text-[10px] text-[#1E2938]/30 font-[family-name:var(--font-jetbrains-mono,'JetBrains_Mono',monospace)] mt-0.5">
+                    As of now
+                </p>
+            </div>
 
-                <div className="hidden items-center gap-2 md:flex">
-                    <span className="text-xs text-muted-foreground/80">As of now</span>
-                </div>
+            {/* Value */}
+            <div
+                className={[
+                    "text-2xl font-bold leading-none",
+                    accentColor,
+                    "font-[family-name:var(--font-space-mono,'Space_Mono',monospace)]",
+                ].join(" ")}
+            >
+                {loading ? (
+                    <Skeleton className="h-7 w-16 rounded-lg" />
+                ) : (
+                    <CountUp value={value} />
+                )}
             </div>
         </div>
     );
@@ -131,10 +109,13 @@ export function EmployeeSummary({ summary, loading }: EmployeeSummaryProps) {
         <section aria-labelledby="employee-summary-heading" className="w-full">
             <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
-                    <h3 id="employee-summary-heading" className="text-base font-semibold">
+                    <h3
+                        id="employee-summary-heading"
+                        className="text-sm font-bold uppercase tracking-widest text-[#1E2938] font-[family-name:var(--font-space-mono,'Space_Mono',monospace)]"
+                    >
                         Employee Summary
                     </h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="mt-1 text-xs text-[#1E2938]/50 font-[family-name:var(--font-jetbrains-mono,'JetBrains_Mono',monospace)]">
                         Snapshot of company headcount and status distribution
                     </p>
                 </div>

@@ -58,7 +58,6 @@ const breadcrumbItems = [
     { label: "Add Employee", href: "/users/employees/add-employee" },
 ];
 
-
 // Initial form values
 const getInitialValues = (): CreateEmployeeFormValues => ({
     name: "",
@@ -96,8 +95,8 @@ const itemVariants = {
 // Formik-compatible FormItem components
 const FormItem: React.FC<{ children: React.ReactNode }> = ({ children }) => <div className="space-y-2">{children}</div>;
 const FormLabel: React.FC<{ children: React.ReactNode; icon?: React.ReactNode }> = ({ children, icon }) => (
-    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-        {icon && <span className="text-blue-600">{icon}</span>}
+    <label className="flex items-center gap-2 text-sm font-semibold" style={{ color: '#1E2938' }}>
+        {icon && <span style={{ color: '#006666' }}>{icon}</span>}
         {children}
     </label>
 );
@@ -105,7 +104,8 @@ const FormMessage: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
     <motion.p
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
-        className="text-xs text-red-500 mt-1 flex items-center gap-1"
+        className="text-xs flex items-center gap-1 mt-1"
+        style={{ color: '#FF2157' }}
     >
         <AlertCircle className="h-3 w-3" />{children}
     </motion.p>
@@ -207,7 +207,6 @@ export default function AddEmployeePage() {
             setSubmitting(true);
             // Step 1: Send verification email
             const service = new EmailVerificationService(values.contactInfo.email);
-            // Use appropriate purpose – adjust according to your constants
             const sendResult = await service.sendVerificationEmail(EMAIL_VERIFICATION_PURPOSE.EMPLOYEE_VERIFICATION);
             if (!sendResult.success) {
                 showToast.error(sendResult.message);
@@ -277,7 +276,10 @@ export default function AddEmployeePage() {
     };
 
     return (
-        <div className="overflow-y-auto flex-1 px-8 py-6" >
+        <div
+            className="overflow-y-auto flex-1 px-8 py-6 min-h-screen"
+            style={{ backgroundColor: '#E7E5E4' }}
+        >
             <Breadcrumbs items={breadcrumbItems} />
 
             <Formik
@@ -294,13 +296,27 @@ export default function AddEmployeePage() {
                             className="space-y-6 pt-5"
                         >
                             {/* Security Section */}
-                            <motion.div variants={itemVariants} className="group">
-                                <div className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-2xl p-6 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-300/20 rounded-full blur-3xl" />
+                            <motion.div variants={itemVariants}>
+                                <div
+                                    className="rounded-2xl p-6"
+                                    style={{
+                                        backgroundColor: '#E7E5E4',
+                                        boxShadow: '8px 8px 16px #d1cfce, -8px -8px 16px #ffffff'
+                                    }}
+                                >
                                     <div className="relative">
-                                        <h3 className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-3">
-                                            <div className="p-2 bg-amber-500 rounded-xl shadow-md">
-                                                <Shield className="h-5 w-5 text-white" />
+                                        <h3
+                                            className="text-xl font-bold mb-5 flex items-center gap-3"
+                                            style={{ color: '#1E2938', fontFamily: '"Space Mono", monospace' }}
+                                        >
+                                            <div
+                                                className="p-2 rounded-xl"
+                                                style={{
+                                                    backgroundColor: '#E7E5E4',
+                                                    boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff'
+                                                }}
+                                            >
+                                                <Shield className="h-5 w-5" style={{ color: '#006666' }} />
                                             </div>
                                             Security Credentials
                                         </h3>
@@ -313,9 +329,15 @@ export default function AddEmployeePage() {
                                                     {({ field }: FieldProps<string>) => (
                                                         <Input
                                                             {...field}
-                                                            disabled={showVerificationDialog} // Disable when dialog open
+                                                            disabled={showVerificationDialog}
                                                             placeholder="Enter your name"
-                                                            className="w-full bg-white/80 backdrop-blur-sm border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all"
+                                                            className="w-full rounded-xl"
+                                                            style={{
+                                                                backgroundColor: '#E7E5E4',
+                                                                boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                border: 'none',
+                                                                color: '#1E2938'
+                                                            }}
                                                         />
                                                     )}
                                                 </Field>
@@ -333,7 +355,13 @@ export default function AddEmployeePage() {
                                                                 type="password"
                                                                 disabled={showVerificationDialog}
                                                                 placeholder="Enter secure password"
-                                                                className="flex-1 bg-white/80 backdrop-blur-sm border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all"
+                                                                className="flex-1 rounded-xl"
+                                                                style={{
+                                                                    backgroundColor: '#E7E5E4',
+                                                                    boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                    border: 'none',
+                                                                    color: '#1E2938'
+                                                                }}
                                                             />
                                                         )}
                                                     </Field>
@@ -341,7 +369,13 @@ export default function AddEmployeePage() {
                                                         type="button"
                                                         variant="outline"
                                                         disabled={showVerificationDialog}
-                                                        className="border-amber-400 bg-white hover:bg-amber-100 hover:border-amber-500 hover:scale-105 transition-all shadow-md"
+                                                        className="rounded-xl font-medium"
+                                                        style={{
+                                                            backgroundColor: '#E7E5E4',
+                                                            boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff',
+                                                            border: 'none',
+                                                            color: '#1E2938'
+                                                        }}
                                                         onClick={() => setFieldValue("password", generateStrongPassword())}
                                                     >
                                                         <RefreshCw className="h-4 w-4 mr-2" /> Generate
@@ -356,12 +390,26 @@ export default function AddEmployeePage() {
 
                             {/* Profile Section */}
                             <motion.div variants={itemVariants}>
-                                <div className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-6 border-2 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-300/20 rounded-full blur-3xl" />
+                                <div
+                                    className="rounded-2xl p-6"
+                                    style={{
+                                        backgroundColor: '#E7E5E4',
+                                        boxShadow: '8px 8px 16px #d1cfce, -8px -8px 16px #ffffff'
+                                    }}
+                                >
                                     <div className="relative">
-                                        <h3 className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-3">
-                                            <div className="p-2 bg-blue-500 rounded-xl shadow-md">
-                                                <User className="h-5 w-5 text-white" />
+                                        <h3
+                                            className="text-xl font-bold mb-5 flex items-center gap-3"
+                                            style={{ color: '#1E2938', fontFamily: '"Space Mono", monospace' }}
+                                        >
+                                            <div
+                                                className="p-2 rounded-xl"
+                                                style={{
+                                                    backgroundColor: '#E7E5E4',
+                                                    boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff'
+                                                }}
+                                            >
+                                                <User className="h-5 w-5" style={{ color: '#006666' }} />
                                             </div>
                                             Profile Information
                                         </h3>
@@ -378,28 +426,41 @@ export default function AddEmployeePage() {
                                                             exit={{ scale: 0, rotate: 90 }}
                                                             className="relative group"
                                                         >
-                                                            <div className="relative w-36 h-36 rounded-3xl overflow-hidden border-4 border-white shadow-2xl ring-4 ring-blue-200 group-hover:ring-blue-400 transition-all">
+                                                            <div
+                                                                className="relative w-36 h-36 rounded-3xl overflow-hidden"
+                                                                style={{
+                                                                    boxShadow: '8px 8px 16px #d1cfce, -8px -8px 16px #ffffff'
+                                                                }}
+                                                            >
                                                                 <Image src={values.avatar} alt="Avatar" fill className="object-cover" />
-                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                                             </div>
                                                             <motion.button
                                                                 whileHover={{ scale: 1.1 }}
                                                                 whileTap={{ scale: 0.9 }}
                                                                 type="button"
                                                                 disabled={showVerificationDialog}
-                                                                className="absolute -top-2 -right-2 p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 disabled:opacity-50"
+                                                                className="absolute -top-2 -right-2 p-2 rounded-full"
+                                                                style={{
+                                                                    backgroundColor: '#FF2157',
+                                                                    boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff',
+                                                                    border: 'none'
+                                                                }}
                                                                 onClick={() => handleClearAvatar(setFieldValue)}
                                                             >
-                                                                <X className="h-4 w-4" />
+                                                                <X className="h-4 w-4 text-white" />
                                                             </motion.button>
                                                         </motion.div>
                                                     ) : (
                                                         <motion.div
                                                             initial={{ scale: 0 }}
                                                             animate={{ scale: 1 }}
-                                                            className="w-36 h-36 rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center border-4 border-white shadow-xl"
+                                                            className="w-36 h-36 rounded-3xl flex items-center justify-center"
+                                                            style={{
+                                                                backgroundColor: '#E7E5E4',
+                                                                boxShadow: 'inset 6px 6px 12px #d1cfce, inset -6px -6px 12px #ffffff'
+                                                            }}
                                                         >
-                                                            <User className="h-16 w-16 text-gray-400" />
+                                                            <User className="h-16 w-16" style={{ color: '#1E2938' }} />
                                                         </motion.div>
                                                     )}
                                                 </AnimatePresence>
@@ -411,19 +472,33 @@ export default function AddEmployeePage() {
                                                             type="file"
                                                             accept={IMAGE_EXTENSIONS.map(ext => `.${ext}`).join(',')}
                                                             onChange={e => e.target.files && handleAvatarUpload(e.target.files[0], setFieldValue)}
-                                                            className="cursor-pointer bg-white/80 border-blue-300 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-500 file:text-white hover:file:bg-blue-600"
+                                                            className="cursor-pointer rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-medium"
+                                                            style={{
+                                                                backgroundColor: '#E7E5E4',
+                                                                boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                border: 'none',
+                                                                color: '#1E2938'
+                                                            }}
                                                             disabled={uploadingAvatar || showVerificationDialog}
                                                         />
-                                                        {uploadingAvatar && <Loader2 className="h-5 w-5 animate-spin text-blue-600" />}
+                                                        {uploadingAvatar && <Loader2 className="h-5 w-5 animate-spin" style={{ color: '#006666' }} />}
                                                     </div>
-                                                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                                                    <p className="text-xs flex items-center gap-1" style={{ color: '#1E2938' }}>
                                                         <Sparkles className="h-3 w-3" />
                                                         Recommended: Square image, max {MAX_FILE_SIZE_MB}MB
                                                     </p>
                                                     {avatarError && (
-                                                        <Alert variant="destructive" className="py-2 bg-red-50 border-red-300">
-                                                            <AlertCircle className="h-4 w-4" />
-                                                            <AlertDescription className="text-xs">{avatarError}</AlertDescription>
+                                                        <Alert
+                                                            variant="destructive"
+                                                            className="py-2 rounded-xl"
+                                                            style={{
+                                                                backgroundColor: '#E7E5E4',
+                                                                boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                border: 'none'
+                                                            }}
+                                                        >
+                                                            <AlertCircle className="h-4 w-4" style={{ color: '#FF2157' }} />
+                                                            <AlertDescription className="text-xs" style={{ color: '#FF2157' }}>{avatarError}</AlertDescription>
                                                         </Alert>
                                                     )}
                                                 </div>
@@ -441,7 +516,15 @@ export default function AddEmployeePage() {
                                                         onValueChange={v => setFieldValue("employmentType", v)}
                                                         disabled={showVerificationDialog}
                                                     >
-                                                        <SelectTrigger className="bg-white/80 border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                                        <SelectTrigger
+                                                            className="rounded-xl"
+                                                            style={{
+                                                                backgroundColor: '#E7E5E4',
+                                                                boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                border: 'none',
+                                                                color: '#1E2938'
+                                                            }}
+                                                        >
                                                             <SelectValue placeholder="Select employment type" />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -458,12 +541,26 @@ export default function AddEmployeePage() {
 
                             {/* Compensation Section */}
                             <motion.div variants={itemVariants}>
-                                <div className="relative bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-6 border-2 border-green-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                    <div className="absolute top-0 left-1/2 w-32 h-32 bg-green-300/20 rounded-full blur-3xl" />
+                                <div
+                                    className="rounded-2xl p-6"
+                                    style={{
+                                        backgroundColor: '#E7E5E4',
+                                        boxShadow: '8px 8px 16px #d1cfce, -8px -8px 16px #ffffff'
+                                    }}
+                                >
                                     <div className="relative">
-                                        <h3 className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-3">
-                                            <div className="p-2 bg-green-500 rounded-xl shadow-md">
-                                                <FaBangladeshiTakaSign className="h-5 w-5 text-white" />
+                                        <h3
+                                            className="text-xl font-bold mb-5 flex items-center gap-3"
+                                            style={{ color: '#1E2938', fontFamily: '"Space Mono", monospace' }}
+                                        >
+                                            <div
+                                                className="p-2 rounded-xl"
+                                                style={{
+                                                    backgroundColor: '#E7E5E4',
+                                                    boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff'
+                                                }}
+                                            >
+                                                <FaBangladeshiTakaSign className="h-5 w-5" style={{ color: '#006666' }} />
                                             </div>
                                             Compensation Details
                                         </h3>
@@ -491,7 +588,13 @@ export default function AddEmployeePage() {
                                                                         setFieldValue("salary", value);
                                                                     }
                                                                 }}
-                                                                className="flex-1 bg-white/80 border-green-300 focus:border-green-500 focus:ring-2 focus:ring-green-200"
+                                                                className="flex-1 rounded-xl"
+                                                                style={{
+                                                                    backgroundColor: '#E7E5E4',
+                                                                    boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                    border: 'none',
+                                                                    color: '#1E2938'
+                                                                }}
                                                                 placeholder="Enter amount"
                                                             />
                                                         )}
@@ -503,7 +606,15 @@ export default function AddEmployeePage() {
                                                                 onValueChange={(v) => setFieldValue("currency", v)}
                                                                 disabled={showVerificationDialog}
                                                             >
-                                                                <SelectTrigger className="w-[130px] bg-white/80 border-green-300 focus:border-green-500">
+                                                                <SelectTrigger
+                                                                    className="w-[130px] rounded-xl"
+                                                                    style={{
+                                                                        backgroundColor: '#E7E5E4',
+                                                                        boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                        border: 'none',
+                                                                        color: '#1E2938'
+                                                                    }}
+                                                                >
                                                                     <SelectValue placeholder="Currency" />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
@@ -528,7 +639,13 @@ export default function AddEmployeePage() {
                                                             onChange={(e) =>
                                                                 setFieldValue("dateOfJoining", new Date(e.target.value))
                                                             }
-                                                            className="bg-white/80 border-green-300 focus:border-green-500 focus:ring-2 focus:ring-green-200"
+                                                            className="rounded-xl"
+                                                            style={{
+                                                                backgroundColor: '#E7E5E4',
+                                                                boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                border: 'none',
+                                                                color: '#1E2938'
+                                                            }}
                                                         />
                                                     )}
                                                 </Field>
@@ -545,33 +662,46 @@ export default function AddEmployeePage() {
                                                                     <div
                                                                         key={mode}
                                                                         className={cn(
-                                                                            "relative flex items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer",
-                                                                            field.value === mode
-                                                                                ? "bg-green-100 border-green-500 shadow-sm"
-                                                                                : "bg-white/80 border-green-200 hover:border-green-300",
+                                                                            "relative flex items-center justify-center p-4 rounded-xl transition-all duration-200 cursor-pointer",
                                                                             showVerificationDialog && "pointer-events-none opacity-60"
                                                                         )}
+                                                                        style={{
+                                                                            backgroundColor: '#E7E5E4',
+                                                                            boxShadow: field.value === mode
+                                                                                ? 'inset 4px 4px 8px #d1cfce, inset -4px -4px 8px #ffffff'
+                                                                                : '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff',
+                                                                            border: 'none'
+                                                                        }}
                                                                         onClick={() => !showVerificationDialog && setFieldValue("paymentMode", mode)}
                                                                     >
                                                                         <div className="flex items-center gap-3">
-                                                                            <div className={cn(
-                                                                                "h-5 w-5 rounded-full border-2 flex items-center justify-center",
-                                                                                field.value === mode
-                                                                                    ? "border-green-500 bg-green-500"
-                                                                                    : "border-gray-300"
-                                                                            )}>
+                                                                            <div
+                                                                                className="h-5 w-5 rounded-full flex items-center justify-center"
+                                                                                style={{
+                                                                                    backgroundColor: '#E7E5E4',
+                                                                                    boxShadow: field.value === mode
+                                                                                        ? 'inset 2px 2px 4px #d1cfce, inset -2px -2px 4px #ffffff'
+                                                                                        : '2px 2px 4px #d1cfce, -2px -2px 4px #ffffff'
+                                                                                }}
+                                                                            >
                                                                                 {field.value === mode && (
-                                                                                    <div className="h-2 w-2 rounded-full bg-white" />
+                                                                                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#006666' }} />
                                                                                 )}
                                                                             </div>
-                                                                            <span className="font-medium text-gray-700">
+                                                                            <span style={{ color: '#1E2938', fontWeight: 500 }}>
                                                                                 {mode === SALARY_PAYMENT_MODE.AUTO ? "Automatic" : "Manual"}
                                                                             </span>
                                                                         </div>
 
                                                                         {mode === SALARY_PAYMENT_MODE.AUTO && (
                                                                             <div className="absolute -top-1 -right-1">
-                                                                                <div className="px-2 py-0.5 text-[10px] font-semibold bg-amber-500 text-white rounded-full">
+                                                                                <div
+                                                                                    className="px-2 py-0.5 text-[10px] font-semibold rounded-full"
+                                                                                    style={{
+                                                                                        backgroundColor: '#FE9900',
+                                                                                        color: '#ffffff'
+                                                                                    }}
+                                                                                >
                                                                                     Recommended
                                                                                 </div>
                                                                             </div>
@@ -581,8 +711,8 @@ export default function AddEmployeePage() {
                                                             </div>
                                                         )}
                                                     </Field>
-                                                    <div className="mt-3 flex items-start gap-2 text-sm text-gray-600">
-                                                        <Info className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                                                    <div className="mt-3 flex items-start gap-2 text-sm" style={{ color: '#1E2938' }}>
+                                                        <Info className="h-4 w-4 flex-shrink-0" style={{ color: '#1E2938' }} />
                                                         <span>
                                                             <strong>Automatic:</strong> Salary is paid automatically on the set date.{" "}
                                                             <strong>Manual:</strong> Requires manual approval and processing for each payment.
@@ -600,11 +730,21 @@ export default function AddEmployeePage() {
                                                         animate={{ opacity: 1, height: "auto" }}
                                                         exit={{ opacity: 0, height: 0 }}
                                                         transition={{ duration: 0.3 }}
-                                                        className="bg-white/80 backdrop-blur-sm border-2 border-green-300 rounded-xl p-5 space-y-4 shadow-inner"
+                                                        className="rounded-xl p-5 space-y-4"
+                                                        style={{
+                                                            backgroundColor: '#E7E5E4',
+                                                            boxShadow: 'inset 4px 4px 8px #d1cfce, inset -4px -4px 8px #ffffff'
+                                                        }}
                                                     >
-                                                        <h4 className="font-semibold text-gray-700 flex items-center gap-2">
-                                                            <div className="p-1.5 bg-green-100 rounded-lg">
-                                                                <CreditCard className="h-4 w-4 text-green-600" />
+                                                        <h4 className="font-semibold flex items-center gap-2" style={{ color: '#1E2938' }}>
+                                                            <div
+                                                                className="p-1.5 rounded-lg"
+                                                                style={{
+                                                                    backgroundColor: '#E7E5E4',
+                                                                    boxShadow: '2px 2px 4px #d1cfce, -2px -2px 4px #ffffff'
+                                                                }}
+                                                            >
+                                                                <CreditCard className="h-4 w-4" style={{ color: '#006666' }} />
                                                             </div>
                                                             Payment Card Details *
                                                         </h4>
@@ -624,7 +764,15 @@ export default function AddEmployeePage() {
                                                                     }}
                                                                     disabled={showVerificationDialog}
                                                                 >
-                                                                    <SelectTrigger className="bg-white/80 border-green-300 focus:border-green-500">
+                                                                    <SelectTrigger
+                                                                        className="rounded-xl"
+                                                                        style={{
+                                                                            backgroundColor: '#E7E5E4',
+                                                                            boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                            border: 'none',
+                                                                            color: '#1E2938'
+                                                                        }}
+                                                                    >
                                                                         <SelectValue placeholder="Select card brand" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
@@ -654,7 +802,13 @@ export default function AddEmployeePage() {
                                                                             last4: val,
                                                                         });
                                                                     }}
-                                                                    className="bg-white/80 border-green-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 font-mono tracking-widest"
+                                                                    className="rounded-xl font-mono tracking-widest"
+                                                                    style={{
+                                                                        backgroundColor: '#E7E5E4',
+                                                                        boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                        border: 'none',
+                                                                        color: '#1E2938'
+                                                                    }}
                                                                 />
                                                             </FormItem>
 
@@ -672,7 +826,15 @@ export default function AddEmployeePage() {
                                                                     }}
                                                                     disabled={showVerificationDialog}
                                                                 >
-                                                                    <SelectTrigger className="bg-white/80 border-green-300 focus:border-green-500">
+                                                                    <SelectTrigger
+                                                                        className="rounded-xl"
+                                                                        style={{
+                                                                            backgroundColor: '#E7E5E4',
+                                                                            boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                            border: 'none',
+                                                                            color: '#1E2938'
+                                                                        }}
+                                                                    >
                                                                         <SelectValue placeholder="Month" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
@@ -699,7 +861,15 @@ export default function AddEmployeePage() {
                                                                     }}
                                                                     disabled={showVerificationDialog}
                                                                 >
-                                                                    <SelectTrigger className="bg-white/80 border-green-300 focus:border-green-500">
+                                                                    <SelectTrigger
+                                                                        className="rounded-xl"
+                                                                        style={{
+                                                                            backgroundColor: '#E7E5E4',
+                                                                            boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                            border: 'none',
+                                                                            color: '#1E2938'
+                                                                        }}
+                                                                    >
                                                                         <SelectValue placeholder="Year" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
@@ -727,14 +897,20 @@ export default function AddEmployeePage() {
                                                                                 cardholderName: e.target.value,
                                                                             });
                                                                         }}
-                                                                        className="bg-white/80 border-green-300 focus:border-green-500 focus:ring-2 focus:ring-green-200"
+                                                                        className="rounded-xl"
+                                                                        style={{
+                                                                            backgroundColor: '#E7E5E4',
+                                                                            boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                            border: 'none',
+                                                                            color: '#1E2938'
+                                                                        }}
                                                                     />
                                                                 </FormItem>
                                                             </div>
                                                         </div>
 
-                                                        <div className="flex items-start gap-2 text-sm text-gray-600 mt-2">
-                                                            <Info className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                                                        <div className="flex items-start gap-2 text-sm" style={{ color: '#1E2938' }}>
+                                                            <Info className="h-4 w-4 flex-shrink-0" />
                                                             <span>Card details are stored securely and used only for automatic salary disbursement.</span>
                                                         </div>
                                                     </motion.div>
@@ -747,12 +923,26 @@ export default function AddEmployeePage() {
 
                             {/* Contact Information */}
                             <motion.div variants={itemVariants}>
-                                <div className="relative bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 rounded-2xl p-6 border-2 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                    <div className="absolute bottom-0 right-0 w-40 h-40 bg-purple-300/20 rounded-full blur-3xl" />
+                                <div
+                                    className="rounded-2xl p-6"
+                                    style={{
+                                        backgroundColor: '#E7E5E4',
+                                        boxShadow: '8px 8px 16px #d1cfce, -8px -8px 16px #ffffff'
+                                    }}
+                                >
                                     <div className="relative">
-                                        <h3 className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-3">
-                                            <div className="p-2 bg-purple-500 rounded-xl shadow-md">
-                                                <Mail className="h-5 w-5 text-white" />
+                                        <h3
+                                            className="text-xl font-bold mb-5 flex items-center gap-3"
+                                            style={{ color: '#1E2938', fontFamily: '"Space Mono", monospace' }}
+                                        >
+                                            <div
+                                                className="p-2 rounded-xl"
+                                                style={{
+                                                    backgroundColor: '#E7E5E4',
+                                                    boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff'
+                                                }}
+                                            >
+                                                <Mail className="h-5 w-5" style={{ color: '#006666' }} />
                                             </div>
                                             Contact Information
                                         </h3>
@@ -768,7 +958,13 @@ export default function AddEmployeePage() {
                                                             type="tel"
                                                             disabled={showVerificationDialog}
                                                             placeholder="01XXXXXXXXX"
-                                                            className="bg-white/80 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                                                            className="rounded-xl"
+                                                            style={{
+                                                                backgroundColor: '#E7E5E4',
+                                                                boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                border: 'none',
+                                                                color: '#1E2938'
+                                                            }}
                                                         />
                                                     )}
                                                 </Field>
@@ -784,7 +980,13 @@ export default function AddEmployeePage() {
                                                             type="email"
                                                             disabled={showVerificationDialog}
                                                             placeholder="email@example.com"
-                                                            className="bg-white/80 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                                                            className="rounded-xl"
+                                                            style={{
+                                                                backgroundColor: '#E7E5E4',
+                                                                boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                border: 'none',
+                                                                color: '#1E2938'
+                                                            }}
                                                         />
                                                     )}
                                                 </Field>
@@ -793,10 +995,22 @@ export default function AddEmployeePage() {
                                         </div>
 
                                         {/* Emergency Contact */}
-                                        <div className="bg-white/80 backdrop-blur-sm border-2 border-purple-300 rounded-xl p-5 space-y-4 shadow-inner">
-                                            <h4 className="font-semibold text-gray-700 flex items-center gap-2">
-                                                <div className="p-1.5 bg-red-100 rounded-lg">
-                                                    <Heart className="h-4 w-4 text-red-600" />
+                                        <div
+                                            className="rounded-xl p-5 space-y-4"
+                                            style={{
+                                                backgroundColor: '#E7E5E4',
+                                                boxShadow: 'inset 4px 4px 8px #d1cfce, inset -4px -4px 8px #ffffff'
+                                            }}
+                                        >
+                                            <h4 className="font-semibold flex items-center gap-2" style={{ color: '#1E2938' }}>
+                                                <div
+                                                    className="p-1.5 rounded-lg"
+                                                    style={{
+                                                        backgroundColor: '#E7E5E4',
+                                                        boxShadow: '2px 2px 4px #d1cfce, -2px -2px 4px #ffffff'
+                                                    }}
+                                                >
+                                                    <Heart className="h-4 w-4" style={{ color: '#FF2157' }} />
                                                 </div>
                                                 Emergency Contact *
                                             </h4>
@@ -805,7 +1019,15 @@ export default function AddEmployeePage() {
                                                     <FormLabel>Name *</FormLabel>
                                                     <Field name="contactInfo.emergencyContact.name">
                                                         {({ field }: FieldProps<string>) => (
-                                                            <Input {...field} disabled={showVerificationDialog} placeholder="Full name" className="border-purple-200" />
+                                                            <Input {...field} disabled={showVerificationDialog} placeholder="Full name"
+                                                                className="rounded-xl"
+                                                                style={{
+                                                                    backgroundColor: '#E7E5E4',
+                                                                    boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                    border: 'none',
+                                                                    color: '#1E2938'
+                                                                }}
+                                                            />
                                                         )}
                                                     </Field>
                                                     <FormMessage>{touched.contactInfo?.emergencyContact?.name && errors.contactInfo?.emergencyContact?.name}</FormMessage>
@@ -814,7 +1036,15 @@ export default function AddEmployeePage() {
                                                     <FormLabel>Phone *</FormLabel>
                                                     <Field name="contactInfo.emergencyContact.phone">
                                                         {({ field }: FieldProps<string>) => (
-                                                            <Input {...field} type="tel" disabled={showVerificationDialog} placeholder="01XXXXXXXXX" className="border-purple-200" />
+                                                            <Input {...field} type="tel" disabled={showVerificationDialog} placeholder="01XXXXXXXXX"
+                                                                className="rounded-xl"
+                                                                style={{
+                                                                    backgroundColor: '#E7E5E4',
+                                                                    boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                    border: 'none',
+                                                                    color: '#1E2938'
+                                                                }}
+                                                            />
                                                         )}
                                                     </Field>
                                                     <FormMessage>{touched.contactInfo?.emergencyContact?.phone && errors.contactInfo?.emergencyContact?.phone}</FormMessage>
@@ -823,7 +1053,15 @@ export default function AddEmployeePage() {
                                                     <FormLabel>Relation *</FormLabel>
                                                     <Field name="contactInfo.emergencyContact.relation">
                                                         {({ field }: FieldProps<string>) => (
-                                                            <Input {...field} disabled={showVerificationDialog} placeholder="e.g., Father" className="border-purple-200" />
+                                                            <Input {...field} disabled={showVerificationDialog} placeholder="e.g., Father"
+                                                                className="rounded-xl"
+                                                                style={{
+                                                                    backgroundColor: '#E7E5E4',
+                                                                    boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                    border: 'none',
+                                                                    color: '#1E2938'
+                                                                }}
+                                                            />
                                                         )}
                                                     </Field>
                                                     <FormMessage>{touched.contactInfo?.emergencyContact?.relation && errors.contactInfo?.emergencyContact?.relation}</FormMessage>
@@ -836,13 +1074,27 @@ export default function AddEmployeePage() {
 
                             {/* Shifts Section */}
                             <motion.div variants={itemVariants}>
-                                <div className="relative bg-gradient-to-br from-cyan-50 via-sky-50 to-blue-50 rounded-2xl p-6 border-2 border-cyan-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-300/20 rounded-full blur-3xl" />
+                                <div
+                                    className="rounded-2xl p-6"
+                                    style={{
+                                        backgroundColor: '#E7E5E4',
+                                        boxShadow: '8px 8px 16px #d1cfce, -8px -8px 16px #ffffff'
+                                    }}
+                                >
                                     <div className="relative">
                                         <div className="flex justify-between items-center mb-5">
-                                            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3">
-                                                <div className="p-2 bg-cyan-500 rounded-xl shadow-md">
-                                                    <Clock className="h-5 w-5 text-white" />
+                                            <h3
+                                                className="text-xl font-bold flex items-center gap-3"
+                                                style={{ color: '#1E2938', fontFamily: '"Space Mono", monospace' }}
+                                            >
+                                                <div
+                                                    className="p-2 rounded-xl"
+                                                    style={{
+                                                        backgroundColor: '#E7E5E4',
+                                                        boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff'
+                                                    }}
+                                                >
+                                                    <Clock className="h-5 w-5" style={{ color: '#006666' }} />
                                                 </div>
                                                 Work Shifts
                                             </h3>
@@ -851,7 +1103,13 @@ export default function AddEmployeePage() {
                                                     type="button"
                                                     size="sm"
                                                     disabled={showVerificationDialog}
-                                                    className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white shadow-lg"
+                                                    className="rounded-xl font-medium"
+                                                    style={{
+                                                        backgroundColor: '#E7E5E4',
+                                                        boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff',
+                                                        border: 'none',
+                                                        color: '#1E2938'
+                                                    }}
                                                     onClick={() => setFieldValue("shifts", [...values.shifts, { startTime: "09:00", endTime: "17:00", days: [] }])}
                                                 >
                                                     <Plus className="mr-2 h-4 w-4" /> Add Shift
@@ -868,11 +1126,15 @@ export default function AddEmployeePage() {
                                                                 initial={{ opacity: 0, scale: 0.9 }}
                                                                 animate={{ opacity: 1, scale: 1 }}
                                                                 exit={{ opacity: 0, scale: 0.9 }}
-                                                                className="text-center py-12 border-2 border-dashed border-cyan-200 rounded-xl bg-white/50"
+                                                                className="text-center py-12 rounded-xl"
+                                                                style={{
+                                                                    backgroundColor: '#E7E5E4',
+                                                                    boxShadow: 'inset 4px 4px 8px #d1cfce, inset -4px -4px 8px #ffffff'
+                                                                }}
                                                             >
-                                                                <Clock className="h-16 w-16 mx-auto mb-3 text-gray-300" />
-                                                                <p className="text-gray-400 font-medium">No shifts added yet</p>
-                                                                <p className="text-sm text-gray-400">Click &quot;Add Shift&quot; to get started</p>
+                                                                <Clock className="h-16 w-16 mx-auto mb-3" style={{ color: '#1E2938' }} />
+                                                                <p className="font-medium" style={{ color: '#1E2938' }}>No shifts added yet</p>
+                                                                <p className="text-sm" style={{ color: '#1E2938' }}>Click &quot;Add Shift&quot; to get started</p>
                                                             </motion.div>
                                                         ) : (
                                                             values.shifts.map((shift, index) => {
@@ -887,11 +1149,22 @@ export default function AddEmployeePage() {
                                                                         animate={{ opacity: 1, x: 0 }}
                                                                         exit={{ opacity: 0, x: 20 }}
                                                                         layout
-                                                                        className="bg-white/80 backdrop-blur-sm border-2 border-cyan-200 rounded-xl p-5 space-y-4 hover:shadow-lg transition-all"
+                                                                        className="rounded-xl p-5 space-y-4"
+                                                                        style={{
+                                                                            backgroundColor: '#E7E5E4',
+                                                                            boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff'
+                                                                        }}
                                                                     >
                                                                         <div className="flex justify-between items-center">
-                                                                            <h4 className="font-semibold text-gray-700 flex items-center gap-3">
-                                                                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-md">
+                                                                            <h4 className="font-semibold flex items-center gap-3" style={{ color: '#1E2938' }}>
+                                                                                <div
+                                                                                    className="w-10 h-10 rounded-xl flex items-center justify-center font-bold"
+                                                                                    style={{
+                                                                                        backgroundColor: '#E7E5E4',
+                                                                                        boxShadow: '3px 3px 6px #d1cfce, -3px -3px 6px #ffffff',
+                                                                                        color: '#006666'
+                                                                                    }}
+                                                                                >
                                                                                     {index + 1}
                                                                                 </div>
                                                                                 Shift {index + 1}
@@ -902,7 +1175,11 @@ export default function AddEmployeePage() {
                                                                                     variant="ghost"
                                                                                     size="sm"
                                                                                     disabled={showVerificationDialog}
-                                                                                    className="hover:bg-red-100 text-red-500"
+                                                                                    className="rounded-lg"
+                                                                                    style={{
+                                                                                        backgroundColor: 'transparent',
+                                                                                        color: '#FF2157'
+                                                                                    }}
                                                                                     onClick={() => remove(index)}
                                                                                 >
                                                                                     <Trash2 className="h-4 w-4" />
@@ -915,7 +1192,15 @@ export default function AddEmployeePage() {
                                                                                 {({ field }: FieldProps<string>) => (
                                                                                     <FormItem>
                                                                                         <FormLabel>Start Time *</FormLabel>
-                                                                                        <Input {...field} type="time" value={field.value ?? ""} disabled={showVerificationDialog} className="border-cyan-200 focus:border-cyan-400" />
+                                                                                        <Input {...field} type="time" value={field.value ?? ""} disabled={showVerificationDialog}
+                                                                                            className="rounded-xl"
+                                                                                            style={{
+                                                                                                backgroundColor: '#E7E5E4',
+                                                                                                boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                                                border: 'none',
+                                                                                                color: '#1E2938'
+                                                                                            }}
+                                                                                        />
                                                                                         <FormMessage>{touchedShift?.startTime && startTimeError}</FormMessage>
                                                                                     </FormItem>
                                                                                 )}
@@ -924,7 +1209,15 @@ export default function AddEmployeePage() {
                                                                                 {({ field }: FieldProps<string>) => (
                                                                                     <FormItem>
                                                                                         <FormLabel>End Time *</FormLabel>
-                                                                                        <Input {...field} type="time" value={field.value ?? ""} disabled={showVerificationDialog} className="border-cyan-200 focus:border-cyan-400" />
+                                                                                        <Input {...field} type="time" value={field.value ?? ""} disabled={showVerificationDialog}
+                                                                                            className="rounded-xl"
+                                                                                            style={{
+                                                                                                backgroundColor: '#E7E5E4',
+                                                                                                boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                                                                border: 'none',
+                                                                                                color: '#1E2938'
+                                                                                            }}
+                                                                                        />
                                                                                         <FormMessage>{touchedShift?.endTime && endTimeError}</FormMessage>
                                                                                     </FormItem>
                                                                                 )}
@@ -947,10 +1240,16 @@ export default function AddEmployeePage() {
                                                                                                         whileTap={{ scale: 0.95 }}
                                                                                                     >
                                                                                                         <Badge
-                                                                                                            className={`cursor-pointer px-4 py-2 transition-all font-medium ${isSelected
-                                                                                                                ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg scale-105"
-                                                                                                                : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                                                                                                                } ${showVerificationDialog ? "pointer-events-none opacity-60" : ""}`}
+                                                                                                            className={`cursor-pointer px-4 py-2 transition-all font-medium rounded-lg ${showVerificationDialog ? "pointer-events-none opacity-60" : ""}`}
+                                                                                                            style={{
+                                                                                                                backgroundColor: '#E7E5E4',
+                                                                                                                boxShadow: isSelected
+                                                                                                                    ? 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff'
+                                                                                                                    : '3px 3px 6px #d1cfce, -3px -3px 6px #ffffff',
+                                                                                                                border: 'none',
+                                                                                                                color: isSelected ? '#006666' : '#1E2938',
+                                                                                                                fontWeight: isSelected ? 700 : 500
+                                                                                                            }}
                                                                                                             onClick={() => {
                                                                                                                 if (showVerificationDialog) return;
                                                                                                                 const newDays = selectedDays.includes(day)
@@ -983,12 +1282,26 @@ export default function AddEmployeePage() {
 
                             {/* Documents Section */}
                             <motion.div variants={itemVariants}>
-                                <div className="relative bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 rounded-2xl p-6 border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-slate-300/20 rounded-full blur-3xl" />
+                                <div
+                                    className="rounded-2xl p-6"
+                                    style={{
+                                        backgroundColor: '#E7E5E4',
+                                        boxShadow: '8px 8px 16px #d1cfce, -8px -8px 16px #ffffff'
+                                    }}
+                                >
                                     <div className="relative">
-                                        <h3 className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-3">
-                                            <div className="p-2 bg-slate-600 rounded-xl shadow-md">
-                                                <FileText className="h-5 w-5 text-white" />
+                                        <h3
+                                            className="text-xl font-bold mb-5 flex items-center gap-3"
+                                            style={{ color: '#1E2938', fontFamily: '"Space Mono", monospace' }}
+                                        >
+                                            <div
+                                                className="p-2 rounded-xl"
+                                                style={{
+                                                    backgroundColor: '#E7E5E4',
+                                                    boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff'
+                                                }}
+                                            >
+                                                <FileText className="h-5 w-5" style={{ color: '#006666' }} />
                                             </div>
                                             Documents & Files
                                         </h3>
@@ -1002,12 +1315,18 @@ export default function AddEmployeePage() {
                                                         multiple
                                                         accept={ALLOWED_EXTENSIONS.map(ext => `.${ext}`).join(',')}
                                                         onChange={e => e.target.files && handleDocumentUpload(e.target.files, values.documents, setFieldValue)}
-                                                        className="cursor-pointer bg-white/80 border-slate-300 focus:border-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-slate-600 file:text-white hover:file:bg-slate-700"
+                                                        className="cursor-pointer rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-medium"
+                                                        style={{
+                                                            backgroundColor: '#E7E5E4',
+                                                            boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                            border: 'none',
+                                                            color: '#1E2938'
+                                                        }}
                                                         disabled={uploadingDocuments || showVerificationDialog}
                                                     />
-                                                    {uploadingDocuments && <Loader2 className="h-5 w-5 animate-spin text-slate-600" />}
+                                                    {uploadingDocuments && <Loader2 className="h-5 w-5 animate-spin" style={{ color: '#006666' }} />}
                                                 </div>
-                                                <p className="text-xs text-gray-500 flex items-center gap-1">
+                                                <p className="text-xs flex items-center gap-1" style={{ color: '#1E2938' }}>
                                                     <Upload className="h-3 w-3" />
                                                     Upload up to {MAX_DOCUMENTS} documents (max {MAX_FILE_SIZE_MB}MB each)
                                                 </p>
@@ -1022,18 +1341,28 @@ export default function AddEmployeePage() {
                                                                     animate={{ opacity: 1, y: 0 }}
                                                                     exit={{ opacity: 0, x: -20 }}
                                                                     layout
-                                                                    className="flex justify-between items-center bg-white border-2 border-slate-200 rounded-xl p-4 hover:shadow-md transition-all group"
+                                                                    className="flex justify-between items-center rounded-xl p-4 group"
+                                                                    style={{
+                                                                        backgroundColor: '#E7E5E4',
+                                                                        boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff'
+                                                                    }}
                                                                 >
                                                                     <div className="flex items-center gap-3">
-                                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${doc.type.startsWith("image/") ? "bg-blue-100" : "bg-gray-100"}`}>
+                                                                        <div
+                                                                            className="w-12 h-12 rounded-xl flex items-center justify-center"
+                                                                            style={{
+                                                                                backgroundColor: '#E7E5E4',
+                                                                                boxShadow: '3px 3px 6px #d1cfce, -3px -3px 6px #ffffff'
+                                                                            }}
+                                                                        >
                                                                             {doc.type.startsWith("image/") ? (
-                                                                                <ImageIcon className="h-6 w-6 text-blue-600" />
+                                                                                <ImageIcon className="h-6 w-6" style={{ color: '#006666' }} />
                                                                             ) : (
-                                                                                <File className="h-6 w-6 text-gray-600" />
+                                                                                <File className="h-6 w-6" style={{ color: '#006666' }} />
                                                                             )}
                                                                         </div>
                                                                         <div>
-                                                                            <p className="text-sm font-medium text-gray-700">{doc.type}</p>
+                                                                            <p className="text-sm font-medium" style={{ color: '#1E2938' }}>{doc.type}</p>
                                                                             {documentErrors[i] && <FormMessage>{documentErrors[i]}</FormMessage>}
                                                                         </div>
                                                                     </div>
@@ -1043,7 +1372,8 @@ export default function AddEmployeePage() {
                                                                             size="sm"
                                                                             variant="ghost"
                                                                             disabled={showVerificationDialog}
-                                                                            className="hover:bg-red-100 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                            className="opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                                                                            style={{ color: '#FF2157' }}
                                                                             onClick={() => handleRemoveDocument(i, values.documents, setFieldValue)}
                                                                         >
                                                                             <Trash2 className="h-4 w-4" />
@@ -1056,10 +1386,14 @@ export default function AddEmployeePage() {
                                                         <motion.div
                                                             initial={{ opacity: 0 }}
                                                             animate={{ opacity: 1 }}
-                                                            className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl bg-white/50"
+                                                            className="text-center py-12 rounded-xl"
+                                                            style={{
+                                                                backgroundColor: '#E7E5E4',
+                                                                boxShadow: 'inset 4px 4px 8px #d1cfce, inset -4px -4px 8px #ffffff'
+                                                            }}
                                                         >
-                                                            <Upload className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                                                            <p className="text-sm text-gray-400 font-medium">No documents uploaded</p>
+                                                            <Upload className="h-12 w-12 mx-auto mb-3" style={{ color: '#1E2938' }} />
+                                                            <p className="text-sm font-medium" style={{ color: '#1E2938' }}>No documents uploaded</p>
                                                         </motion.div>
                                                     )}
                                                 </AnimatePresence>
@@ -1071,12 +1405,26 @@ export default function AddEmployeePage() {
 
                             {/* Notes Section */}
                             <motion.div variants={itemVariants}>
-                                <div className="relative bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 rounded-2xl p-6 border-2 border-yellow-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-300/20 rounded-full blur-3xl" />
+                                <div
+                                    className="rounded-2xl p-6"
+                                    style={{
+                                        backgroundColor: '#E7E5E4',
+                                        boxShadow: '8px 8px 16px #d1cfce, -8px -8px 16px #ffffff'
+                                    }}
+                                >
                                     <div className="relative">
-                                        <h3 className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-3">
-                                            <div className="p-2 bg-yellow-500 rounded-xl shadow-md">
-                                                <FileText className="h-5 w-5 text-white" />
+                                        <h3
+                                            className="text-xl font-bold mb-5 flex items-center gap-3"
+                                            style={{ color: '#1E2938', fontFamily: '"Space Mono", monospace' }}
+                                        >
+                                            <div
+                                                className="p-2 rounded-xl"
+                                                style={{
+                                                    backgroundColor: '#E7E5E4',
+                                                    boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff'
+                                                }}
+                                            >
+                                                <FileText className="h-5 w-5" style={{ color: '#006666' }} />
                                             </div>
                                             Additional Notes
                                         </h3>
@@ -1088,7 +1436,13 @@ export default function AddEmployeePage() {
                                                         value={field.value ?? ""}
                                                         disabled={showVerificationDialog}
                                                         placeholder="Add any additional notes, comments, or special requirements..."
-                                                        className="min-h-[120px] bg-white/80 border-yellow-300 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 resize-none"
+                                                        className="min-h-[120px] rounded-xl resize-none"
+                                                        style={{
+                                                            backgroundColor: '#E7E5E4',
+                                                            boxShadow: 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff',
+                                                            border: 'none',
+                                                            color: '#1E2938'
+                                                        }}
                                                     />
                                                 )}
                                             </Field>
@@ -1103,7 +1457,11 @@ export default function AddEmployeePage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="sticky bottom-0 -mx-8 -mb-6 mt-8 bg-gradient-to-t from-white via-white to-transparent pt-6 pb-6 px-8 border-t-2 border-gray-200"
+                            className="sticky bottom-0 -mx-8 -mb-6 mt-8 pt-6 pb-6 px-8"
+                            style={{
+                                backgroundColor: '#E7E5E4',
+                                boxShadow: '0 -4px 10px rgba(0,0,0,0.05)'
+                            }}
                         >
                             <div className="flex gap-3">
                                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
@@ -1112,7 +1470,13 @@ export default function AddEmployeePage() {
                                         variant="outline"
                                         disabled={showVerificationDialog}
                                         onClick={() => router.push(`/users/employees`)}
-                                        className="w-full border-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400 font-semibold"
+                                        className="w-full rounded-xl font-semibold"
+                                        style={{
+                                            backgroundColor: '#E7E5E4',
+                                            boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff',
+                                            border: 'none',
+                                            color: '#1E2938'
+                                        }}
                                     >
                                         Return
                                     </Button>
@@ -1121,7 +1485,13 @@ export default function AddEmployeePage() {
                                     <Button
                                         type="submit"
                                         disabled={isSubmitting || uploadingAvatar || uploadingDocuments || showVerificationDialog}
-                                        className="w-full bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-gray-950 text-white shadow-md font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                                        style={{
+                                            backgroundColor: '#006666',
+                                            boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff',
+                                            border: 'none',
+                                            color: '#ffffff'
+                                        }}
                                     >
                                         {isSubmitting ? (
                                             <>

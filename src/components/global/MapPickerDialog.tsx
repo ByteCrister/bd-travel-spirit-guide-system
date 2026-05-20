@@ -11,106 +11,89 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { MapPin } from "lucide-react";
+import { useMap, useMapEvents } from "react-leaflet";
+import { LatLngExpression, LeafletMouseEvent } from "leaflet";
 
 const MapContainer = dynamic(
     () => import("react-leaflet").then((m) => m.MapContainer),
     { ssr: false }
 );
-
 const TileLayer = dynamic(
     () => import("react-leaflet").then((m) => m.TileLayer),
     { ssr: false }
 );
-
 const Marker = dynamic(
     () => import("react-leaflet").then((m) => m.Marker),
     { ssr: false }
 );
 
-import { useMap, useMapEvents } from "react-leaflet";
+/* ─── Design tokens ──────────────────────────────────────────────── */
+const surface  = "#E7E5E4";
+const primary  = "#006666";
+const text     = "#1E2938";
 
-import { LatLngExpression, LeafletMouseEvent } from "leaflet";
-import { Button } from "@/components/ui/button";
+const nmBase: React.CSSProperties = {
+    background: surface,
+    boxShadow:
+        "4px 4px 8px rgba(0,0,0,0.14), -3px -3px 7px rgba(255,255,255,0.70)",
+    borderRadius: "8px",
+    border: "none",
+};
 
+const nmInset: React.CSSProperties = {
+    background: surface,
+    boxShadow:
+        "inset 3px 3px 6px rgba(0,0,0,0.10), inset -2px -2px 5px rgba(255,255,255,0.65)",
+    borderRadius: "6px",
+};
 
-// -------------------------------------------------
-// FIX 1 — Robust resize after dialog opens
-// -------------------------------------------------
+/* ─── Leaflet helpers (logic unchanged) ─────────────────────────── */
 const ForceResize: FC<{ open: boolean }> = ({ open }) => {
     const map = useMap();
-
     useEffect(() => {
         if (!open) return;
-
-        // Run multiple invalidations during animation
-        const timeouts = [
+        const ts = [
             setTimeout(() => map.invalidateSize(), 50),
             setTimeout(() => map.invalidateSize(), 150),
             setTimeout(() => map.invalidateSize(), 300),
         ];
-
-        return () => timeouts.forEach(clearTimeout);
+        return () => ts.forEach(clearTimeout);
     }, [open, map]);
-
     return null;
 };
 
-
-// -------------------------------------------------
-// Center Map to Position
-// -------------------------------------------------
 const CenterMap: FC<{ center: [number, number] }> = ({ center }) => {
     const map = useMap();
-
     useEffect(() => {
-        if (center && center[0] !== 0 && center[1] !== 0) {
-            map.setView(center, 12); // Zoom to 12 for better view of specific location
-        }
+        if (center[0] !== 0 && center[1] !== 0) map.setView(center, 12);
     }, [center, map]);
-
     return null;
 };
 
-
-// -------------------------------------------------
-// FIX 2 — Configure Leaflet Icons (same as before)
-// -------------------------------------------------
 let L: typeof import("leaflet") | null = null;
-
 async function configureLeafletIcons() {
-    if (!L) {
-        L = (await import("leaflet")).default;
-    }
-
+    if (!L) L = (await import("leaflet")).default;
     const flag = "_configured";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((L.Icon.Default as any)[flag]) return;
-
     L.Icon.Default.mergeOptions({
         iconUrl: "/leaflet/marker-icon.png",
         iconRetinaUrl: "/leaflet/marker-icon-2x.png",
         shadowUrl: "/leaflet/marker-shadow.png",
     });
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (L.Icon.Default as any)[flag] = true;
 }
 
-
-// -------------------------------------------------
-// Props
-// -------------------------------------------------
+/* ─── Props ──────────────────────────────────────────────────────── */
 export interface MapPickerProps {
     open: boolean;
     onClose: () => void;
     onSelect: (lat: number, lng: number) => void;
-    initialPosition?: [number, number]; // Add this prop
+    initialPosition?: [number, number];
 }
 
-
-// -------------------------------------------------
-// FIXED MapPickerDialog
-// -------------------------------------------------
+/* ─── Component ──────────────────────────────────────────────────── */
 export const MapPickerDialog: FC<MapPickerProps> = ({
     open,
     onClose,
@@ -124,24 +107,21 @@ export const MapPickerDialog: FC<MapPickerProps> = ({
             : null
     );
 
-    // Reset position when initialPosition changes (for editing mode)
     useEffect(() => {
         if (initialPosition && initialPosition[0] !== 0 && initialPosition[1] !== 0) {
             setPosition(initialPosition);
         }
     }, [initialPosition]);
 
-    // FIX 3 — prevent leaflet rendering during hydration
     useEffect(() => {
         setMounted(true);
         configureLeafletIcons();
     }, []);
 
-    // Determine default center: use initialPosition if valid, otherwise use default
     const defaultCenter: LatLngExpression =
         initialPosition && initialPosition[0] !== 0 && initialPosition[1] !== 0
             ? initialPosition
-            : [23.8103, 90.4125]; // Bangladesh coordinates as fallback
+            : [23.8103, 90.4125];
 
     const ClickHandler: FC = () => {
         useMapEvents({
@@ -157,74 +137,171 @@ export const MapPickerDialog: FC<MapPickerProps> = ({
 
     return (
         <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-            <DialogContent className="
-            max-w-3xl
-            p-0
-            overflow-hidden
-            max-h-[90vh]
-            flex
-            flex-col
-            ">
-                <DialogHeader className="px-4 py-3 border-b">
-                    <DialogTitle className="flex items-center gap-2">
-                        <MapPin className="h-5 w-5 text-emerald-500" />
-                        {position ? "Update Location on Map" : "Pick a Location"}
+            {/*
+             * We override the default shadcn DialogContent with a
+             * neumorphic shell. The `asChild`-style approach isn't
+             * available here, so we zero-out its own styles via
+             * className and re-apply nm styles via style prop.
+             */}
+            <DialogContent
+                className="max-w-3xl p-0 overflow-hidden max-h-[90vh] flex flex-col border-none"
+                style={{
+                    background: surface,
+                    boxShadow:
+                        "14px 14px 30px rgba(0,0,0,0.14), -8px -8px 22px rgba(255,255,255,0.72)",
+                    borderRadius: "16px",
+                }}
+            >
+                {/* ── Header ── */}
+                <DialogHeader
+                    className="px-5 py-4 flex-shrink-0"
+                    style={{
+                        borderBottom: `1px solid ${text}12`,
+                        background: surface,
+                    }}
+                >
+                    <DialogTitle className="flex items-center gap-2.5">
+                        {/* Icon pill */}
+                        <span
+                            style={{
+                                ...nmBase,
+                                padding: "6px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                color: primary,
+                            }}
+                        >
+                            <MapPin size={16} />
+                        </span>
+                        <span
+                            style={{
+                                fontFamily:
+                                    "var(--font-space-mono, 'Space Mono', monospace)",
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                letterSpacing: "0.1em",
+                                textTransform: "uppercase",
+                                color: text,
+                            }}
+                        >
+                            {position ? "Update Location" : "Pick a Location"}
+                        </span>
                     </DialogTitle>
+
                     {position && (
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            Click anywhere on the map to update the location
+                        <p
+                            style={{
+                                fontFamily:
+                                    "var(--font-jetbrains-mono, 'JetBrains Mono', monospace)",
+                                fontSize: "11px",
+                                color: `${text}55`,
+                                marginTop: "4px",
+                            }}
+                        >
+                            Click anywhere on the map to update the pin
                         </p>
                     )}
                 </DialogHeader>
 
-                <div className="h-[500px] w-full">
-                    {/* FIX: Prevent map from rendering before mount */}
+                {/* ── Map area — inset shadow gives it a "recessed screen" feel ── */}
+                <div
+                    className="flex-1 w-full overflow-hidden"
+                    style={{
+                        ...nmInset,
+                        borderRadius: 0,
+                        minHeight: "460px",
+                        maxHeight: "500px",
+                    }}
+                >
                     {mounted && open && (
                         <MapContainer
                             center={defaultCenter}
-                            zoom={position ? 12 : 5} // Zoom in more if we have an existing position
+                            zoom={position ? 12 : 5}
                             scrollWheelZoom
                             className="h-full w-full"
+                            style={{ minHeight: "460px" }}
                         >
                             <ForceResize open={open} />
-
-                            {/* Center map to initial position */}
                             {position && <CenterMap center={position} />}
-
                             <TileLayer
                                 url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 attribution="© OpenStreetMap contributors"
                             />
-
                             <ClickHandler />
-
                             {position && <Marker position={position} />}
                         </MapContainer>
                     )}
                 </div>
 
-                <div className="px-4 py-3 border-t bg-slate-50 dark:bg-slate-800">
-                    <div className="flex justify-between items-center">
-                        <div className="text-sm text-slate-600 dark:text-slate-300">
-                            {position ? (
-                                <>
-                                    Current selection:{" "}
-                                    <span className="font-semibold">
-                                        {position[0].toFixed(6)}, {position[1].toFixed(6)}
-                                    </span>
-                                </>
-                            ) : (
-                                "Click on the map to select a location"
-                            )}
-                        </div>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={onClose}
-                        >
-                            Cancel
-                        </Button>
+                {/* ── Footer ── */}
+                <div
+                    className="px-5 py-3 flex-shrink-0 flex items-center justify-between gap-4"
+                    style={{
+                        borderTop: `1px solid ${text}12`,
+                        background: surface,
+                    }}
+                >
+                    {/* Coordinate readout — inset chip */}
+                    <div
+                        style={{
+                            ...nmInset,
+                            padding: "6px 14px",
+                            fontFamily:
+                                "var(--font-jetbrains-mono, 'JetBrains Mono', monospace)",
+                            fontSize: "12px",
+                            color: position ? primary : `${text}45`,
+                            minWidth: 0,
+                            flex: 1,
+                        }}
+                        className="truncate"
+                    >
+                        {position ? (
+                            <>
+                                <span style={{ color: `${text}55`, fontSize: "10px", letterSpacing: "0.06em" }}>
+                                    SELECTED&nbsp;
+                                </span>
+                                {position[0].toFixed(6)},&nbsp;{position[1].toFixed(6)}
+                            </>
+                        ) : (
+                            <span style={{ fontSize: "11px", fontStyle: "italic" }}>
+                                Click on the map to select a location
+                            </span>
+                        )}
                     </div>
+
+                    {/* Cancel button */}
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        style={{
+                            ...nmBase,
+                            fontFamily:
+                                "var(--font-space-mono, 'Space Mono', monospace)",
+                            fontSize: "10px",
+                            fontWeight: 700,
+                            letterSpacing: "0.1em",
+                            textTransform: "uppercase",
+                            color: `${text}70`,
+                            padding: "8px 16px",
+                            cursor: "pointer",
+                            flexShrink: 0,
+                            transition: "all 0.15s",
+                        }}
+                        onMouseDown={(e) => {
+                            (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                                "inset 3px 3px 6px rgba(0,0,0,0.12), inset -2px -2px 5px rgba(255,255,255,0.60)";
+                        }}
+                        onMouseUp={(e) => {
+                            (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                                "4px 4px 8px rgba(0,0,0,0.14), -3px -3px 7px rgba(255,255,255,0.70)";
+                        }}
+                        onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                                "4px 4px 8px rgba(0,0,0,0.14), -3px -3px 7px rgba(255,255,255,0.70)";
+                        }}
+                    >
+                        Cancel
+                    </button>
                 </div>
             </DialogContent>
         </Dialog>

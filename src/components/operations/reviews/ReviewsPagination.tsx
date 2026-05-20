@@ -4,6 +4,16 @@
 import { JSX } from "react";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal } from "lucide-react";
 
+// ── Tokens ───────────────────────────────────────────────────────────────────
+const S        = "#E7E5E4";
+const SHADOW_OUT = "6px 6px 14px #c9c7c6, -6px -6px 14px #ffffff";
+const SHADOW_IN  = "inset 3px 3px 7px #c9c7c6, inset -3px -3px 7px #ffffff";
+const PRIMARY  = "#006666";
+const TEXT     = "#1E2938";
+const MUTED    = "#607080";
+const MONO     = "var(--font-jetbrains-mono), monospace";
+const BRAND    = "var(--font-space-mono), monospace";
+
 interface Props {
     page: number;
     pages: number;
@@ -19,164 +29,168 @@ export default function ReviewsPagination({
     limit,
     total,
     onChangePage,
-    onChangeLimit
+    onChangeLimit,
 }: Props): JSX.Element {
     const goFirst = () => onChangePage(1);
-    const goPrev = () => onChangePage(Math.max(1, page - 1));
-    const goNext = () => onChangePage(Math.min(pages, page + 1));
-    const goLast = () => onChangePage(pages);
+    const goPrev  = () => onChangePage(Math.max(1, page - 1));
+    const goNext  = () => onChangePage(Math.min(pages, page + 1));
+    const goLast  = () => onChangePage(pages);
 
     const isFirstPage = page === 1;
-    const isLastPage = page === pages;
+    const isLastPage  = page === pages;
 
-    // Generate visible page numbers with ellipsis logic
     const getPageNumbers = (): (number | string)[] => {
-        if (pages <= 7) {
-            return Array.from({ length: pages }, (_, i) => i + 1);
-        }
-
-        const pageNumbers: (number | string)[] = [];
-
+        if (pages <= 7) return Array.from({ length: pages }, (_, i) => i + 1);
+        const nums: (number | string)[] = [];
         if (page <= 4) {
-            // Near start: 1 2 3 4 5 ... last
-            for (let i = 1; i <= Math.min(5, pages); i++) {
-                pageNumbers.push(i);
-            }
-            if (pages > 5) {
-                pageNumbers.push('...', pages);
-            }
+            for (let i = 1; i <= Math.min(5, pages); i++) nums.push(i);
+            if (pages > 5) nums.push("...", pages);
         } else if (page >= pages - 3) {
-            // Near end: 1 ... last-4 last-3 last-2 last-1 last
-            pageNumbers.push(1, '...');
-            for (let i = Math.max(pages - 4, 2); i <= pages; i++) {
-                pageNumbers.push(i);
-            }
+            nums.push(1, "...");
+            for (let i = Math.max(pages - 4, 2); i <= pages; i++) nums.push(i);
         } else {
-            // Middle: 1 ... page-1 page page+1 ... last
-            pageNumbers.push(1, '...', page - 1, page, page + 1, '...', pages);
+            nums.push(1, "...", page - 1, page, page + 1, "...", pages);
         }
-
-        return pageNumbers;
+        return nums;
     };
 
     const pageNumbers = getPageNumbers();
+    const startItem   = total ? (page - 1) * limit + 1 : 0;
+    const endItem     = total ? Math.min(page * limit, total) : 0;
 
-    // Calculate range display
-    const startItem = total ? (page - 1) * limit + 1 : 0;
-    const endItem = total ? Math.min(page * limit, total) : 0;
+    /** Nav button (press/raised neumorphic) */
+    const NavBtn = ({
+        onClick, disabled, label, children,
+    }: {
+        onClick: () => void;
+        disabled: boolean;
+        label: string;
+        children: React.ReactNode;
+    }) => (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            aria-label={label}
+            title={label}
+            className="inline-flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none focus-visible:ring-2 disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{
+                background: S,
+                boxShadow: disabled ? SHADOW_IN : SHADOW_OUT,
+                color: disabled ? MUTED : TEXT,
+                border: "none",
+            }}
+        >
+            {children}
+        </button>
+    );
 
     return (
-        <div className="w-full">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-6 rounded-xl border border-gray-200/80 bg-gradient-to-br from-white to-gray-50/50 px-5 py-4 shadow-md backdrop-blur-sm">
-                {/* Results info with icon */}
-                <div className="flex items-center gap-3 text-sm text-gray-600 order-2 lg:order-1">
-                    <div className="hidden sm:flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-blue-600">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <div className="w-full px-5 py-4">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-5">
+
+                {/* ── Result info ── */}
+                <div
+                    className="flex items-center gap-3 order-2 lg:order-1 text-xs"
+                    style={{ fontFamily: MONO, color: MUTED }}
+                >
+                    <div
+                        className="flex items-center justify-center w-8 h-8 rounded-xl"
+                        style={{ background: S, boxShadow: SHADOW_IN }}
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: PRIMARY }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                     </div>
                     <div>
                         {total !== undefined ? (
-                            <div className="space-y-0.5">
-                                <p className="font-medium text-gray-900">
-                                    {startItem.toLocaleString()} – {endItem.toLocaleString()} <span className="text-gray-400 font-normal">of</span> {total.toLocaleString()}
+                            <>
+                                <p className="font-bold" style={{ color: TEXT, fontFamily: BRAND }}>
+                                    {startItem.toLocaleString()} – {endItem.toLocaleString()}{" "}
+                                    <span style={{ color: MUTED, fontWeight: 400 }}>of</span>{" "}
+                                    {total.toLocaleString()}
                                 </p>
-                                <p className="text-xs text-gray-500">Total results</p>
-                            </div>
+                                <p className="text-xs" style={{ color: MUTED }}>Total results</p>
+                            </>
                         ) : (
-                            <div className="space-y-0.5">
-                                <p className="font-medium text-gray-900">
-                                    Page {page} <span className="text-gray-400 font-normal">of</span> {pages}
+                            <>
+                                <p className="font-bold" style={{ color: TEXT, fontFamily: BRAND }}>
+                                    Page {page}{" "}
+                                    <span style={{ color: MUTED, fontWeight: 400 }}>of</span>{" "}
+                                    {pages}
                                 </p>
-                                <p className="text-xs text-gray-500">Navigation</p>
-                            </div>
+                                <p className="text-xs" style={{ color: MUTED }}>Navigation</p>
+                            </>
                         )}
                     </div>
                 </div>
 
-                {/* Page controls with modern design */}
+                {/* ── Page controls ── */}
                 <div className="flex items-center gap-2 order-1 lg:order-2">
-                    {/* First & Previous */}
-                    <div className="flex items-center gap-1 border-r border-gray-200 pr-2">
-                        <button
-                            data-testid="pagination-first"
-                            className="group relative inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-600"
-                            onClick={goFirst}
-                            disabled={isFirstPage}
-                            aria-label="First page"
-                            title="First page"
-                        >
-                            <ChevronsLeft className="h-4 w-4 transition-transform group-hover:scale-110" />
-                        </button>
-                        <button
-                            data-testid="pagination-prev"
-                            className="group relative inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-600"
-                            onClick={goPrev}
-                            disabled={isFirstPage}
-                            aria-label="Previous page"
-                            title="Previous page"
-                        >
-                            <ChevronLeft className="h-4 w-4 transition-transform group-hover:scale-110" />
-                        </button>
+                    {/* First + Prev */}
+                    <div className="flex items-center gap-1.5">
+                        <NavBtn onClick={goFirst} disabled={isFirstPage} label="First page">
+                            <ChevronsLeft className="h-4 w-4" />
+                        </NavBtn>
+                        <NavBtn onClick={goPrev} disabled={isFirstPage} label="Previous page">
+                            <ChevronLeft className="h-4 w-4" />
+                        </NavBtn>
                     </div>
 
                     {/* Page numbers */}
                     <div className="flex items-center gap-1">
                         {pageNumbers.map((p, idx) =>
-                            typeof p === 'string' ? (
+                            typeof p === "string" ? (
                                 <div
                                     key={`ellipsis-${idx}`}
-                                    className="inline-flex items-center justify-center w-9 h-9 text-gray-400"
+                                    className="inline-flex items-center justify-center w-9 h-9"
+                                    style={{ color: MUTED }}
                                 >
                                     <MoreHorizontal className="h-4 w-4" />
                                 </div>
                             ) : (
                                 <button
                                     key={p}
-                                    className={`relative inline-flex items-center justify-center min-w-[2.25rem] h-9 rounded-lg px-3 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${p === page
-                                            ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30 scale-105 focus:ring-blue-500/40"
-                                            : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:scale-105 focus:ring-gray-400/40"
-                                        }`}
+                                    type="button"
                                     onClick={() => onChangePage(p)}
                                     aria-current={p === page ? "page" : undefined}
+                                    className="inline-flex items-center justify-center min-w-[2.25rem] h-9 rounded-xl text-xs font-bold transition-all focus:outline-none focus-visible:ring-2"
+                                    style={{
+                                        background: p === page ? PRIMARY : S,
+                                        boxShadow: p === page
+                                            ? "3px 3px 8px #004d4d, -1px -1px 4px #008080"
+                                            : SHADOW_OUT,
+                                        color: p === page ? "#ffffff" : TEXT,
+                                        fontFamily: BRAND,
+                                        border: "none",
+                                        transform: p === page ? "scale(1.05)" : "scale(1)",
+                                    }}
                                 >
                                     {p}
-                                    {p === page && (
-                                        <span className="absolute inset-0 rounded-lg bg-white/20 animate-pulse" />
-                                    )}
                                 </button>
                             )
                         )}
                     </div>
 
-                    {/* Next & Last */}
-                    <div className="flex items-center gap-1 border-l border-gray-200 pl-2">
-                        <button
-                            data-testid="pagination-next"
-                            className="group relative inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-600"
-                            onClick={goNext}
-                            disabled={isLastPage}
-                            aria-label="Next page"
-                            title="Next page"
-                        >
-                            <ChevronRight className="h-4 w-4 transition-transform group-hover:scale-110" />
-                        </button>
-                        <button
-                            data-testid="pagination-last"
-                            className="group relative inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-2 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-600"
-                            onClick={goLast}
-                            disabled={isLastPage}
-                            aria-label="Last page"
-                            title="Last page"
-                        >
-                            <ChevronsRight className="h-4 w-4 transition-transform group-hover:scale-110" />
-                        </button>
+                    {/* Next + Last */}
+                    <div className="flex items-center gap-1.5">
+                        <NavBtn onClick={goNext} disabled={isLastPage} label="Next page">
+                            <ChevronRight className="h-4 w-4" />
+                        </NavBtn>
+                        <NavBtn onClick={goLast} disabled={isLastPage} label="Last page">
+                            <ChevronsRight className="h-4 w-4" />
+                        </NavBtn>
                     </div>
                 </div>
 
-                {/* Items per page with modern select */}
+                {/* ── Items per page ── */}
                 <div className="flex items-center gap-3 order-3">
-                    <label htmlFor="page-size" className="text-sm font-medium text-gray-600 whitespace-nowrap">
+                    <label
+                        htmlFor="page-size"
+                        className="text-xs font-medium whitespace-nowrap"
+                        style={{ color: MUTED, fontFamily: MONO }}
+                    >
                         Show
                     </label>
                     <div className="relative">
@@ -184,23 +198,31 @@ export default function ReviewsPagination({
                             id="page-size"
                             data-testid="pagination-limit"
                             value={limit}
-                            className="appearance-none rounded-lg border border-gray-300 bg-white pl-3 pr-10 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:border-gray-400 hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 cursor-pointer"
                             onChange={(e) => onChangeLimit(Number(e.target.value))}
+                            className="appearance-none rounded-xl text-xs font-medium pl-3 pr-8 py-2 outline-none cursor-pointer transition-all focus-visible:ring-2"
+                            style={{
+                                background: S,
+                                boxShadow: SHADOW_IN,
+                                color: TEXT,
+                                fontFamily: MONO,
+                                border: "none",
+                            }}
                         >
                             {[10, 25, 50, 100].map((n) => (
-                                <option key={n} value={n}>
-                                    {n}
-                                </option>
+                                <option key={n} value={n}>{n}</option>
                             ))}
                         </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span className="pointer-events-none absolute inset-y-0 right-2.5 flex items-center" style={{ color: MUTED }}>
+                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
-                        </div>
+                        </span>
                     </div>
-                    <span className="text-sm text-gray-500 whitespace-nowrap">per page</span>
+                    <span className="text-xs whitespace-nowrap" style={{ color: MUTED, fontFamily: MONO }}>
+                        per page
+                    </span>
                 </div>
+
             </div>
         </div>
     );

@@ -1,12 +1,10 @@
 // components/reports/ReportDetailsPanel.tsx
-
 "use client";
 
 import type { FC } from "react";
 import { useMemo } from "react";
 import { motion, Variants } from "framer-motion";
 import type { ReportFull } from "@/types/tour/reports.types";
-import { Card } from "@/components/ui/card";
 import { useReportsStore } from "@/store/report.store";
 import { PulseLoader } from "./PulseLoader";
 import { formatDateTime } from "@/utils/helpers/format.reports";
@@ -28,10 +26,153 @@ import {
     MdCalendarToday,
     MdUpdate,
     MdCheckCircle,
-    MdWarning
+    MdWarning,
 } from "react-icons/md";
-import { HiSparkles } from "react-icons/hi";
 
+/* ─── Design tokens ──────────────────────────────────────────────── */
+const surface = "#E7E5E4";
+const primary = "#006666";
+const text = "#1E2938";
+
+const nmCard: React.CSSProperties = {
+    background: surface,
+    boxShadow:
+        "8px 8px 18px rgba(0,0,0,0.13), -5px -5px 14px rgba(255,255,255,0.72)",
+    borderRadius: "14px",
+    border: "none",
+};
+
+const nmInset: React.CSSProperties = {
+    background: surface,
+    boxShadow:
+        "inset 4px 4px 8px rgba(0,0,0,0.10), inset -3px -3px 7px rgba(255,255,255,0.65)",
+    borderRadius: "10px",
+};
+
+const nmIconPill = (color: string): React.CSSProperties => ({
+    background: surface,
+    boxShadow: `3px 3px 7px rgba(0,0,0,0.13), -2px -2px 5px rgba(255,255,255,0.68)`,
+    borderRadius: "8px",
+    padding: "6px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color,
+});
+
+const nmBadge = (color: string): React.CSSProperties => ({
+    background: surface,
+    boxShadow:
+        "inset 2px 2px 4px rgba(0,0,0,0.09), inset -1px -1px 3px rgba(255,255,255,0.60)",
+    borderRadius: "6px",
+    padding: "3px 10px",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    fontSize: "11px",
+    fontWeight: 600,
+    color,
+    fontFamily: "var(--font-space-mono, 'Space Mono', monospace)",
+    letterSpacing: "0.04em",
+});
+
+const nmTagBadge: React.CSSProperties = {
+    background: surface,
+    boxShadow:
+        "inset 2px 2px 4px rgba(0,0,0,0.09), inset -1px -1px 3px rgba(255,255,255,0.60)",
+    borderRadius: "999px",
+    padding: "3px 12px",
+    fontSize: "11px",
+    fontWeight: 600,
+    color: primary,
+    fontFamily: "var(--font-space-mono, 'Space Mono', monospace)",
+};
+
+/* ─── Shared font vars ───────────────────────────────────────────── */
+const monoFont = {
+    fontFamily: "var(--font-jetbrains-mono, 'JetBrains Mono', monospace)",
+};
+const displayFont = {
+    fontFamily: "var(--font-space-mono, 'Space Mono', monospace)",
+};
+
+/* ─── Animation variants ─────────────────────────────────────────── */
+const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+};
+
+const cardVariants: Variants = {
+    hidden: { opacity: 0, y: 16, scale: 0.97 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+    },
+};
+
+/* ─── Sub-components ─────────────────────────────────────────────── */
+const SectionCard: FC<{ children: React.ReactNode; className?: string }> = ({
+    children,
+    className = "",
+}) => (
+    <div style={nmCard} className={`p-5 ${className}`}>
+        {children}
+    </div>
+);
+
+const CardHeader: FC<{ icon: React.ReactNode; title: string }> = ({
+    icon,
+    title,
+}) => (
+    <div className="flex items-center gap-3 mb-4">
+        <div style={nmIconPill(primary)}>{icon}</div>
+        <h3
+            style={{ ...displayFont, color: text }}
+            className="text-xs font-bold uppercase tracking-widest"
+        >
+            {title}
+        </h3>
+    </div>
+);
+
+const InfoRow: FC<{
+    icon: FC<{ size?: number; style?: React.CSSProperties }>;
+    label: string;
+    value: string;
+    iconColor?: string;
+}> = ({ icon: Icon, label, value, iconColor = primary }) => (
+    <div className="flex items-start gap-3">
+        <Icon size={16} style={{ color: iconColor, marginTop: 2, flexShrink: 0 }} />
+        <div className="flex-1 min-w-0">
+            <div
+                style={{ ...displayFont, color: `${text}88`, fontSize: "10px", letterSpacing: "0.06em" }}
+                className="uppercase font-semibold mb-0.5"
+            >
+                {label}
+            </div>
+            <div
+                style={{ ...monoFont, color: text, fontSize: "13px" }}
+                className="truncate"
+            >
+                {value}
+            </div>
+        </div>
+    </div>
+);
+
+const Divider: FC = () => (
+    <div
+        style={{
+            height: 1,
+            background: `linear-gradient(to right, transparent, ${text}18, transparent)`,
+            margin: "12px 0",
+        }}
+    />
+);
+
+/* ─── Main component ─────────────────────────────────────────────── */
 export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
     const { detailsCache } = useReportsStore();
     const cache = detailsCache[reportId];
@@ -39,44 +180,28 @@ export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
     const error = cache?.error ?? null;
     const report: ReportFull | null = useMemo(() => cache?.data ?? null, [cache]);
 
-    const containerVariants: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
-        }
-    };
-
-    const cardVariants: Variants = {
-        hidden: { opacity: 0, y: 20, scale: 0.95 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            transition: {
-                duration: 0.4,
-                ease: [0.22, 1, 0.36, 1]
-            }
-        }
-    };
-
+    /* ── Loading ── */
     if (loading && !report) {
         return (
             <div className="p-8 flex items-center justify-center">
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.92 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex flex-col items-center gap-4"
                 >
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full blur-2xl opacity-20 animate-pulse" />
-                        <PulseLoader />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <HiSparkles className="text-blue-500 animate-spin" size={16} />
-                        <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                    <div
+                        style={{
+                            ...nmCard,
+                            padding: "20px",
+                            borderRadius: "16px",
+                        }}
+                        className="flex flex-col items-center gap-3"
+                    >
+                        <PulseLoader size={10} />
+                        <span
+                            style={{ ...displayFont, color: `${text}70`, fontSize: "11px", letterSpacing: "0.1em" }}
+                            className="uppercase font-semibold"
+                        >
                             Loading details...
                         </span>
                     </div>
@@ -85,6 +210,7 @@ export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
         );
     }
 
+    /* ── Error ── */
     if (error && !report) {
         return (
             <div className="p-8">
@@ -92,339 +218,254 @@ export const ReportDetailsPanel: FC<{ reportId: string }> = ({ reportId }) => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                 >
-                    <Card className="p-6 border-2 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/50">
-                                <MdWarning className="text-red-600 dark:text-red-400" size={24} />
-                            </div>
-                            <div>
-                                <p className="font-semibold text-red-900 dark:text-red-100">Failed to load details</p>
-                                <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
-                            </div>
+                    <div
+                        style={{
+                            ...nmCard,
+                            borderLeft: "3px solid #FF2157",
+                            padding: "20px",
+                        }}
+                        className="flex items-center gap-4"
+                    >
+                        <div style={nmIconPill("#FF2157")}>
+                            <MdWarning size={22} />
                         </div>
-                    </Card>
+                        <div>
+                            <p style={{ ...displayFont, color: text }} className="text-xs font-bold uppercase tracking-widest mb-1">
+                                Failed to load
+                            </p>
+                            <p style={{ ...monoFont, color: `${text}70` }} className="text-xs">
+                                {error}
+                            </p>
+                        </div>
+                    </div>
                 </motion.div>
             </div>
         );
     }
 
-    if (!report) {
-        return null;
-    }
-
-    const InfoRow: FC<{ icon: FC<{ size?: number; className?: string }>; label: string; value: string; iconColor?: string }> = ({
-        icon: Icon,
-        label,
-        value,
-        iconColor = "text-gray-500 dark:text-gray-400"
-    }) => (
-        <div className="flex items-start gap-3 group">
-            <div className={`mt-0.5 ${iconColor} group-hover:scale-110 transition-transform`}>
-                <Icon size={18} />
-            </div>
-            <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">{label}</div>
-                <div className="text-sm text-gray-900 dark:text-gray-100 truncate">{value}</div>
-            </div>
-        </div>
-    );
+    if (!report) return null;
 
     return (
         <motion.div
-            className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-5"
+            className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-4"
+            style={{ background: surface }}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
-            {/* Reporter Card */}
+            {/* ── Reporter ── */}
             <motion.div variants={cardVariants}>
-                <Card className="relative p-6 border-2 border-cyan-200 dark:border-cyan-800 bg-gradient-to-br from-cyan-50/50 to-blue-50/50 dark:from-cyan-950/20 dark:to-blue-950/20 hover:shadow-lg transition-all duration-300 overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
-
-                    <div className="relative">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 shadow-lg">
-                                <MdPerson className="text-white" size={20} />
-                            </div>
-                            <h3 className="text-lg font-bold bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400 bg-clip-text text-transparent">
-                                Reporter
-                            </h3>
-                        </div>
-
-                        <div className="space-y-3">
-                            <InfoRow
-                                icon={MdPerson}
-                                label="Name"
-                                value={report.reporter?.name ?? "-"}
-                                iconColor="text-cyan-500 dark:text-cyan-400"
-                            />
-                            <InfoRow
-                                icon={MdEmail}
-                                label="Email"
-                                value={report.reporter?.email ?? "-"}
-                                iconColor="text-blue-500 dark:text-blue-400"
-                            />
-                        </div>
+                <SectionCard>
+                    <CardHeader icon={<MdPerson size={18} />} title="Reporter" />
+                    <div className="space-y-3">
+                        <InfoRow icon={MdPerson} label="Name" value={report.reporter?.name ?? "—"} />
+                        <Divider />
+                        <InfoRow icon={MdEmail} label="Email" value={report.reporter?.email ?? "—"} />
                     </div>
-                </Card>
+                </SectionCard>
             </motion.div>
 
-            {/* Tour Card */}
+            {/* ── Tour ── */}
             <motion.div variants={cardVariants}>
-                <Card className="relative p-6 border-2 border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/20 hover:shadow-lg transition-all duration-300 overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/10 to-emerald-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
-
-                    <div className="relative">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg">
-                                <MdTour className="text-white" size={20} />
-                            </div>
-                            <h3 className="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">
-                                Tour
-                            </h3>
-                        </div>
-
-                        <div className="space-y-3">
-                            <InfoRow
-                                icon={MdTour}
-                                label="Title"
-                                value={report.tour?.title ?? "-"}
-                                iconColor="text-green-500 dark:text-green-400"
-                            />
-                            <InfoRow
-                                icon={MdLink}
-                                label="Slug"
-                                value={report.tour?.slug ?? "-"}
-                                iconColor="text-emerald-500 dark:text-emerald-400"
-                            />
-                            <InfoRow
-                                icon={MdBusiness}
-                                label="Company"
-                                value={report.tour?.companyId ?? "-"}
-                                iconColor="text-teal-500 dark:text-teal-400"
-                            />
-                        </div>
+                <SectionCard>
+                    <CardHeader icon={<MdTour size={18} />} title="Tour" />
+                    <div className="space-y-3">
+                        <InfoRow icon={MdTour} label="Title" value={report.tour?.title ?? "—"} />
+                        <Divider />
+                        <InfoRow icon={MdLink} label="Slug" value={report.tour?.slug ?? "—"} />
+                        <Divider />
+                        <InfoRow icon={MdBusiness} label="Company" value={report.tour?.companyId ?? "—"} />
                     </div>
-                </Card>
+                </SectionCard>
             </motion.div>
 
-            {/* Assignment Card */}
+            {/* ── Assignment ── */}
             <motion.div variants={cardVariants}>
-                <Card className="relative p-6 border-2 border-purple-200 dark:border-purple-800 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 hover:shadow-lg transition-all duration-300 overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
-
-                    <div className="relative">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
-                                <MdAssignment className="text-white" size={20} />
-                            </div>
-                            <h3 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-                                Assignment
-                            </h3>
-                        </div>
-
-                        <div className="space-y-3">
-                            <InfoRow
-                                icon={MdPriorityHigh}
-                                label="Priority"
-                                value={report.priority}
-                                iconColor="text-orange-500 dark:text-orange-400"
-                            />
-                            <InfoRow
-                                icon={MdToggleOn}
-                                label="Status"
-                                value={report.status}
-                                iconColor="text-emerald-500 dark:text-emerald-400"
-                            />
-                            <InfoRow
-                                icon={MdRefresh}
-                                label="Reopened"
-                                value={String(report.reopenedCount)}
-                                iconColor="text-pink-500 dark:text-pink-400"
-                            />
-                        </div>
+                <SectionCard>
+                    <CardHeader icon={<MdAssignment size={18} />} title="Assignment" />
+                    <div className="space-y-3">
+                        <InfoRow icon={MdPriorityHigh} label="Priority" value={report.priority} iconColor="#FE9900" />
+                        <Divider />
+                        <InfoRow icon={MdToggleOn} label="Status" value={report.status} iconColor="#00A63D" />
+                        <Divider />
+                        <InfoRow icon={MdRefresh} label="Reopened" value={String(report.reopenedCount)} iconColor="#FF2157" />
                     </div>
-                </Card>
+                </SectionCard>
             </motion.div>
 
-            {/* Message Card */}
+            {/* ── Message (spans 2 cols) ── */}
             <motion.div variants={cardVariants} className="lg:col-span-2">
-                <Card className="relative p-6 border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 hover:shadow-lg transition-all duration-300 overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
+                <SectionCard>
+                    <CardHeader icon={<MdMessage size={18} />} title="Message" />
 
-                    <div className="relative">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 shadow-lg">
-                                <MdMessage className="text-white" size={20} />
+                    <div style={nmInset} className="p-4 mb-4">
+                        <p style={{ ...monoFont, color: text, fontSize: "13px", lineHeight: 1.7 }}
+                            className="whitespace-pre-wrap">
+                            {report.message}
+                        </p>
+                    </div>
+
+                    {report.resolutionNotes && (
+                        <>
+                            <div className="flex items-center gap-2 mb-2">
+                                <MdNotes size={15} style={{ color: "#00A63D" }} />
+                                <span style={{ ...displayFont, color: "#00A63D", fontSize: "10px", letterSpacing: "0.08em" }}
+                                    className="uppercase font-bold">
+                                    Resolution Notes
+                                </span>
                             </div>
-                            <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                                Message
-                            </h3>
-                        </div>
-
-                        <div className="bg-white/50 dark:bg-gray-900/50 rounded-lg p-4 border border-blue-100 dark:border-blue-900">
-                            <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">
-                                {report.message}
-                            </p>
-                        </div>
-
-                        {report.resolutionNotes && (
-                            <div className="mt-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <MdNotes className="text-emerald-500 dark:text-emerald-400" size={18} />
-                                    <h4 className="font-semibold text-sm text-emerald-700 dark:text-emerald-300">
-                                        Resolution Notes
-                                    </h4>
-                                </div>
-                                <div className="bg-emerald-50/50 dark:bg-emerald-950/20 rounded-lg p-4 border border-emerald-100 dark:border-emerald-900">
-                                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
-                                        {report.resolutionNotes}
-                                    </p>
-                                </div>
+                            <div style={{ ...nmInset, borderLeft: "2px solid #00A63D" }} className="p-4 mb-4">
+                                <p style={{ ...monoFont, color: text, fontSize: "13px", lineHeight: 1.7 }}
+                                    className="whitespace-pre-wrap">
+                                    {report.resolutionNotes}
+                                </p>
                             </div>
+                        </>
+                    )}
+
+                    {/* Timestamps */}
+                    <div className="flex flex-wrap gap-2 pt-3" style={{ borderTop: `1px solid ${text}12` }}>
+                        <span style={nmBadge(`${text}70`)}>
+                            <MdCalendarToday size={12} />
+                            Created: {formatDateTime(report.createdAt)}
+                        </span>
+                        <span style={nmBadge(`${text}70`)}>
+                            <MdUpdate size={12} />
+                            Updated: {formatDateTime(report.updatedAt)}
+                        </span>
+                        {report.resolvedAt && (
+                            <span style={nmBadge("#00A63D")}>
+                                <MdCheckCircle size={12} />
+                                Resolved: {formatDateTime(report.resolvedAt)}
+                            </span>
                         )}
+                    </div>
+                </SectionCard>
+            </motion.div>
 
-                        <div className="mt-5 pt-4 border-t border-blue-100 dark:border-blue-900">
-                            <div className="flex flex-wrap gap-4 text-xs">
-                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                                    <MdCalendarToday className="text-blue-600 dark:text-blue-400" size={14} />
-                                    <span className="text-blue-700 dark:text-blue-300 font-medium">
-                                        Created: {formatDateTime(report.createdAt)}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-                                    <MdUpdate className="text-indigo-600 dark:text-indigo-400" size={14} />
-                                    <span className="text-indigo-700 dark:text-indigo-300 font-medium">
-                                        Updated: {formatDateTime(report.updatedAt)}
-                                    </span>
-                                </div>
-                                {report.resolvedAt && (
-                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-                                        <MdCheckCircle className="text-emerald-600 dark:text-emerald-400" size={14} />
-                                        <span className="text-emerald-700 dark:text-emerald-300 font-medium">
-                                            Resolved: {formatDateTime(report.resolvedAt)}
-                                        </span>
-                                    </div>
+            {/* ── Evidence ── */}
+            <motion.div variants={cardVariants}>
+                <SectionCard>
+                    <CardHeader icon={<MdAttachFile size={18} />} title="Evidence" />
+
+                    <div className="space-y-5">
+                        {/* Images */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <MdImage size={14} style={{ color: "#FF2157" }} />
+                                <span style={{ ...displayFont, color: `${text}70`, fontSize: "10px", letterSpacing: "0.07em" }}
+                                    className="uppercase font-semibold">
+                                    Images
+                                </span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {(report.evidenceImages ?? []).length === 0 ? (
+                                    <span style={{ ...monoFont, color: `${text}45`, fontSize: "12px" }}>No images</span>
+                                ) : (
+                                    report.evidenceImages!.map((src, idx) => (
+                                        <motion.a
+                                            key={src}
+                                            href={src}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            initial={{ opacity: 0, scale: 0.85 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            style={{
+                                                ...nmBadge("#FF2157"),
+                                                textDecoration: "none",
+                                                cursor: "pointer",
+                                            }}
+                                            title={`View image: ${src}`}
+                                        >
+                                            <MdImage size={12} />
+                                            Image {idx + 1}
+                                        </motion.a>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Links */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <MdLink size={14} style={{ color: primary }} />
+                                <span style={{ ...displayFont, color: `${text}70`, fontSize: "10px", letterSpacing: "0.07em" }}
+                                    className="uppercase font-semibold">
+                                    Links
+                                </span>
+                            </div>
+                            <div className="space-y-1.5">
+                                {(report.evidenceLinks ?? []).length === 0 ? (
+                                    <span style={{ ...monoFont, color: `${text}45`, fontSize: "12px" }}>No links</span>
+                                ) : (
+                                    report.evidenceLinks!.map((href, idx) => {
+                                        const displayUrl = href
+                                            .replace(/^https?:\/\//, "")
+                                            .replace(/^www\./, "")
+                                            .slice(0, 32) + (href.length > 32 ? "…" : "");
+                                        return (
+                                            <motion.a
+                                                key={`${href}-${idx}`}
+                                                href={href}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                initial={{ opacity: 0, x: -8 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: idx * 0.05 }}
+                                                style={{
+                                                    ...nmInset,
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "6px",
+                                                    padding: "6px 10px",
+                                                    textDecoration: "none",
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                <MdLink size={13} style={{ color: primary, flexShrink: 0 }} />
+                                                <span style={{ ...monoFont, color: primary, fontSize: "11px" }}
+                                                    className="break-all">
+                                                    {displayUrl}
+                                                </span>
+                                            </motion.a>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Tags */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <MdLocalOffer size={14} style={{ color: primary }} />
+                                <span style={{ ...displayFont, color: `${text}70`, fontSize: "10px", letterSpacing: "0.07em" }}
+                                    className="uppercase font-semibold">
+                                    Tags
+                                </span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {(report.tags ?? []).length === 0 ? (
+                                    <span style={{ ...monoFont, color: `${text}45`, fontSize: "12px" }}>No tags</span>
+                                ) : (
+                                    report.tags!.map((t, idx) => (
+                                        <motion.span
+                                            key={t}
+                                            initial={{ opacity: 0, scale: 0.85 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            style={nmTagBadge}
+                                            className="inline-flex items-center gap-1"
+                                        >
+                                            <MdLocalOffer size={11} />
+                                            {t}
+                                        </motion.span>
+                                    ))
                                 )}
                             </div>
                         </div>
                     </div>
-                </Card>
-            </motion.div>
-
-            {/* Evidence Card */}
-            <motion.div variants={cardVariants}>
-                <Card className="relative p-6 border-2 border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20 hover:shadow-lg transition-all duration-300 overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/10 to-orange-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
-
-                    <div className="relative">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg">
-                                <MdAttachFile className="text-white" size={20} />
-                            </div>
-                            <h3 className="text-lg font-bold bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-400 dark:to-orange-400 bg-clip-text text-transparent">
-                                Evidence
-                            </h3>
-                        </div>
-
-                        <div className="space-y-4">
-
-                            {/* Images */}
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <MdImage className="text-pink-500 dark:text-pink-400" size={16} />
-                                    <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">Images</div>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {(report.evidenceImages ?? []).length === 0 ? (
-                                        <span className="text-xs text-gray-500 dark:text-gray-400 italic">No images</span>
-                                    ) : (
-                                        report.evidenceImages!.map((src, idx) => (
-                                            <motion.a
-                                                key={src}
-                                                href={src}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                initial={{ opacity: 0, scale: 0.8 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                transition={{ delay: idx * 0.05 }}
-                                                className="inline-flex items-center rounded-lg border-2 border-pink-200 dark:border-pink-800 bg-pink-50 dark:bg-pink-950/30 px-3 py-1.5 text-xs font-medium text-pink-700 dark:text-pink-300 hover:shadow-md transition-all hover:bg-pink-100 dark:hover:bg-pink-900/50 cursor-pointer"
-                                                title={`View image: ${src}`}
-                                            >
-                                                Image {idx + 1}
-                                            </motion.a>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Links */}
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <MdLink className="text-blue-500 dark:text-blue-400" size={16} />
-                                    <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">Links</div>
-                                </div>
-                                <div className="space-y-1">
-                                    {(report.evidenceLinks ?? []).length === 0 ? (
-                                        <span className="text-xs text-gray-500 dark:text-gray-400 italic">No links</span>
-                                    ) : (
-                                        report.evidenceLinks!.map((href, idx) => {
-                                            // Try to create a clean display URL
-                                            const displayUrl = href
-                                                .replace(/^https?:\/\//, '')
-                                                .replace(/^www\./, '')
-                                                .slice(0, 30) + (href.length > 30 ? '...' : '');
-
-                                            return (
-                                                <motion.a
-                                                    key={`${href}-${idx}`}
-                                                    href={href}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    initial={{ opacity: 0, x: -10 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: idx * 0.05 }}
-                                                    className="flex items-start gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 hover:shadow-sm transition-all hover:bg-blue-100 dark:hover:bg-blue-900/50 cursor-pointer group"
-                                                >
-                                                    <MdLink className="text-blue-500 dark:text-blue-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform" size={14} />
-                                                    <span className="text-xs text-blue-700 dark:text-blue-300 break-all font-mono group-hover:text-blue-900 dark:group-hover:text-blue-200 transition-colors">
-                                                        {displayUrl}
-                                                    </span>
-                                                </motion.a>
-                                            );
-                                        })
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Tags */}
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <MdLocalOffer className="text-purple-500 dark:text-purple-400" size={16} />
-                                    <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">Tags</div>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {(report.tags ?? []).length === 0 ? (
-                                        <span className="text-xs text-gray-500 dark:text-gray-400 italic">No tags</span>
-                                    ) : (
-                                        report.tags!.map((t, idx) => (
-                                            <motion.span
-                                                key={t}
-                                                initial={{ opacity: 0, scale: 0.8 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                transition={{ delay: idx * 0.05 }}
-                                                className="inline-flex items-center gap-1 rounded-full bg-purple-100 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 px-3 py-1 text-xs font-semibold text-purple-700 dark:text-purple-300 hover:shadow-md transition-all"
-                                            >
-                                                <MdLocalOffer size={12} />
-                                                {t}
-                                            </motion.span>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
+                </SectionCard>
             </motion.div>
         </motion.div>
     );

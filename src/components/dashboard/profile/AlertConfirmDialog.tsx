@@ -20,36 +20,28 @@ interface AlertConfirmDialogProps {
 
 const variantConfig = {
     destructive: {
-        bg: "bg-gradient-to-r from-red-50 to-white border-l-4 border-red-500",
-        iconBg: "bg-red-100",
-        iconColor: "text-red-600",
-        button: "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700",
-        border: "border-red-200",
-        textColor: "text-gray-800",
+        iconColor: "text-[#FF2157]",
+        buttonBg: "bg-[#FF2157] hover:bg-[#e01046]",
+        accentBorder: "border-l-[#FF2157]",
+        glow: "shadow-[0_0_20px_rgba(255,33,87,0.15)]",
     },
     warning: {
-        bg: "bg-gradient-to-r from-amber-50 to-white border-l-4 border-amber-500",
-        iconBg: "bg-amber-100",
-        iconColor: "text-amber-600",
-        button: "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700",
-        border: "border-amber-200",
-        textColor: "text-gray-800",
+        iconColor: "text-[#FE9900]",
+        buttonBg: "bg-[#FE9900] hover:bg-[#e08800]",
+        accentBorder: "border-l-[#FE9900]",
+        glow: "shadow-[0_0_20px_rgba(254,153,0,0.15)]",
     },
     info: {
-        bg: "bg-gradient-to-r from-blue-50 to-white border-l-4 border-blue-500",
-        iconBg: "bg-blue-100",
-        iconColor: "text-blue-600",
-        button: "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700",
-        border: "border-blue-200",
-        textColor: "text-gray-800",
+        iconColor: "text-[#006666]",
+        buttonBg: "bg-[#006666] hover:bg-[#005555]",
+        accentBorder: "border-l-[#006666]",
+        glow: "shadow-[0_0_20px_rgba(0,102,102,0.15)]",
     },
     success: {
-        bg: "bg-gradient-to-r from-emerald-50 to-white border-l-4 border-emerald-500",
-        iconBg: "bg-emerald-100",
-        iconColor: "text-emerald-600",
-        button: "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700",
-        border: "border-emerald-200",
-        textColor: "text-gray-800",
+        iconColor: "text-[#00A63D]",
+        buttonBg: "bg-[#00A63D] hover:bg-[#008f34]",
+        accentBorder: "border-l-[#00A63D]",
+        glow: "shadow-[0_0_20px_rgba(0,166,61,0.15)]",
     },
 };
 
@@ -79,89 +71,103 @@ export function AlertConfirmDialog({
         <AnimatePresence>
             {isOpen && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                    {/* Light Background with subtle blur */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-black/30"
+                        className="absolute inset-0 bg-[#1E2938]/40 backdrop-blur-sm"
                         onClick={onClose}
                     />
 
-                    {/* Confirmation Modal */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        initial={{ opacity: 0, scale: 0.92, y: 16 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        exit={{ opacity: 0, scale: 0.92, y: 16 }}
                         transition={{
-                            duration: 0.2,
+                            duration: 0.22,
                             ease: "easeOut",
-                            scale: { type: "spring", stiffness: 300, damping: 25 }
+                            scale: { type: "spring", stiffness: 320, damping: 28 },
                         }}
-                        className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden"
+                        className={`relative w-full max-w-md rounded-2xl overflow-hidden border-l-4 ${config.accentBorder}
+                            bg-[#E7E5E4]
+                            shadow-[8px_8px_20px_rgba(0,0,0,0.18),-4px_-4px_12px_rgba(255,255,255,0.85)]
+                            ${config.glow}`}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Header with light gradient */}
-                        <div className={`relative ${config.bg} p-5 ${config.textColor} border-b ${config.border}`}>
+                        {/* Header */}
+                        <div className="relative px-6 pt-6 pb-5 bg-[#E7E5E4]">
                             <button
                                 onClick={onClose}
-                                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-gray-500 hover:text-gray-700"
                                 disabled={isLoading}
+                                className="absolute top-4 right-4 p-2 rounded-xl text-[#1E2938]/50
+                                    shadow-[3px_3px_6px_rgba(0,0,0,0.12),-2px_-2px_5px_rgba(255,255,255,0.8)]
+                                    hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.7)]
+                                    active:shadow-[inset_3px_3px_7px_rgba(0,0,0,0.15),inset_-1px_-1px_3px_rgba(255,255,255,0.6)]
+                                    transition-all duration-150"
                             >
                                 <FiX className="h-4 w-4" />
                             </button>
 
                             <div className="flex items-center gap-4 pr-8">
-                                <div className={`p-3 rounded-lg ${config.iconBg} ${config.iconColor}`}>
+                                <div className={`p-3 rounded-xl ${config.iconColor}
+                                    bg-[#E7E5E4]
+                                    shadow-[4px_4px_10px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.8)]`}>
                                     {IconComponent}
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold">{title}</h3>
+                                    <h3 className="text-base font-bold text-[#1E2938] font-[var(--font-space-mono)]">
+                                        {title}
+                                    </h3>
                                     {description && (
-                                        <p className="text-gray-600 text-sm mt-1">{description}</p>
+                                        <p className="text-sm text-[#1E2938]/60 mt-1 font-[var(--font-jetbrains-mono)]">
+                                            {description}
+                                        </p>
                                     )}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Content */}
-                        <div className="p-6 bg-gradient-to-b from-white to-gray-50">
-                            {/* Action Buttons */}
+                        {/* Actions */}
+                        <div className="px-6 pb-6 pt-2 bg-[#E7E5E4] space-y-4">
                             <div className="flex gap-3">
-                                <Button
-                                    variant="outline"
+                                {/* Cancel — inset/pressed neumorphic */}
+                                <button
                                     onClick={onClose}
                                     disabled={isLoading}
-                                    className="flex-1 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 disabled:opacity-50 transition-all duration-200"
+                                    className="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold text-[#1E2938]/70
+                                        font-[var(--font-space-mono)]
+                                        bg-[#E7E5E4]
+                                        shadow-[inset_3px_3px_7px_rgba(0,0,0,0.1),inset_-3px_-3px_7px_rgba(255,255,255,0.75)]
+                                        hover:text-[#1E2938]
+                                        active:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.15),inset_-2px_-2px_5px_rgba(255,255,255,0.6)]
+                                        disabled:opacity-40 transition-all duration-150"
                                 >
                                     {cancelText}
-                                </Button>
-                                <Button
+                                </button>
+
+                                {/* Confirm */}
+                                <button
                                     onClick={onConfirm}
                                     disabled={isLoading}
-                                    className={`flex-1 ${config.button} text-white shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50`}
+                                    className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold text-white
+                                        font-[var(--font-space-mono)]
+                                        ${config.buttonBg}
+                                        shadow-[4px_4px_10px_rgba(0,0,0,0.2),-2px_-2px_6px_rgba(255,255,255,0.5)]
+                                        active:shadow-[inset_3px_3px_8px_rgba(0,0,0,0.25)]
+                                        disabled:opacity-40 transition-all duration-150`}
                                 >
                                     {isLoading ? (
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            className="flex items-center justify-center gap-2"
-                                        >
-                                            <Spinner className="size-6 text-white" />
-                                            Processing...
-                                        </motion.div>
-                                    ) : (
-                                        confirmText
-                                    )}
-                                </Button>
+                                        <span className="flex items-center justify-center gap-2">
+                                            <Spinner className="size-4 text-white" />
+                                            Processing…
+                                        </span>
+                                    ) : confirmText}
+                                </button>
                             </div>
 
-                            {/* Additional Info */}
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                                <p className="text-xs text-gray-500 text-center">
-                                    This action cannot be undone.
-                                </p>
-                            </div>
+                            <p className="text-center text-xs text-[#1E2938]/40 font-[var(--font-jetbrains-mono)]">
+                                This action cannot be undone.
+                            </p>
                         </div>
                     </motion.div>
                 </div>

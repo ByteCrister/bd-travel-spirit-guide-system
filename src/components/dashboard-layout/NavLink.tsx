@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { IconType } from "react-icons";
 import { cn } from "@/lib/utils";
-import { plusJakartaSans } from "@/app/fonts";
 
 interface NavLinkProps {
   href: string;
-  icon: IconType | React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   isCollapsed?: boolean;
   onClick?: () => void;
@@ -18,23 +16,33 @@ interface NavLinkProps {
 function useIsActive(href: string, pathname: string | null | undefined) {
   if (!pathname) return false;
 
-  const normalizedHref = href.endsWith("/") && href !== "/" ? href.replace(/\/+$/, "") : href;
-  const normalizedPath = pathname.endsWith("/") && pathname !== "/" ? pathname.replace(/\/+$/, "") : pathname;
+  const normalizedHref =
+    href.endsWith("/") && href !== "/" ? href.replace(/\/+$/, "") : href;
+  const normalizedPath =
+    pathname.endsWith("/") && pathname !== "/"
+      ? pathname.replace(/\/+$/, "")
+      : pathname;
 
   if (normalizedPath === normalizedHref) return true;
-
   if (normalizedHref === "/") return false;
 
   const segmentCount = normalizedHref.split("/").filter(Boolean).length;
-
-  if (segmentCount >= 2 && normalizedPath.startsWith(normalizedHref + "/")) {
+  if (
+    segmentCount >= 2 &&
+    normalizedPath.startsWith(normalizedHref + "/")
+  ) {
     return true;
   }
-
   return false;
 }
 
-export function NavLink({ href, icon: Icon, label, isCollapsed = false, onClick }: NavLinkProps) {
+export function NavLink({
+  href,
+  icon: Icon,
+  label,
+  isCollapsed = false,
+  onClick,
+}: NavLinkProps) {
   const pathname = usePathname();
   const isActive = useIsActive(href, pathname);
 
@@ -47,78 +55,54 @@ export function NavLink({ href, icon: Icon, label, isCollapsed = false, onClick 
     >
       <motion.div
         className={cn(
-          "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-          plusJakartaSans.variable,
-          "group cursor-pointer",
+          "relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-200",
+          "font-[family-name:var(--font-jetbrains-mono)]",
+          "cursor-pointer select-none",
           isActive
-            ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 shadow-sm border border-blue-200/50 dark:border-blue-800/50"
-            : "hover:bg-slate-100 dark:hover:bg-slate-800"
+            ? [
+                "bg-[#E7E5E4] text-[#006666]",
+                "shadow-[inset_2px_2px_5px_rgba(0,0,0,0.12),inset_-2px_-2px_5px_rgba(255,255,255,0.75)]",
+              ]
+            : [
+                "bg-[#E7E5E4] text-[#1E2938]/60",
+                "shadow-[1px_1px_4px_rgba(0,0,0,0.08),-1px_-1px_4px_rgba(255,255,255,0.7)]",
+                "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
+                "hover:text-[#1E2938]",
+              ]
         )}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileTap={{ scale: 0.97 }}
         role="menuitem"
         tabIndex={0}
       >
-        {/* Icon */}
-        <motion.div
-          className="relative flex items-center justify-center"
-          whileHover={{ y: -2 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Icon
-            className={cn(
-              "h-5 w-5 flex-shrink-0 transition-colors duration-200",
-              isActive
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
-            )}
+        {/* Active bar */}
+        {isActive && (
+          <motion.span
+            layoutId="navActiveBar"
+            className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-[#006666]"
+            initial={false}
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
           />
-          {isActive && (
-            <motion.div
-              className="absolute inset-0 rounded-full bg-blue-500/15 blur-md"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1.1 }}
-              transition={{ duration: 0.3 }}
-            />
+        )}
+
+        {/* Icon */}
+        <Icon
+          className={cn(
+            "h-4 w-4 flex-shrink-0 transition-colors duration-200",
+            isActive ? "text-[#006666]" : "text-[#1E2938]/40"
           )}
-        </motion.div>
+        />
 
         {/* Label */}
         {!isCollapsed && (
           <motion.span
-            initial={{ opacity: 0, x: -10 }}
-            animate={{
-              opacity: 1,
-              x: 0,
-              color: isActive ? "rgb(37, 99, 235)" : "rgb(100, 116, 139)",
-            }}
-            exit={{ opacity: 0, x: -10 }}
-            transition={{ duration: 0.2 }}
-            className="truncate"
-            whileHover={{
-              color: "rgb(37, 99, 235)",
-            }}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
+            transition={{ duration: 0.18 }}
+            className="truncate tracking-wide"
           >
             {label}
           </motion.span>
-        )}
-
-        {/* Active indicator */}
-        {isActive ? (
-          <motion.div
-            className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-blue-500 to-indigo-600 shadow-sm"
-            layoutId="activeIndicator"
-            initial={{ scaleY: 0, opacity: 0 }}
-            animate={{ scaleY: 1, opacity: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          />
-        ) : (
-          <motion.div
-            className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-slate-400/40"
-            initial={{ scaleY: 0, opacity: 0 }}
-            whileHover={{ scaleY: 1, opacity: 1 }}
-            transition={{ duration: 0.2 }}
-          />
         )}
       </motion.div>
     </Link>

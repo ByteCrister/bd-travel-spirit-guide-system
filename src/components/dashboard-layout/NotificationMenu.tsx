@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiBell, FiMessageCircle, FiAlertCircle, FiFlag, FiSettings } from "react-icons/fi";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import {
+  Bell,
+  MessageCircle,
+  AlertCircle,
+  Flag,
+  Settings,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
@@ -53,84 +57,73 @@ const mockNotifications: Notification[] = [
 ];
 
 const notificationIcons = {
-  message: FiMessageCircle,
-  update: FiSettings,
-  system: FiAlertCircle,
-  flag: FiFlag,
+  message: MessageCircle,
+  update: Settings,
+  system: AlertCircle,
+  flag: Flag,
 };
 
-const notificationColors = {
-  message: "bg-blue-500",
-  update: "bg-green-500",
-  system: "bg-yellow-500",
-  flag: "bg-red-500",
+const notificationAccents: Record<string, string> = {
+  message: "text-[#006666] bg-[#006666]/10",
+  update:  "text-[#00A63D] bg-[#00A63D]/10",
+  system:  "text-[#FE9900] bg-[#FE9900]/10",
+  flag:    "text-[#FF2157] bg-[#FF2157]/10",
 };
 
 export function NotificationMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
-  const [isAnimating, setIsAnimating] = useState(false);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === id 
-          ? { ...notification, isRead: true }
-          : notification
-      )
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
   };
 
   const markAllAsRead = () => {
-    setIsAnimating(true);
-    setNotifications(prev => 
-      prev.map(notification => ({ ...notification, isRead: true }))
-    );
-    setTimeout(() => setIsAnimating(false), 300);
-  };
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 
   return (
     <div className="relative">
       <motion.button
-        onClick={toggleMenu}
-        className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 transition-all duration-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-        whileHover={{ scale: 1.05 }}
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "relative flex h-10 w-10 items-center justify-center rounded-xl",
+          "bg-[#E7E5E4] text-[#1E2938]",
+          "shadow-[3px_3px_8px_rgba(0,0,0,0.13),-3px_-3px_8px_rgba(255,255,255,0.9)]",
+          "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+          "transition-all duration-200 focus:outline-none"
+        )}
         whileTap={{ scale: 0.95 }}
-        aria-label={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ''}`}
+        aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         aria-expanded={isOpen}
       >
-        <motion.div
-          animate={{ rotate: isOpen ? 15 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <FiBell className="h-5 w-5" />
+        <motion.div animate={{ rotate: isOpen ? 15 : 0 }} transition={{ duration: 0.2 }}>
+          <Bell className="h-5 w-5" />
         </motion.div>
+
         {unreadCount > 0 && (
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-xs font-medium text-white shadow-lg shadow-red-500/25"
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className={cn(
+              "absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full",
+              "bg-[#FF2157] text-white text-[10px] font-bold",
+              "font-[family-name:var(--font-space-mono)]",
+              "shadow-[0_2px_6px_rgba(255,33,87,0.4)]"
+            )}
           >
-            <motion.span
-              animate={isAnimating ? { scale: [1, 1.2, 1] } : {}}
-              transition={{ duration: 0.3 }}
-            >
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </motion.span>
-          </motion.div>
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </motion.span>
         )}
       </motion.button>
 
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -138,80 +131,94 @@ export function NotificationMenu() {
               className="fixed inset-0 z-40"
               onClick={() => setIsOpen(false)}
             />
-            
-            {/* Notification Panel */}
+
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              initial={{ opacity: 0, scale: 0.95, y: -8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="absolute right-0 top-12 z-50 w-80 rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-xl shadow-slate-200/20 dark:shadow-slate-900/20"
+              exit={{ opacity: 0, scale: 0.95, y: -8 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className={cn(
+                "absolute right-0 top-12 z-50 w-80 rounded-2xl overflow-hidden",
+                "bg-[#E7E5E4]",
+                "shadow-[6px_6px_20px_rgba(0,0,0,0.14),-6px_-6px_20px_rgba(255,255,255,0.9)]",
+                "border border-[#d0cecc]"
+              )}
               role="dialog"
               aria-label="Notifications panel"
             >
-              <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-700/60 p-4">
-                <h3 className="font-semibold">Notifications</h3>
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#d0cecc]">
+                <h3 className="font-[family-name:var(--font-space-mono)] text-sm font-bold tracking-tight text-[#1E2938]">
+                  Notifications
+                </h3>
                 {unreadCount > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <button
                     onClick={markAllAsRead}
-                    className="text-xs"
+                    className={cn(
+                      "text-[10px] font-bold tracking-widest uppercase px-2 py-1 rounded-lg",
+                      "font-[family-name:var(--font-space-mono)] text-[#006666]",
+                      "shadow-[1px_1px_4px_rgba(0,0,0,0.1),-1px_-1px_4px_rgba(255,255,255,0.8)]",
+                      "hover:shadow-[inset_1px_1px_3px_rgba(0,0,0,0.1),inset_-1px_-1px_3px_rgba(255,255,255,0.7)]",
+                      "transition-all duration-150"
+                    )}
                   >
                     Mark all read
-                  </Button>
+                  </button>
                 )}
               </div>
 
               <ScrollArea className="max-h-96">
-                <div className="p-2">
-                  {notifications.length === 0 ? (
-                    <div className="py-8 text-center text-slate-600 dark:text-slate-400">
-                      No notifications
-                    </div>
-                  ) : (
-                    notifications.map((notification, index) => {
-                      const Icon = notificationIcons[notification.type];
-                      return (
-                        <motion.div
-                          key={notification.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
+                <div className="p-2 space-y-1">
+                  {notifications.map((notification, index) => {
+                    const Icon = notificationIcons[notification.type];
+                    return (
+                      <motion.div
+                        key={notification.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.04 }}
+                        onClick={() => markAsRead(notification.id)}
+                        className={cn(
+                          "flex items-start gap-3 rounded-xl p-3 cursor-pointer transition-all duration-150",
+                          "font-[family-name:var(--font-jetbrains-mono)]",
+                          notification.isRead
+                            ? [
+                                "shadow-[1px_1px_4px_rgba(0,0,0,0.08),-1px_-1px_4px_rgba(255,255,255,0.7)]",
+                                "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
+                              ]
+                            : [
+                                "shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
+                                "border border-[#006666]/20",
+                              ]
+                        )}
+                      >
+                        <div
                           className={cn(
-                            "flex items-start gap-3 rounded-xl p-3 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:scale-[1.02] cursor-pointer group",
-                            !notification.isRead && "bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/30 dark:border-blue-800/30"
+                            "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg",
+                            notificationAccents[notification.type]
                           )}
-                          onClick={() => markAsRead(notification.id)}
-                          whileHover={{ x: 4 }}
-                          whileTap={{ scale: 0.98 }}
                         >
-                          <div className={cn(
-                            "flex h-8 w-8 items-center justify-center rounded-full text-white",
-                            notificationColors[notification.type]
-                          )}>
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-medium truncate">
-                                {notification.title}
-                              </p>
-                              {!notification.isRead && (
-                                <div className="h-2 w-2 rounded-full bg-blue-500" />
-                              )}
-                            </div>
-                            <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
-                              {notification.message}
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-semibold text-[#1E2938] truncate">
+                              {notification.title}
                             </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                              {notification.timestamp}
-                            </p>
+                            {!notification.isRead && (
+                              <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#006666]" />
+                            )}
                           </div>
-                        </motion.div>
-                      );
-                    })
-                  )}
+                          <p className="text-[11px] text-[#1E2938]/50 line-clamp-2 mt-0.5">
+                            {notification.message}
+                          </p>
+                          <p className="text-[10px] text-[#1E2938]/35 mt-1 tracking-wide">
+                            {notification.timestamp}
+                          </p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </ScrollArea>
             </motion.div>

@@ -1,12 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { FiLogOut, FiAlertTriangle, FiX } from "react-icons/fi";
+import { LogOut, AlertTriangle, X, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react"; // Import the shadcn loader
 import { useCurrentUserStore } from "@/store/current-user.store";
 import userProfilePreview from "@/utils/helpers/user-profile-preview";
+import { cn } from "@/lib/utils";
 
 interface LogoutConfirmationProps {
   isOpen: boolean;
@@ -21,19 +20,11 @@ export function LogoutConfirmation({
   onConfirm,
   isLoggingOut = false,
 }: LogoutConfirmationProps) {
-
   const { baseUser, fullUser } = useCurrentUserStore();
-
   userProfilePreview.setUsers(baseUser, fullUser);
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map(word => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const getInitials = (name: string) =>
+    name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 
   return (
     <AnimatePresence>
@@ -44,86 +35,139 @@ export function LogoutConfirmation({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-[#1E2938]/40 backdrop-blur-sm"
             onClick={onClose}
           />
 
-          {/* Confirmation Modal */}
+          {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.94, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            exit={{ opacity: 0, scale: 0.94, y: 16 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
+            className={cn(
+              "relative w-full max-w-md rounded-2xl overflow-hidden",
+              "bg-[#E7E5E4]",
+              "shadow-[12px_12px_32px_rgba(0,0,0,0.18),-12px_-12px_32px_rgba(255,255,255,0.85)]",
+              "border border-[#d0cecc]"
+            )}
           >
-            {/* Header */}
-            <div className="relative bg-gradient-to-r from-red-500 to-red-600 p-6 text-white">
+            {/* Header band */}
+            <div className={cn(
+              "relative px-6 py-5",
+              "bg-[#E7E5E4]",
+              "shadow-[inset_0_-3px_8px_rgba(0,0,0,0.06)]",
+              "border-b border-[#d0cecc]"
+            )}>
               <button
                 onClick={onClose}
                 disabled={isLoggingOut}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className={cn(
+                  "absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg",
+                  "bg-[#E7E5E4] text-[#1E2938]/50",
+                  "shadow-[2px_2px_6px_rgba(0,0,0,0.1),-2px_-2px_6px_rgba(255,255,255,0.85)]",
+                  "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.75)]",
+                  "hover:text-[#FF2157] transition-all duration-150",
+                  "disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none"
+                )}
               >
-                <FiX className="h-4 w-4" />
+                <X className="h-4 w-4" />
               </button>
 
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-white/20 rounded-full">
-                  <FiAlertTriangle className="h-6 w-6" />
+                <div className={cn(
+                  "flex h-12 w-12 items-center justify-center rounded-xl",
+                  "bg-[#E7E5E4]",
+                  "shadow-[3px_3px_8px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.85)]"
+                )}>
+                  <AlertTriangle className="h-6 w-6 text-[#FF2157]" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">Confirm Logout</h3>
-                  <p className="text-red-100 text-sm">Are you sure you want to sign out?</p>
+                  <h3 className="font-[family-name:var(--font-space-mono)] text-base font-bold text-[#1E2938]">
+                    Confirm Logout
+                  </h3>
+                  <p className="font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#1E2938]/50 mt-0.5">
+                    Are you sure you want to sign out?
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Content */}
-            <div className="p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={userProfilePreview.getAvatar()} alt={userProfilePreview.getDisplayName()} />
-                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+            {/* Body */}
+            <div className="p-6 space-y-5">
+              {/* User card */}
+              <div className={cn(
+                "flex items-center gap-4 rounded-xl p-3",
+                "bg-[#E7E5E4]",
+                "shadow-[inset_2px_2px_6px_rgba(0,0,0,0.09),inset_-2px_-2px_6px_rgba(255,255,255,0.75)]"
+              )}>
+                <Avatar className="h-10 w-10 ring-2 ring-[#006666]/20">
+                  <AvatarImage
+                    src={userProfilePreview.getAvatar()}
+                    alt={userProfilePreview.getDisplayName()}
+                  />
+                  <AvatarFallback className="bg-[#006666] text-white font-[family-name:var(--font-space-mono)] text-sm font-bold">
                     {getInitials(userProfilePreview.getDisplayName())}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-slate-900 dark:text-slate-100">{userProfilePreview.getDisplayName()}</p>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{baseUser?.email}</p>
+                  <p className="font-[family-name:var(--font-space-mono)] text-sm font-bold text-[#1E2938]">
+                    {userProfilePreview.getDisplayName()}
+                  </p>
+                  <p className="font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#1E2938]/45">
+                    {baseUser?.email}
+                  </p>
                 </div>
               </div>
 
-              <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
-                You will be signed out of your account and redirected to the login page. Any unsaved changes will be lost.
+              <p className="font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#1E2938]/55 leading-relaxed">
+                You will be signed out and redirected to the login page. Any unsaved changes will be lost.
               </p>
 
-              {/* Action Buttons */}
+              {/* Buttons */}
               <div className="flex gap-3">
-                <Button
-                  variant="outline"
+                <button
                   onClick={onClose}
                   disabled={isLoggingOut}
-                  className="flex-1 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={cn(
+                    "flex-1 rounded-xl py-2.5 text-xs font-bold tracking-wide",
+                    "font-[family-name:var(--font-space-mono)] text-[#1E2938]",
+                    "bg-[#E7E5E4]",
+                    "shadow-[3px_3px_8px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.9)]",
+                    "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+                    "transition-all duration-150 focus:outline-none",
+                    "disabled:opacity-40 disabled:cursor-not-allowed"
+                  )}
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+
+                <button
                   onClick={onConfirm}
                   disabled={isLoggingOut}
-                  className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-90 disabled:cursor-not-allowed"
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold tracking-wide",
+                    "font-[family-name:var(--font-space-mono)] text-white",
+                    "bg-[#FF2157]",
+                    "shadow-[3px_3px_10px_rgba(255,33,87,0.4),-1px_-1px_4px_rgba(255,255,255,0.2)]",
+                    "hover:shadow-[inset_2px_2px_6px_rgba(0,0,0,0.2),inset_-1px_-1px_4px_rgba(255,100,120,0.3)]",
+                    "transition-all duration-150 focus:outline-none",
+                    "disabled:opacity-70 disabled:cursor-not-allowed"
+                  )}
                 >
                   {isLoggingOut ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                       Signing Out...
                     </>
                   ) : (
                     <>
-                      <FiLogOut className="h-4 w-4 mr-2" />
+                      <LogOut className="h-4 w-4" />
                       Sign Out
                     </>
                   )}
-                </Button>
+                </button>
               </div>
             </div>
           </motion.div>

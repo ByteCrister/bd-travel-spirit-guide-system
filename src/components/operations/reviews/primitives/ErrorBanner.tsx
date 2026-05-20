@@ -3,11 +3,6 @@
 import type { ApiError } from "@/types/tour/reviews.types";
 import { JSX, useState } from "react";
 import { HiExclamationCircle, HiOutlineX, HiRefresh, HiChevronDown } from "react-icons/hi";
-
-// shadcn/ui imports (adjust paths to your setup)
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 type ErrorBannerProps = {
@@ -33,80 +28,89 @@ export function ErrorBanner({
     const message = description ?? error.message;
 
     return (
-        <Alert
+        <div
             role="alert"
             className={cn(
-                // modern + professional styling
-                "relative overflow-hidden rounded-xl border border-destructive/30 bg-destructive/10",
-                "shadow-sm backdrop-blur-sm",
-                "supports-[backdrop-filter]:bg-gradient-to-br supports-[backdrop-filter]:from-destructive/10 supports-[backdrop-filter]:to-destructive/5",
-                "transition-colors",
-                className
+                // Neumorphic raised surface
+                "relative overflow-hidden rounded-2xl border-l-4 border-danger bg-surface p-4 text-text",
+                "shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff]",
+                className,
             )}
-            variant="destructive"
         >
-            {/* Soft gradient accent bar */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-500/60 via-red-400/40 to-red-500/60" />
+            {/* Subtle danger gradient top bar */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-danger/60 via-danger/40 to-danger/60" />
 
             <div className="flex items-start gap-3">
-                {/* Icon */}
-                <div className="mt-0.5 flex-shrink-0 text-destructive">
-                    <HiExclamationCircle aria-hidden="true" className="h-6 w-6" />
+                {/* Error icon with neumorphic pressed circle */}
+                <div className="mt-0.5 flex-shrink-0 rounded-full bg-surface p-1.5 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]">
+                    <HiExclamationCircle aria-hidden="true" className="h-5 w-5 text-danger" />
                 </div>
 
                 {/* Content */}
-                <div className="flex-1">
-                    <AlertTitle className="text-base font-semibold tracking-[-0.01em]">
+                <div className="min-w-0 flex-1">
+                    <h3 className="text-base font-semibold tracking-[-0.01em]">
                         Something went wrong
-                    </AlertTitle>
-
-                    <AlertDescription className="mt-1 text-sm leading-relaxed">
-                        {message}
-                    </AlertDescription>
+                    </h3>
+                    <p className="mt-1 text-sm leading-relaxed opacity-90">{message}</p>
 
                     {/* Actions */}
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                         {onRetry && (
-                            <Button
+                            <button
                                 type="button"
-                                size="sm"
-                                className="gap-1"
                                 onClick={onRetry}
-                                variant="destructive"
+                                className={cn(
+                                    "inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-sm font-medium",
+                                    "bg-surface text-primary shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff]",
+                                    "transition-all duration-150 ease-out",
+                                    "hover:shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
+                                    "active:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff]",
+                                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2",
+                                )}
                             >
                                 <HiRefresh className="h-4 w-4" aria-hidden="true" />
                                 Retry
-                            </Button>
+                            </button>
                         )}
 
-                        <Button
+                        <button
                             type="button"
-                            size="sm"
-                            variant="outline"
-                            className="border-destructive/30 text-destructive hover:bg-destructive/10"
                             onClick={() => setShowDetails((s) => !s)}
                             aria-expanded={showDetails}
                             aria-controls="error-details"
+                            className={cn(
+                                "inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-sm font-medium",
+                                "bg-surface text-danger shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff]",
+                                "transition-all duration-150 ease-out",
+                                "hover:shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
+                                "active:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff]",
+                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/50 focus-visible:ring-offset-2",
+                            )}
                         >
                             <HiChevronDown
                                 className={cn("h-4 w-4 transition-transform", showDetails && "rotate-180")}
                                 aria-hidden="true"
                             />
                             Details
-                        </Button>
+                        </button>
                     </div>
 
-                    {/* Details (collapsible) */}
+                    {/* Collapsible technical details */}
                     <div
                         id="error-details"
                         className={cn(
                             "grid transition-[grid-template-rows,opacity] duration-200 ease-out",
-                            showDetails ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                            showDetails ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
                         )}
                     >
                         <div className="overflow-hidden">
-                            <Separator className="my-3 bg-destructive/20" />
-                            <div className="rounded-lg bg-destructive/5 p-3 text-xs text-destructive/90">
+                            <hr className="my-3 border-t border-danger/20" />
+                            <div
+                                className={cn(
+                                    "rounded-lg p-3 text-xs text-text/80",
+                                    "bg-surface shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
+                                )}
+                            >
                                 <div className="font-medium">Technical details</div>
                                 <ul className="mt-1 space-y-1">
                                     <li>
@@ -127,18 +131,25 @@ export function ErrorBanner({
                     </div>
                 </div>
 
-                {/* Dismiss */}
+                {/* Dismiss button */}
                 {dismissible && (
                     <button
                         type="button"
                         aria-label="Dismiss error"
-                        className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-md text-destructive/80 transition-colors hover:bg-destructive/10 hover:text-destructive focus:outline-none focus:ring-2 focus:ring-destructive/40"
                         onClick={() => setOpen(false)}
+                        className={cn(
+                            "mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full",
+                            "bg-surface shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+                            "text-text/60 transition-all duration-150 ease-out",
+                            "hover:text-danger hover:shadow-[1px_1px_3px_#c8c6c5,-1px_-1px_3px_#ffffff]",
+                            "active:shadow-[inset_1px_1px_3px_#c8c6c5,inset_-1px_-1px_3px_#ffffff]",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/50",
+                        )}
                     >
                         <HiOutlineX aria-hidden="true" className="h-4 w-4" />
                     </button>
                 )}
             </div>
-        </Alert>
+        </div>
     );
 }

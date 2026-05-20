@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FiMenu } from "react-icons/fi";
+import { Menu } from "lucide-react";
 import { SearchBar } from "./SearchBar";
 import { NotificationMenu } from "./NotificationMenu";
 import { AdminAvatars } from "./AdminAvatars";
@@ -15,8 +15,14 @@ interface TopbarProps {
   onLogout?: () => void;
 }
 
-export function Topbar({ onMenuClick, isMobile = false, isCollapsed = false, onLogout }: TopbarProps) {
-  const desktopLeft = isCollapsed ? "lg:left-20" : "lg:left-72"; // 80px vs 288px
+export function Topbar({
+  onMenuClick,
+  isMobile = false,
+  isCollapsed = false,
+  onLogout,
+}: TopbarProps) {
+  const desktopLeft = isCollapsed ? "lg:left-20" : "lg:left-72";
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
@@ -24,53 +30,57 @@ export function Topbar({ onMenuClick, isMobile = false, isCollapsed = false, onL
       transition={{ duration: 0.3, ease: "easeOut" }}
       className={cn(
         "fixed top-0 right-0 z-50 flex h-16 items-center justify-between",
-        "bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-700/60",
-        "shadow-lg shadow-slate-200/10 dark:shadow-slate-900/10",
-        "supports-[backdrop-filter]:bg-white/80 supports-[backdrop-filter]:dark:bg-slate-900/80",
+        // Neumorphic surface
+        "bg-[#E7E5E4]",
+        "border-b border-[#d0cecc]",
+        "shadow-[0_4px_12px_rgba(0,0,0,0.08),0_-1px_0_rgba(255,255,255,0.9)]",
+        "font-[family-name:var(--font-jetbrains-mono)]",
         isMobile ? "px-4 left-0" : `px-6 ${desktopLeft}`
       )}
       role="banner"
     >
       {/* Left Section */}
       <div className="flex items-center gap-4">
-        {/* Mobile Menu Button */}
         {isMobile && (
           <motion.button
             onClick={onMenuClick}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            whileHover={{ scale: 1.05 }}
+            className={cn(
+              "flex h-10 w-10 items-center justify-center rounded-xl",
+              "bg-[#E7E5E4] text-[#006666]",
+              "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]",
+              "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.12),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+              "transition-all duration-200 focus:outline-none"
+            )}
             whileTap={{ scale: 0.95 }}
             aria-label="Open navigation menu"
-            aria-expanded="false"
           >
-            <FiMenu className="h-5 w-5" />
+            <Menu className="h-5 w-5" />
           </motion.button>
         )}
 
-        {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
           className="hidden md:block"
         >
-          <h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent font-display">
+          <h1 className="font-[family-name:var(--font-space-mono)] text-lg font-bold tracking-tight text-[#1E2938]">
             Dashboard
           </h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Welcome back, Admin</p>
+          <p className="text-[10px] tracking-widest uppercase text-[#006666] font-semibold">
+            Welcome back, Admin
+          </p>
         </motion.div>
       </div>
 
-      {/* Center Section - Search */}
+      {/* Center — Search */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
         className="flex-1 max-w-md mx-4"
       >
-        <SearchBar
-          isMobile={isMobile}
-        />
+        <SearchBar isMobile={isMobile} />
       </motion.div>
 
       {/* Right Section */}
@@ -80,18 +90,13 @@ export function Topbar({ onMenuClick, isMobile = false, isCollapsed = false, onL
         transition={{ delay: 0.3 }}
         className="flex items-center gap-3"
       >
-        {/* Notifications */}
         <NotificationMenu />
 
-        {/* Admin Avatars */}
         <div className="hidden lg:block">
           <AdminAvatars />
         </div>
 
-        {/* Profile Popover */}
-        <ProfilePopover
-          onLogout={onLogout}
-        />
+        <ProfilePopover onLogout={onLogout} />
       </motion.div>
     </motion.header>
   );

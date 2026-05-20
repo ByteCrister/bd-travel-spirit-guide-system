@@ -17,12 +17,16 @@ import {
     Clock,
     Key,
     AlertCircle,
-    Sparkles,
 } from "lucide-react";
 import { useResetRequestsStore } from "@/store/reset-requests.store";
 import DenyDialog from "./DenyDialog";
 import UpdatePasswordDialog from "./UpdatePasswordDialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { REQUEST_STATUS } from "@/constants/employee/reset-password-request.const";
 
 interface RequestDetailsDrawerProps {
@@ -31,19 +35,89 @@ interface RequestDetailsDrawerProps {
     requestId: string;
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Neumorphic design tokens & helpers                                        */
+/* -------------------------------------------------------------------------- */
+
+// Surface colors
+const surfaceLight = "#E7E5E4";
+const surfaceDark = "#2A2A2A";
+const shadowDarkLight = "#B8B5B4";
+const shadowLightLight = "#FFFFFF";
+const shadowDarkDark = "#1A1A1A";
+const shadowLightDark = "#3E3E3E";
+
+/** Reusable neumorphic card with pressed/raised effect */
+function NeumorphicCard({
+    children,
+    className = "",
+    ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+    return (
+        <div
+            className={`rounded-2xl border-0 bg-[${surfaceLight}] p-4
+        shadow-[6px_6px_12px_${shadowDarkLight},-6px_-6px_12px_${shadowLightLight}]
+        dark:bg-[${surfaceDark}] dark:shadow-[6px_6px_12px_${shadowDarkDark},-6px_-6px_12px_${shadowLightDark}]
+        transition-all duration-200 ${className}`}
+            {...props}
+        >
+            {children}
+        </div>
+    );
+}
+
+/** InfoCard using neumorphic card wrapper */
+function InfoCard({
+    icon,
+    label,
+    children,
+    className = "",
+}: {
+    icon: React.ReactNode;
+    label: string;
+    children: React.ReactNode;
+    className?: string;
+}) {
+    return (
+        <NeumorphicCard className={`flex items-start gap-4 ${className}`}>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E7E5E4] shadow-[inset_2px_2px_4px_rgba(184,181,180,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.4)] dark:bg-[#2A2A2A] dark:shadow-[inset_3px_3px_6px_#1A1A1A,inset_-3px_-3px_6px_#3E3E3E]">
+                {icon}
+            </div>
+            <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#1E2938]/70 dark:text-white/60">
+                    {label}
+                </p>
+                <div className="mt-1 font-medium text-[#1E2938] dark:text-white">
+                    {children}
+                </div>
+            </div>
+        </NeumorphicCard>
+    );
+}
+
+/** Section title with neumorphic accent */
+function SectionTitle({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="flex items-center gap-3">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#006666]" />
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-[#1E2938]/80 dark:text-white/70">
+                {children}
+            </h3>
+        </div>
+    );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Main component                                                            */
+/* -------------------------------------------------------------------------- */
+
 export default function RequestDetailsDrawer({
     open,
     onOpenChange,
     requestId,
 }: RequestDetailsDrawerProps) {
-    const {
-        fetchById,
-        denyRequest,
-        updatePassword,
-        entities,
-        isFetchingById,
-        error,
-    } = useResetRequestsStore();
+    const { fetchById, denyRequest, updatePassword, entities, isFetchingById, error } =
+        useResetRequestsStore();
 
     const [denyOpen, setDenyOpen] = useState(false);
     const [updateOpen, setUpdateOpen] = useState(false);
@@ -55,92 +129,75 @@ export default function RequestDetailsDrawer({
 
     const dto = entities[requestId]?.attributes;
 
-    const getStatusConfig = () => {
+    /* ---------- status config ---------- */
+    const statusConfig = (() => {
         if (!dto) return null;
-
         switch (dto.status) {
             case REQUEST_STATUS.PENDING:
                 return {
-                    icon: <Clock className="w-5 h-5" />,
+                    icon: Clock,
                     badge: (
-                        <Badge className="gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 shadow-lg shadow-amber-500/30">
-                            <Clock className="w-3.5 h-3.5" />
+                        <Badge className="gap-1.5 border-0 bg-[#FE9900]/15 text-[#FE9900] dark:bg-[#FE9900]/30 dark:text-[#FE9900]">
+                            <Clock className="h-3.5 w-3.5" />
                             Pending Review
                         </Badge>
                     ),
-                    gradient: "from-amber-500/20 via-orange-500/20 to-red-500/20",
                 };
             case REQUEST_STATUS.DENIED:
                 return {
-                    icon: <XCircle className="w-5 h-5" />,
+                    icon: XCircle,
                     badge: (
-                        <Badge className="gap-2 px-3 py-1.5 bg-gradient-to-r from-red-500 to-rose-600 text-white border-0 shadow-lg shadow-red-500/30">
-                            <XCircle className="w-3.5 h-3.5" />
+                        <Badge className="gap-1.5 border-0 bg-[#FF2157]/15 text-[#FF2157] dark:bg-[#FF2157]/30 dark:text-[#FF2157]">
+                            <XCircle className="h-3.5 w-3.5" />
                             Denied
                         </Badge>
                     ),
-                    gradient: "from-red-500/20 via-rose-500/20 to-pink-500/20",
                 };
             default:
                 return {
-                    icon: <CheckCircle2 className="w-5 h-5" />,
+                    icon: CheckCircle2,
                     badge: (
-                        <Badge className="gap-2 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-lg shadow-emerald-500/30">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
+                        <Badge className="gap-1.5 border-0 bg-[#00A63D]/15 text-[#00A63D] dark:bg-[#00A63D]/30 dark:text-[#00A63D]">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
                             Fulfilled
                         </Badge>
                     ),
-                    gradient: "from-emerald-500/20 via-teal-500/20 to-cyan-500/20",
                 };
         }
-    };
+    })();
 
-    const statusConfig = getStatusConfig();
-
+    /* ---------- loading ---------- */
     if (isFetchingById && !dto) {
         return (
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-2xl bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-950">
-                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <div className="relative">
-                            <Loader2 className="w-12 h-12 animate-spin text-violet-500" />
-                            <div className="absolute inset-0 blur-xl bg-violet-500/30 animate-pulse" />
-                        </div>
-                        <div className="space-y-1 text-center">
-                            <p className="font-medium text-slate-700 dark:text-slate-300">
-                                Loading request details
-                            </p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
-                                Please wait a moment...
-                            </p>
-                        </div>
+                <DialogContent className="font-[Space_Mono] sm:max-w-2xl bg-[#E7E5E4] dark:bg-[#1E1E1E] border-0 shadow-[8px_8px_16px_rgba(184,181,180,0.5),-8px_-8px_16px_rgba(255,255,255,0.7)] dark:shadow-[12px_12px_24px_#0D0D0D,-12px_-12px_24px_#3A3A3A]">
+                    <div className="flex flex-col items-center justify-center py-24">
+                        <Loader2 className="h-10 w-10 animate-spin text-[#006666]" />
+                        <p className="mt-6 text-sm font-medium text-[#1E2938]/70 dark:text-white/70">
+                            Loading request details…
+                        </p>
                     </div>
                 </DialogContent>
             </Dialog>
         );
     }
 
+    /* ---------- error ---------- */
     if (error && !dto) {
         return (
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-2xl">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex flex-col items-center justify-center py-16 gap-4"
-                    >
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-xl shadow-red-500/30">
-                            <AlertCircle className="w-10 h-10 text-white" />
+                <DialogContent className="font-[Space_Mono] sm:max-w-2xl bg-[#E7E5E4] dark:bg-[#1E1E1E] border-0 shadow-[12px_12px_24px_#B8B5B4,-12px_-12px_24px_#FFFFFF] dark:shadow-[12px_12px_24px_#0D0D0D,-12px_-12px_24px_#3A3A3A]">
+                    <div className="flex flex-col items-center justify-center py-24">
+                        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#FF2157]/10 dark:bg-[#FF2157]/20">
+                            <AlertCircle className="h-8 w-8 text-[#FF2157]" />
                         </div>
-                        <div className="text-center space-y-2">
-                            <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                                Failed to fetch request
-                            </p>
-                            <p className="text-sm text-slate-600 dark:text-slate-400">
-                                {error.message}
-                            </p>
-                        </div>
-                    </motion.div>
+                        <h3 className="text-lg font-semibold text-[#1E2938] dark:text-white">
+                            Failed to fetch request
+                        </h3>
+                        <p className="mt-2 text-sm text-[#1E2938]/70 dark:text-white/70">
+                            {error.message}
+                        </p>
+                    </div>
                 </DialogContent>
             </Dialog>
         );
@@ -148,19 +205,18 @@ export default function RequestDetailsDrawer({
 
     if (!dto) return null;
 
+    /* ---------- data ---------- */
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-950 border-slate-200 dark:border-slate-800">
-                {/* Decorative gradient overlay */}
-                <div className={`absolute top-0 inset-x-0 h-32 bg-gradient-to-b ${statusConfig?.gradient} opacity-30 pointer-events-none`} />
-
-                <DialogHeader className="relative">
-                    <div className="flex items-start justify-between gap-4">
+            <DialogContent className="font-[Space_Mono] max-h-[90vh] overflow-y-auto border-0 bg-[#E7E5E4] dark:bg-[#1E1E1E] sm:max-w-2xl shadow-[4px_4px_8px_rgba(184,181,180,0.35),-4px_-4px_8px_rgba(255,255,255,0.5)] dark:shadow-[6px_6px_12px_rgba(0,0,0,0.25),-6px_-6px_12px_rgba(60,60,60,0.35)]">
+                {/* Header */}
+                <DialogHeader>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="space-y-1">
-                            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
+                            <DialogTitle className="text-2xl font-bold tracking-tight text-[#1E2938] dark:text-white">
                                 Request Details
                             </DialogTitle>
-                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                            <p className="text-sm text-[#1E2938]/60 dark:text-white/50">
                                 Review and manage this password reset request
                             </p>
                         </div>
@@ -168,180 +224,99 @@ export default function RequestDetailsDrawer({
                     </div>
                 </DialogHeader>
 
+                {/* Body */}
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="space-y-6 py-4 relative"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                    className="mt-6 space-y-8 pb-2"
                 >
                     {/* Requester Information */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-violet-500" />
-                            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                                Requester Information
-                            </h3>
-                        </div>
+                    <section className="space-y-4">
+                        <SectionTitle>Requester Information</SectionTitle>
                         <div className="grid gap-3">
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.15 }}
-                                className="group relative overflow-hidden flex items-start gap-3 p-4 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 transition-all shadow-sm hover:shadow-md"
+                            <InfoCard
+                                icon={<Mail className="h-5 w-5 text-[#006666] dark:text-[#006666]" />}
+                                label="Email Address"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/5 to-violet-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-950/50">
-                                    <Mail className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                                </div>
-                                <div className="flex-1 min-w-0 relative">
-                                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                                        Email Address
-                                    </p>
-                                    <p className="font-semibold text-slate-900 dark:text-slate-100 truncate">
-                                        {dto.requesterEmail}
-                                    </p>
-                                </div>
-                            </motion.div>
-
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="group relative overflow-hidden flex items-start gap-3 p-4 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-fuchsia-300 dark:hover:border-fuchsia-700 transition-all shadow-sm hover:shadow-md"
+                                <span className="truncate">{dto.requesterEmail}</span>
+                            </InfoCard>
+                            <InfoCard
+                                icon={<User className="h-5 w-5 text-[#006666] dark:text-[#006666]" />}
+                                label="Full Name"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-500/0 via-fuchsia-500/5 to-fuchsia-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <div className="p-2 rounded-lg bg-fuchsia-100 dark:bg-fuchsia-950/50">
-                                    <User className="w-5 h-5 text-fuchsia-600 dark:text-fuchsia-400" />
-                                </div>
-                                <div className="flex-1 relative">
-                                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                                        Full Name
-                                    </p>
-                                    <p className="font-semibold text-slate-900 dark:text-slate-100">
-                                        {dto.requesterName || (
-                                            <span className="text-slate-400 dark:text-slate-500 italic font-normal">
-                                                Not provided
-                                            </span>
-                                        )}
-                                    </p>
-                                </div>
-                            </motion.div>
-
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.25 }}
-                                className="group relative overflow-hidden flex items-start gap-3 p-4 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-700 transition-all shadow-sm hover:shadow-md"
+                                {dto.requesterName || (
+                                    <span className="italic text-[#1E2938]/40 dark:text-white/40">
+                                        Not provided
+                                    </span>
+                                )}
+                            </InfoCard>
+                            <InfoCard
+                                icon={<Phone className="h-5 w-5 text-[#006666] dark:text-[#006666]" />}
+                                label="Mobile Number"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/5 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-950/50">
-                                    <Phone className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
-                                </div>
-                                <div className="flex-1 relative">
-                                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                                        Mobile Number
-                                    </p>
-                                    <p className="font-semibold text-slate-900 dark:text-slate-100">
-                                        {dto.requesterMobile || (
-                                            <span className="text-slate-400 dark:text-slate-500 italic font-normal">
-                                                Not provided
-                                            </span>
-                                        )}
-                                    </p>
-                                </div>
-                            </motion.div>
+                                {dto.requesterMobile || (
+                                    <span className="italic text-[#1E2938]/40 dark:text-white/40">
+                                        Not provided
+                                    </span>
+                                )}
+                            </InfoCard>
                         </div>
-                    </div>
+                    </section>
 
-                    <Separator className="bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent" />
+                    <Separator className="bg-transparent h-px shadow-[inset_0_1px_1px_rgba(184,181,180,0.3)] dark:shadow-[inset_0_1px_2px_#3E3E3E]" />
 
                     {/* Request Details */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-fuchsia-500" />
-                            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                                Request Details
-                            </h3>
-                        </div>
+                    <section className="space-y-4">
+                        <SectionTitle>Request Details</SectionTitle>
                         <div className="grid gap-3">
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.3 }}
-                                className="flex items-start gap-3 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 rounded-xl border border-blue-200 dark:border-blue-900/50"
+                            <InfoCard
+                                icon={<Calendar className="h-5 w-5 text-[#006666] dark:text-[#006666]" />}
+                                label="Requested At"
                             >
-                                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-950/50">
-                                    <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">
-                                        Requested At
-                                    </p>
-                                    <p className="font-semibold text-blue-900 dark:text-blue-100">
-                                        {new Date(dto.requestedAt).toLocaleString()}
-                                    </p>
-                                </div>
-                            </motion.div>
+                                {new Date(dto.requestedAt).toLocaleString()}
+                            </InfoCard>
 
                             {dto.description && (
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.35 }}
-                                    className="flex items-start gap-3 p-4 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800"
+                                <InfoCard
+                                    icon={<FileText className="h-5 w-5 text-[#006666] dark:text-[#006666]" />}
+                                    label="Description"
                                 >
-                                    <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-950/50">
-                                        <FileText className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
-                                            Description
-                                        </p>
-                                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                            {dto.description}
-                                        </p>
-                                    </div>
-                                </motion.div>
+                                    <span className="text-sm font-normal leading-relaxed">
+                                        {dto.description}
+                                    </span>
+                                </InfoCard>
                             )}
 
                             {dto.reason && (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.4 }}
-                                    className="relative overflow-hidden flex items-start gap-3 p-4 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-950/30 border-2 border-red-200 dark:border-red-900/50 rounded-xl shadow-lg shadow-red-500/10"
-                                >
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl" />
-                                    <div className="p-2 rounded-lg bg-red-100 dark:bg-red-950/50 relative">
-                                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                                <NeumorphicCard className="!bg-[#FF2157]/5 dark:!bg-[#FF2157]/10 border-0 shadow-[inset_2px_2px_4px_rgba(184,181,180,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.5)] dark:shadow-[inset_3px_3px_6px_#1A1A1A,inset_-3px_-3px_6px_#3E3E3E]">
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FF2157]/10 dark:bg-[#FF2157]/20">
+                                            <AlertCircle className="h-5 w-5 text-[#FF2157]" />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-xs font-bold uppercase tracking-wide text-[#FF2157]">
+                                                Denial Reason
+                                            </p>
+                                            <p className="mt-1 text-sm font-medium leading-relaxed text-[#1E2938] dark:text-white/90">
+                                                {dto.reason}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 relative">
-                                        <p className="text-xs font-bold text-red-600 dark:text-red-400 mb-2">
-                                            DENIAL REASON
-                                        </p>
-                                        <p className="text-sm text-red-700 dark:text-red-300 leading-relaxed font-medium">
-                                            {dto.reason}
-                                        </p>
-                                    </div>
-                                </motion.div>
+                                </NeumorphicCard>
                             )}
                         </div>
-                    </div>
+                    </section>
 
-                    <Separator className="bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent" />
+                    <Separator className="bg-transparent h-px shadow-[inset_0_1px_2px_#B8B5B4] dark:shadow-[inset_0_1px_2px_#3E3E3E]" />
 
                     {/* Actions */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-cyan-500" />
-                            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                                Actions
-                            </h3>
-                        </div>
+                    <section className="space-y-4">
+                        <SectionTitle>Actions</SectionTitle>
                         <AnimatePresence mode="wait">
                             {dto.status === "pending" ? (
                                 <motion.div
-                                    key="pending-actions"
+                                    key="pending"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
@@ -350,52 +325,53 @@ export default function RequestDetailsDrawer({
                                     <Button
                                         variant="destructive"
                                         onClick={() => setDenyOpen(true)}
-                                        className="gap-2 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-lg shadow-red-500/25"
+                                        className="gap-2 bg-[#E7E5E4] text-[#FF2157] border-0 shadow-[2px_2px_4px_rgba(184,181,180,0.4),-2px_-2px_4px_rgba(255,255,255,0.6)] hover:shadow-[inset_4px_4px_8px_#B8B5B4,inset_-4px_-4px_8px_#FFFFFF] dark:bg-[#2A2A2A] dark:text-[#FF2157] dark:shadow-[4px_4px_8px_#1A1A1A,-4px_-4px_8px_#3E3E3E] dark:hover:shadow-[inset_4px_4px_8px_#1A1A1A,inset_-4px_-4px_8px_#3E3E3E] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF2157]/50"
                                     >
-                                        <XCircle className="w-4 h-4" />
+                                        <XCircle className="h-4 w-4" />
                                         Deny Request
                                     </Button>
                                     <Button
                                         onClick={() => setUpdateOpen(true)}
-                                        className="gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 shadow-lg shadow-violet-500/25"
+                                        className="gap-2 bg-[#E7E5E4] text-[#006666] border-0 shadow-[2px_2px_4px_rgba(184,181,180,0.4),-2px_-2px_4px_rgba(255,255,255,0.6)] hover:shadow-[inset_4px_4px_8px_#B8B5B4,inset_-4px_-4px_8px_#FFFFFF] dark:bg-[#2A2A2A] dark:text-[#006666] dark:shadow-[4px_4px_8px_#1A1A1A,-4px_-4px_8px_#3E3E3E] dark:hover:shadow-[inset_4px_4px_8px_#1A1A1A,inset_-4px_-4px_8px_#3E3E3E] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50"
                                     >
-                                        <Key className="w-4 h-4" />
+                                        <Key className="h-4 w-4" />
                                         Update Password
                                     </Button>
                                 </motion.div>
                             ) : dto.status === "denied" ? (
                                 <motion.div
-                                    key="denied-actions"
+                                    key="denied"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
                                 >
                                     <Button
                                         onClick={() => setUpdateOpen(true)}
-                                        className="gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 shadow-lg shadow-violet-500/25"
+                                        className="gap-2 bg-[#E7E5E4] text-[#006666] border-0 shadow-[2px_2px_4px_rgba(184,181,180,0.4),-2px_-2px_4px_rgba(255,255,255,0.6)] hover:shadow-[inset_4px_4px_8px_#B8B5B4,inset_-4px_-4px_8px_#FFFFFF] dark:bg-[#2A2A2A] dark:text-[#006666] dark:shadow-[4px_4px_8px_#1A1A1A,-4px_-4px_8px_#3E3E3E] dark:hover:shadow-[inset_4px_4px_8px_#1A1A1A,inset_-4px_-4px_8px_#3E3E3E] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50"
                                     >
-                                        <Key className="w-4 h-4" />
+                                        <Key className="h-4 w-4" />
                                         Update Password
                                     </Button>
                                 </motion.div>
                             ) : (
                                 <motion.div
-                                    key="fulfilled-actions"
+                                    key="fulfilled"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="flex items-center gap-2 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 rounded-xl"
+                                    className="flex items-center gap-3 rounded-2xl bg-[#00A63D]/10 p-4 shadow-[inset_2px_2px_4px_rgba(184,181,180,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.4)] dark:bg-[#00A63D]/20 dark:shadow-[inset_3px_3px_6px_#1A1A1A,inset_-3px_-3px_6px_#3E3E3E]"
                                 >
-                                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                                    <p className="text-sm text-emerald-700 dark:text-emerald-300 font-medium">
-                                        Request has been fulfilled
+                                    <CheckCircle2 className="h-5 w-5 text-[#00A63D]" />
+                                    <p className="text-sm font-medium text-[#1E2938] dark:text-white/90">
+                                        This request has been fulfilled.
                                     </p>
                                 </motion.div>
                             )}
                         </AnimatePresence>
-                    </div>
+                    </section>
                 </motion.div>
 
+                {/* Dialogs */}
                 <DenyDialog
                     open={denyOpen}
                     onOpenChange={setDenyOpen}

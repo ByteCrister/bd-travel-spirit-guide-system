@@ -1,10 +1,10 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
-import { plusJakartaSans, inter } from "./fonts";
 import GlobalProvider from "@/components/wrappers/GlobalProvider";
 import { Toaster } from "@/components/ui/sonner";
 import ScrollInitializer from "@/components/global/ScrollInitializer";
+import { jetbrainsMono, spaceMono } from "@/styles/fonts";
 
 export const metadata: Metadata = {
   title: "BD Travel Spirit Guide - Professional Travel Management",
@@ -19,12 +19,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${plusJakartaSans.variable} ${inter.variable} antialiased`}
+        className={`${spaceMono.variable} ${jetbrainsMono.variable}`}
       >
         <GlobalProvider>
           {/* Initialize scroll functionality */}
           <ScrollInitializer />
-          
+
           {/* App content */}
           {children}
 

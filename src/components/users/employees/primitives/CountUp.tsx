@@ -1,5 +1,6 @@
 // components/employees/primitives/CountUp.tsx
 "use client";
+
 import { useEffect, useState } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 
@@ -19,11 +20,15 @@ export function CountUp({ value, duration = 0.6 }: CountUpProps) {
             onUpdate: (latest) => setDisplay(Math.round(latest)),
         });
 
-        return controls.stop; // cleanup animation on unmount
+        return controls.stop;
     }, [value, duration, motionValue]);
 
     return (
-        <motion.span aria-live="polite" role="status">
+        <motion.span
+            aria-live="polite"
+            role="status"
+            className="font-[family-name:var(--font-space-mono,'Space_Mono',monospace)] tabular-nums"
+        >
             {display.toLocaleString()}
         </motion.span>
     );

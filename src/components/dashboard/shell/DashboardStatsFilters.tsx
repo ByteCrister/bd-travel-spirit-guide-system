@@ -23,6 +23,25 @@ import { REPORT_STATUS } from '@/constants/tour/report.const';
 import { BOOKING_STATUS } from '@/constants/tour/tour-booking.const';
 import { cn } from '@/lib/utils';
 
+const brand = {
+    primary: '#006666',
+    surface: '#E7E5E4',
+    text: '#1E2938',
+    muted: '#6B7A8D',
+    border: 'rgba(0,102,102,0.12)',
+    shadowOut: '5px 5px 10px #c8c6c4, -5px -5px 10px #ffffff',
+    shadowIn: 'inset 3px 3px 6px #c8c6c4, inset -3px -3px 6px #ffffff',
+};
+
+const selectStyle = {
+    background: brand.surface,
+    boxShadow: brand.shadowIn,
+    border: `1px solid ${brand.border}`,
+    color: brand.text,
+    fontFamily: 'var(--font-jetbrains-mono)',
+    fontSize: '12px',
+};
+
 type DashboardStatsFiltersProps = {
     filters: DashboardFilters;
     isLoadingStats: boolean;
@@ -45,18 +64,33 @@ export function DashboardStatsFilters({
     const range = filters.statsDateRange;
 
     return (
-        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-r from-slate-50 via-white to-slate-50 px-4 py-4 shadow-sm dark:border-slate-700/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-slate-800/80 sm:px-6">
-            {/* Glossy top sheen */}
+        <div
+            className="relative overflow-hidden rounded-2xl px-4 py-4 sm:px-6"
+            style={{
+                background: brand.surface,
+                boxShadow: brand.shadowOut,
+                border: `1px solid ${brand.border}`,
+            }}
+        >
+            {/* Teal left accent bar */}
             <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent dark:via-white/10"
+                className="pointer-events-none absolute inset-y-0 left-0 w-[3px] rounded-l-2xl"
+                style={{ background: `linear-gradient(180deg, ${brand.primary}, #00a8a8)` }}
                 aria-hidden
             />
 
+            {/* Label row */}
             <div className="mb-3 flex flex-wrap items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800/10 dark:bg-slate-200/10">
-                    <SlidersHorizontal className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" aria-hidden />
+                <div
+                    className="flex h-6 w-6 items-center justify-center rounded-lg"
+                    style={{ boxShadow: brand.shadowOut, background: brand.surface }}
+                >
+                    <SlidersHorizontal className="h-3 w-3" style={{ color: brand.primary }} aria-hidden />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                <span
+                    className="text-[10px] font-bold uppercase tracking-[0.2em]"
+                    style={{ color: brand.primary, fontFamily: 'var(--font-space-mono)' }}
+                >
                     Stats &amp; charts range
                 </span>
             </div>
@@ -65,16 +99,22 @@ export function DashboardStatsFilters({
                 {/* Date range picker */}
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button
-                            variant="outline"
+                        <button
                             className={cn(
-                                'h-11 justify-between gap-2 rounded-xl border-slate-200 bg-white/90 px-4 shadow-sm backdrop-blur-sm transition-all hover:bg-white hover:shadow-md dark:border-slate-600 dark:bg-slate-700/80 dark:hover:bg-slate-700 sm:min-w-[240px]',
-                                isLoadingStats && 'opacity-60',
+                                'flex h-10 items-center justify-between gap-2 rounded-xl px-4 text-xs font-medium transition-all sm:min-w-[240px]',
+                                isLoadingStats && 'opacity-50',
                             )}
                             disabled={isLoadingStats}
+                            style={{
+                                background: brand.surface,
+                                boxShadow: isLoadingStats ? brand.shadowIn : brand.shadowOut,
+                                border: `1px solid ${brand.border}`,
+                                color: brand.text,
+                                fontFamily: 'var(--font-jetbrains-mono)',
+                            }}
                         >
-                            <CalendarIcon className="h-4 w-4 shrink-0 text-slate-400" />
-                            <span className="truncate text-left text-sm font-medium text-slate-700 dark:text-slate-200">
+                            <CalendarIcon className="h-3.5 w-3.5 shrink-0" style={{ color: brand.primary }} />
+                            <span className="flex-1 truncate text-left">
                                 {range.from && range.to ? (
                                     <>
                                         {format(range.from, 'MMM d, y')} — {format(range.to, 'MMM d, y')}
@@ -83,8 +123,8 @@ export function DashboardStatsFilters({
                                     'Stats range'
                                 )}
                             </span>
-                            <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
-                        </Button>
+                            <ChevronDown className="h-3.5 w-3.5 shrink-0" style={{ color: brand.muted }} />
+                        </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
@@ -99,74 +139,37 @@ export function DashboardStatsFilters({
                     </PopoverContent>
                 </Popover>
 
+                {/* Status filters */}
                 <div className="flex flex-wrap gap-3">
-                    <Select
-                        value={filters.tourStatus ?? 'all'}
-                        onValueChange={(val) => onTourStatus(val === 'all' ? undefined : val)}
-                    >
-                        <SelectTrigger className="h-11 w-full rounded-xl border-slate-200 bg-white/90 shadow-sm dark:border-slate-600 dark:bg-slate-700/80 sm:w-[150px]">
-                            <SelectValue placeholder="Tour status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All tours</SelectItem>
-                            {Object.values(TOUR_STATUS).map((s) => (
-                                <SelectItem key={s} value={s}>
-                                    {s}
+                    {[
+                        { value: filters.tourStatus, onChange: onTourStatus, all: 'All tours', options: TOUR_STATUS, width: '140px', label: 'Tour status' },
+                        { value: filters.employeeStatus, onChange: onEmployeeStatus, all: 'All employees', options: EMPLOYEE_STATUS, width: '152px', label: 'Employee' },
+                        { value: filters.reportStatus, onChange: onReportStatus, all: 'All reports', options: REPORT_STATUS, width: '152px', label: 'Reports', replace: /_/g },
+                        { value: filters.bookingStatus, onChange: onBookingStatus, all: 'All bookings', options: BOOKING_STATUS, width: '152px', label: 'Bookings', replace: /-/g },
+                    ].map(({ value, onChange, all, options, width, replace }) => (
+                        <Select
+                            key={all}
+                            value={value ?? 'all'}
+                            onValueChange={(val) => onChange(val === 'all' ? undefined : val)}
+                        >
+                            <SelectTrigger
+                                className="h-10 w-full rounded-xl text-xs"
+                                style={{ ...selectStyle, width, minWidth: width }}
+                            >
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all" className="text-xs" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
+                                    {all}
                                 </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    <Select
-                        value={filters.employeeStatus ?? 'all'}
-                        onValueChange={(val) => onEmployeeStatus(val === 'all' ? undefined : val)}
-                    >
-                        <SelectTrigger className="h-11 w-full rounded-xl border-slate-200 bg-white/90 shadow-sm dark:border-slate-600 dark:bg-slate-700/80 sm:w-[160px]">
-                            <SelectValue placeholder="Employee" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All employees</SelectItem>
-                            {Object.values(EMPLOYEE_STATUS).map((s) => (
-                                <SelectItem key={s} value={s}>
-                                    {String(s).replace(/_/g, ' ')}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    <Select
-                        value={filters.reportStatus ?? 'all'}
-                        onValueChange={(val) => onReportStatus(val === 'all' ? undefined : val)}
-                    >
-                        <SelectTrigger className="h-11 w-full rounded-xl border-slate-200 bg-white/90 shadow-sm dark:border-slate-600 dark:bg-slate-700/80 sm:w-[160px]">
-                            <SelectValue placeholder="Reports" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All reports</SelectItem>
-                            {Object.values(REPORT_STATUS).map((s) => (
-                                <SelectItem key={s} value={s}>
-                                    {String(s).replace(/_/g, ' ')}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    <Select
-                        value={filters.bookingStatus ?? 'all'}
-                        onValueChange={(val) => onBookingStatus(val === 'all' ? undefined : val)}
-                    >
-                        <SelectTrigger className="h-11 w-full rounded-xl border-slate-200 bg-white/90 shadow-sm dark:border-slate-600 dark:bg-slate-700/80 sm:w-[160px]">
-                            <SelectValue placeholder="Bookings" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All bookings</SelectItem>
-                            {Object.values(BOOKING_STATUS).map((s) => (
-                                <SelectItem key={s} value={s}>
-                                    {String(s).replace(/-/g, ' ')}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                                {Object.values(options).map((s) => (
+                                    <SelectItem key={s} value={s} className="text-xs" style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>
+                                        {replace ? String(s).replace(replace, ' ') : String(s)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    ))}
                 </div>
             </div>
         </div>

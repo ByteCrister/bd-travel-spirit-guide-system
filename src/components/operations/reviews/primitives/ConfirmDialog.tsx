@@ -66,54 +66,48 @@ export default function ConfirmDialog({
                 {open && (
                     <DialogContent
                         className={cn(
-                            "sm:max-w-[480px] overflow-hidden rounded-2xl border shadow-xl",
-                            "bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70",
+                            // Responsive width & neumorphic surface
+                            "w-[calc(100vw-1.5rem)] max-w-[480px] sm:max-w-[480px]",
+                            "rounded-[2rem] border-0 p-0",
+                            "bg-[#E7E5E4] shadow-[8px_8px_16px_#cfcdcb,-8px_-8px_16px_#f9f8f7]",
+                            // Override shadcn’s default overflow
+                            "[&>button]:hidden",
                             className
                         )}
                     >
-                        {/* Accent bar */}
-                        <motion.div
-                            className={cn(
-                                "absolute inset-x-0 top-0 h-1",
-                                isDestructive
-                                    ? "bg-gradient-to-r from-red-500 via-red-400 to-red-500"
-                                    : "bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500"
-                            )}
-                            initial={{ opacity: 0, scaleX: 0.9 }}
-                            animate={{ opacity: 1, scaleX: 1 }}
-                            exit={{ opacity: 0, scaleX: 0.9 }}
-                            transition={{ duration: 0.18 }}
-                        />
-
                         {/* Animated panel content */}
                         <motion.div
                             initial={{ opacity: 0, y: 14, scale: 0.98 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 14, scale: 0.98 }}
                             transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                            className="p-6"
                         >
                             <DialogHeader>
                                 <div className="flex items-start gap-3">
+                                    {/* Neumorphic icon circle */}
                                     <div
                                         className={cn(
-                                            "mt-0.5 flex-shrink-0",
-                                            isDestructive ? "text-red-600" : "text-emerald-600"
+                                            "mt-0.5 flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center",
+                                            "shadow-[inset_2px_2px_4px_#cfcdcb,inset_-2px_-2px_4px_#ffffff]",
+                                            "bg-[#E7E5E4]",
+                                            isDestructive ? "text-[#FF2157]" : "text-[#006666]"
                                         )}
                                         aria-hidden="true"
                                     >
                                         {isDestructive ? (
-                                            <HiExclamationTriangle className="h-6 w-6" />
+                                            <HiExclamationTriangle className="h-5 w-5" />
                                         ) : (
-                                            <HiOutlineCheck className="h-6 w-6" />
+                                            <HiOutlineCheck className="h-5 w-5" />
                                         )}
                                     </div>
 
-                                    <div className="flex-1">
-                                        <DialogTitle className="text-base font-semibold tracking-[-0.01em]">
+                                    <div className="flex-1 min-w-0">
+                                        <DialogTitle className="font-mono text-lg font-bold tracking-tight text-[#1E2938] break-words">
                                             {title}
                                         </DialogTitle>
                                         {description && (
-                                            <DialogDescription className="mt-1 text-sm text-neutral-700">
+                                            <DialogDescription className="mt-1 text-sm text-[#475569] break-words">
                                                 {description}
                                             </DialogDescription>
                                         )}
@@ -122,27 +116,47 @@ export default function ConfirmDialog({
                             </DialogHeader>
 
                             {/* Divider */}
-                            <div className="my-4 h-px bg-neutral-200/80" />
+                            <div className="my-5 h-px bg-[#cfcdcb]" />
 
                             <DialogFooter className="sm:justify-end gap-2">
                                 <Button
                                     type="button"
-                                    variant="outline"
+                                    variant="ghost"
                                     onClick={onCancel}
-                                    className="border-neutral-300 text-neutral-800 hover:bg-neutral-50"
+                                    className={cn(
+                                        "rounded-xl font-mono font-semibold text-[#1E2938]",
+                                        "bg-[#E7E5E4] border-0",
+                                        "shadow-[3px_3px_6px_#cfcdcb,-3px_-3px_6px_#f9f8f7]",
+                                        "hover:shadow-[inset_3px_3px_6px_#cfcdcb,inset_-3px_-3px_6px_#f9f8f7]",
+                                        "hover:bg-[#dfdddb] transition-all",
+                                        "focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2"
+                                    )}
                                 >
                                     {cancelLabel}
                                 </Button>
 
                                 <Button
                                     type="button"
+                                    variant="ghost"
                                     onClick={onConfirm}
-                                    variant={isDestructive ? "destructive" : "default"}
                                     className={cn(
-                                        "font-semibold",
+                                        "rounded-xl font-mono font-semibold border-0",
                                         isDestructive
-                                            ? "shadow-sm focus:ring-2 focus:ring-red-400"
-                                            : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm focus:ring-2 focus:ring-emerald-400"
+                                            ? cn(
+                                                "bg-[#FF2157] text-white",
+                                                "shadow-[3px_3px_6px_#cc1a45,-3px_-3px_6px_#ff527a]",
+                                                "hover:shadow-[inset_3px_3px_6px_#cc1a45,inset_-3px_-3px_6px_#ff527a]",
+                                                "hover:bg-[#e61a4e]",
+                                                "focus-visible:ring-2 focus-visible:ring-[#FF2157] focus-visible:ring-offset-2"
+                                            )
+                                            : cn(
+                                                "bg-[#006666] text-white",
+                                                "shadow-[3px_3px_6px_#004d4d,-3px_-3px_6px_#008080]",
+                                                "hover:shadow-[inset_3px_3px_6px_#004d4d,inset_-3px_-3px_6px_#008080]",
+                                                "hover:bg-[#005555]",
+                                                "focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2"
+                                            ),
+                                        "transition-all"
                                     )}
                                 >
                                     {confirmLabel}

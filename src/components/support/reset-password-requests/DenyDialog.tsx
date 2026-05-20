@@ -2,201 +2,238 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, XCircle, Loader2, ShieldAlert } from "lucide-react";
 
 interface DenyDialogProps {
-    open: boolean;
-    onOpenChange: (v: boolean) => void;
-    onConfirm: (reason: string) => Promise<void>;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onConfirm: (reason: string) => Promise<void>;
 }
 
-export default function DenyDialog({ open, onOpenChange, onConfirm }: DenyDialogProps) {
-    const [reason, setReason] = useState("");
-    const [submitting, setSubmitting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+export default function DenyDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+}: DenyDialogProps) {
+  const [reason, setReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const submit = async () => {
-        if (!reason.trim()) {
-            setError("Please provide a reason for denial");
-            return;
-        }
+  const submit = async () => {
+    if (!reason.trim()) {
+      setError("Please provide a reason for denial");
+      return;
+    }
 
-        setSubmitting(true);
-        setError(null);
+    setSubmitting(true);
+    setError(null);
 
-        try {
-            await onConfirm(reason);
-            setReason("");
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (err) {
-            setError("Failed to deny request. Please try again.");
-        } finally {
-            setSubmitting(false);
-        }
-    };
+    try {
+      await onConfirm(reason);
+      setReason("");
+    } catch {
+      setError("Failed to deny request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-    const handleCancel = () => {
-        if (!submitting) {
-            setReason("");
-            setError(null);
-            onOpenChange(false);
-        }
-    };
+  const handleCancel = () => {
+    if (!submitting) {
+      setReason("");
+      setError(null);
+      onOpenChange(false);
+    }
+  };
 
-    return (
-        <Dialog open={open} onOpenChange={handleCancel}>
-            <DialogContent className="sm:max-w-lg bg-white dark:from-slate-900 dark:via-red-950/10 dark:to-rose-950/10 border-red-200 dark:border-red-900/50">
-                {/* Decorative gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-rose-500/5 pointer-events-none rounded-lg" />
+  return (
+    <Dialog open={open} onOpenChange={handleCancel}>
+      <DialogContent className="sm:max-w-lg p-0 bg-transparent border-none shadow-none">
+        {/* Neumorphic card */}
+        <div className="relative w-full bg-[#E7E5E4] rounded-2xl p-6 [box-shadow:12px_12px_24px_#cac8c7,-12px_-12px_24px_#ffffff]">
+          <DialogHeader className="mb-6">
+            <div className="flex items-start gap-4">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", duration: 0.5 }}
+                className="relative shrink-0"
+              >
+                {/* Neumorphic raised circle for icon */}
+                <div className="w-14 h-14 rounded-full bg-[#E7E5E4] [box-shadow:6px_6px_12px_#cac8c7,-6px_-6px_12px_#ffffff] flex items-center justify-center">
+                  <XCircle
+                    className="w-7 h-7"
+                    style={{ color: "#FF2157" }}
+                    aria-hidden="true"
+                  />
+                </div>
+              </motion.div>
+              <div className="flex-1 space-y-1">
+                <DialogTitle
+                  className="text-2xl font-bold"
+                  style={{ color: "#FF2157" }}
+                >
+                  Deny Request
+                </DialogTitle>
+                <DialogDescription className="text-sm text-[#1E2938]/70">
+                  This action will notify the requester via email with your
+                  reason.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
 
-                <DialogHeader className="relative">
-                    <div className="flex items-start gap-4">
-                        <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring", duration: 0.5 }}
-                            className="relative"
-                        >
-                            <div className="p-3 rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 shadow-xl shadow-red-500/30">
-                                <XCircle className="w-7 h-7 text-white" />
-                            </div>
-                            <div className="absolute inset-0 bg-red-500 rounded-2xl blur-xl opacity-40 animate-pulse" />
-                        </motion.div>
-                        <div className="flex-1 space-y-1">
-                            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-red-600 to-rose-600 dark:from-red-400 dark:to-rose-400 bg-clip-text text-transparent">
-                                Deny Request
-                            </DialogTitle>
-                            <DialogDescription className="text-sm text-slate-600 dark:text-slate-400">
-                                This action will notify the requester via email with your reason
-                            </DialogDescription>
-                        </div>
+          <AnimatePresence mode="wait">
+            {submitting ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="flex flex-col items-center justify-center py-16 gap-4"
+              >
+                <div className="relative">
+                  <Loader2
+                    className="w-12 h-12 animate-spin"
+                    style={{ color: "#FF2157" }}
+                  />
+                  <div
+                    className="absolute inset-0 blur-xl opacity-30 animate-pulse"
+                    style={{ backgroundColor: "#FF2157" }}
+                  />
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="font-semibold text-[#1E2938]">
+                    Processing denial...
+                  </p>
+                  <p className="text-sm text-[#1E2938]/60">
+                    Notifying the requester
+                  </p>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="form"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-6"
+              >
+                {/* Warning Banner – neumorphic raised with amber accent */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="flex items-start gap-3 p-4 rounded-xl bg-[#E7E5E4] [box-shadow:4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] border-l-4"
+                  style={{ borderLeftColor: "#FE9900" }}
+                >
+                  <ShieldAlert
+                    className="w-5 h-5 flex-shrink-0 mt-0.5"
+                    style={{ color: "#FE9900" }}
+                  />
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-semibold text-[#1E2938]">
+                      Important Notice
+                    </p>
+                    <p className="text-xs text-[#1E2938]/70 leading-relaxed">
+                      The requester will receive an email notification with your
+                      denial reason. Please be clear and professional.
+                    </p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="space-y-3"
+                >
+                  <Label
+                    htmlFor="reason"
+                    className="text-sm font-semibold text-[#1E2938] flex items-center gap-2"
+                  >
+                    Reason for denial
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold text-white bg-[#FF2157]">
+                      *
+                    </span>
+                  </Label>
+                  <div className="relative">
+                    <Textarea
+                      id="reason"
+                      placeholder="E.g., Request does not meet security verification requirements..."
+                      value={reason}
+                      onChange={(e) => {
+                        setReason(e.target.value);
+                        setError(null);
+                      }}
+                      rows={5}
+                      className="resize-none block w-full rounded-xl border-none bg-[#E7E5E4] px-4 py-3 text-sm text-[#1E2938] placeholder:text-[#1E2938]/40
+                        [box-shadow:inset_4px_4px_8px_#cac8c7,inset_-4px_-4px_8px_#ffffff]
+                        focus:outline-none focus:[box-shadow:inset_6px_6px_12px_#cac8c7,inset_-6px_-6px_12px_#ffffff]
+                        transition-shadow duration-200"
+                    />
+                    <div className="absolute bottom-3 right-3 text-xs text-[#1E2938]/40">
+                      {reason.length} / 500
                     </div>
-                </DialogHeader>
+                  </div>
+                  <p className="text-xs text-[#1E2938]/50 flex items-center gap-1.5">
+                    <AlertCircle className="w-3 h-3" />
+                    This message will be sent directly to the requester
+                  </p>
+                </motion.div>
 
-                <AnimatePresence mode="wait">
-                    {submitting ? (
-                        <motion.div
-                            key="loading"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="flex flex-col items-center justify-center py-16 gap-4"
-                        >
-                            <div className="relative">
-                                <Loader2 className="w-12 h-12 animate-spin text-red-500" />
-                                <div className="absolute inset-0 blur-xl bg-red-500/30 animate-pulse" />
-                            </div>
-                            <div className="text-center space-y-1">
-                                <p className="font-semibold text-slate-700 dark:text-slate-300">
-                                    Processing denial...
-                                </p>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">
-                                    Notifying the requester
-                                </p>
-                            </div>
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="form"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="space-y-6 py-4 relative"
-                        >
-                            {/* Warning Banner */}
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.1 }}
-                                className="flex items-start gap-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-200 dark:border-amber-900/50 rounded-xl"
-                            >
-                                <ShieldAlert className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
-                                        Important Notice
-                                    </p>
-                                    <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
-                                        The requester will receive an email notification with your denial reason. Please be clear and professional.
-                                    </p>
-                                </div>
-                            </motion.div>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex items-center gap-3 p-4 rounded-xl bg-[#E7E5E4] [box-shadow:4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] border-l-4 border-[#FF2157]">
+                      <AlertCircle
+                        className="w-5 h-5 flex-shrink-0"
+                        style={{ color: "#FF2157" }}
+                      />
+                      <p className="text-sm font-medium text-[#1E2938]">
+                        {error}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
 
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="space-y-3"
-                            >
-                                <Label htmlFor="reason" className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                                    Reason for denial
-                                    <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold">
-                                        *
-                                    </span>
-                                </Label>
-                                <div className="relative">
-                                    <Textarea
-                                        id="reason"
-                                        placeholder="E.g., Request does not meet security verification requirements..."
-                                        value={reason}
-                                        onChange={(e) => {
-                                            setReason(e.target.value);
-                                            setError(null);
-                                        }}
-                                        rows={5}
-                                        className="resize-none bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 focus:border-red-400 dark:focus:border-red-600 focus:ring-red-400/20 rounded-xl transition-all"
-                                    />
-                                    <div className="absolute bottom-3 right-3 text-xs text-slate-400">
-                                        {reason.length} / 500
-                                    </div>
-                                </div>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                                    <AlertCircle className="w-3 h-3" />
-                                    This message will be sent directly to the requester
-                                </p>
-                            </motion.div>
-
-                            {error && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="overflow-hidden"
-                                >
-                                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-950/30 border-2 border-red-200 dark:border-red-900 rounded-xl">
-                                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-                                        <p className="text-sm font-medium text-red-700 dark:text-red-300">
-                                            {error}
-                                        </p>
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            <div className="flex justify-end gap-3 pt-2">
-                                <Button
-                                    variant="outline"
-                                    onClick={handleCancel}
-                                    disabled={submitting}
-                                    className="rounded-xl"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    onClick={submit}
-                                    disabled={!reason.trim() || submitting}
-                                    className="gap-2 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all rounded-xl"
-                                >
-                                    <XCircle className="w-4 h-4" />
-                                    Deny Request
-                                </Button>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </DialogContent>
-        </Dialog>
-    );
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={submitting}
+                    className="h-11 rounded-xl bg-[#F1F2F5] border-none [box-shadow:4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] hover:[box-shadow:2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff] active:[box-shadow:inset_4px_4px_8px_#cac8c7,inset_-4px_-4px_8px_#ffffff] text-[#1E2938] font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={submit}
+                    disabled={!reason.trim() || submitting}
+                    className="h-11 rounded-xl bg-[#FF2157] border-none text-white font-semibold [box-shadow:4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff,0_0_0_1px_rgba(255,33,87,0.2)] hover:[box-shadow:2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff,0_0_0_1px_rgba(255,33,87,0.4)] active:[box-shadow:inset_4px_4px_8px_#cac8c7,inset_-4px_-4px_8px_#ffffff] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none"
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Deny Request
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }

@@ -9,11 +9,20 @@ import {
     Star,
     Users2,
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import type { DashboardStats } from '@/types/dashboard/dashboard.type';
 import { AnimatedNumber } from '@/components/dashboard/shell/AnimatedNumber';
 import { cn } from '@/lib/utils';
 import { TbCurrencyTaka } from 'react-icons/tb';
+
+const brand = {
+    primary: '#006666',
+    surface: '#E7E5E4',
+    text: '#1E2938',
+    muted: '#6B7A8D',
+    shadowOut: '6px 6px 12px #c8c6c4, -6px -6px 12px #ffffff',
+    shadowIn: 'inset 3px 3px 6px #c8c6c4, inset -3px -3px 6px #ffffff',
+    border: 'rgba(0,102,102,0.10)',
+};
 
 const container: Variants = {
     hidden: { opacity: 0 },
@@ -24,8 +33,8 @@ const container: Variants = {
 };
 
 const item: Variants = {
-    hidden: { opacity: 0, y: 16, scale: 0.98 },
-    show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 260, damping: 22 } },
+    hidden: { opacity: 0, y: 14, scale: 0.97 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 280, damping: 24 } },
 };
 
 type StatDef = {
@@ -34,9 +43,8 @@ type StatDef = {
     icon: ElementType;
     format: 'int' | 'money' | 'rating';
     hint?: string;
-    iconBg: string;
-    iconColor: string;
-    accent: string;
+    accentColor: string;
+    accentBg: string;
 };
 
 const STATS: StatDef[] = [
@@ -45,18 +53,16 @@ const STATS: StatDef[] = [
         label: 'Total Tours',
         icon: Briefcase,
         format: 'int',
-        iconBg: 'bg-slate-800/8 dark:bg-slate-200/10',
-        iconColor: 'text-slate-700 dark:text-slate-200',
-        accent: 'from-slate-400 via-slate-300 to-slate-200',
+        accentColor: brand.primary,
+        accentBg: 'rgba(0,102,102,0.1)',
     },
     {
         key: 'totalBookings',
         label: 'Bookings',
         icon: CalendarCheck2,
         format: 'int',
-        iconBg: 'bg-blue-500/10',
-        iconColor: 'text-blue-600 dark:text-blue-400',
-        accent: 'from-blue-500 via-blue-400 to-sky-300',
+        accentColor: '#0088cc',
+        accentBg: 'rgba(0,136,204,0.1)',
     },
     {
         key: 'totalRevenue',
@@ -64,36 +70,32 @@ const STATS: StatDef[] = [
         icon: TbCurrencyTaka,
         format: 'money',
         hint: 'Confirmed payments',
-        iconBg: 'bg-emerald-500/10',
-        iconColor: 'text-emerald-600 dark:text-emerald-400',
-        accent: 'from-emerald-500 via-teal-400 to-cyan-300',
+        accentColor: '#00A63D',
+        accentBg: 'rgba(0,166,61,0.1)',
     },
     {
         key: 'pendingReports',
         label: 'Reports in Review',
         icon: AlertTriangle,
         format: 'int',
-        iconBg: 'bg-amber-500/10',
-        iconColor: 'text-amber-600 dark:text-amber-400',
-        accent: 'from-amber-500 via-amber-400 to-yellow-300',
+        accentColor: '#FE9900',
+        accentBg: 'rgba(254,153,0,0.1)',
     },
     {
         key: 'averageRating',
         label: 'Avg. Rating',
         icon: Star,
         format: 'rating',
-        iconBg: 'bg-violet-500/10',
-        iconColor: 'text-violet-600 dark:text-violet-400',
-        accent: 'from-violet-500 via-purple-400 to-fuchsia-300',
+        accentColor: '#9966cc',
+        accentBg: 'rgba(153,102,204,0.1)',
     },
     {
         key: 'activeEmployees',
         label: 'Active Staff',
         icon: Users2,
         format: 'int',
-        iconBg: 'bg-rose-500/10',
-        iconColor: 'text-rose-600 dark:text-rose-400',
-        accent: 'from-rose-500 via-pink-400 to-rose-300',
+        accentColor: '#FF2157',
+        accentBg: 'rgba(255,33,87,0.1)',
     },
 ];
 
@@ -120,47 +122,54 @@ export function DashboardStatsGrid({ stats, animateKey }: DashboardStatsGridProp
 
                 return (
                     <motion.div key={def.key} variants={item}>
-                        <Card
-                            className={cn(
-                                'group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white via-slate-50/80 to-slate-100/60 p-6 shadow-md shadow-slate-200/50 transition-all duration-200',
-                                'hover:-translate-y-0.5 hover:shadow-xl hover:shadow-slate-200/60',
-                                'dark:border-slate-700/60 dark:from-slate-800 dark:via-slate-800/90 dark:to-slate-900/80 dark:shadow-slate-900/50 dark:hover:shadow-slate-900/70',
-                            )}
+                        <div
+                            className="group relative overflow-hidden rounded-2xl p-5 transition-all duration-200 cursor-default"
+                            style={{
+                                background: brand.surface,
+                                boxShadow: brand.shadowOut,
+                                border: `1px solid ${brand.border}`,
+                            }}
                         >
-                            {/* Glossy top sheen */}
+                            {/* Top accent line in stat's own color */}
                             <div
-                                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/90 to-transparent dark:via-white/10"
-                                aria-hidden
-                            />
-                            {/* Colored top accent line */}
-                            <div
-                                className={cn(
-                                    'pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r opacity-70',
-                                    def.accent,
-                                )}
+                                className="pointer-events-none absolute inset-x-0 top-0 h-[3px]"
+                                style={{ background: def.accentColor }}
                                 aria-hidden
                             />
 
                             <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <p
+                                        className="text-[10px] font-bold uppercase tracking-[0.18em]"
+                                        style={{ color: brand.muted, fontFamily: 'var(--font-space-mono)' }}
+                                    >
                                         {def.label}
                                     </p>
-                                    {def.hint ? (
-                                        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{def.hint}</p>
-                                    ) : null}
-                                </div>
-                                <div
-                                    className={cn(
-                                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ring-black/5 dark:ring-white/10',
-                                        def.iconBg,
+                                    {def.hint && (
+                                        <p
+                                            className="mt-0.5 text-[10px]"
+                                            style={{ color: brand.muted, fontFamily: 'var(--font-jetbrains-mono)' }}
+                                        >
+                                            {def.hint}
+                                        </p>
                                     )}
+                                </div>
+                                {/* Icon badge — neumorphic circle */}
+                                <div
+                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                                    style={{
+                                        background: def.accentBg,
+                                        boxShadow: brand.shadowIn,
+                                    }}
                                 >
-                                    <Icon className={cn('h-5 w-5', def.iconColor)} aria-hidden />
+                                    <Icon className="h-5 w-5" style={{ color: def.accentColor }} aria-hidden />
                                 </div>
                             </div>
 
-                            <div className="mt-5 text-3xl font-black tabular-nums tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl">
+                            <div
+                                className="mt-4 text-[2.25rem] font-bold tabular-nums leading-none tracking-tight"
+                                style={{ color: brand.text, fontFamily: 'var(--font-space-mono)' }}
+                            >
                                 {def.format === 'money' ? (
                                     <AnimatedNumber
                                         value={value}
@@ -181,7 +190,14 @@ export function DashboardStatsGrid({ stats, animateKey }: DashboardStatsGridProp
                                     />
                                 )}
                             </div>
-                        </Card>
+
+                            {/* Subtle bottom bar in accent color */}
+                            <div
+                                className="absolute bottom-0 left-0 h-[2px] w-1/3 rounded-b-sm opacity-40 transition-all duration-300 group-hover:w-full group-hover:opacity-70"
+                                style={{ background: def.accentColor }}
+                                aria-hidden
+                            />
+                        </div>
                     </motion.div>
                 );
             })}

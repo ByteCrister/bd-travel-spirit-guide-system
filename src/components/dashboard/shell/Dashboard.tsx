@@ -20,7 +20,6 @@ import {
     buildBookingsChartData,
     buildRatingDistribution,
 } from '@/components/dashboard/shell/dashboard-shell-utils';
-import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
     Popover,
@@ -28,6 +27,16 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { CalendarIcon, ChevronDown } from 'lucide-react';
+
+const brand = {
+    primary: '#006666',
+    surface: '#E7E5E4',
+    text: '#1E2938',
+    muted: '#6B7A8D',
+    shadowOut: '5px 5px 10px #c8c6c4, -5px -5px 10px #ffffff',
+    shadowIn: 'inset 3px 3px 6px #c8c6c4, inset -3px -3px 6px #ffffff',
+    border: 'rgba(0,102,102,0.10)',
+};
 
 const TAB_TO_RANGE: Record<DashboardTabId, DashboardDateSection> = {
     tours: 'toursDateRange',
@@ -100,36 +109,18 @@ export default function Dashboard() {
     const isTabLoading = useCallback(
         (tab: DashboardTabId) => {
             switch (tab) {
-                case 'tours':
-                    return isLoadingTours;
-                case 'bookings':
-                    return isLoadingBookings;
-                case 'reviews':
-                    return isLoadingReviews;
-                case 'reports':
-                    return isLoadingReports;
-                case 'employees':
-                    return isLoadingEmployees;
-                case 'running':
-                    return isLoadingRunningTours;
-                case 'faqs':
-                    return isLoadingFaqs;
-                case 'refunds':
-                    return isLoadingRefunds;
-                default:
-                    return false;
+                case 'tours': return isLoadingTours;
+                case 'bookings': return isLoadingBookings;
+                case 'reviews': return isLoadingReviews;
+                case 'reports': return isLoadingReports;
+                case 'employees': return isLoadingEmployees;
+                case 'running': return isLoadingRunningTours;
+                case 'faqs': return isLoadingFaqs;
+                case 'refunds': return isLoadingRefunds;
+                default: return false;
             }
         },
-        [
-            isLoadingTours,
-            isLoadingBookings,
-            isLoadingReviews,
-            isLoadingReports,
-            isLoadingEmployees,
-            isLoadingRunningTours,
-            isLoadingFaqs,
-            isLoadingRefunds,
-        ],
+        [isLoadingTours, isLoadingBookings, isLoadingReviews, isLoadingReports, isLoadingEmployees, isLoadingRunningTours, isLoadingFaqs, isLoadingRefunds],
     );
 
     const tables = useMemo(
@@ -146,15 +137,8 @@ export default function Dashboard() {
         [toursData, bookingsData, reviewsData, reportsData, employeesData, runningToursData, faqsData, refundsData],
     );
 
-    const bookingsChartData = useMemo(
-        () => buildBookingsChartData(chartBookings ?? undefined),
-        [chartBookings],
-    );
-
-    const ratingDistribution = useMemo(
-        () => buildRatingDistribution(chartReviews ?? undefined),
-        [chartReviews],
-    );
+    const bookingsChartData = useMemo(() => buildBookingsChartData(chartBookings ?? undefined), [chartBookings]);
+    const ratingDistribution = useMemo(() => buildRatingDistribution(chartReviews ?? undefined), [chartReviews]);
 
     const statsAnimateKey = useMemo(
         () =>
@@ -185,7 +169,7 @@ export default function Dashboard() {
     const showProfileSkeleton = isLoadingProfile && !companyInfo;
 
     return (
-        <div className="space-y-10 pb-16">
+        <div className="space-y-8 pb-16">
             <DashboardPageHeader
                 exportWindow={filters.globalDateRange}
                 onExportWindowChange={(range) => setSectionDateRange('globalDateRange', range)}
@@ -212,7 +196,9 @@ export default function Dashboard() {
                 <DashboardStatsGrid stats={stats ?? undefined} animateKey={statsAnimateKey} />
             )}
 
-            {showStatsSkeleton ? <ChartRowSkeleton /> : <DashboardChartsSection bookingsSeries={bookingsChartData} ratingSlices={ratingDistribution} />}
+            {showStatsSkeleton ? <ChartRowSkeleton /> : (
+                <DashboardChartsSection bookingsSeries={bookingsChartData} ratingSlices={ratingDistribution} />
+            )}
 
             {showProfileSkeleton ? (
                 <ProfileCardsSkeleton />
@@ -229,24 +215,54 @@ export default function Dashboard() {
                 isTabLoading={isTabLoading}
             />
 
-            <div className="rounded-2xl border bg-card/60 p-4 shadow-sm backdrop-blur-sm sm:p-6">
-                <h2 className="mb-4 text-sm font-semibold text-muted-foreground">Transactions feed</h2>
-                <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-xl border bg-muted/15 px-3 py-3">
-                    <p className="text-xs text-muted-foreground">Date range for transaction API (separate from stats)</p>
+            {/* Transactions section */}
+            <div
+                className="rounded-2xl p-4 sm:p-6"
+                style={{
+                    background: brand.surface,
+                    boxShadow: brand.shadowOut,
+                    border: `1px solid ${brand.border}`,
+                }}
+            >
+                <h2
+                    className="mb-4 text-xs font-bold uppercase tracking-[0.18em]"
+                    style={{ color: brand.primary, fontFamily: 'var(--font-space-mono)' }}
+                >
+                    Transactions feed
+                </h2>
+                <div
+                    className="mb-4 flex flex-col gap-2 rounded-xl px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4"
+                    style={{
+                        background: 'rgba(0,102,102,0.04)',
+                        boxShadow: brand.shadowIn,
+                        border: `1px solid ${brand.border}`,
+                    }}
+                >
+                    <p
+                        className="text-[10px]"
+                        style={{ color: brand.muted, fontFamily: 'var(--font-jetbrains-mono)' }}
+                    >
+                        Date range for transaction API (separate from stats)
+                    </p>
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-9 justify-between gap-2 rounded-xl border-dashed"
+                            <button
+                                className="flex h-9 items-center gap-2 rounded-xl px-3 text-xs transition-all"
+                                style={{
+                                    background: brand.surface,
+                                    boxShadow: brand.shadowOut,
+                                    border: `1px solid ${brand.border}`,
+                                    color: brand.text,
+                                    fontFamily: 'var(--font-jetbrains-mono)',
+                                }}
                             >
-                                <CalendarIcon className="h-3.5 w-3.5 opacity-70" />
-                                <span className="text-xs font-medium">
+                                <CalendarIcon className="h-3 w-3" style={{ color: brand.primary }} />
+                                <span className="font-medium">
                                     {format(filters.transactionsDateRange.from, 'MMM d, y')} —{' '}
                                     {format(filters.transactionsDateRange.to, 'MMM d, y')}
                                 </span>
-                                <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                            </Button>
+                                <ChevronDown className="h-3 w-3" style={{ color: brand.muted }} />
+                            </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="end">
                             <Calendar

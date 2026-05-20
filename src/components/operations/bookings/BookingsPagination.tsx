@@ -2,13 +2,45 @@
 
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { PaginationMeta } from '@/types/tour/booking.types';
 import { cn } from '@/lib/utils';
+import { spaceMono, jetbrainsMono } from '@/styles/fonts';
 
 interface BookingsPaginationProps {
     pagination: PaginationMeta;
     onPageChange: (page: number) => void;
+}
+
+// Neumorphic icon nav button
+function NavBtn({
+    onClick,
+    disabled,
+    children,
+}: {
+    onClick: () => void;
+    disabled: boolean;
+    children: React.ReactNode;
+}) {
+    return (
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            className={cn(
+                'h-8 w-8 rounded-lg flex items-center justify-center transition-all duration-150',
+                'bg-[#E7E5E4] text-[#1E2938]/50',
+                disabled
+                    ? 'opacity-30 cursor-not-allowed shadow-none'
+                    : [
+                        'shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_5px_#ffffff]',
+                        'hover:shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff] hover:text-[#006666]',
+                        'active:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                    ].join(' '),
+            )}
+            aria-disabled={disabled}
+        >
+            {children}
+        </button>
+    );
 }
 
 export function BookingsPagination({ pagination, onPageChange }: BookingsPaginationProps) {
@@ -19,7 +51,6 @@ export function BookingsPagination({ pagination, onPageChange }: BookingsPaginat
 
     const getPageNumbers = (): (number | '...')[] => {
         if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
-
         const pages: (number | '...')[] = [1];
         if (page > 3) pages.push('...');
         for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
@@ -38,45 +69,59 @@ export function BookingsPagination({ pagination, onPageChange }: BookingsPaginat
             animate={{ opacity: 1 }}
             className="flex items-center justify-between gap-4 flex-wrap"
         >
-            <p className="text-xs text-slate-500">
-                Showing <span className="text-slate-700 font-medium">{from}–{to}</span>{' '}
-                of <span className="text-slate-700 font-medium">{total}</span> bookings
+            {/* Count label */}
+            <p
+                className="text-[11px] text-[#1E2938]/45"
+                style={jetbrainsMono.style}
+            >
+                Showing{' '}
+                <span className="text-[#1E2938]/70 font-semibold">{from}–{to}</span>{' '}
+                of{' '}
+                <span className="text-[#1E2938]/70 font-semibold">{total}</span>{' '}
+                bookings
             </p>
 
-            <div className="flex items-center gap-1">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={!hasPrevPage}
-                    onClick={() => onPageChange(1)}
-                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30"
-                >
-                    <ChevronsLeft size={14} />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={!hasPrevPage}
-                    onClick={() => onPageChange(page - 1)}
-                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30"
-                >
-                    <ChevronLeft size={14} />
-                </Button>
+            {/* Page controls */}
+            <div className="flex items-center gap-1.5" style={spaceMono.style}>
+                <NavBtn disabled={!hasPrevPage} onClick={() => onPageChange(1)}>
+                    <ChevronsLeft size={13} />
+                </NavBtn>
+                <NavBtn disabled={!hasPrevPage} onClick={() => onPageChange(page - 1)}>
+                    <ChevronLeft size={13} />
+                </NavBtn>
 
                 <div className="flex items-center gap-1 mx-1">
                     {pages.map((p, idx) =>
                         p === '...' ? (
-                            <span key={`ellipsis-${idx}`} className="text-slate-400 px-1 text-sm">…</span>
+                            <span
+                                key={`ellipsis-${idx}`}
+                                className="text-[#1E2938]/35 px-1 text-xs"
+                                style={jetbrainsMono.style}
+                            >
+                                …
+                            </span>
                         ) : (
                             <button
                                 key={p}
                                 onClick={() => onPageChange(p as number)}
                                 className={cn(
-                                    'h-8 min-w-[32px] px-2.5 rounded-lg text-xs font-medium transition-all duration-150',
+                                    'h-8 min-w-[32px] px-2.5 rounded-lg text-[11px] font-medium transition-all duration-150',
                                     p === page
-                                        ? 'bg-indigo-600 text-white shadow-sm'
-                                        : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                                        // Active page: pressed inset with teal accent
+                                        ? [
+                                            'bg-[#E7E5E4] text-[#006666]',
+                                            'shadow-[inset_3px_3px_6px_#c0bebb,inset_-2px_-2px_5px_#ffffff]',
+                                            'ring-1 ring-[#006666]/20',
+                                        ].join(' ')
+                                        // Inactive: raised
+                                        : [
+                                            'bg-[#E7E5E4] text-[#1E2938]/50',
+                                            'shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_5px_#ffffff]',
+                                            'hover:text-[#006666] hover:shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff]',
+                                            'active:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                        ].join(' '),
                                 )}
+                                style={jetbrainsMono.style}
                             >
                                 {p}
                             </button>
@@ -84,24 +129,12 @@ export function BookingsPagination({ pagination, onPageChange }: BookingsPaginat
                     )}
                 </div>
 
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={!hasNextPage}
-                    onClick={() => onPageChange(page + 1)}
-                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30"
-                >
-                    <ChevronRight size={14} />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={!hasNextPage}
-                    onClick={() => onPageChange(totalPages)}
-                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30"
-                >
-                    <ChevronsRight size={14} />
-                </Button>
+                <NavBtn disabled={!hasNextPage} onClick={() => onPageChange(page + 1)}>
+                    <ChevronRight size={13} />
+                </NavBtn>
+                <NavBtn disabled={!hasNextPage} onClick={() => onPageChange(totalPages)}>
+                    <ChevronsRight size={13} />
+                </NavBtn>
             </div>
         </motion.div>
     );

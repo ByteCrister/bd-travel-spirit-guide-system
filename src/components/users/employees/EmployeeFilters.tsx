@@ -5,9 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Field } from "./primitives/Field";
 import { Skeleton } from "./primitives/Skeleton";
 
-import {
-    EmployeesQuery,
-} from "@/types/employee/employee.types";
+import { EmployeesQuery } from "@/types/employee/employee.types";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,14 +20,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 
 import {
     EMPLOYEE_ROLE,
@@ -89,9 +79,9 @@ const PAYMENT_STATUS_LABELS: Record<PayrollStatus, string> = {
 };
 
 const PAYMENT_STATUS_ICONS: Record<PayrollStatus, React.ReactNode> = {
-    pending: <Clock className="h-4 w-4" />,
-    paid: <CheckCircle className="h-4 w-4" />,
-    failed: <XCircle className="h-4 w-4" />,
+    pending: <Clock className="h-3 w-3" />,
+    paid: <CheckCircle className="h-3 w-3" />,
+    failed: <XCircle className="h-3 w-3" />,
 };
 
 const PAYMENT_STATUS_VARIANTS: Record<PayrollStatus, "default" | "secondary" | "destructive" | "outline"> = {
@@ -107,6 +97,13 @@ const STATUS_VARIANTS: Record<EmployeeStatus, "default" | "secondary" | "destruc
     terminated: "outline",
 };
 
+// ── Shared neumorphism class strings ──────────────────────────────────────────
+const NEU_SURFACE = "bg-[#E7E5E4] shadow-[6px_6px_12px_#c9c7c5,-6px_-6px_12px_#ffffff]";
+const NEU_INSET = "bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c9c7c5,inset_-3px_-3px_7px_#ffffff]";
+const NEU_BTN = "bg-[#E7E5E4] shadow-[4px_4px_8px_#c9c7c5,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_10px_#c9c7c5,-6px_-6px_10px_#ffffff] active:shadow-[inset_2px_2px_5px_#c9c7c5,inset_-2px_-2px_5px_#ffffff] transition-all duration-150 border-0";
+const MONO = "font-[family-name:var(--font-space-mono,'Space_Mono',monospace)]";
+const JETBRAINS = "font-[family-name:var(--font-jetbrains-mono,'JetBrains_Mono',monospace)]";
+
 export function EmployeeFilters({
     query,
     onChange,
@@ -121,12 +118,12 @@ export function EmployeeFilters({
     const [enums, setEnums] = useState<EnumsShape | null>(null);
     const [isExpanded, setIsExpanded] = useState(true);
     const [searchValue, setSearchValue] = useState(query.filters?.search ?? "");
-    // Create debounced function to update filters with search value
+
     const debouncedUpdateSearch = useDebouncedCallback(
         (searchTerm: string) => {
             setFilters({ search: searchTerm || undefined });
         },
-        1000 // 1000ms delay
+        1000
     );
 
     useEffect(() => {
@@ -156,10 +153,7 @@ export function EmployeeFilters({
         };
     }, [fetchEnums]);
 
-    const filters = useMemo(
-        () => query.filters ?? {},
-        [query.filters]
-    );
+    const filters = useMemo(() => query.filters ?? {}, [query.filters]);
 
     const setFilters = useCallback(
         (patch: Partial<NonNullable<EmployeesQuery["filters"]>>) => {
@@ -173,7 +167,6 @@ export function EmployeeFilters({
     );
 
     const clearFilters = () => {
-        // Cancel any pending debounced calls
         debouncedUpdateSearch.cancel?.();
         setSearchValue("");
         onChange({ ...query, page: 1, filters: {} });
@@ -181,7 +174,7 @@ export function EmployeeFilters({
 
     const activeFilterCount = useMemo(() => {
         return Object.values(filters).filter(
-            (v) => v !== undefined && v !== "" && (Array.isArray(v) ? v.length > 0 : true),
+            (v) => v !== undefined && v !== "" && (Array.isArray(v) ? v.length > 0 : true)
         ).length;
     }, [filters]);
 
@@ -229,7 +222,6 @@ export function EmployeeFilters({
                 key: `search:${filters.search}`,
                 label: `"${filters.search}"`,
                 onRemove: () => {
-                    // Cancel pending debounced calls
                     debouncedUpdateSearch.cancel?.();
                     setSearchValue("");
                     setFilters({ search: undefined });
@@ -249,7 +241,6 @@ export function EmployeeFilters({
         return chips;
     }, [debouncedUpdateSearch, filters.employmentTypes, filters.includeDeleted, filters.paymentStatuses, filters.search, filters.statuses, setFilters]);
 
-    // Handle search input change
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearchValue(value);
@@ -258,163 +249,155 @@ export function EmployeeFilters({
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative"
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         >
-            {/* Ambient glow effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 rounded-3xl blur-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-            <Card className="relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-background via-background/95 to-background/90 shadow-xl shadow-black/5 backdrop-blur-xl transition-all duration-300 hover:border-border/60 hover:shadow-2xl">
-                {/* Decorative gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-transparent pointer-events-none" />
-
-                <CardHeader className="relative space-y-5 pb-6 pt-7 px-7">
-                    <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-4 flex-1 min-w-0">
-                            <motion.div
-                                className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 shadow-lg shadow-primary/20"
-                                whileHover={{ scale: 1.05, rotate: 5 }}
-                                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                            >
-                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                                <Filter className="relative h-5 w-5 text-primary" aria-hidden="true" />
-                            </motion.div>
-
-                            <div className="space-y-2 flex-1 min-w-0">
-                                <div className="flex items-center gap-3 flex-wrap">
-                                    <CardTitle className="text-xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text">
-                                        Filter Employees
-                                    </CardTitle>
-                                    {hasActiveFilters && (
-                                        <motion.div
-                                            initial={{ scale: 0.8, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                                        >
-                                            <Badge
-                                                variant="secondary"
-                                                className="h-6 px-2.5 text-xs font-semibold shadow-sm bg-primary/15 text-primary border-primary/20"
-                                            >
-                                                <Sparkles className="h-3 w-3 mr-1" />
-                                                {activeFilterCount}
-                                            </Badge>
-                                        </motion.div>
-                                    )}
-                                </div>
-                                <CardDescription className="text-sm text-muted-foreground/80 font-medium">
-                                    {hasActiveFilters
-                                        ? `${activeFilterCount} active ${activeFilterCount === 1 ? "filter" : "filters"} applied`
-                                        : "Refine and narrow down your employee search"}
-                                </CardDescription>
-                            </div>
+            <div className={`rounded-2xl ${NEU_SURFACE}`}>
+                {/* ── Header ──────────────────────────────────────────────── */}
+                <div className="flex items-start justify-between gap-4 p-5">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                        {/* Icon chip — inset */}
+                        <div
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${NEU_INSET} text-[#006666]`}
+                            aria-hidden="true"
+                        >
+                            <Filter className="h-4 w-4" />
                         </div>
 
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setIsExpanded((v) => !v)}
-                            className="h-10 w-10 shrink-0 rounded-2xl transition-all duration-300 hover:bg-accent/50 hover:scale-105"
-                            aria-expanded={isExpanded}
-                            aria-label={isExpanded ? "Collapse filters" : "Expand filters"}
-                        >
-                            <motion.div
-                                animate={{ rotate: isExpanded ? 180 : 0 }}
-                                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                            >
-                                <ChevronDown className="h-5 w-5" aria-hidden="true" />
-                            </motion.div>
-                        </Button>
+                        <div className="space-y-1 flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <h2 className={`text-sm font-bold uppercase tracking-widest text-[#1E2938] ${MONO}`}>
+                                    Filter Employees
+                                </h2>
+                                {hasActiveFilters && (
+                                    <motion.span
+                                        initial={{ scale: 0.8, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-bold ${MONO} ${NEU_INSET} text-[#006666]`}
+                                    >
+                                        <Sparkles className="h-2.5 w-2.5" />
+                                        {activeFilterCount}
+                                    </motion.span>
+                                )}
+                            </div>
+                            <p className={`text-[11px] text-[#1E2938]/40 ${JETBRAINS}`}>
+                                {hasActiveFilters
+                                    ? `${activeFilterCount} active ${activeFilterCount === 1 ? "filter" : "filters"} applied`
+                                    : "Refine and narrow down your employee search"}
+                            </p>
+                        </div>
                     </div>
 
-                    <AnimatePresence mode="wait">
-                        {hasActiveFilters && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                                className="overflow-hidden"
-                            >
-                                <div className="flex flex-wrap items-center gap-2 pt-1">
-                                    {filterChips.map((chip, idx) => (
-                                        <motion.div
-                                            key={chip.key}
-                                            initial={{ scale: 0.85, opacity: 0, y: -10 }}
-                                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                                            exit={{ scale: 0.85, opacity: 0, y: -10 }}
-                                            transition={{
-                                                delay: idx * 0.04,
-                                                duration: 0.25,
-                                                ease: [0.4, 0, 0.2, 1]
-                                            }}
-                                        >
-                                            <Badge
-                                                variant={chip.variant ?? "secondary"}
-                                                className="h-8 gap-2 rounded-full pl-3.5 pr-2 text-xs font-medium shadow-sm backdrop-blur-sm transition-all hover:shadow-md hover:scale-105"
-                                            >
-                                                {chip.key.startsWith('payment:') && (
-                                                    <span className="flex items-center">
-                                                        {PAYMENT_STATUS_ICONS[chip.key.split(':')[1] as PayrollStatus]}
-                                                    </span>
-                                                )}
-                                                {chip.label}
-                                                <button
-                                                    type="button"
-                                                    className="ml-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-background/60 hover:bg-background transition-colors"
-                                                    aria-label={`Remove ${chip.label} filter`}
-                                                    onClick={chip.onRemove}
-                                                >
-                                                    <X className="h-3 w-3" aria-hidden="true" />
-                                                </button>
-                                            </Badge>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </CardHeader>
+                    {/* Collapse toggle */}
+                    <button
+                        type="button"
+                        onClick={() => setIsExpanded((v) => !v)}
+                        className={`h-9 w-9 shrink-0 flex items-center justify-center rounded-xl ${NEU_BTN} text-[#1E2938]/50 hover:text-[#006666] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/30`}
+                        aria-expanded={isExpanded}
+                        aria-label={isExpanded ? "Collapse filters" : "Expand filters"}
+                    >
+                        <motion.div
+                            animate={{ rotate: isExpanded ? 180 : 0 }}
+                            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                        >
+                            <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                    </button>
+                </div>
 
+                {/* ── Active filter chips ──────────────────────────────────── */}
+                <AnimatePresence>
+                    {hasActiveFilters && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                            className="overflow-hidden"
+                        >
+                            <div className="flex flex-wrap gap-2 px-5 pb-4">
+                                {filterChips.map((chip, idx) => (
+                                    <motion.div
+                                        key={chip.key}
+                                        initial={{ scale: 0.85, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        exit={{ scale: 0.85, opacity: 0 }}
+                                        transition={{ delay: idx * 0.04, duration: 0.2 }}
+                                    >
+                                        <span
+                                            className={[
+                                                "inline-flex items-center gap-1.5 rounded-lg pl-2.5 pr-1.5 py-1",
+                                                NEU_INSET,
+                                                `text-[11px] font-semibold ${MONO} text-[#006666]`,
+                                            ].join(" ")}
+                                        >
+                                            {chip.key.startsWith("payment:") && (
+                                                <span>{PAYMENT_STATUS_ICONS[chip.key.split(":")[1] as PayrollStatus]}</span>
+                                            )}
+                                            {chip.label}
+                                            <button
+                                                type="button"
+                                                className={`ml-0.5 inline-flex h-4 w-4 items-center justify-center rounded-md ${NEU_BTN} text-[#1E2938]/40 hover:text-[#FF2157]`}
+                                                aria-label={`Remove ${chip.label} filter`}
+                                                onClick={chip.onRemove}
+                                            >
+                                                <X className="h-2.5 w-2.5" />
+                                            </button>
+                                        </span>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Divider */}
+                <div className="mx-5 h-px bg-gradient-to-r from-transparent via-[#c9c7c5] to-transparent" />
+
+                {/* ── Expandable body ──────────────────────────────────────── */}
                 <AnimatePresence initial={false}>
                     {isExpanded && (
                         <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                            className="overflow-hidden"
                         >
-                            <div className="mx-7 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
-
-                            <CardContent className="relative space-y-8 pt-8 pb-7 px-7">
-                                {/* Search field with enhanced styling */}
+                            <div className="space-y-6 p-5">
+                                {/* Search */}
                                 <Field label="Quick Search" hint="Search by name, email, phone, or department">
-                                    <div className="relative group">
-                                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/10 to-primary/5 opacity-0 blur-xl transition-opacity duration-300 group-focus-within:opacity-100" />
+                                    <div className="relative">
                                         <Search
-                                            className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground/60 transition-all duration-300 group-focus-within:text-primary group-focus-within:scale-110"
+                                            className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#1E2938]/30"
                                             aria-hidden="true"
                                         />
                                         {loading ? (
-                                            <Skeleton className="h-12 w-full rounded-2xl" />
+                                            <Skeleton className="h-10 w-full rounded-xl" />
                                         ) : (
                                             <Input
                                                 placeholder="Start typing to search..."
                                                 value={searchValue}
                                                 onChange={handleSearchChange}
-                                                className="relative h-12 rounded-2xl border border-border/40 bg-background/80 pl-12 pr-4 text-sm font-medium shadow-sm backdrop-blur-sm transition-all duration-300 placeholder:text-muted-foreground/50 hover:border-border/60 hover:shadow-md focus-visible:border-primary/50 focus-visible:ring-4 focus-visible:ring-primary/10"
+                                                className={[
+                                                    "h-10 rounded-xl pl-10 pr-4",
+                                                    NEU_INSET,
+                                                    "border-0 text-sm text-[#1E2938]",
+                                                    `${JETBRAINS}`,
+                                                    "placeholder:text-[#1E2938]/30",
+                                                    "focus-visible:ring-2 focus-visible:ring-[#006666]/20 focus-visible:ring-offset-0",
+                                                ].join(" ")}
                                                 aria-label="Search employees"
                                             />
                                         )}
                                     </div>
                                 </Field>
 
-                                <div className="h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+                                <div className="h-px bg-gradient-to-r from-transparent via-[#c9c7c5]/60 to-transparent" />
 
-                                {/* Filter grid with improved spacing */}
-                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-
+                                {/* Filter grid */}
+                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                     <ShadcnFilterSelect
                                         label="Employment Status"
                                         icon={<Activity className="h-4 w-4" aria-hidden="true" />}
@@ -471,19 +454,22 @@ export function EmployeeFilters({
                                     />
                                 </div>
 
-                                {/* Enhanced deleted records toggle */}
+                                {/* Deleted records toggle */}
                                 <Field label="Advanced Options" hint="Additional filtering preferences">
-                                    <motion.div
-                                        className="group relative flex h-12 items-center justify-between rounded-2xl border border-border/40 bg-background/80 px-4 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-border/60 hover:shadow-md"
-                                        whileHover={{ scale: 1.01 }}
-                                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                    <div
+                                        className={[
+                                            "flex h-11 items-center justify-between rounded-xl px-4",
+                                            NEU_INSET,
+                                        ].join(" ")}
                                     >
                                         <Label
                                             htmlFor="include-deleted"
-                                            className="flex cursor-pointer items-center gap-2.5 text-sm font-semibold"
+                                            className={`flex cursor-pointer items-center gap-2.5 text-[12px] font-semibold text-[#1E2938] ${MONO}`}
                                         >
-                                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-destructive/10 text-destructive transition-colors group-hover:bg-destructive/15">
-                                                <Trash2 className="h-4 w-4" aria-hidden="true" />
+                                            <div
+                                                className={`flex h-7 w-7 items-center justify-center rounded-lg ${NEU_BTN} text-[#FF2157]`}
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
                                             </div>
                                             Include Deleted Records
                                         </Label>
@@ -497,55 +483,63 @@ export function EmployeeFilters({
                                             aria-checked={!!filters.includeDeleted}
                                             aria-label="Include deleted employees"
                                         />
-                                    </motion.div>
+                                    </div>
                                 </Field>
 
-                                <div className="h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
+                                <div className="h-px bg-gradient-to-r from-transparent via-[#c9c7c5]/60 to-transparent" />
 
-                                {/* Footer with status and clear button */}
-                                <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                {/* Footer */}
+                                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div className="flex items-center gap-3">
                                         {hasActiveFilters ? (
                                             <motion.div
-                                                className="flex items-center gap-3"
-                                                initial={{ opacity: 0, x: -10 }}
+                                                className="flex items-center gap-2"
+                                                initial={{ opacity: 0, x: -8 }}
                                                 animate={{ opacity: 1, x: 0 }}
                                             >
-                                                <div className="relative flex h-2.5 w-2.5">
-                                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                                                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
-                                                </div>
-                                                <p className="text-sm font-semibold text-foreground">
+                                                <span className="relative flex h-2 w-2">
+                                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#006666] opacity-60" />
+                                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#006666]" />
+                                                </span>
+                                                <p className={`text-[12px] font-semibold text-[#1E2938] ${MONO}`}>
                                                     {activeFilterCount} {activeFilterCount === 1 ? "filter" : "filters"} active
                                                 </p>
                                             </motion.div>
                                         ) : (
-                                            <p className="text-sm font-medium text-muted-foreground/70">No active filters</p>
+                                            <p className={`text-[11px] text-[#1E2938]/30 ${MONO}`}>No active filters</p>
                                         )}
                                         {loading && (
-                                            <Badge variant="secondary" className="h-7 gap-2 px-3 text-xs font-semibold shadow-sm">
-                                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                            <span
+                                                className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-semibold ${MONO} ${NEU_INSET} text-[#1E2938]/50`}
+                                            >
+                                                <Loader2 className="h-3 w-3 animate-spin" />
                                                 Loading
-                                            </Badge>
+                                            </span>
                                         )}
                                     </div>
 
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
+                                    <button
+                                        type="button"
                                         onClick={clearFilters}
                                         disabled={!hasActiveFilters || loading}
-                                        className="h-10 gap-2.5 rounded-xl border-border/40 px-5 text-sm font-semibold shadow-sm transition-all duration-300 hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive hover:shadow-md disabled:opacity-40"
+                                        className={[
+                                            "inline-flex items-center gap-2 rounded-xl px-4 py-2",
+                                            NEU_BTN,
+                                            `text-[12px] font-semibold ${MONO}`,
+                                            "text-[#1E2938]/60 hover:text-[#FF2157]",
+                                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/30",
+                                            "disabled:opacity-30 disabled:cursor-not-allowed",
+                                        ].join(" ")}
                                     >
-                                        <X className="h-4 w-4" aria-hidden="true" />
-                                        Clear All Filters
-                                    </Button>
+                                        <X className="h-3.5 w-3.5" />
+                                        Clear All
+                                    </button>
                                 </div>
-                            </CardContent>
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </Card>
+            </div>
         </motion.div>
     );
 }
@@ -572,23 +566,45 @@ function ShadcnFilterSelect({
     return (
         <Field label={label}>
             {loading ? (
-                <Skeleton className="h-11 w-full rounded-2xl" />
+                <Skeleton className="h-10 w-full rounded-xl" />
             ) : (
                 <Select
                     value={value || "__all__"}
                     onValueChange={(v) => onValueChange(v === "__all__" ? "" : v)}
                     disabled={disabled}
                 >
-                    <SelectTrigger className="h-11 gap-2.5 rounded-2xl border border-border/40 bg-background/80 px-4 text-sm font-medium shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-border/60 hover:shadow-md focus:border-primary/50 focus:ring-4 focus:ring-primary/10">
-                        {icon && <span className="text-muted-foreground/70 transition-colors group-hover:text-foreground">{icon}</span>}
+                    <SelectTrigger
+                        className={[
+                            "h-10 gap-2 rounded-xl px-3",
+                            NEU_INSET,
+                            "border-0 text-sm text-[#1E2938]",
+                            `font-[family-name:var(--font-jetbrains-mono,'JetBrains_Mono',monospace)]`,
+                            "focus:ring-2 focus:ring-[#006666]/20 focus:ring-offset-0",
+                            "data-[placeholder]:text-[#1E2938]/30",
+                        ].join(" ")}
+                    >
+                        {icon && <span className="text-[#1E2938]/30">{icon}</span>}
                         <SelectValue placeholder={placeholder || `Select ${label.toLowerCase()}`} />
                     </SelectTrigger>
-                    <SelectContent className="max-h-[320px] rounded-2xl border border-border/40 bg-background/95 backdrop-blur-xl">
-                        <SelectItem value="__all__" className="rounded-xl text-sm font-medium">
-                            <span className="text-muted-foreground">All {label}</span>
+                    <SelectContent
+                        className={[
+                            "rounded-xl border-0",
+                            "bg-[#E7E5E4]",
+                            "shadow-[8px_8px_20px_#c9c7c5,-8px_-8px_20px_#ffffff]",
+                        ].join(" ")}
+                    >
+                        <SelectItem
+                            value="__all__"
+                            className={`rounded-lg text-[12px] font-medium ${JETBRAINS} text-[#1E2938]/40 focus:bg-[#006666]/10`}
+                        >
+                            All {label}
                         </SelectItem>
                         {options.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value} className="rounded-xl text-sm font-medium">
+                            <SelectItem
+                                key={opt.value}
+                                value={opt.value}
+                                className={`rounded-lg text-[12px] font-medium ${JETBRAINS} text-[#1E2938] focus:bg-[#006666]/10`}
+                            >
                                 {opt.label}
                             </SelectItem>
                         ))}
