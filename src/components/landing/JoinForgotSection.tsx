@@ -102,7 +102,7 @@ export default function JoinForgotSection() {
                 redirect: true,
                 email: join.email,
                 password: join.password,
-                callbackUrl: "/dashboard/overview",
+                callbackUrl: "/dashboard",
             });
 
         } catch (error: unknown) {
@@ -119,7 +119,7 @@ export default function JoinForgotSection() {
         try {
             const res = await signIn("google", {
                 redirect: false,
-                callbackUrl: "/dashboard/overview"
+                callbackUrl: "/dashboard"
             });
 
             if (res?.error) {
@@ -127,7 +127,7 @@ export default function JoinForgotSection() {
             } else {
                 showToast.success("Login successful", "Redirecting to dashboard...");
                 // Redirect after successful login
-                window.location.href = res?.url || "/dashboard/overview";
+                window.location.href = res?.url || "/dashboard";
             }
         } catch {
             showToast.error("Google Login Error", "Failed to sign in with Google. Please try again.");

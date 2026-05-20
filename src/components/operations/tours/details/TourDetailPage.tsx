@@ -16,12 +16,14 @@ import TourCoreDetails from "./TourCoreDetails";
 import { useTourDetailStore } from "@/store/tour-detail.store";
 import { encodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { Breadcrumbs } from "@/components/global/Breadcrumbs";
+import { LuCalendar } from "react-icons/lu";
+import TourBookingsPanel from "./TourBookingsPanel";
 
 interface TourDetailProps {
     tourId: string;
 }
 
-type TabValue = "details" | "reviews" | "reports" | "faqs";
+type TabValue = "details" | "reviews" | "reports" | "faqs" | "bookings";
 
 interface Tab {
     value: TabValue;
@@ -32,6 +34,7 @@ interface Tab {
 
 const tabs: Tab[] = [
     { value: "details", label: "Details", icon: LayoutDashboard, description: "Core tour information" },
+    { value: "bookings", label: "Bookings", icon: LuCalendar, description: "Manage bookings" },
     { value: "reviews", label: "Reviews", icon: MessageSquare, description: "Guest feedback" },
     { value: "reports", label: "Reports", icon: Flag, description: "Analytics & reports" },
     { value: "faqs", label: "FAQs", icon: HelpCircle, description: "Common questions" },
@@ -82,11 +85,11 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
             <div className="relative">
                 {/* Subtle glow effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-xl opacity-60" />
-                
+
                 <div className="relative bg-gradient-to-br from-background via-card to-background border border-border/40 rounded-2xl shadow-2xl shadow-black/5 p-1.5">
                     {/* Glass morphism overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none" />
-                    
+
                     <div className="relative flex flex-wrap gap-1 p-1">
                         {tabs.map((tab, index) => {
                             const Icon = tab.icon;
@@ -102,7 +105,7 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                                     className="relative flex-1 group min-w-[100px] max-w-[200px]"
                                     initial={{ opacity: 0, y: -15 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ 
+                                    transition={{
                                         delay: index * 0.06,
                                         type: "spring",
                                         stiffness: 300,
@@ -116,10 +119,10 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                                         <motion.div
                                             layoutId="activeTab"
                                             className="absolute inset-0 bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 rounded-xl border border-primary/20 shadow-lg shadow-primary/10"
-                                            transition={{ 
-                                                type: "spring", 
-                                                stiffness: 380, 
-                                                damping: 30 
+                                            transition={{
+                                                type: "spring",
+                                                stiffness: 380,
+                                                damping: 30
                                             }}
                                         />
                                     )}
@@ -147,26 +150,24 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                                                 />
                                             )}
                                             <Icon
-                                                className={`h-5 w-5 transition-all duration-200 relative z-10 ${
-                                                    isActive 
-                                                        ? "text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.3)]" 
+                                                className={`h-5 w-5 transition-all duration-200 relative z-10 ${isActive
+                                                        ? "text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.3)]"
                                                         : isHovered
-                                                        ? "text-foreground/90"
-                                                        : "text-muted-foreground"
-                                                }`}
+                                                            ? "text-foreground/90"
+                                                            : "text-muted-foreground"
+                                                    }`}
                                                 strokeWidth={isActive ? 2.5 : 2}
                                             />
                                         </div>
 
                                         {/* Label */}
-                                        <span 
-                                            className={`text-sm font-semibold transition-all duration-200 ${
-                                                isActive 
-                                                    ? "text-foreground" 
-                                                    : isHovered 
-                                                    ? "text-foreground/90"
-                                                    : "text-muted-foreground"
-                                            }`}
+                                        <span
+                                            className={`text-sm font-semibold transition-all duration-200 ${isActive
+                                                    ? "text-foreground"
+                                                    : isHovered
+                                                        ? "text-foreground/90"
+                                                        : "text-muted-foreground"
+                                                }`}
                                         >
                                             {tab.label}
                                         </span>
@@ -191,10 +192,10 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                                             <motion.div
                                                 layoutId="activeIndicator"
                                                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full"
-                                                transition={{ 
-                                                    type: "spring", 
-                                                    stiffness: 380, 
-                                                    damping: 30 
+                                                transition={{
+                                                    type: "spring",
+                                                    stiffness: 380,
+                                                    damping: 30
                                                 }}
                                             />
                                         )}
@@ -206,7 +207,7 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                                             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
                                             initial={{ x: "-100%" }}
                                             animate={{ x: "100%" }}
-                                            transition={{ 
+                                            transition={{
                                                 duration: 0.6,
                                                 ease: "easeInOut"
                                             }}
@@ -235,6 +236,7 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                             {activeTab === "reviews" && <ReviewsPanel tourId={tourId} />}
                             {activeTab === "reports" && <ReportsPanel tourId={tourId} />}
                             {activeTab === "faqs" && <TourFaqs tourId={tourId} />}
+                            {activeTab === "bookings" && <TourBookingsPanel tourId={tourId} />}
                         </div>
                     </div>
                 </motion.div>

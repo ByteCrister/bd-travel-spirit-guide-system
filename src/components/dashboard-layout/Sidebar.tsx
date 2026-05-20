@@ -11,10 +11,10 @@ import {
   FiGift,
   FiMenu,
   FiX,
-  FiChevronRight
+  FiChevronRight,
+  FiBookOpen,
 } from "react-icons/fi";
 import { FaComments } from "react-icons/fa";
-import { RiDashboardLine } from "react-icons/ri"
 import { NavLink } from "./NavLink";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -49,7 +49,6 @@ const navigationGroups: NavGroup[] = [
     icon: FiHome,
     items: [
       { href: "/dashboard", label: "Dashboard", icon: FiHome },
-      { href: "/dashboard/overview", label: "Company Overview", icon: RiDashboardLine, adminOnly: true },
       { href: "/dashboard/profile", label: "Profile", icon: User },
     ],
   },
@@ -58,6 +57,7 @@ const navigationGroups: NavGroup[] = [
     icon: FiFileText,
     items: [
       { href: "/operations/tours", label: "Tours", icon: FiFileText },
+      { href: "/operations/bookings", label: "Bookings", icon: FiBookOpen },
       { href: "/operations/reports", label: "Reports", icon: FiFileText },
       { href: "/operations/reviews", label: "Reviews", icon: FaComments },
     ],

@@ -14,6 +14,4 @@ export enum BOOKING_PAYMENT_STATUS {
   FAILED = 'failed',
   REFUNDED = 'refunded',
 }
-
-
 export type BookingPaymentStatus = `${BOOKING_PAYMENT_STATUS}`;

@@ -22,9 +22,14 @@ import api from "@/utils/axios/axios";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import { TOUR_STATUS } from "@/constants/tour/tour.const";
 import { ApiResponse } from "@/types/common/api.types";
+import {
+  BookingListItemDTO,
+  TourBookingFilterParams,
+  TourBookingsResponseDTO,
+} from "@/types/tour/tour-detail-booking.types";
 
-// const URL_AFTER_API = "/mock/operations/tours";
-const URL_AFTER_API = "/operations/tours/v1";
+const URL_AFTER_API = "/mock/operations/tours";
+// const URL_AFTER_API = "/operations/tours/v1";
 
 // --------------------
 // Types
@@ -79,6 +84,7 @@ type CompanyListCache = {
   tourReviews: Record<string, ListCacheBucket<ReviewListItemDTO>>;
   tourReports: Record<string, ListCacheBucket<TourReportListItemDTO>>;
   tourFaqs: Record<string, ListCacheBucket<TourFAQDTO>>;
+  tourBookings: Record<string, ListCacheBucket<BookingListItemDTO>>;
 };
 
 type ParamsMap = {
@@ -89,6 +95,7 @@ type ParamsMap = {
   tourReviews: Record<string, TourReviewFilterParams>;
   tourReports: Record<string, PaginationParams>;
   tourFaqs: Record<string, TourFaqFilterParams>;
+  tourBookings: Record<string, TourBookingFilterParams>;
 };
 
 type ActiveCacheKeyMap = {
@@ -96,6 +103,7 @@ type ActiveCacheKeyMap = {
   tourReviews: Record<string, string | undefined>;
   tourReports: Record<string, string | undefined>;
   tourFaqs: Record<string, string | undefined>;
+  tourBookings: Record<string, string | undefined>;
 };
 
 // --------------------
@@ -143,6 +151,11 @@ interface ToutDetailState {
     params?: Partial<TourFaqFilterParams>,
     force?: boolean
   ) => Promise<ListCache<TourFAQDTO>>;
+  fetchBookings: (
+    tourId: string,
+    params?: Partial<TourBookingFilterParams>,
+    force?: boolean
+  ) => Promise<ListCache<BookingListItemDTO>>;
 
   // Cache utilities
   invalidateCache?: (
@@ -150,6 +163,7 @@ interface ToutDetailState {
       | "tours"
       | "tourReviews"
       | "tourReports"
+      | "tourBookings"
       | "tourFaqs"
       | "company"
       | "tourDetails",
@@ -180,6 +194,8 @@ const defaultTourParams = {
 
 export const tourDetailLoadingKey = (id: string) => `tourDetail:${id}`;
 export const tourDetailErrorKey = (id: string) => `tourDetailError:${id}`;
+export const tourBookingListLoadingKey = (tourId: string) => `bookingsList:${tourId}`;
+export const tourBookingListErrorKey = (tourId: string) => `bookingsListError:${tourId}`;
 
 const tourListLoadingKey = (
   tourId: string,
@@ -221,6 +237,14 @@ const makeFaqCacheKey = (params: TourFaqFilterParams) => {
   });
   return `${paginationKey}-${filterKey}`;
 };
+
+const makeBookingCacheKey = (params: TourBookingFilterParams) => {
+  const paginationKey = `${params.page}-${params.limit}-${params.sort ?? ""}-${params.order ?? ""}`;
+  const filterKey = JSON.stringify({
+    search: params.search ?? "",
+  });
+  return `${paginationKey}-${filterKey}`;
+};
 // --------------------
 // Store
 // --------------------
@@ -236,18 +260,21 @@ export const useTourDetailStore = create<ToutDetailState>()(
           tourReviews: {},
           tourReports: {},
           tourFaqs: {},
+          tourBookings: {},
         },
         params: {
           tours: defaultTourParams,
           tourReviews: {},
           tourReports: {},
           tourFaqs: {},
+          tourBookings: {},
         },
         activeCacheKey: {
           tours: undefined,
           tourReviews: {},
           tourReports: {},
           tourFaqs: {},
+          tourBookings: {},
         },
         tourDetails: {},
         loading: {},
@@ -289,102 +316,6 @@ export const useTourDetailStore = create<ToutDetailState>()(
 
           // Invalidate tours list cache
           get().invalidateCache?.('tours');
-        },
-
-        // --------------------
-        // Cache utilities
-        // --------------------
-        invalidateCache: (scope, id, key) => {
-          set((state) => {
-            const next = {
-              ...state,
-              listCache: {
-                tours: { ...state.listCache.tours },
-                tourReviews: { ...state.listCache.tourReviews },
-                tourReports: { ...state.listCache.tourReports },
-                tourFaqs: { ...state.listCache.tourFaqs },
-              },
-              cacheTimestamps: { ...state.cacheTimestamps },
-            };
-
-            if (scope === "company") {
-              next.company = undefined;
-            } else if (scope === "tourDetails" && id) {
-              delete next.tourDetails[id];
-            } else if (scope === "tours") {
-              if (key) {
-                delete next.listCache.tours[key];
-                delete next.cacheTimestamps[`tours:${key}`];
-              } else {
-                next.listCache.tours = {};
-                // remove matching timestamps
-                Object.keys(next.cacheTimestamps).forEach((k) => {
-                  if (k.startsWith(`tours:`)) delete next.cacheTimestamps[k];
-                });
-              }
-            } else if (scope === "tourReviews" && id) {
-              if (key) {
-                delete next.listCache.tourReviews[id]?.[key];
-                delete next.cacheTimestamps[`tourReviews:${id}:${key}`];
-              } else {
-                delete next.listCache.tourReviews[id];
-                Object.keys(next.cacheTimestamps).forEach((k) => {
-                  if (k.startsWith(`tourReviews:${id}:`))
-                    delete next.cacheTimestamps[k];
-                });
-              }
-            } else if (scope === "tourReports" && id) {
-              if (key) {
-                delete next.listCache.tourReports[id]?.[key];
-                delete next.cacheTimestamps[`tourReports:${id}:${key}`];
-              } else {
-                delete next.listCache.tourReports[id];
-                Object.keys(next.cacheTimestamps).forEach((k) => {
-                  if (k.startsWith(`tourReports:${id}:`))
-                    delete next.cacheTimestamps[k];
-                });
-              }
-            } else if (scope === "tourFaqs" && id) {
-              if (key) {
-                delete next.listCache.tourFaqs[id]?.[key];
-                delete next.cacheTimestamps[`tourFaqs:${id}:${key}`];
-              } else {
-                delete next.listCache.tourFaqs[id];
-                Object.keys(next.cacheTimestamps).forEach((k) => {
-                  if (k.startsWith(`tourFaqs:${id}:`))
-                    delete next.cacheTimestamps[k];
-                });
-              }
-            }
-
-            return next;
-          });
-        },
-
-        clearAllCaches: () => {
-          set(() => ({
-            listCache: {
-              tours: {},
-              tourReviews: {},
-              tourReports: {},
-              tourFaqs: {},
-            },
-            params: {
-              tours: defaultTourParams,
-              tourReviews: {},
-              tourReports: {},
-              tourFaqs: {},
-            },
-            activeCacheKey: {
-              tours: undefined,
-              tourReviews: {},
-              tourReports: {},
-              tourFaqs: {},
-            },
-            tourDetails: {},
-            company: undefined,
-            cacheTimestamps: {},
-          }));
         },
 
         selectCompanyKpisFromActiveTours: () => {
@@ -1037,6 +968,252 @@ export const useTourDetailStore = create<ToutDetailState>()(
 
           inFlightRequests.set(reqKey, p);
           return p;
+        },
+
+        fetchBookings: async (tourId, overrideParams = {}, force = false) => {
+          const state = get();
+          if (!state.params.tourBookings) state.params.tourBookings = {};
+          if (!state.params.tourBookings[tourId])
+            state.params.tourBookings[tourId] = { ...defaultPagination, search: "" };
+
+          const currentParams = state.params.tourBookings[tourId];
+          const params: TourBookingFilterParams = {
+            ...defaultPagination,
+            search: "",
+            ...currentParams,
+            ...overrideParams,
+          };
+          const cacheKey = makeBookingCacheKey(params);
+
+          const cached = state.listCache.tourBookings?.[tourId]?.[cacheKey];
+          const tsKey = `tourBookings:${tourId}:${cacheKey}`;
+          const tsVal = state.cacheTimestamps[tsKey];
+
+          if (!force && cached && isFresh(tsVal)) {
+            set((s) => ({
+              params: {
+                ...s.params,
+                tourBookings: { ...s.params.tourBookings, [tourId]: params },
+              },
+              activeCacheKey: {
+                ...s.activeCacheKey,
+                tourBookings: {
+                  ...s.activeCacheKey.tourBookings,
+                  [tourId]: cacheKey,
+                },
+              },
+              loading: {
+                ...s.loading,
+                [tourBookingListLoadingKey(tourId)]: false,
+              },
+              error: {
+                ...s.error,
+                [tourBookingListErrorKey(tourId)]: undefined,
+              },
+            }));
+            return cached;
+          }
+
+          const url = `${URL_AFTER_API}/${tourId}/tour-insights/bookings`;
+          const requestParams: Record<string, unknown> = {
+            page: params.page,
+            limit: params.limit,
+          };
+          if (params.sort) requestParams.sort = params.sort;
+          if (params.order) requestParams.order = params.order;
+          if (params.search?.trim()) requestParams.search = params.search.trim();
+
+          const reqKey = makeRequestKey("GET", url, requestParams);
+
+          if (!force && inFlightRequests.has(reqKey))
+            return inFlightRequests.get(reqKey) as Promise<ListCache<BookingListItemDTO>>;
+
+          const loadingKey = tourBookingListLoadingKey(tourId);
+          const errorKey = tourBookingListErrorKey(tourId);
+          set((s) => ({
+            loading: { ...s.loading, [loadingKey]: true },
+            error: { ...s.error, [errorKey]: undefined },
+          }));
+
+          const p = api
+            .get<ApiResponse<TourBookingsResponseDTO>>(url, { params: requestParams })
+            .then((res) => {
+              if (!(res.data && res.data.data)) {
+                throw new Error("Invalid response body.");
+              }
+              const list: ListCache<BookingListItemDTO> = {
+                items: res.data.data.docs,
+                total: res.data.data.total,
+                page: res.data.data.page,
+                pages: res.data.data.pages,
+                params: {
+                  pagination: {
+                    page: params.page,
+                    limit: params.limit,
+                    sort: params.sort,
+                    order: params.order,
+                  },
+                  filters: { search: params.search },
+                },
+              };
+
+              set((s) => {
+                const bucket: ListCacheBucket<BookingListItemDTO> = {
+                  ...(s.listCache.tourBookings[tourId] || {}),
+                  [cacheKey]: list,
+                };
+                return {
+                  listCache: {
+                    ...s.listCache,
+                    tourBookings: {
+                      ...s.listCache.tourBookings,
+                      [tourId]: bucket,
+                    },
+                  },
+                  params: {
+                    ...s.params,
+                    tourBookings: { ...s.params.tourBookings, [tourId]: params },
+                  },
+                  activeCacheKey: {
+                    ...s.activeCacheKey,
+                    tourBookings: {
+                      ...s.activeCacheKey.tourBookings,
+                      [tourId]: cacheKey,
+                    },
+                  },
+                  loading: { ...s.loading, [loadingKey]: false },
+                  cacheTimestamps: {
+                    ...s.cacheTimestamps,
+                    [tsKey]: Date.now(),
+                  },
+                };
+              });
+
+              return list;
+            })
+            .catch((err: unknown) => {
+              const message = extractErrorMessage(err);
+              set((s) => ({
+                error: { ...s.error, [errorKey]: message },
+                loading: { ...s.loading, [loadingKey]: false },
+              }));
+              throw new Error(message);
+            })
+            .finally(() => inFlightRequests.delete(reqKey));
+
+          inFlightRequests.set(reqKey, p);
+          return p;
+        },
+
+        // --------------------
+        // Cache utilities
+        // --------------------
+        invalidateCache: (scope, id, key) => {
+          set((state) => {
+            const next = {
+              ...state,
+              listCache: {
+                tours: { ...state.listCache.tours },
+                tourReviews: { ...state.listCache.tourReviews },
+                tourReports: { ...state.listCache.tourReports },
+                tourFaqs: { ...state.listCache.tourFaqs },
+                tourBookings: { ...state.listCache.tourBookings },
+              },
+              cacheTimestamps: { ...state.cacheTimestamps },
+            };
+
+            if (scope === "company") {
+              next.company = undefined;
+            } else if (scope === "tourDetails" && id) {
+              delete next.tourDetails[id];
+            } else if (scope === "tours") {
+              if (key) {
+                delete next.listCache.tours[key];
+                delete next.cacheTimestamps[`tours:${key}`];
+              } else {
+                next.listCache.tours = {};
+                // remove matching timestamps
+                Object.keys(next.cacheTimestamps).forEach((k) => {
+                  if (k.startsWith(`tours:`)) delete next.cacheTimestamps[k];
+                });
+              }
+            } else if (scope === "tourReviews" && id) {
+              if (key) {
+                delete next.listCache.tourReviews[id]?.[key];
+                delete next.cacheTimestamps[`tourReviews:${id}:${key}`];
+              } else {
+                delete next.listCache.tourReviews[id];
+                Object.keys(next.cacheTimestamps).forEach((k) => {
+                  if (k.startsWith(`tourReviews:${id}:`))
+                    delete next.cacheTimestamps[k];
+                });
+              }
+            } else if (scope === "tourReports" && id) {
+              if (key) {
+                delete next.listCache.tourReports[id]?.[key];
+                delete next.cacheTimestamps[`tourReports:${id}:${key}`];
+              } else {
+                delete next.listCache.tourReports[id];
+                Object.keys(next.cacheTimestamps).forEach((k) => {
+                  if (k.startsWith(`tourReports:${id}:`))
+                    delete next.cacheTimestamps[k];
+                });
+              }
+            } else if (scope === "tourFaqs" && id) {
+              if (key) {
+                delete next.listCache.tourFaqs[id]?.[key];
+                delete next.cacheTimestamps[`tourFaqs:${id}:${key}`];
+              } else {
+                delete next.listCache.tourFaqs[id];
+                Object.keys(next.cacheTimestamps).forEach((k) => {
+                  if (k.startsWith(`tourFaqs:${id}:`))
+                    delete next.cacheTimestamps[k];
+                });
+              }
+            } else if (scope === "tourBookings" && id) {
+              if (key) {
+                delete next.listCache.tourBookings[id]?.[key];
+                delete next.cacheTimestamps[`tourBookings:${id}:${key}`];
+              } else {
+                delete next.listCache.tourBookings[id];
+                Object.keys(next.cacheTimestamps).forEach((k) => {
+                  if (k.startsWith(`tourBookings:${id}:`))
+                    delete next.cacheTimestamps[k];
+                });
+              }
+            }
+
+            return next;
+          });
+        },
+
+        clearAllCaches: () => {
+          set(() => ({
+            listCache: {
+              tours: {},
+              tourReviews: {},
+              tourReports: {},
+              tourFaqs: {},
+              tourBookings: {},
+            },
+            params: {
+              tours: defaultTourParams,
+              tourReviews: {},
+              tourReports: {},
+              tourFaqs: {},
+              tourBookings: {},
+            },
+            activeCacheKey: {
+              tours: undefined,
+              tourReviews: {},
+              tourReports: {},
+              tourFaqs: {},
+              tourBookings: {},
+            },
+            tourDetails: {},
+            company: undefined,
+            cacheTimestamps: {},
+          }));
         },
 
       }),
