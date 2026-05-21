@@ -6,14 +6,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { fileToBase64, IMAGE_EXTENSIONS, isAllowedExtension } from '@/utils/helpers/file-conversion';
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Upload, Trash2, Save, X, Image as ImageIcon, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+  Upload, Trash2, Save, X,
+  Image as ImageIcon, CheckCircle2, AlertTriangle, Loader2
+} from 'lucide-react';
 import { showToast } from '@/components/global/showToast';
 import api from '@/utils/axios/axios';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
@@ -21,6 +16,42 @@ import { TourDetailDTO } from '@/types/tour/tour.types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ApiResponse } from '@/types/common/api.types';
 
+// ── Neumorphism Style Tokens ──────────────────────────────────
+const NEU_SURFACE   = 'bg-[#E7E5E4]';
+const NEU_CARD      = 'rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60';
+const NEU_INSET     = 'bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]';
+const NEU_DIVIDER   = 'border-[#1E2938]/10';
+const NEU_HEADING   = 'font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight';
+const NEU_LABEL     = 'font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest';
+const NEU_MUTED     = 'font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50';
+const NEU_ICON_WELL = 'p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]';
+
+const NEU_BTN_PRIMARY =
+  'rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide ' +
+  'shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] ' +
+  'hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] ' +
+  'active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] ' +
+  'transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none';
+
+const NEU_BTN_GHOST =
+  'rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] ' +
+  'shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] border border-white/60 ' +
+  'hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] ' +
+  'transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none';
+
+const NEU_BTN_DANGER =
+  'rounded-xl bg-[#E7E5E4] text-[#FF2157] font-[family-name:var(--font-space-mono)] ' +
+  'shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] border border-white/60 ' +
+  'hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] ' +
+  'transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none';
+
+const NEU_ALERT_WARNING = 'rounded-xl bg-[#FE9900]/8 border border-[#FE9900]/25 shadow-[2px_2px_6px_#c8c6c5,-2px_-2px_6px_#ffffff]';
+const NEU_ALERT_DANGER  = 'rounded-xl bg-[#FF2157]/5 border border-[#FF2157]/20 shadow-[2px_2px_6px_#c8c6c5,-2px_-2px_6px_#ffffff]';
+
+const NEU_PROGRESS_TRACK = 'w-full h-2 rounded-full bg-[#E7E5E4] shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] overflow-hidden';
+const NEU_PROGRESS_BAR   = 'h-full rounded-full bg-[#006666] shadow-[0_0_6px_#006666]/40 transition-all duration-300';
+
+const NEU_GUIDELINE_ITEM = 'flex items-start gap-2.5 font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/60';
 
 interface HeroImageUpdateProps {
   tourId: string;
@@ -28,15 +59,12 @@ interface HeroImageUpdateProps {
   updateData: (updates: Partial<TourDetailDTO>) => void;
 }
 
-const getApiUrl = (tourId: string) => {
-  return `/operations/tours/v1/${tourId}/hero-image`
-}
+const getApiUrl = (tourId: string) => `/operations/tours/v1/${tourId}/hero-image`;
 
 export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }: HeroImageUpdateProps) {
-  const queryClient = useQueryClient();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient       = useQueryClient();
+  const fileInputRef      = useRef<HTMLInputElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
 
   const [pendingImage, setPendingImage] = useState<{
     file: File;
@@ -44,15 +72,13 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
     base64?: string;
   } | null>(null);
 
-  const [isRemoving, setIsRemoving] = useState(false);
+  const [isRemoving, setIsRemoving]         = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (isRemoving) {
-        const { data } = await api.patch(getApiUrl(tourId), {
-          heroImage: null,
-        });
+        const { data } = await api.patch(getApiUrl(tourId), { heroImage: null });
         return data;
       } else if (pendingImage?.base64) {
         const { data } = await api.patch<ApiResponse<{ data: string }>>(getApiUrl(tourId), {
@@ -74,29 +100,24 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
       queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
     },
     onError: (error: Error) => {
-      const message = extractErrorMessage(error);
-      showToast.error(`Failed to save changes: ${message}`);
+      showToast.error(`Failed to save changes: ${extractErrorMessage(error)}`);
     },
   });
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     try {
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
+      if (file.size > 5 * 1024 * 1024) {
         showToast.warning('File size exceeds 5MB limit. Please choose a smaller image.');
         event.target.value = '';
         return;
       }
-
       if (!isAllowedExtension(file.name, IMAGE_EXTENSIONS)) {
         showToast.warning('Invalid file type. Please upload an image (JPG, PNG, GIF, WebP, or BMP)');
         event.target.value = '';
         return;
       }
-
       const previewUrl = URL.createObjectURL(file);
       simulateUploadProgress();
       processImage(file, previewUrl);
@@ -109,25 +130,17 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
   const processImage = async (file: File, previewUrl: string) => {
     try {
       showToast.info('Processing image...');
-
       const base64Image = await fileToBase64(file, {
         compressImages: true,
         maxWidth: 1920,
         quality: 0.85,
         maxFileBytes: 5 * 1024 * 1024,
       });
-
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
         progressIntervalRef.current = null;
       }
-
-      setPendingImage({
-        file,
-        previewUrl,
-        base64: base64Image,
-      });
-
+      setPendingImage({ file, previewUrl, base64: base64Image });
       setIsRemoving(false);
       setUploadProgress(100);
       showToast.info('Image processed and ready to save');
@@ -140,12 +153,7 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
 
   const handleRemove = () => {
     if (!currentHeroImage && !pendingImage) return;
-
-    if (pendingImage) {
-      resetPendingChanges();
-      return;
-    }
-
+    if (pendingImage) { resetPendingChanges(); return; }
     setIsRemoving(true);
     setPendingImage(null);
     showToast.info('Hero image marked for removal. Click Save to confirm.');
@@ -165,33 +173,22 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
   };
 
   const resetPendingChanges = () => {
-    if (pendingImage?.previewUrl) {
-      URL.revokeObjectURL(pendingImage.previewUrl);
-    }
+    if (pendingImage?.previewUrl) URL.revokeObjectURL(pendingImage.previewUrl);
     setPendingImage(null);
     setIsRemoving(false);
-
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
       progressIntervalRef.current = null;
     }
     setUploadProgress(0);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const simulateUploadProgress = () => {
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-    }
-
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     setUploadProgress(0);
-
     progressIntervalRef.current = setInterval(() => {
       setUploadProgress((prev) => {
-        if (prev >= 100) return 100;
         if (prev >= 95) {
           clearInterval(progressIntervalRef.current!);
           progressIntervalRef.current = null;
@@ -204,43 +201,39 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
 
   React.useEffect(() => {
     return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-      if (pendingImage?.previewUrl) {
-        URL.revokeObjectURL(pendingImage.previewUrl);
-      }
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+      if (pendingImage?.previewUrl) URL.revokeObjectURL(pendingImage.previewUrl);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const displayImage = pendingImage?.previewUrl || currentHeroImage;
+  const displayImage      = pendingImage?.previewUrl || currentHeroImage;
   const hasPendingChanges = pendingImage || isRemoving;
-  const isProcessing = uploadProgress > 0 && uploadProgress < 100;
+  const isProcessing      = uploadProgress > 0 && uploadProgress < 100;
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+    hidden:  { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
-
   const imageVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } }
+    hidden:  { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1,  transition: { duration: 0.3 } },
   };
 
   return (
-    <motion.div
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <Card className="mb-6 border-slate-200 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 bg-slate-50/50 pb-4">
+    <motion.div variants={cardVariants} initial="hidden" animate="visible" className="mb-6">
+      <div className={NEU_CARD}>
+
+        {/* ── Card Header ── */}
+        <div className={`flex flex-row items-center justify-between p-5 border-b ${NEU_DIVIDER}`}>
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-50 border border-blue-100">
-              <ImageIcon className="h-5 w-5 text-blue-600" />
+            <div className={NEU_ICON_WELL}>
+              <ImageIcon className="h-5 w-5 text-[#006666]" />
             </div>
-            <CardTitle className="text-lg font-semibold text-slate-800">Hero Image</CardTitle>
+            <div>
+              <h3 className={`text-base ${NEU_HEADING}`}>Hero Image</h3>
+              <p className={`text-xs mt-0.5 ${NEU_MUTED}`}>Main banner shown on tour listing</p>
+            </div>
           </div>
 
           <AnimatePresence>
@@ -251,41 +244,40 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
                 exit={{ opacity: 0, x: 20 }}
                 className="flex gap-2"
               >
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCancel}
-                    disabled={saveMutation.isPending}
-                    className="gap-2 border-slate-300 text-slate-700 hover:bg-slate-50"
-                  >
-                    <X className="h-4 w-4" />
-                    Cancel
-                  </Button>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={handleSave}
-                    disabled={saveMutation.isPending || isProcessing}
-                    className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {saveMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Save className="h-4 w-4" />
-                    )}
-                    {saveMutation.isPending ? 'Saving...' : 'Save Changes'}
-                  </Button>
-                </motion.div>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button"
+                  onClick={handleCancel}
+                  disabled={saveMutation.isPending}
+                  className={`${NEU_BTN_GHOST} flex items-center gap-2 px-3 py-2 text-sm`}
+                >
+                  <X className="h-4 w-4" />
+                  Cancel
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saveMutation.isPending || isProcessing}
+                  className={`${NEU_BTN_PRIMARY} flex items-center gap-2 px-3 py-2 text-sm`}
+                >
+                  {saveMutation.isPending
+                    ? <Loader2 className="h-4 w-4 animate-spin" />
+                    : <Save className="h-4 w-4" />}
+                  {saveMutation.isPending ? 'Saving…' : 'Save Changes'}
+                </motion.button>
               </motion.div>
             )}
           </AnimatePresence>
-        </CardHeader>
+        </div>
 
-        <CardContent className="pt-6">
+        {/* ── Card Content ── */}
+        <div className="p-5">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+
+            {/* Image Preview */}
             <AnimatePresence mode="wait">
               {displayImage ? (
                 <motion.div
@@ -294,41 +286,39 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  className="relative w-full md:w-56 h-56 rounded-xl overflow-hidden border-2 border-slate-200 shadow-sm"
+                  className={`relative w-full md:w-56 h-56 rounded-2xl overflow-hidden ${NEU_INSET}`}
                 >
                   <Image
                     src={displayImage}
-                    alt={pendingImage ? "New hero image preview" : "Current hero image"}
+                    alt={pendingImage ? 'New hero image preview' : 'Current hero image'}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 224px"
                   />
-
                   {pendingImage && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center pb-4"
                     >
-                      <div className="flex items-center gap-2 bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg">
-                        <AlertTriangle className="h-4 w-4" />
-                        Unsaved Changes
-                      </div>
+                      <span className="flex items-center gap-2 bg-[#FE9900] text-white px-4 py-1.5 rounded-full text-xs font-[family-name:var(--font-space-mono)] font-bold shadow-lg">
+                        <AlertTriangle className="h-3.5 w-3.5" />
+                        Unsaved
+                      </span>
                     </motion.div>
                   )}
-
                   {isRemoving && currentHeroImage && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-3 p-4"
                     >
-                      <div className="flex items-center gap-2 bg-red-500 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-lg">
-                        <Trash2 className="h-4 w-4" />
+                      <span className="flex items-center gap-2 bg-[#FF2157] text-white px-4 py-1.5 rounded-full text-xs font-[family-name:var(--font-space-mono)] font-bold shadow-lg">
+                        <Trash2 className="h-3.5 w-3.5" />
                         Marked for Removal
-                      </div>
-                      <p className="text-white text-sm text-center">
-                        Image will be removed when you save
+                      </span>
+                      <p className="text-white text-xs text-center font-[family-name:var(--font-jetbrains-mono)]">
+                        Will be removed on save
                       </p>
                     </motion.div>
                   )}
@@ -340,15 +330,17 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  className="w-full md:w-56 h-56 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center bg-slate-50"
+                  className={`w-full md:w-56 h-56 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-[#1E2938]/15 ${NEU_SURFACE}`}
                 >
-                  <ImageIcon className="h-12 w-12 text-slate-400 mb-2" />
-                  <p className="text-slate-500 text-sm">No hero image</p>
+                  <ImageIcon className="h-10 w-10 text-[#1E2938]/30 mb-2" />
+                  <p className={`text-sm ${NEU_MUTED}`}>No hero image</p>
                 </motion.div>
               )}
             </AnimatePresence>
 
+            {/* Actions & Info */}
             <div className="flex-1 space-y-5 w-full">
+              {/* Upload / Remove Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <div>
                   <input
@@ -361,94 +353,90 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
                     disabled={saveMutation.isPending || isProcessing}
                   />
                   <label htmlFor="hero-image-upload">
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button
-                        variant="outline"
-                        className="gap-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400"
-                        disabled={saveMutation.isPending || isProcessing}
-                        asChild
-                      >
-                        <span className="cursor-pointer">
-                          {isProcessing ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Upload className="h-4 w-4" />
-                          )}
-                          {isProcessing ? 'Processing...' : 'Upload New'}
-                        </span>
-                      </Button>
-                    </motion.div>
+                    <motion.span
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm cursor-pointer ${
+                        saveMutation.isPending || isProcessing
+                          ? 'opacity-40 cursor-not-allowed pointer-events-none'
+                          : ''
+                      } ${NEU_BTN_GHOST}`}
+                    >
+                      {isProcessing
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <Upload className="h-4 w-4" />}
+                      {isProcessing ? 'Processing…' : 'Upload New'}
+                    </motion.span>
                   </label>
                 </div>
 
                 {(currentHeroImage || pendingImage) && !saveMutation.isPending && (
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      variant="outline"
-                      className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-                      onClick={handleRemove}
-                      disabled={saveMutation.isPending || isProcessing}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      {pendingImage ? 'Discard' : 'Remove'}
-                    </Button>
-                  </motion.div>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="button"
+                    onClick={handleRemove}
+                    disabled={saveMutation.isPending || isProcessing}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm ${NEU_BTN_DANGER}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {pendingImage ? 'Discard' : 'Remove'}
+                  </motion.button>
                 )}
               </div>
 
+              {/* Upload Progress */}
               <AnimatePresence>
                 {isProcessing && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="space-y-2"
+                    className="space-y-2 overflow-hidden"
                   >
-                    <Progress value={uploadProgress} className="h-2" />
-                    <p className="text-sm text-slate-600 flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Processing image... {uploadProgress}%
+                    <div className={NEU_PROGRESS_TRACK}>
+                      <div className={NEU_PROGRESS_BAR} style={{ width: `${uploadProgress}%` }} />
+                    </div>
+                    <p className={`flex items-center gap-2 ${NEU_MUTED}`}>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      Processing image… {uploadProgress}%
                     </p>
                   </motion.div>
                 )}
               </AnimatePresence>
 
+              {/* Pending Alerts */}
               <AnimatePresence>
                 {hasPendingChanges && !isProcessing && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10 }}
+                    initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
+                    exit={{ opacity: 0, y: -8 }}
                     className="space-y-3"
                   >
                     {pendingImage && (
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                        <div className="flex items-start gap-3">
-                          <CheckCircle2 className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm text-amber-900 font-medium">
-                              Image ready to save
-                            </p>
-                            <p className="text-xs text-amber-700 mt-1">
-                              Click &quot;Save Changes&quot; to update the hero image
-                            </p>
-                          </div>
+                      <div className={`flex items-start gap-3 p-4 ${NEU_ALERT_WARNING}`}>
+                        <CheckCircle2 className="h-4 w-4 text-[#FE9900] mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-[family-name:var(--font-space-mono)] font-bold text-sm text-[#1E2938]">
+                            Image ready to save
+                          </p>
+                          <p className={`text-xs mt-0.5 ${NEU_MUTED}`}>
+                            Click &quot;Save Changes&quot; to update the hero image
+                          </p>
                         </div>
                       </div>
                     )}
-
                     {isRemoving && (
-                      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div className="flex items-start gap-3">
-                          <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm text-red-900 font-medium">
-                              Hero image marked for removal
-                            </p>
-                            <p className="text-xs text-red-700 mt-1">
-                              Click &quot;Save Changes&quot; to confirm removal
-                            </p>
-                          </div>
+                      <div className={`flex items-start gap-3 p-4 ${NEU_ALERT_DANGER}`}>
+                        <AlertTriangle className="h-4 w-4 text-[#FF2157] mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-[family-name:var(--font-space-mono)] font-bold text-sm text-[#1E2938]">
+                            Hero image marked for removal
+                          </p>
+                          <p className={`text-xs mt-0.5 ${NEU_MUTED}`}>
+                            Click &quot;Save Changes&quot; to confirm removal
+                          </p>
                         </div>
                       </div>
                     )}
@@ -456,28 +444,30 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
                 )}
               </AnimatePresence>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2 text-sm text-slate-600">
-                <p className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                  Recommended: 1920×1080px (16:9 ratio)
-                </p>
-                <p className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                  Maximum size: 5MB
-                </p>
-                <p className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                  Supported: JPG, PNG, GIF, WebP, BMP
-                </p>
-                <p className="flex items-center gap-2 pt-2 font-medium text-slate-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                  Changes are saved only when you click &quot;Save Changes&quot;
-                </p>
+              {/* Guidelines */}
+              <div className={`rounded-xl p-4 space-y-2 ${NEU_INSET}`}>
+                <p className={NEU_LABEL}>Guidelines</p>
+                <div className="mt-2 space-y-1.5">
+                  {[
+                    'Recommended: 1920×1080 px (16:9)',
+                    'Maximum size: 5 MB',
+                    'Supported: JPG, PNG, GIF, WebP, BMP',
+                  ].map((text) => (
+                    <p key={text} className={NEU_GUIDELINE_ITEM}>
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1E2938]/30 shrink-0" />
+                      {text}
+                    </p>
+                  ))}
+                  <p className={`pt-1 font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#006666] flex items-start gap-2.5`}>
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#006666] shrink-0" />
+                    Changes are saved only when you click &quot;Save Changes&quot;
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }

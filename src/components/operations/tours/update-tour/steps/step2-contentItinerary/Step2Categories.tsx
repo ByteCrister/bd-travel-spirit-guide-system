@@ -3,296 +3,156 @@
 import { TOUR_CATEGORIES, TourCategories } from '@/constants/tour/tour.const';
 import { useFormikContext } from 'formik';
 import { UpdateTourContentItineraryDTO } from '@/types/tour/tour.types';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
-    Palmtree,
-    Landmark,
-    UtensilsCrossed,
-    Trees,
-    Squirrel,
-    Building2,
-    Church,
-    Castle,
-    Ship,
-    Check,
-    X,
-    FolderOpen
+    Palmtree, Landmark, UtensilsCrossed, Trees, Squirrel,
+    Building2, Church, Castle, Ship, Check, X, FolderOpen
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number; color?: string; strokeWidth?: number }>;
 
-// Category configuration with icons matching TOUR_CATEGORIES enum
+// ── Neumorphism Style Tokens ──────────────────────────────────
+const NEU_CARD = 'rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60';
+const NEU_SURFACE_INSET = 'bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]';
+const NEU_HEADING = 'font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight';
+const NEU_LABEL = 'font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest';
+const NEU_MUTED = 'font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50';
+const NEU_BADGE_PRIMARY = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]';
+const NEU_DIVIDER = 'border-[#1E2938]/10';
+const NEU_ICON_WELL = 'p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]';
+const NEU_BTN_DANGER_SM = 'inline-flex items-center gap-1 text-xs font-[family-name:var(--font-space-mono)] text-[#1E2938]/50 hover:text-[#FF2157] transition-colors duration-200';
+// ─────────────────────────────────────────────────────────────
+
 const CATEGORY_CONFIG: Record<string, {
-    label: string;
-    icon: IconType;
-    color: string;
-    lightBg: string;
-    borderColor: string;
-    textColor: string;
-    description: string;
+    label: string; icon: IconType; accentBg: string; accentText: string; accentBorder: string; description: string;
 }> = {
-    [TOUR_CATEGORIES.BEACHES]: {
-        label: 'Beaches',
-        icon: Palmtree,
-        color: 'bg-cyan-500',
-        lightBg: 'bg-cyan-50 dark:bg-cyan-950/30',
-        borderColor: 'border-cyan-500',
-        textColor: 'text-cyan-700 dark:text-cyan-400',
-        description: 'Coastal destinations'
-    },
-    [TOUR_CATEGORIES.CULTURE_HISTORY]: {
-        label: 'Culture & History',
-        icon: Landmark,
-        color: 'bg-amber-500',
-        lightBg: 'bg-amber-50 dark:bg-amber-950/30',
-        borderColor: 'border-amber-500',
-        textColor: 'text-amber-700 dark:text-amber-400',
-        description: 'Historical sites & museums'
-    },
-    [TOUR_CATEGORIES.FOOD_DRINK]: {
-        label: 'Food & Drink',
-        icon: UtensilsCrossed,
-        color: 'bg-orange-500',
-        lightBg: 'bg-orange-50 dark:bg-orange-950/30',
-        borderColor: 'border-orange-500',
-        textColor: 'text-orange-700 dark:text-orange-400',
-        description: 'Culinary experiences'
-    },
-    [TOUR_CATEGORIES.NATURE]: {
-        label: 'Nature',
-        icon: Trees,
-        color: 'bg-green-500',
-        lightBg: 'bg-green-50 dark:bg-green-950/30',
-        borderColor: 'border-green-500',
-        textColor: 'text-green-700 dark:text-green-400',
-        description: 'Outdoor activities'
-    },
-    [TOUR_CATEGORIES.WILDLIFE]: {
-        label: 'Wildlife',
-        icon: Squirrel,
-        color: 'bg-emerald-500',
-        lightBg: 'bg-emerald-50 dark:bg-emerald-950/30',
-        borderColor: 'border-emerald-500',
-        textColor: 'text-emerald-700 dark:text-emerald-400',
-        description: 'Safari & animal watching'
-    },
-    [TOUR_CATEGORIES.CITY]: {
-        label: 'City',
-        icon: Building2,
-        color: 'bg-slate-500',
-        lightBg: 'bg-slate-50 dark:bg-slate-950/30',
-        borderColor: 'border-slate-500',
-        textColor: 'text-slate-700 dark:text-slate-400',
-        description: 'Urban exploration'
-    },
-    [TOUR_CATEGORIES.RELIGIOUS]: {
-        label: 'Religious',
-        icon: Church,
-        color: 'bg-purple-500',
-        lightBg: 'bg-purple-50 dark:bg-purple-950/30',
-        borderColor: 'border-purple-500',
-        textColor: 'text-purple-700 dark:text-purple-400',
-        description: 'Spiritual destinations'
-    },
-    [TOUR_CATEGORIES.HERITAGE]: {
-        label: 'Heritage',
-        icon: Castle,
-        color: 'bg-rose-500',
-        lightBg: 'bg-rose-50 dark:bg-rose-950/30',
-        borderColor: 'border-rose-500',
-        textColor: 'text-rose-700 dark:text-rose-400',
-        description: 'UNESCO & heritage sites'
-    },
-    [TOUR_CATEGORIES.CRUISE]: {
-        label: 'Cruise',
-        icon: Ship,
-        color: 'bg-blue-500',
-        lightBg: 'bg-blue-50 dark:bg-blue-950/30',
-        borderColor: 'border-blue-500',
-        textColor: 'text-blue-700 dark:text-blue-400',
-        description: 'Cruise-based travel'
-    }
+    [TOUR_CATEGORIES.BEACHES]: { label: 'Beaches', icon: Palmtree, accentBg: 'bg-cyan-500', accentText: 'text-cyan-600', accentBorder: 'border-cyan-400', description: 'Coastal destinations' },
+    [TOUR_CATEGORIES.CULTURE_HISTORY]: { label: 'Culture & History', icon: Landmark, accentBg: 'bg-amber-500', accentText: 'text-amber-600', accentBorder: 'border-amber-400', description: 'Historical sites & museums' },
+    [TOUR_CATEGORIES.FOOD_DRINK]: { label: 'Food & Drink', icon: UtensilsCrossed, accentBg: 'bg-orange-500', accentText: 'text-orange-600', accentBorder: 'border-orange-400', description: 'Culinary experiences' },
+    [TOUR_CATEGORIES.NATURE]: { label: 'Nature', icon: Trees, accentBg: 'bg-green-500', accentText: 'text-green-600', accentBorder: 'border-green-400', description: 'Outdoor activities' },
+    [TOUR_CATEGORIES.WILDLIFE]: { label: 'Wildlife', icon: Squirrel, accentBg: 'bg-emerald-500', accentText: 'text-emerald-600', accentBorder: 'border-emerald-400', description: 'Safari & animal watching' },
+    [TOUR_CATEGORIES.CITY]: { label: 'City', icon: Building2, accentBg: 'bg-slate-500', accentText: 'text-slate-600', accentBorder: 'border-slate-400', description: 'Urban exploration' },
+    [TOUR_CATEGORIES.RELIGIOUS]: { label: 'Religious', icon: Church, accentBg: 'bg-purple-500', accentText: 'text-purple-600', accentBorder: 'border-purple-400', description: 'Spiritual destinations' },
+    [TOUR_CATEGORIES.HERITAGE]: { label: 'Heritage', icon: Castle, accentBg: 'bg-rose-500', accentText: 'text-rose-600', accentBorder: 'border-rose-400', description: 'UNESCO & heritage sites' },
+    [TOUR_CATEGORIES.CRUISE]: { label: 'Cruise', icon: Ship, accentBg: 'bg-blue-500', accentText: 'text-blue-600', accentBorder: 'border-blue-400', description: 'Cruise-based travel' },
 };
 
 const Step2Categories = () => {
     const { values, setFieldValue, touched, errors } = useFormikContext<UpdateTourContentItineraryDTO>();
 
     const toggleCategory = (category: TourCategories) => {
-        const currentCategories = values.categories || [];
-
-        if (currentCategories.includes(category)) {
-            setFieldValue('categories', currentCategories.filter((c: string) => c !== category));
-        } else {
-            setFieldValue('categories', [...currentCategories, category]);
-        }
+        const current = values.categories || [];
+        setFieldValue('categories',
+            current.includes(category) ? current.filter((c: string) => c !== category) : [...current, category]
+        );
     };
 
-    const clearAll = () => {
-        setFieldValue('categories', []);
-    };
+    const clearAll = () => setFieldValue('categories', []);
 
     const selectedCategories = values.categories || [];
     const hasError = touched.categories && errors.categories;
     const categoryOptions = Object.values(TOUR_CATEGORIES);
 
     return (
-        <Card className={cn(
-            "border-2 transition-colors",
-            hasError ? "border-destructive" : "hover:border-primary/50"
-        )}>
-            <CardHeader>
+        <div className={`${NEU_CARD} ${hasError ? 'ring-2 ring-[#FF2157]/50' : ''} overflow-hidden`}>
+            {/* Header */}
+            <div className={`px-6 py-5 border-b ${NEU_DIVIDER}`}>
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <FolderOpen className="h-5 w-5 text-primary" />
-                        <CardTitle className="text-lg">Content Categories</CardTitle>
+                    <div className="flex items-center gap-3">
+                        <div className={NEU_ICON_WELL}>
+                            <FolderOpen className="w-4 h-4 text-[#006666]" />
+                        </div>
+                        <div>
+                            <h3 className={`${NEU_HEADING} text-base`}>Content Categories</h3>
+                            <p className={`${NEU_MUTED} mt-0.5`}>Choose categories that best describe this tour</p>
+                        </div>
                     </div>
                     {selectedCategories.length > 0 && (
-                        <Badge variant="secondary" className="text-xs">
-                            {selectedCategories.length} selected
-                        </Badge>
+                        <span className={NEU_BADGE_PRIMARY}>{selectedCategories.length} selected</span>
                     )}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                    Choose categories that best describe this tour
-                </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {/* Selected Categories Summary */}
+            </div>
+
+            <div className="px-6 py-5 space-y-5">
+                {/* Selected summary */}
                 {selectedCategories.length > 0 && (
-                    <div className="p-4 rounded-lg bg-muted/50 border-2 border-dashed">
-                        <div className="flex items-center justify-between mb-2">
-                            <Label className="text-sm font-medium">Selected Categories</Label>
-                            <button
-                                type="button"
-                                onClick={clearAll}
-                                className="text-xs text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1"
-                            >
-                                <X className="h-3 w-3" />
-                                Clear all
+                    <div className={`${NEU_SURFACE_INSET} rounded-xl p-4`}>
+                        <div className="flex items-center justify-between mb-3">
+                            <span className={NEU_LABEL}>Selected</span>
+                            <button type="button" onClick={clearAll} className={NEU_BTN_DANGER_SM}>
+                                <X className="h-3 w-3" /> Clear all
                             </button>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                            {selectedCategories.map((category: string) => {
-                                const config = CATEGORY_CONFIG[category] || {
-                                    label: category,
-                                    icon: FolderOpen,
-                                    lightBg: 'bg-gray-50 dark:bg-gray-950/30',
-                                    textColor: 'text-gray-700 dark:text-gray-400'
-                                };
-                                const Icon = config.icon;
+                            {selectedCategories.map((cat: string) => {
+                                const cfg = CATEGORY_CONFIG[cat] || { label: cat, icon: FolderOpen };
+                                const Icon = cfg.icon;
                                 return (
-                                    <Badge
-                                        key={category}
-                                        variant="secondary"
-                                        className={cn(
-                                            "px-3 py-1.5 gap-1.5",
-                                            config.lightBg,
-                                            config.textColor
-                                        )}
-                                    >
-                                        <Icon className="h-3 w-3" />
-                                        {config.label}
-                                    </Badge>
+                                    <span key={cat} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#E7E5E4] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff] text-[#1E2938]">
+                                        <Icon className="h-3 w-3" /> {cfg.label}
+                                    </span>
                                 );
                             })}
                         </div>
                     </div>
                 )}
 
-                {/* Category Selection Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {categoryOptions.map((categoryValue) => {
-                        const config = CATEGORY_CONFIG[categoryValue] || {
-                            label: categoryValue,
-                            icon: FolderOpen,
-                            color: 'bg-gray-500',
-                            lightBg: 'bg-gray-50 dark:bg-gray-950/30',
-                            borderColor: 'border-gray-500',
-                            textColor: 'text-gray-700 dark:text-gray-400',
-                            description: 'Tour category'
-                        };
-                        const Icon = config.icon;
-                        const isSelected = selectedCategories.includes(categoryValue);
+                {/* Category Grid — centred icon layout */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
+                    {categoryOptions.map((val) => {
+                        const cfg = CATEGORY_CONFIG[val] || { label: val, icon: FolderOpen, accentBg: 'bg-gray-500', accentText: 'text-gray-600', accentBorder: 'border-gray-400', description: '' };
+                        const Icon = cfg.icon;
+                        const selected = selectedCategories.includes(val);
 
                         return (
                             <button
-                                key={categoryValue}
+                                key={val}
                                 type="button"
-                                onClick={() => toggleCategory(categoryValue)}
-                                className={cn(
-                                    "relative p-4 rounded-lg border-2 transition-all duration-200",
-                                    "hover:scale-[1.02] active:scale-[0.98]",
-                                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                                    isSelected
-                                        ? cn(config.borderColor, config.lightBg, "shadow-md")
-                                        : "border-border hover:border-primary/50 bg-card"
-                                )}
+                                onClick={() => toggleCategory(val)}
+                                className={[
+                                    'relative p-4 rounded-xl flex flex-col items-center text-center gap-2.5 transition-all duration-200',
+                                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50',
+                                    selected
+                                        ? `bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-2 ${cfg.accentBorder}`
+                                        : 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border-2 border-transparent hover:shadow-[6px_6px_14px_#c8c6c5,-6px_-6px_14px_#ffffff] hover:-translate-y-0.5',
+                                ].join(' ')}
                             >
-                                {/* Selection Indicator */}
-                                <div
-                                    className={cn(
-                                        "absolute top-2 right-2 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all",
-                                        isSelected
-                                            ? cn(config.color, "border-transparent")
-                                            : "border-muted-foreground/30"
-                                    )}
-                                >
-                                    {isSelected && <Check className="h-3 w-3 text-white" />}
+                                {/* Check indicator */}
+                                <div className={[
+                                    'absolute top-2 right-2 h-4 w-4 rounded-full border-2 flex items-center justify-center transition-all duration-200',
+                                    selected ? `${cfg.accentBg} border-transparent` : 'border-[#1E2938]/20 bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c5]',
+                                ].join(' ')}>
+                                    {selected && <Check className="h-2.5 w-2.5 text-white" />}
                                 </div>
 
-                                {/* Category Content */}
-                                <div className="flex flex-col items-center text-center gap-2">
-                                    <div
-                                        className={cn(
-                                            "h-12 w-12 rounded-full flex items-center justify-center",
-                                            isSelected ? config.color : "bg-muted"
-                                        )}
-                                    >
-                                        <Icon
-                                            className={cn(
-                                                "h-6 w-6",
-                                                isSelected ? "text-white" : "text-muted-foreground"
-                                            )}
-                                        />
-                                    </div>
-                                    <div className="space-y-0.5">
-                                        <div
-                                            className={cn(
-                                                "font-semibold text-sm",
-                                                isSelected ? config.textColor : "text-foreground"
-                                            )}
-                                        >
-                                            {config.label}
-                                        </div>
-                                        <div className="text-xs text-muted-foreground">
-                                            {config.description}
-                                        </div>
-                                    </div>
+                                <div className={[
+                                    'h-12 w-12 rounded-full flex items-center justify-center',
+                                    selected ? cfg.accentBg : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]',
+                                ].join(' ')}>
+                                    <Icon className={`h-6 w-6 ${selected ? 'text-white' : 'text-[#1E2938]/40'}`} />
+                                </div>
+
+                                <div>
+                                    <p className={`font-[family-name:var(--font-space-mono)] font-bold text-sm ${selected ? cfg.accentText : 'text-[#1E2938]'}`}>
+                                        {cfg.label}
+                                    </p>
+                                    <p className={NEU_MUTED}>{cfg.description}</p>
                                 </div>
                             </button>
                         );
                     })}
                 </div>
 
-                {/* Error Message */}
                 {hasError && (
-                    <p className="text-sm text-destructive flex items-center gap-1">
-                        <X className="h-4 w-4" />
-                        {errors.categories}
+                    <p className="flex items-center gap-1.5 text-sm font-[family-name:var(--font-space-mono)] text-[#FF2157]">
+                        <X className="h-4 w-4" /> {String(errors.categories)}
                     </p>
                 )}
 
-                {/* Helper Text */}
                 {selectedCategories.length === 0 && !hasError && (
-                    <p className="text-xs text-center text-muted-foreground pt-2">
-                        Select one or more categories to classify this tour
-                    </p>
+                    <p className={`${NEU_MUTED} text-center pt-1`}>Select one or more categories to classify this tour</p>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 };
 

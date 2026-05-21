@@ -1,15 +1,10 @@
-// app/operations/tours/[tourId]/update-tour/components/MainUpdateTourContainer.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import {
-  Alert,
-  Container
-} from '@mui/material';
 import { Breadcrumbs } from '@/components/global/Breadcrumbs';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, AlertCircle, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import HeroImageUpdate from './image-managers/HeroImageUpdate';
 import GalleryUpdate from './image-managers/GalleryUpdate';
@@ -24,16 +19,70 @@ import Step6Policies from './steps/Step6Policies';
 import {
   tourDetailErrorKey,
   tourDetailLoadingKey,
-  useTourDetailStore
+  useTourDetailStore,
 } from '@/store/tour-detail.store';
 import { TourDetailDTO } from '@/types/tour/tour.types';
 import LoadingUpdateTourContainer from './loading-skeletons/LoadingUpdateTourContainer';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
-import { formatValidationErrors, validateTourDataStepByStep } from '@/utils/validators/tour/validateTour';
+import {
+  formatValidationErrors,
+  validateTourDataStepByStep,
+} from '@/utils/validators/tour/validateTour';
 import ConfirmationAlert from './ConfirmationAlert';
 import { useRouter } from 'next/navigation';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
 
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+const NEU = {
+  surface: 'bg-[#E7E5E4]',
+  card: 'bg-[#E7E5E4] rounded-2xl shadow-[6px_6px_16px_#c8c6c4,-6px_-6px_16px_#ffffff]',
+  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
+  raised: 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff]',
+  iconBox: 'rounded-xl shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff] flex items-center justify-center bg-[#E7E5E4]',
+  primaryText: 'text-[#1E2938]',
+  secondaryText: 'text-[#4a5568]',
+  mutedText: 'text-[#718096]',
+  labelFont: 'font-[Space_Mono,monospace] tracking-wide',
+  bodyFont: 'font-[JetBrains_Mono,monospace]',
+  primaryColor: '#006666',
+  btnBack: [
+    'flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold',
+    'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff]',
+    'hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff]',
+    'active:shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
+    'disabled:opacity-40 disabled:cursor-not-allowed',
+    'transition-all duration-200 text-[#4a5568]',
+  ].join(' '),
+  btnNext: [
+    'flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold',
+    'bg-[#006666] text-white',
+    'shadow-[4px_4px_10px_#004d4d,-4px_-4px_10px_#008080]',
+    'hover:shadow-[2px_2px_6px_#004d4d,-2px_-2px_6px_#008080]',
+    'active:shadow-[inset_2px_2px_6px_#004d4d,inset_-2px_-2px_6px_#008080]',
+    'transition-all duration-200',
+  ].join(' '),
+  btnSubmit: [
+    'flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold',
+    'bg-[#1E2938] text-white',
+    'shadow-[4px_4px_10px_#111820,-4px_-4px_10px_#2b3a50]',
+    'hover:shadow-[2px_2px_6px_#111820,-2px_-2px_6px_#2b3a50]',
+    'active:shadow-[inset_2px_2px_6px_#111820,inset_-2px_-2px_6px_#2b3a50]',
+    'disabled:opacity-50 disabled:cursor-not-allowed',
+    'transition-all duration-200',
+  ].join(' '),
+  stepActive: [
+    'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
+    'ring-2 ring-[#006666]/40',
+  ].join(' '),
+  stepDone: 'shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff]',
+  stepIdle: [
+    'shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff]',
+    'hover:shadow-[1px_1px_5px_#c8c6c4,-1px_-1px_5px_#ffffff]',
+  ].join(' '),
+  divider: 'border-t border-[#d1cfcd]',
+};
+
+// ─── Step Config ──────────────────────────────────────────────────────────────
 const steps = [
   { label: 'Basic Info', icon: '/images/tour-review/sticky-note.png' },
   { label: 'Bangladesh Info', icon: '/images/tour-review/earth.png' },
@@ -69,107 +118,86 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
 
   const handleNext = () => {
     if (activeStep < steps.length - 1) {
-      setActiveStep(prev => prev + 1);
+      setActiveStep((p) => p + 1);
       window.scrollTo(0, 0);
     }
   };
 
   const handleBack = () => {
     if (activeStep > 0) {
-      setActiveStep(prev => prev - 1);
+      setActiveStep((p) => p - 1);
       window.scrollTo(0, 0);
     }
   };
 
   const validateAndSubmit = async () => {
-    if (!tourData) {
-      setSaveError("No tour data available to submit");
-      return;
-    }
-
+    if (!tourData) { setSaveError('No tour data available to submit'); return; }
     setIsSaving(true);
     setSaveError(null);
-
     try {
-      // Step 1: Validate the tour data
       const validationErrors = await validateTourDataStepByStep(tourData);
-
       if (validationErrors.length > 0) {
-        const errorMessage = formatValidationErrors(validationErrors);
-        setSaveError(`Validation failed:\n${errorMessage}`);
+        setSaveError(`Validation failed:\n${formatValidationErrors(validationErrors)}`);
         setIsSaving(false);
         return;
       }
-
-      // Step 2: Show confirmation dialog
       setShowConfirmation(true);
-      setIsSaving(false); // IMPORTANT: Reset saving state so dialog can be interacted with
-
-    } catch (error) {
-      console.error('Error during validation:', error);
+      setIsSaving(false);
+    } catch {
       setSaveError('Validation error occurred. Please try again.');
       setIsSaving(false);
     }
   };
 
-
   const handleConfirmSubmit = async () => {
-    // Set loading state for dialog button
     setIsSaving(true);
-
     if (!tourData) {
-      setSaveError("No tour data available to submit");
+      setSaveError('No tour data available to submit');
       setShowConfirmation(false);
       setIsSaving(false);
       return;
     }
-
     try {
-      // Step 3: Submit for approval
       await tourUpdateService.submitTourForApprovalApi(tourId);
-
-      // Success - navigate away
       router.push(`/operations/tours/${tourId}`);
-
     } catch (error) {
-      console.error('Error submitting tour:', error);
       const message = extractErrorMessage(error);
       setSaveError(`Failed to submit tour: ${message}`);
-      // Don't close dialog on error - let user retry
       setIsSaving(false);
-      // Keep dialog open for retry
-    } finally {
-      // Only close dialog on successful submission or explicit cancel
-      // setShowConfirmation(false); // Remove this line
     }
   };
 
-  // Add this function to handle dialog close
   const handleDialogClose = () => {
     setShowConfirmation(false);
     setIsSaving(false);
   };
 
+  // ─── Loading / Error States ──────────────────────────────────────────────────
   if (loading[tourDetailLoadingKey(tourId)]) {
-    return (
-      <LoadingUpdateTourContainer />
-    );
+    return <LoadingUpdateTourContainer />;
   }
 
   if (loading[tourDetailErrorKey(tourId)] || !tourData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Alert severity="error" className="rounded-2xl">
-            Failed to load tour data. Please try again.
-          </Alert>
-        </Container>
+      <div className={`min-h-screen ${NEU.surface} flex items-center justify-center p-6`}>
+        <div className={`${NEU.card} p-8 max-w-md w-full flex items-start gap-4`}>
+          <div className={`${NEU.iconBox} w-10 h-10 flex-shrink-0`}>
+            <AlertCircle className="w-5 h-5 text-red-500" />
+          </div>
+          <div>
+            <p className={`text-sm font-bold text-red-600 ${NEU.labelFont}`}>Failed to Load</p>
+            <p className={`text-xs mt-1 ${NEU.mutedText} ${NEU.bodyFont}`}>
+              Failed to load tour data. Please try again.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const progressPercentage = ((activeStep + 1) / steps.length) * 100;
+  const progressPct = ((activeStep + 1) / steps.length) * 100;
 
+  // ─── Step Content ─────────────────────────────────────────────────────────────
   const renderStepContent = () => {
     switch (activeStep) {
       case 0:
@@ -177,22 +205,17 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
           <>
             <HeroImageUpdate
               tourId={tourId}
-              updateData={(updates: Partial<TourDetailDTO>) => updateTourLocal(tourId, updates)}
+              updateData={(u: Partial<TourDetailDTO>) => updateTourLocal(tourId, u)}
               currentHeroImage={tourData.heroImage}
             />
             <GalleryUpdate
               tourId={tourId}
               currentGallery={tourData.gallery || []}
-              updateData={(updates: Partial<TourDetailDTO>) => updateTourLocal(tourId, updates)}
+              updateData={(u: Partial<TourDetailDTO>) => updateTourLocal(tourId, u)}
             />
             <Step0BasicInfo
               tourId={tourId}
-              initialData={{
-                title: tourData.title,
-                summary: tourData.summary,
-                seo: tourData.seo,
-                tags: tourData.tags,
-              }}
+              initialData={{ title: tourData.title, summary: tourData.summary, seo: tourData.seo, tags: tourData.tags }}
             />
           </>
         );
@@ -201,13 +224,9 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
           <Step1BangladeshInfo
             tourId={tourId}
             initialData={{
-              tourType: tourData.tourType,
-              division: tourData.division,
-              district: tourData.district,
-              accommodationType: tourData.accommodationType,
-              guideIncluded: tourData.guideIncluded,
-              transportIncluded: tourData.transportIncluded,
-              emergencyContacts: tourData.emergencyContacts,
+              tourType: tourData.tourType, division: tourData.division, district: tourData.district,
+              accommodationType: tourData.accommodationType, guideIncluded: tourData.guideIncluded,
+              transportIncluded: tourData.transportIncluded, emergencyContacts: tourData.emergencyContacts,
             }}
           />
         );
@@ -217,21 +236,17 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
             <Step2ContentItinerary
               tourId={tourId}
               initialData={{
-                destinations: tourData.destinations,
-                itinerary: tourData.itinerary,
-                inclusions: tourData.inclusions,
-                exclusions: tourData.exclusions,
-                difficulty: tourData.difficulty,
-                bestSeason: tourData.bestSeason,
-                audience: tourData.audience,
-                categories: tourData.categories,
+                destinations: tourData.destinations, itinerary: tourData.itinerary,
+                inclusions: tourData.inclusions, exclusions: tourData.exclusions,
+                difficulty: tourData.difficulty, bestSeason: tourData.bestSeason,
+                audience: tourData.audience, categories: tourData.categories,
                 translations: tourData.translations,
               }}
             />
             <DestinationImagesManager
               tourId={tourId}
               destinations={tourData.destinations || []}
-              updateData={(updates: Partial<TourDetailDTO>) => updateTourLocal(tourId, updates)}
+              updateData={(u: Partial<TourDetailDTO>) => updateTourLocal(tourId, u)}
             />
           </>
         );
@@ -240,10 +255,8 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
           <Step3Logistics
             tourId={tourId}
             initialData={{
-              mainLocation: tourData.mainLocation,
-              transportModes: tourData.transportModes,
-              pickupOptions: tourData.pickupOptions,
-              meetingPoint: tourData.meetingPoint,
+              mainLocation: tourData.mainLocation, transportModes: tourData.transportModes,
+              pickupOptions: tourData.pickupOptions, meetingPoint: tourData.meetingPoint,
               packingList: tourData.packingList,
             }}
           />
@@ -253,12 +266,9 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
           <Step4Pricing
             tourId={tourId}
             initialData={{
-              basePrice: tourData.basePrice,
-              discounts: tourData.discounts,
-              duration: tourData.duration,
-              operatingWindows: tourData.operatingWindows,
-              departures: tourData.departures,
-              paymentMethods: tourData.paymentMethods,
+              basePrice: tourData.basePrice, discounts: tourData.discounts,
+              duration: tourData.duration, operatingWindows: tourData.operatingWindows,
+              departures: tourData.departures, paymentMethods: tourData.paymentMethods,
             }}
           />
         );
@@ -290,268 +300,270 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
   };
 
   const breadcrumbItems = [
-    { label: "Home", href: "/" },
-    { label: "Tours", href: "/operations/tours" },
+    { label: 'Home', href: '/' },
+    { label: 'Tours', href: '/operations/tours' },
     { label: tourData.title, href: `/operations/tours/${tourId}` },
-    { label: "Edit Tour", href: `/operations/tours/${tourId}/update-tour` }
+    { label: 'Edit Tour', href: `/operations/tours/${tourId}/update-tour` },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className={`min-h-screen ${NEU.surface} py-6 px-4 sm:px-6`}>
+      <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.45 }}
         >
-          <Breadcrumbs items={breadcrumbItems} className='pb-3.5' />
+          {/* ── Breadcrumbs ──────────────────────────────────────────── */}
+          <Breadcrumbs items={breadcrumbItems} className="pb-4" />
 
-          {/* Header Section */}
-          <div className="mb-8">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex items-center gap-3 mb-4"
-            >
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg">
-                <Image
-                  src="/images/tour-review/pin.png"
-                  alt="Tour location icon"
-                  width={24}
-                  height={24}
-                  className="object-contain"
-                />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Edit Tour: {tourData.title}
-                </h1>
-                <p className="text-slate-600 mt-1">
-                  Update tour details and manage content
-                </p>
-              </div>
-            </motion.div>
+          {/* ── Page Header ──────────────────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.15 }}
+            className="flex items-center gap-4 mb-6"
+          >
+            <div className={`${NEU.iconBox} w-12 h-12 flex-shrink-0`}>
+              <Image
+                src="/images/tour-review/pin.png"
+                alt="Tour location icon"
+                width={24}
+                height={24}
+                className="object-contain"
+              />
+            </div>
+            <div className="min-w-0">
+              <h1 className={`text-xl sm:text-2xl font-bold ${NEU.primaryText} ${NEU.labelFont} truncate`}>
+                Edit Tour: {tourData.title}
+              </h1>
+              <p className={`text-xs mt-0.5 ${NEU.mutedText} ${NEU.bodyFont}`}>
+                Update tour details and manage content
+              </p>
+            </div>
+          </motion.div>
 
-            {/* Progress Bar */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="relative h-2 bg-slate-200 rounded-full overflow-hidden"
+          {/* ── Progress Track ───────────────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="mb-6"
+          >
+            <div
+              className="relative h-2.5 rounded-full overflow-hidden"
+              style={{ background: '#E7E5E4', boxShadow: 'inset 2px 2px 5px #c8c6c4, inset -2px -2px 5px #ffffff' }}
             >
               <motion.div
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full"
+                className="absolute inset-y-0 left-0 rounded-full"
+                style={{ background: '#006666' }}
                 initial={{ width: 0 }}
-                animate={{ width: `${progressPercentage}%` }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
+                animate={{ width: `${progressPct}%` }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
               />
-            </motion.div>
-            <div className="flex justify-between mt-2 px-1">
-              <span className="text-sm font-medium text-slate-600">
+            </div>
+            <div className="flex justify-between mt-2">
+              <span className={`text-xs ${NEU.mutedText} ${NEU.bodyFont}`}>
                 Step {activeStep + 1} of {steps.length}
               </span>
-              <span className="text-sm font-medium text-indigo-600">
-                {Math.round(progressPercentage)}% Complete
+              <span className={`text-xs font-bold ${NEU.labelFont}`} style={{ color: '#006666' }}>
+                {Math.round(progressPct)}% Complete
               </span>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Main Card */}
+          {/* ── Main Card ────────────────────────────────────────────── */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.3 }}
+            className={`${NEU.card} overflow-hidden`}
           >
-            <div className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-xl shadow-blue-100/50">
-              {/* Custom Stepper */}
-              <div className="bg-white p-6 border-b border-slate-200">
-                <div className="flex items-center justify-between">
-                  {steps.map((step, index) => {
-                    const isCompleted = index < activeStep;
-                    const isCurrent = index === activeStep;
+            {/* Stepper */}
+            <div className={`p-4 sm:p-6 ${NEU.divider}`}>
+              <div className="flex items-center justify-between gap-1">
+                {steps.map((step, index) => {
+                  const isCompleted = index < activeStep;
+                  const isCurrent = index === activeStep;
 
-                    return (
-                      <div key={step.label} className="flex items-center flex-1">
-                        <motion.div
-                          initial={false}
-                          animate={{
-                            scale: isCurrent ? 1.1 : 1,
-                          }}
-                          className="flex flex-col items-center relative"
+                  return (
+                    <div key={step.label} className="flex items-center flex-1 min-w-0">
+                      <div className="flex flex-col items-center">
+                        <motion.button
+                          type="button"
+                          whileHover={{ scale: isSaving ? 1 : 1.05 }}
+                          whileTap={{ scale: isSaving ? 1 : 0.96 }}
+                          animate={{ scale: isCurrent ? 1.08 : 1 }}
+                          onClick={() => !isSaving && handleStepChange(index)}
+                          disabled={isSaving}
+                          className={[
+                            'w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center',
+                            'transition-all duration-200 outline-none',
+                            'bg-[#E7E5E4]',
+                            isCurrent ? NEU.stepActive :
+                              isCompleted ? NEU.stepDone : NEU.stepIdle,
+                            isSaving ? 'cursor-not-allowed' : 'cursor-pointer',
+                          ].join(' ')}
+                          style={isCurrent ? { outline: `2px solid #00666640` } : {}}
+                          aria-label={step.label}
                         >
-                          <motion.button
-                            type="button"
-                            className={`
-                              w-12 h-12 rounded-2xl flex items-center justify-center text-2xl
-                              transition-all duration-300 relative z-10
-                              ${isCompleted
-                                ? 'shadow-lg shadow-green-500/30'
-                                : isCurrent
-                                  ? 'shadow-lg shadow-blue-500/30'
-                                  : 'bg-slate-100 hover:bg-slate-200'
-                              }
-                            `}
-                            whileHover={{ scale: 1.05 }}
-                            onClick={() => handleStepChange(index)}
-                            disabled={isSaving}
-                          >
-                            {isCompleted ? (
-                              <Image
-                                src="/images/tour-review/check-mark.png"
-                                alt="Completed"
-                                width={24}
-                                height={24}
-                                className="object-contain"
-                              />
-                            ) : (
-                              <Image
-                                src={step.icon}
-                                alt={step.label}
-                                width={24}
-                                height={24}
-                                className="object-contain"
-                              />
-                            )}
-                          </motion.button>
-
-                          <span className={`
-                            text-xs font-medium mt-2 text-center max-w-[80px] hidden lg:block
-                            ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-slate-400'}
-                          `}>
-                            {step.label}
-                          </span>
-                        </motion.div>
-
-                        {index < steps.length - 1 && (
-                          <div className="flex-1 h-1 mx-2 relative">
-                            <div className="absolute inset-0 bg-slate-200 rounded-full" />
-                            <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full"
-                              initial={{ scaleX: 0 }}
-                              animate={{ scaleX: isCompleted ? 1 : 0 }}
-                              transition={{ duration: 0.5 }}
-                              style={{ transformOrigin: 'left' }}
+                          {isCompleted ? (
+                            <Image
+                              src="/images/tour-review/check-mark.png"
+                              alt="Completed"
+                              width={20}
+                              height={20}
+                              className="object-contain"
                             />
-                          </div>
-                        )}
+                          ) : (
+                            <Image
+                              src={step.icon}
+                              alt={step.label}
+                              width={20}
+                              height={20}
+                              className="object-contain"
+                            />
+                          )}
+                        </motion.button>
+
+                        <span
+                          className={[
+                            'text-[10px] font-medium mt-1.5 text-center hidden lg:block max-w-[72px] leading-tight',
+                            NEU.labelFont,
+                            isCurrent ? 'text-[#006666]' :
+                              isCompleted ? 'text-[#1E2938]' : NEU.mutedText,
+                          ].join(' ')}
+                        >
+                          {step.label}
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
 
-              {/* Error Alert */}
-              <AnimatePresence>
-                {saveError && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="px-6 pt-6"
+                      {index < steps.length - 1 && (
+                        <div className="flex-1 h-1 mx-1.5 sm:mx-2 relative min-w-0">
+                          <div
+                            className="absolute inset-0 rounded-full"
+                            style={{ boxShadow: 'inset 1px 1px 3px #c8c6c4, inset -1px -1px 3px #ffffff', background: '#E7E5E4' }}
+                          />
+                          <motion.div
+                            className="absolute inset-0 rounded-full"
+                            style={{ background: '#006666', transformOrigin: 'left' }}
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: isCompleted ? 1 : 0 }}
+                            transition={{ duration: 0.45 }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Error Alert */}
+            <AnimatePresence>
+              {saveError && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="px-5 pt-4"
+                >
+                  <div
+                    className={`${NEU.cardInner} flex items-start gap-3 p-4`}
+                    style={{ background: '#fef2f2' }}
                   >
-                    <Alert
-                      severity="error"
-                      className="rounded-2xl"
-                      onClose={() => setSaveError(null)}
-                    >
+                    <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                    <p className={`text-xs text-red-700 flex-1 whitespace-pre-line ${NEU.bodyFont}`}>
                       {saveError}
-                    </Alert>
-                  </motion.div>
-                )}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSaveError(null)}
+                      className="text-red-400 hover:text-red-600 transition-colors flex-shrink-0"
+                      aria-label="Dismiss"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Step Content */}
+            <div className="p-4 sm:p-6 lg:p-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStep}
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  {renderStepContent()}
+                </motion.div>
               </AnimatePresence>
+            </div>
 
-              {/* Step Content */}
-              <div className="p-6 lg:p-8 bg-gradient-to-br from-white to-slate-50">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeStep}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {renderStepContent()}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+            {/* Navigation Footer */}
+            <div className={`p-4 sm:p-6 ${NEU.divider} flex items-center justify-between gap-3`}>
+              {/* Back */}
+              <motion.button
+                type="button"
+                whileHover={{ scale: activeStep === 0 || isSaving ? 1 : 1.02 }}
+                whileTap={{ scale: activeStep === 0 || isSaving ? 1 : 0.97 }}
+                disabled={activeStep === 0 || isSaving}
+                onClick={handleBack}
+                className={`${NEU.btnBack} ${NEU.labelFont}`}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span>Back</span>
+              </motion.button>
 
-              {/* Navigation Buttons */}
-              <div className="p-6 bg-white border-t border-slate-200">
-                <div className="flex items-center justify-between gap-4">
+              {/* Next / Submit */}
+              <div className="flex gap-3">
+                {activeStep < steps.length - 1 ? (
                   <motion.button
                     type="button"
-                    whileHover={{ scale: activeStep === 0 ? 1 : 1.02 }}
-                    whileTap={{ scale: activeStep === 0 ? 1 : 0.98 }}
-                    disabled={activeStep === 0 || isSaving}
-                    onClick={handleBack}
-                    className={`
-                      flex items-center gap-2 px-6 py-3 rounded-xl font-medium
-                      transition-all duration-200
-                      ${activeStep === 0 || isSaving
-                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                        : 'bg-white border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400'
-                      }
-                    `}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleNext}
+                    className={`${NEU.btnNext} ${NEU.labelFont}`}
                   >
-                    ← Back
+                    <span>Next</span>
+                    <ChevronRight className="h-4 w-4" />
                   </motion.button>
-
-                  <div className="flex gap-3">
-                    {activeStep < steps.length - 1 ? (
-                      <motion.button
-                        type="button"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={handleNext}
-                        className="flex items-center gap-2 px-8 py-3 rounded-xl font-semibold
-                          bg-gradient-to-r from-blue-600 to-indigo-600 text-white
-                          hover:from-blue-700 hover:to-indigo-700
-                          shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40
-                          transition-all duration-200"
-                      >
-                        Next →
-                      </motion.button>
+                ) : (
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: isSaving ? 1 : 1.02 }}
+                    whileTap={{ scale: isSaving ? 1 : 0.97 }}
+                    disabled={isSaving}
+                    onClick={validateAndSubmit}
+                    className={`${NEU.btnSubmit} ${NEU.labelFont}`}
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Submitting…</span>
+                      </>
                     ) : (
-                      <motion.button
-                        type="button"
-                        whileHover={{ scale: isSaving ? 1 : 1.02 }}
-                        whileTap={{ scale: isSaving ? 1 : 0.98 }}
-                        disabled={isSaving}
-                        onClick={() => validateAndSubmit()}
-                        className={`
-                            flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-semibold
-                            shadow-lg transition-all duration-200
-                            ${isSaving
-                            ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40'
-                          }
-                          `}
-                      >
-                        {isSaving ? (
-                          <>
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>Submitting...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Send className="h-5 w-5" />
-                            <span>Submit Tour</span>
-                          </>
-                        )}
-                      </motion.button>
+                      <>
+                        <Send className="h-4 w-4" />
+                        <span>Submit Tour</span>
+                      </>
                     )}
-                  </div>
-                </div>
+                  </motion.button>
+                )}
               </div>
             </div>
           </motion.div>
         </motion.div>
       </div>
-      {/* Confirmation Alert Dialog */}
+
+      {/* Confirmation Dialog */}
       <ConfirmationAlert
         open={showConfirmation}
-        onOpenChange={handleDialogClose} 
+        onOpenChange={handleDialogClose}
         onConfirm={handleConfirmSubmit}
         isLoading={isSaving}
       />

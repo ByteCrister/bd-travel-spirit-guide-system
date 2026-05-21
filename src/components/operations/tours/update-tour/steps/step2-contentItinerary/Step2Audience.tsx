@@ -3,251 +3,137 @@
 import { AUDIENCE_TYPE, AudienceType } from '@/constants/tour/tour.const';
 import { UpdateTourContentItineraryDTO } from '@/types/tour/tour.types';
 import { useFormikContext } from 'formik';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
-    Users,
-    Check,
-    X,
-    User,
-    UserPlus,
-    Heart,
-    Briefcase,
-    MapPin
+    Users, Check, X, User, UserPlus, Heart, Briefcase, MapPin
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number; color?: string; strokeWidth?: number }>;
 
-// Audience configuration with icons
+// ── Neumorphism Style Tokens ──────────────────────────────────
+const NEU_CARD = 'rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60';
+const NEU_SURFACE_INSET = 'bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]';
+const NEU_HEADING = 'font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight';
+const NEU_LABEL = 'font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest';
+const NEU_MUTED = 'font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50';
+const NEU_BADGE_PRIMARY = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]';
+const NEU_DIVIDER = 'border-[#1E2938]/10';
+const NEU_ICON_WELL = 'p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]';
+const NEU_BTN_DANGER_SM = 'inline-flex items-center gap-1 text-xs font-[family-name:var(--font-space-mono)] text-[#1E2938]/50 hover:text-[#FF2157] transition-colors duration-200';
+// ─────────────────────────────────────────────────────────────
+
 const AUDIENCE_CONFIG: Record<string, {
-    label: string;
-    icon: IconType;
-    color: string;
-    lightBg: string;
-    borderColor: string;
-    textColor: string;
-    description: string;
+    label: string; icon: IconType; accentBg: string;
+    accentText: string; accentBorder: string; description: string;
 }> = {
-    [AUDIENCE_TYPE.FAMILIES]: {
-        label: "Families",
-        icon: Users, // import { Users } from 'lucide-react'
-        color: "bg-blue-500",
-        lightBg: "bg-blue-50 dark:bg-blue-950/30",
-        borderColor: "border-blue-500",
-        textColor: "text-blue-700 dark:text-blue-400",
-        description: "Perfect for family trips",
-    },
-    [AUDIENCE_TYPE.COUPLES]: {
-        label: "Couples",
-        icon: Heart, // import { Heart } from 'lucide-react'
-        color: "bg-pink-500",
-        lightBg: "bg-pink-50 dark:bg-pink-950/30",
-        borderColor: "border-pink-500",
-        textColor: "text-pink-700 dark:text-pink-400",
-        description: "Romantic getaways",
-    },
-    [AUDIENCE_TYPE.SOLO]: {
-        label: "Solo Travelers",
-        icon: User, // import { User } from 'lucide-react'
-        color: "bg-purple-500",
-        lightBg: "bg-purple-50 dark:bg-purple-950/30",
-        borderColor: "border-purple-500",
-        textColor: "text-purple-700 dark:text-purple-400",
-        description: "Individual adventurers",
-    },
-    [AUDIENCE_TYPE.GROUPS]: {
-        label: "Groups",
-        icon: UserPlus, // import { UserPlus } from 'lucide-react'
-        color: "bg-green-500",
-        lightBg: "bg-green-50 dark:bg-green-950/30",
-        borderColor: "border-green-500",
-        textColor: "text-green-700 dark:text-green-400",
-        description: "Group activities",
-    },
-    [AUDIENCE_TYPE.SENIORS]: {
-        label: "Seniors",
-        icon: Users, // choose an appropriate icon
-        color: "bg-amber-500",
-        lightBg: "bg-amber-50 dark:bg-amber-950/30",
-        borderColor: "border-amber-500",
-        textColor: "text-amber-700 dark:text-amber-400",
-        description: "Comfort-focused tours",
-    },
-    [AUDIENCE_TYPE.BUSINESS]: {
-        label: "Business",
-        icon: Briefcase, // import { Briefcase } from 'lucide-react'
-        color: "bg-slate-600",
-        lightBg: "bg-slate-50 dark:bg-slate-950/30",
-        borderColor: "border-slate-600",
-        textColor: "text-slate-700 dark:text-slate-400",
-        description: "Corporate and business travel",
-    },
-    [AUDIENCE_TYPE.ADVENTURE]: {
-        label: "Adventure",
-        icon: MapPin, // import { MapPin } from 'lucide-react' or choose Mountain/Navigation
-        color: "bg-red-600",
-        lightBg: "bg-red-50 dark:bg-red-950/30",
-        borderColor: "border-red-600",
-        textColor: "text-red-700 dark:text-red-400",
-        description: "Thrill-seeking experiences",
-    },
+    [AUDIENCE_TYPE.FAMILIES]: { label: 'Families', icon: Users, accentBg: 'bg-blue-500', accentText: 'text-blue-600', accentBorder: 'border-blue-400', description: 'Perfect for family trips' },
+    [AUDIENCE_TYPE.COUPLES]: { label: 'Couples', icon: Heart, accentBg: 'bg-pink-500', accentText: 'text-pink-600', accentBorder: 'border-pink-400', description: 'Romantic getaways' },
+    [AUDIENCE_TYPE.SOLO]: { label: 'Solo Travelers', icon: User, accentBg: 'bg-purple-500', accentText: 'text-purple-600', accentBorder: 'border-purple-400', description: 'Individual adventurers' },
+    [AUDIENCE_TYPE.GROUPS]: { label: 'Groups', icon: UserPlus, accentBg: 'bg-green-500', accentText: 'text-green-600', accentBorder: 'border-green-400', description: 'Group activities' },
+    [AUDIENCE_TYPE.SENIORS]: { label: 'Seniors', icon: Users, accentBg: 'bg-amber-500', accentText: 'text-amber-600', accentBorder: 'border-amber-400', description: 'Comfort-focused tours' },
+    [AUDIENCE_TYPE.BUSINESS]: { label: 'Business', icon: Briefcase, accentBg: 'bg-slate-600', accentText: 'text-slate-600', accentBorder: 'border-slate-400', description: 'Corporate & business travel' },
+    [AUDIENCE_TYPE.ADVENTURE]: { label: 'Adventure', icon: MapPin, accentBg: 'bg-red-600', accentText: 'text-red-600', accentBorder: 'border-red-400', description: 'Thrill-seeking experiences' },
 };
 
 const Step2Audience = () => {
     const formik = useFormikContext<UpdateTourContentItineraryDTO>();
 
     const toggleAudience = (audience: AudienceType) => {
-        const currentAudiences = formik.values.audience || [];
-
-        if (currentAudiences.includes(audience)) {
-            formik.setFieldValue('audience', currentAudiences.filter((a: string) => a !== audience));
-        } else {
-            formik.setFieldValue('audience', [...currentAudiences, audience]);
-        }
+        const current = formik.values.audience || [];
+        formik.setFieldValue('audience',
+            current.includes(audience) ? current.filter((a: string) => a !== audience) : [...current, audience]
+        );
     };
 
-    const clearAll = () => {
-        formik.setFieldValue('audience', []);
-    };
+    const clearAll = () => formik.setFieldValue('audience', []);
 
     const selectedAudiences = formik.values.audience || [];
     const hasError = formik.touched.audience && formik.errors.audience;
     const audienceOptions = Object.values(AUDIENCE_TYPE);
 
     return (
-        <Card className={cn(
-            "border-2 transition-colors",
-            hasError ? "border-destructive" : "hover:border-primary/50"
-        )}>
-            <CardHeader>
+        <div className={`${NEU_CARD} ${hasError ? 'ring-2 ring-[#FF2157]/50' : ''} overflow-hidden`}>
+            {/* Header */}
+            <div className={`px-6 py-5 border-b ${NEU_DIVIDER}`}>
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Users className="h-5 w-5 text-primary" />
-                        <CardTitle className="text-lg">Target Audience</CardTitle>
+                    <div className="flex items-center gap-3">
+                        <div className={NEU_ICON_WELL}>
+                            <Users className="w-4 h-4 text-[#006666]" />
+                        </div>
+                        <div>
+                            <h3 className={`${NEU_HEADING} text-base`}>Target Audience</h3>
+                            <p className={`${NEU_MUTED} mt-0.5`}>Select who this tour is designed for</p>
+                        </div>
                     </div>
                     {selectedAudiences.length > 0 && (
-                        <Badge variant="secondary" className="text-xs">
-                            {selectedAudiences.length} selected
-                        </Badge>
+                        <span className={NEU_BADGE_PRIMARY}>{selectedAudiences.length} selected</span>
                     )}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                    Select who this tour is designed for
-                </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {/* Selected Audiences Summary */}
+            </div>
+
+            <div className="px-6 py-5 space-y-5">
+                {/* Selected summary strip */}
                 {selectedAudiences.length > 0 && (
-                    <div className="p-4 rounded-lg bg-muted/50 border-2 border-dashed">
-                        <div className="flex items-center justify-between mb-2">
-                            <Label className="text-sm font-medium">Selected Audiences</Label>
-                            <button
-                                type="button"
-                                onClick={clearAll}
-                                className="text-xs text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1"
-                            >
-                                <X className="h-3 w-3" />
-                                Clear all
+                    <div className={`${NEU_SURFACE_INSET} rounded-xl p-4`}>
+                        <div className="flex items-center justify-between mb-3">
+                            <span className={NEU_LABEL}>Selected</span>
+                            <button type="button" onClick={clearAll} className={NEU_BTN_DANGER_SM}>
+                                <X className="h-3 w-3" /> Clear all
                             </button>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                            {selectedAudiences.map((audience: string) => {
-                                const config = AUDIENCE_CONFIG[audience] || {
-                                    label: audience,
-                                    icon: Users,
-                                    lightBg: 'bg-gray-50 dark:bg-gray-950/30',
-                                    textColor: 'text-gray-700 dark:text-gray-400'
-                                };
-                                const Icon = config.icon;
+                            {selectedAudiences.map((aud: string) => {
+                                const cfg = AUDIENCE_CONFIG[aud] || { label: aud, icon: Users, accentBg: 'bg-gray-500', accentText: 'text-gray-600' };
+                                const Icon = cfg.icon;
                                 return (
-                                    <Badge
-                                        key={audience}
-                                        variant="secondary"
-                                        className={cn(
-                                            "px-3 py-1.5 gap-1.5",
-                                            config.lightBg,
-                                            config.textColor
-                                        )}
-                                    >
-                                        <Icon className="h-3 w-3" />
-                                        {config.label}
-                                    </Badge>
+                                    <span key={aud} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#E7E5E4] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff] text-[#1E2938]">
+                                        <Icon className="h-3 w-3" /> {cfg.label}
+                                    </span>
                                 );
                             })}
                         </div>
                     </div>
                 )}
 
-                {/* Audience Selection Grid */}
+                {/* Selection grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {audienceOptions.map((audienceValue) => {
-                        const config = AUDIENCE_CONFIG[audienceValue] || {
-                            label: audienceValue,
-                            icon: Users,
-                            color: 'bg-gray-500',
-                            lightBg: 'bg-gray-50 dark:bg-gray-950/30',
-                            borderColor: 'border-gray-500',
-                            textColor: 'text-gray-700 dark:text-gray-400',
-                            description: 'Target audience'
-                        };
-                        const Icon = config.icon;
-                        const isSelected = selectedAudiences.includes(audienceValue);
+                    {audienceOptions.map((val) => {
+                        const cfg = AUDIENCE_CONFIG[val] || { label: val, icon: Users, accentBg: 'bg-gray-500', accentText: 'text-gray-600', accentBorder: 'border-gray-400', description: '' };
+                        const Icon = cfg.icon;
+                        const selected = selectedAudiences.includes(val);
 
                         return (
                             <button
-                                key={audienceValue}
+                                key={val}
                                 type="button"
-                                onClick={() => toggleAudience(audienceValue)}
-                                className={cn(
-                                    "relative p-4 rounded-lg border-2 transition-all duration-200",
-                                    "hover:scale-[1.02] active:scale-[0.98]",
-                                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                                    isSelected
-                                        ? cn(config.borderColor, config.lightBg, "shadow-md")
-                                        : "border-border hover:border-primary/50 bg-card"
-                                )}
+                                onClick={() => toggleAudience(val)}
+                                className={[
+                                    'relative p-4 rounded-xl text-left transition-all duration-200',
+                                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50',
+                                    selected
+                                        ? `bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-2 ${cfg.accentBorder}`
+                                        : 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border-2 border-transparent hover:shadow-[6px_6px_14px_#c8c6c5,-6px_-6px_14px_#ffffff] hover:-translate-y-0.5',
+                                ].join(' ')}
                             >
-                                {/* Selection Indicator */}
-                                <div
-                                    className={cn(
-                                        "absolute top-2 right-2 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all",
-                                        isSelected
-                                            ? cn(config.color, "border-transparent")
-                                            : "border-muted-foreground/30"
-                                    )}
-                                >
-                                    {isSelected && <Check className="h-3 w-3 text-white" />}
+                                {/* Checkmark indicator */}
+                                <div className={[
+                                    'absolute top-2.5 right-2.5 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all duration-200',
+                                    selected ? `${cfg.accentBg} border-transparent` : 'border-[#1E2938]/20 bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c5,inset_-1px_-1px_3px_#ffffff]',
+                                ].join(' ')}>
+                                    {selected && <Check className="h-3 w-3 text-white" />}
                                 </div>
 
-                                {/* Audience Content */}
-                                <div className="flex items-start gap-3">
-                                    <div
-                                        className={cn(
-                                            "h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0",
-                                            isSelected ? config.color : "bg-muted"
-                                        )}
-                                    >
-                                        <Icon
-                                            className={cn(
-                                                "h-5 w-5",
-                                                isSelected ? "text-white" : "text-muted-foreground"
-                                            )}
-                                        />
+                                <div className="flex items-center gap-3">
+                                    <div className={[
+                                        'h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0',
+                                        selected ? cfg.accentBg : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]',
+                                    ].join(' ')}>
+                                        <Icon className={`h-5 w-5 ${selected ? 'text-white' : 'text-[#1E2938]/40'}`} />
                                     </div>
-                                    <div className="flex-1 text-left">
-                                        <div
-                                            className={cn(
-                                                "font-semibold mb-0.5",
-                                                isSelected ? config.textColor : "text-foreground"
-                                            )}
-                                        >
-                                            {config.label}
-                                        </div>
-                                        <div className="text-xs text-muted-foreground">
-                                            {config.description}
-                                        </div>
+                                    <div>
+                                        <p className={`font-[family-name:var(--font-space-mono)] font-bold text-sm ${selected ? cfg.accentText : 'text-[#1E2938]'}`}>
+                                            {cfg.label}
+                                        </p>
+                                        <p className={NEU_MUTED}>{cfg.description}</p>
                                     </div>
                                 </div>
                             </button>
@@ -255,22 +141,19 @@ const Step2Audience = () => {
                     })}
                 </div>
 
-                {/* Error Message */}
+                {/* Error */}
                 {hasError && (
-                    <p className="text-sm text-destructive flex items-center gap-1">
-                        <X className="h-4 w-4" />
-                        {formik.errors.audience}
+                    <p className="flex items-center gap-1.5 text-sm font-[family-name:var(--font-space-mono)] text-[#FF2157]">
+                        <X className="h-4 w-4" /> {String(formik.errors.audience)}
                     </p>
                 )}
 
-                {/* Helper Text */}
+                {/* Helper */}
                 {selectedAudiences.length === 0 && !hasError && (
-                    <p className="text-xs text-center text-muted-foreground pt-2">
-                        Select one or more target audiences for this tour
-                    </p>
+                    <p className={`${NEU_MUTED} text-center pt-1`}>Select one or more target audiences for this tour</p>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 };
 

@@ -1,4 +1,3 @@
-// app/operations/tours/[tourId]/update-tour/components/steps/Step5Compliance.tsx
 'use client';
 
 import { useFormik } from 'formik';
@@ -22,12 +21,6 @@ import {
   Info,
   UserCheck,
 } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,6 +34,30 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ValidationError } from 'yup';
+
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+const NEU = {
+  surface: 'bg-[#E7E5E4]',
+  card: 'bg-[#E7E5E4] rounded-2xl shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff]',
+  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
+  raised: 'bg-[#E7E5E4] rounded-xl shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff]',
+  pressed: 'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
+  iconBox: 'rounded-xl shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff] flex items-center justify-center',
+  primaryText: 'text-[#1E2938]',
+  secondaryText: 'text-[#4a5568]',
+  mutedText: 'text-[#718096]',
+  primary: '#006666',
+  primaryBg: 'bg-[#006666]',
+  primaryText2: 'text-[#006666]',
+  border: 'border border-[#d1cfcd]',
+  inputBase: 'bg-[#E7E5E4] shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] border-0 rounded-xl focus:ring-2 focus:ring-[#006666]/30 outline-none transition-all duration-200',
+  labelFont: 'font-[Space_Mono,monospace] tracking-wide',
+  bodyFont: 'font-[JetBrains_Mono,monospace]',
+  btnPrimary: 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff] active:shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] transition-all duration-200 rounded-xl text-[#006666] font-semibold',
+  btnSubmit: 'bg-[#006666] text-white rounded-xl shadow-[4px_4px_10px_#004d4d,-4px_-4px_10px_#008080] hover:shadow-[2px_2px_6px_#004d4d,-2px_-2px_6px_#008080] active:shadow-[inset_2px_2px_6px_#004d4d,inset_-2px_-2px_6px_#008080] transition-all duration-200 font-semibold',
+  badge: 'rounded-lg shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+  divider: 'border-t border-[#d1cfcd]',
+};
 
 interface Step5ComplianceProps {
   tourId: string;
@@ -72,23 +89,16 @@ export default function Step5Compliance({ tourId, initialData }: Step5Compliance
     validationSchema: Step5ComplianceSchema,
     onSubmit: async (values) => {
       try {
-        // Validate the form before submission
         await Step5ComplianceSchema.validate(values, { abortEarly: false });
-
-        // Only submit if validation passes
         mutation.mutate(values);
       } catch (error) {
-        // Handle validation errors
         if (error instanceof ValidationError) {
           const errors: { [key: string]: string } = {};
           error.inner.forEach((err) => {
-            if (err.path) {
-              errors[err.path] = err.message;
-            }
+            if (err.path) errors[err.path] = err.message;
           });
           formik.setErrors(errors);
         }
-        // Don't submit on validation error
       }
     },
   });
@@ -97,403 +107,332 @@ export default function Step5Compliance({ tourId, initialData }: Step5Compliance
     formik.setFieldValue(`accessibility.${field}`, value);
   };
 
+  // ─── Animation Variants ─────────────────────────────────────────────────────
   const containerVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4, staggerChildren: 0.1 }
-    }
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45, staggerChildren: 0.1 } },
   };
-
   const itemVariants: Variants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.3 }
-    }
+    hidden: { opacity: 0, x: -16 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+  };
+  const alertVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.96, y: -8 },
+    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3 } },
+    exit: { opacity: 0, scale: 0.96, y: -8, transition: { duration: 0.2 } },
   };
 
-  const alertVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.95, y: -10 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: { duration: 0.3 }
+  // ─── Accessibility Tile Config ───────────────────────────────────────────────
+  const accessibilityTiles = [
+    {
+      key: 'wheelchair',
+      label: 'Wheelchair',
+      sub: 'Accessible',
+      icon: PersonStanding,
+      active: formik.values.accessibility?.wheelchair,
+      activeColor: 'text-[#006666]',
+      activeBg: 'bg-[#e0f0f0]',
+      activeBorder: 'ring-2 ring-[#006666]/50',
     },
-    exit: {
-      opacity: 0,
-      scale: 0.95,
-      y: -10,
-      transition: { duration: 0.2 }
-    }
-  };
+    {
+      key: 'familyFriendly',
+      label: 'Family',
+      sub: 'Friendly',
+      icon: Baby,
+      active: formik.values.accessibility?.familyFriendly,
+      activeColor: 'text-[#b83280]',
+      activeBg: 'bg-[#fce7f3]',
+      activeBorder: 'ring-2 ring-[#b83280]/40',
+    },
+    {
+      key: 'petFriendly',
+      label: 'Pet',
+      sub: 'Friendly',
+      icon: PawPrint,
+      active: formik.values.accessibility?.petFriendly,
+      activeColor: 'text-[#b45309]',
+      activeBg: 'bg-[#fef3c7]',
+      activeBorder: 'ring-2 ring-[#b45309]/40',
+    },
+  ];
 
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
+      className={`${NEU.surface} min-h-screen p-4 sm:p-6`}
     >
-      <Card className="mb-6 border-slate-200 shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-indigo-50/30 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-lg shadow-indigo-500/20">
-              <ShieldCheck className="h-6 w-6 text-white" />
-            </div>
-            <CardTitle className="text-xl font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              Compliance & Accessibility
-            </CardTitle>
-          </div>
-        </CardHeader>
+      <div className={`${NEU.card} p-6 sm:p-8 max-w-3xl mx-auto`}>
 
-        <CardContent className="pt-6 pb-8 px-6">
-          <form onSubmit={formik.handleSubmit}>
-            <div className="space-y-6">
-              {/* License Required Section */}
-              <motion.div variants={itemVariants}>
-                <div className="p-5 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border-2 border-indigo-100">
-                  <div className="flex items-start gap-4">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white shadow-sm border border-indigo-200 flex-shrink-0">
-                      <FileCheck className="h-6 w-6 text-indigo-600" />
+        {/* ── Header ───────────────────────────────────────────────────── */}
+        <motion.div variants={itemVariants} className="flex items-center gap-4 mb-8">
+          <div
+            className={`${NEU.iconBox} w-12 h-12 sm:w-14 sm:h-14`}
+            style={{ background: '#E7E5E4' }}
+          >
+            <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7" style={{ color: '#006666' }} />
+          </div>
+          <div>
+            <h2 className={`text-xl sm:text-2xl font-bold ${NEU.primaryText} ${NEU.labelFont}`}>
+              Compliance & Accessibility
+            </h2>
+            <p className={`text-sm mt-0.5 ${NEU.mutedText} ${NEU.bodyFont}`}>
+              Set tour requirements and accessibility options
+            </p>
+          </div>
+        </motion.div>
+
+        <form onSubmit={formik.handleSubmit} className="space-y-7">
+
+          {/* ── License Required ─────────────────────────────────────────── */}
+          <motion.div variants={itemVariants}>
+            <div className={`${NEU.cardInner} p-5`}>
+              <div className="flex items-start gap-4">
+                <div className={`${NEU.iconBox} w-11 h-11 flex-shrink-0`} style={{ background: '#E7E5E4' }}>
+                  <FileCheck className="w-5 h-5" style={{ color: '#006666' }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className={`text-sm font-bold ${NEU.primaryText} ${NEU.labelFont}`}>
+                        License Requirement
+                      </p>
+                      <p className={`text-xs mt-0.5 ${NEU.mutedText} ${NEU.bodyFont}`}>
+                        Does this tour require a special license?
+                      </p>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-base font-semibold text-slate-800 mb-1">
-                            License Requirement
-                          </h3>
-                          <p className="text-sm text-slate-600">
-                            Does this tour require participants to have a special license?
+                    <Checkbox
+                      id="licenseRequired"
+                      checked={formik.values.licenseRequired}
+                      onCheckedChange={(checked) => formik.setFieldValue('licenseRequired', checked)}
+                      className="mt-0.5 h-5 w-5 rounded-md border-[#006666]/40 data-[state=checked]:bg-[#006666] data-[state=checked]:border-[#006666]"
+                    />
+                  </div>
+
+                  <AnimatePresence>
+                    {formik.values.licenseRequired && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-3 overflow-hidden"
+                      >
+                        <div className={`${NEU.badge} px-3 py-2.5 flex items-start gap-2`} style={{ background: '#e0f0f0' }}>
+                          <Info className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: '#006666' }} />
+                          <p className={`text-xs ${NEU.bodyFont}`} style={{ color: '#006666' }}>
+                            Participants will be notified that a valid license is required for this tour.
                           </p>
                         </div>
-                        <Checkbox
-                          id="licenseRequired"
-                          checked={formik.values.licenseRequired}
-                          onCheckedChange={(checked) => formik.setFieldValue('licenseRequired', checked)}
-                          className="border-indigo-400 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 h-6 w-6"
-                        />
-                      </div>
-                      {formik.values.licenseRequired && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="mt-3 p-3 bg-white rounded-lg border border-indigo-200"
-                        >
-                          <div className="flex items-start gap-2">
-                            <Info className="h-4 w-4 text-indigo-600 mt-0.5 flex-shrink-0" />
-                            <p className="text-xs text-indigo-700">
-                              Participants will be notified that a valid license is required for this tour.
-                            </p>
-                          </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ── Age Suitability ──────────────────────────────────────────── */}
+          <motion.div variants={itemVariants} className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className={`${NEU.iconBox} w-9 h-9`} style={{ background: '#E7E5E4' }}>
+                <Users className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <Label className={`text-sm font-bold ${NEU.primaryText} ${NEU.labelFont}`}>
+                  Age Suitability
+                </Label>
+                <p className={`text-xs ${NEU.mutedText} ${NEU.bodyFont}`}>
+                  Who is this tour appropriate for?
+                </p>
+              </div>
+            </div>
+
+            <Select
+              value={formik.values.ageSuitability}
+              onValueChange={(value) => formik.setFieldValue('ageSuitability', value)}
+            >
+              <SelectTrigger
+                className={`${NEU.inputBase} h-12 px-4 w-full text-sm ${NEU.primaryText} ${NEU.bodyFont}`}
+              >
+                <SelectValue placeholder="Select age suitability" />
+              </SelectTrigger>
+              <SelectContent className={`${NEU.raised} border-0 ${NEU.bodyFont}`}>
+                {Object.values(AGE_SUITABILITY).map((age) => (
+                  <SelectItem
+                    key={age}
+                    value={age}
+                    className={`text-sm ${NEU.primaryText} hover:bg-[#d8d6d4] rounded-lg cursor-pointer`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <UserCheck className="h-4 w-4 text-[#006666]" />
+                      {age}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {formik.touched.ageSuitability && formik.errors.ageSuitability && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className={`text-xs text-red-600 flex items-center gap-1 ${NEU.bodyFont}`}
+              >
+                <AlertCircle className="h-3 w-3" />
+                {formik.errors.ageSuitability}
+              </motion.p>
+            )}
+          </motion.div>
+
+          {/* ── Accessibility Features ───────────────────────────────────── */}
+          <motion.div variants={itemVariants} className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className={`${NEU.iconBox} w-9 h-9`} style={{ background: '#E7E5E4' }}>
+                <PersonStanding className="w-4 h-4 text-[#006666]" />
+              </div>
+              <div>
+                <Label className={`text-sm font-bold ${NEU.primaryText} ${NEU.labelFont}`}>
+                  Accessibility Features
+                </Label>
+                <p className={`text-xs ${NEU.mutedText} ${NEU.bodyFont}`}>
+                  Specify accessibility options and amenities
+                </p>
+              </div>
+            </div>
+
+            {/* Tiles */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {accessibilityTiles.map(({ key, label, sub, icon: Icon, active, activeColor, activeBg, activeBorder }) => (
+                <motion.button
+                  key={key}
+                  type="button"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => updateAccessibility(key, !formik.values.accessibility?.[key as keyof typeof formik.values.accessibility])}
+                  className={`
+                    ${NEU.surface} p-4 rounded-xl transition-all duration-200 outline-none
+                    ${active
+                      ? `shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] ${activeBorder}`
+                      : 'shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff]'
+                    }
+                  `}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <div className={`p-2.5 rounded-lg ${active ? activeBg : 'bg-[#ddd9d7]'}`}>
+                      <Icon className={`h-6 w-6 ${active ? activeColor : NEU.mutedText}`} />
+                    </div>
+                    <div className="text-center">
+                      <p className={`text-sm font-bold ${active ? activeColor : NEU.primaryText} ${NEU.labelFont}`}>
+                        {label}
+                      </p>
+                      <p className={`text-xs ${NEU.mutedText} ${NEU.bodyFont}`}>{sub}</p>
+                    </div>
+                    <div
+                      className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 ${
+                        active
+                          ? 'shadow-[inset_2px_2px_4px_rgba(0,0,0,0.15)]'
+                          : 'shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff]'
+                      }`}
+                      style={{ background: active ? '#006666' : '#E7E5E4' }}
+                    >
+                      {active && (
+                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                          <CheckCircle2 className="h-3.5 w-3.5 text-white" />
                         </motion.div>
                       )}
                     </div>
                   </div>
-                </div>
-              </motion.div>
-
-              {/* Age Suitability */}
-              <motion.div variants={itemVariants} className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-blue-50 border border-blue-100">
-                    <Users className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <Label className="text-base font-semibold text-slate-800">Age Suitability</Label>
-                    <p className="text-sm text-slate-600">Who is this tour appropriate for?</p>
-                  </div>
-                </div>
-                <Select
-                  value={formik.values.ageSuitability}
-                  onValueChange={(value) => formik.setFieldValue('ageSuitability', value)}
-                >
-                  <SelectTrigger className="border-slate-300 focus:border-blue-500 focus:ring-blue-500 h-12">
-                    <SelectValue placeholder="Select age suitability" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(AGE_SUITABILITY).map((age) => (
-                      <SelectItem key={age} value={age}>
-                        <div className="flex items-center gap-2">
-                          <UserCheck className="h-4 w-4 text-slate-500" />
-                          {age}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {formik.touched.ageSuitability && formik.errors.ageSuitability && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-xs text-red-600 flex items-center gap-1"
-                  >
-                    <AlertCircle className="h-3 w-3" />
-                    {formik.errors.ageSuitability}
-                  </motion.p>
-                )}
-              </motion.div>
-
-              {/* Accessibility Features Section */}
-              <motion.div variants={itemVariants} className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-teal-50 border border-teal-100">
-                    <PersonStanding className="h-5 w-5 text-teal-600" />
-                  </div>
-                  <div>
-                    <Label className="text-base font-semibold text-slate-800">Accessibility Features</Label>
-                    <p className="text-sm text-slate-600">Specify accessibility options and amenities</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {/* Wheelchair Accessible */}
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div
-                      className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${formik.values.accessibility?.wheelchair
-                        ? 'border-teal-500 bg-teal-50'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                        }`}
-                      onClick={() => updateAccessibility('wheelchair', !formik.values.accessibility?.wheelchair)}
-                    >
-                      <div className="flex flex-col items-center gap-2 text-center">
-                        <div className={`p-3 rounded-lg ${formik.values.accessibility?.wheelchair
-                          ? 'bg-teal-100'
-                          : 'bg-slate-100'
-                          }`}>
-                          <PersonStanding className={`h-6 w-6 ${formik.values.accessibility?.wheelchair
-                            ? 'text-teal-600'
-                            : 'text-slate-500'
-                            }`} />
-                        </div>
-                        <div>
-                          <p className={`text-sm font-semibold ${formik.values.accessibility?.wheelchair
-                            ? 'text-teal-700'
-                            : 'text-slate-700'
-                            }`}>
-                            Wheelchair
-                          </p>
-                          <p className="text-xs text-slate-600 mt-0.5">Accessible</p>
-                        </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${formik.values.accessibility?.wheelchair
-                          ? 'border-teal-500 bg-teal-500'
-                          : 'border-slate-300'
-                          }`}>
-                          {formik.values.accessibility?.wheelchair && (
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                            >
-                              <CheckCircle2 className="h-4 w-4 text-white" />
-                            </motion.div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Family Friendly */}
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div
-                      className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${formik.values.accessibility?.familyFriendly
-                        ? 'border-pink-500 bg-pink-50'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                        }`}
-                      onClick={() => updateAccessibility('familyFriendly', !formik.values.accessibility?.familyFriendly)}
-                    >
-                      <div className="flex flex-col items-center gap-2 text-center">
-                        <div className={`p-3 rounded-lg ${formik.values.accessibility?.familyFriendly
-                          ? 'bg-pink-100'
-                          : 'bg-slate-100'
-                          }`}>
-                          <Baby className={`h-6 w-6 ${formik.values.accessibility?.familyFriendly
-                            ? 'text-pink-600'
-                            : 'text-slate-500'
-                            }`} />
-                        </div>
-                        <div>
-                          <p className={`text-sm font-semibold ${formik.values.accessibility?.familyFriendly
-                            ? 'text-pink-700'
-                            : 'text-slate-700'
-                            }`}>
-                            Family
-                          </p>
-                          <p className="text-xs text-slate-600 mt-0.5">Friendly</p>
-                        </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${formik.values.accessibility?.familyFriendly
-                          ? 'border-pink-500 bg-pink-500'
-                          : 'border-slate-300'
-                          }`}>
-                          {formik.values.accessibility?.familyFriendly && (
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                            >
-                              <CheckCircle2 className="h-4 w-4 text-white" />
-                            </motion.div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Pet Friendly */}
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div
-                      className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${formik.values.accessibility?.petFriendly
-                        ? 'border-amber-500 bg-amber-50'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                        }`}
-                      onClick={() => updateAccessibility('petFriendly', !formik.values.accessibility?.petFriendly)}
-                    >
-                      <div className="flex flex-col items-center gap-2 text-center">
-                        <div className={`p-3 rounded-lg ${formik.values.accessibility?.petFriendly
-                          ? 'bg-amber-100'
-                          : 'bg-slate-100'
-                          }`}>
-                          <PawPrint className={`h-6 w-6 ${formik.values.accessibility?.petFriendly
-                            ? 'text-amber-600'
-                            : 'text-slate-500'
-                            }`} />
-                        </div>
-                        <div>
-                          <p className={`text-sm font-semibold ${formik.values.accessibility?.petFriendly
-                            ? 'text-amber-700'
-                            : 'text-slate-700'
-                            }`}>
-                            Pet
-                          </p>
-                          <p className="text-xs text-slate-600 mt-0.5">Friendly</p>
-                        </div>
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${formik.values.accessibility?.petFriendly
-                          ? 'border-amber-500 bg-amber-500'
-                          : 'border-slate-300'
-                          }`}>
-                          {formik.values.accessibility?.petFriendly && (
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                            >
-                              <CheckCircle2 className="h-4 w-4 text-white" />
-                            </motion.div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Accessibility Notes */}
-                <div className="space-y-2 pt-2">
-                  <Label className="text-sm font-medium text-slate-700">Additional Accessibility Information</Label>
-                  <Textarea
-                    value={formik.values.accessibility?.notes || ''}
-                    onChange={(e) => updateAccessibility('notes', e.target.value)}
-                    placeholder="Describe any additional accessibility features, facilities, or requirements..."
-                    rows={4}
-                    className="border-slate-300 focus:border-teal-500 focus:ring-teal-500 resize-none"
-                  />
-                  <p className="text-xs text-slate-600 flex items-center gap-1.5">
-                    <Info className="h-3.5 w-3.5" />
-                    Provide details about ramps, elevators, accessible restrooms, parking, or any other relevant information
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Error/Success Alerts */}
-              <AnimatePresence mode="wait">
-                {mutation.isError && (
-                  <motion.div
-                    key="error"
-                    variants={alertVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                  >
-                    <Alert variant="destructive" className="border-red-200 bg-red-50">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription className="text-red-800">
-                        Failed to update compliance & accessibility information
-                      </AlertDescription>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-2 right-2 h-6 w-6 p-0 text-red-600 hover:bg-red-100"
-                        onClick={() => mutation.reset()}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </Alert>
-                  </motion.div>
-                )}
-
-                {mutation.isSuccess && (
-                  <motion.div
-                    key="success"
-                    variants={alertVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                  >
-                    <Alert className="border-green-200 bg-green-50">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <AlertDescription className="text-green-800">
-                        Compliance & accessibility information updated successfully
-                      </AlertDescription>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-2 right-2 h-6 w-6 p-0 text-green-600 hover:bg-green-100"
-                        onClick={() => mutation.reset()}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </Alert>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Submit Button */}
-              <motion.div
-                variants={itemVariants}
-                className="flex justify-end pt-6 border-t border-slate-200"
-              >
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    type="submit"
-                    disabled={mutation.isPending}
-                    className="px-8 py-5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-lg shadow-indigo-500/30 transition-all duration-200"
-                  >
-                    {mutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Updating...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="mr-2 h-5 w-5" />
-                        Update Compliance & Accessibility
-                      </>
-                    )}
-                  </Button>
-                </motion.div>
-              </motion.div>
+                </motion.button>
+              ))}
             </div>
-          </form>
-        </CardContent>
-      </Card>
+
+            {/* Notes */}
+            <div className="space-y-2 pt-1">
+              <Label className={`text-xs font-bold ${NEU.secondaryText} ${NEU.labelFont} uppercase tracking-wider`}>
+                Additional Accessibility Notes
+              </Label>
+              <Textarea
+                value={formik.values.accessibility?.notes || ''}
+                onChange={(e) => updateAccessibility('notes', e.target.value)}
+                placeholder="Describe ramps, elevators, accessible restrooms, parking, or other relevant details..."
+                rows={4}
+                className={`${NEU.inputBase} w-full p-4 text-sm resize-none ${NEU.primaryText} ${NEU.bodyFont} placeholder:${NEU.mutedText}`}
+              />
+              <p className={`text-xs ${NEU.mutedText} flex items-center gap-1.5 ${NEU.bodyFont}`}>
+                <Info className="h-3.5 w-3.5 flex-shrink-0" />
+                Provide details that help participants plan appropriately
+              </p>
+            </div>
+          </motion.div>
+
+          {/* ── Alerts ───────────────────────────────────────────────────── */}
+          <AnimatePresence mode="wait">
+            {mutation.isError && (
+              <motion.div key="error" variants={alertVariants} initial="hidden" animate="visible" exit="exit">
+                <Alert
+                  variant="destructive"
+                  className={`${NEU.cardInner} border-0 bg-red-50 relative`}
+                >
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <AlertDescription className={`text-red-800 text-sm ${NEU.bodyFont}`}>
+                    Failed to update compliance & accessibility information
+                  </AlertDescription>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 h-7 w-7 p-0 text-red-500 hover:bg-red-100 rounded-lg"
+                    onClick={() => mutation.reset()}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </Alert>
+              </motion.div>
+            )}
+            {mutation.isSuccess && (
+              <motion.div key="success" variants={alertVariants} initial="hidden" animate="visible" exit="exit">
+                <Alert className={`${NEU.cardInner} border-0 bg-green-50 relative`}>
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <AlertDescription className={`text-green-800 text-sm ${NEU.bodyFont}`}>
+                    Compliance & accessibility information updated successfully
+                  </AlertDescription>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 h-7 w-7 p-0 text-green-600 hover:bg-green-100 rounded-lg"
+                    onClick={() => mutation.reset()}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </Alert>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Submit ───────────────────────────────────────────────────── */}
+          <motion.div variants={itemVariants} className={`flex justify-end pt-5 ${NEU.divider}`}>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className={`${NEU.btnSubmit} h-12 px-7 text-sm gap-2 disabled:opacity-60`}
+              >
+                {mutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className={NEU.labelFont}>Updating…</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span className={NEU.labelFont}>Update Compliance</span>
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          </motion.div>
+        </form>
+      </div>
     </motion.div>
   );
 }

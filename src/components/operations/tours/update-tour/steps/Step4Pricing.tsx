@@ -7,105 +7,88 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-import {
-  UpdateTourPricingDTO,
-  DiscountDTO,
-  OperatingWindowDTO,
-  DepartureDTO,
-  PriceDTO,
-} from '@/types/tour/tour.types';
-import { CURRENCY, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, PAYMENT_METHOD, Currency, TourDiscount, PaymentMethod, TourDiscountType } from '@/constants/tour/tour.const';
-import { tourUpdateService } from '@/utils/api/tour.update.api';
-import { Step4PricingSchema } from '@/utils/validators/tour/add-tour.validator';
-
-// Shadcn Components
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  AlertCircle,
-  Plus,
-  Trash2,
-  CalendarIcon,
-  Percent,
-  Plane,
-  Users,
-  MapPin,
-  Loader2,
-  Check,
-  X,
-  TrendingDown,
-  CalendarDays,
-  Timer,
-  Wallet,
-  Tag,
-  Gift,
-  Navigation,
-  CheckCircle2,
-  XCircle,
-  Coins,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { MapPickerDialog } from '@/components/global/MapPickerDialog';
 import { FaBangladeshiTakaSign } from 'react-icons/fa6';
 
-interface Step4PricingProps {
-  tourId: string;
-  initialData: UpdateTourPricingDTO;
-  onUpdateSuccess?: () => void;
-}
+import {
+  UpdateTourPricingDTO, DiscountDTO, OperatingWindowDTO, DepartureDTO, PriceDTO,
+} from '@/types/tour/tour.types';
+import {
+  CURRENCY, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, PAYMENT_METHOD,
+  Currency, TourDiscount, PaymentMethod, TourDiscountType,
+} from '@/constants/tour/tour.const';
+import { tourUpdateService } from '@/utils/api/tour.update.api';
+import { Step4PricingSchema } from '@/utils/validators/tour/add-tour.validator';
+import { MapPickerDialog } from '@/components/global/MapPickerDialog';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  AlertCircle, Plus, Trash2, CalendarIcon, Percent, Plane, Users, MapPin,
+  Loader2, Check, X, TrendingDown, CalendarDays, Timer, Wallet, Tag, Gift,
+  Navigation, CheckCircle2, XCircle, Coins, ChevronDown,
+} from 'lucide-react';
 
-const discountCategoryLabels: Record<TourDiscount, string> = {
+// ─── Neumorphism + Font Style Constants ───────────────────────────────────────
+const neu = {
+  // surfaces
+  card: 'bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_18px_#c8c6c4,-8px_-8px_18px_#ffffff]',
+  cardInner: 'bg-[#E7E5E4] rounded-xl border border-[#d4d2d0] shadow-[5px_5px_12px_#c8c6c4,-5px_-5px_12px_#ffffff] hover:shadow-[7px_7px_16px_#c8c6c4,-7px_-7px_16px_#ffffff] transition-all duration-300',
+  inset: 'bg-[#E7E5E4] rounded-xl shadow-[inset_4px_4px_9px_#c8c6c4,inset_-4px_-4px_9px_#ffffff]',
+  insetSm: 'bg-[#E7E5E4] rounded-lg  shadow-[inset_3px_3px_6px_#c8c6c4,inset_-3px_-3px_6px_#ffffff]',
+  flat: 'bg-[#E7E5E4] rounded-xl border border-[#d4d2d0]',
+
+  // interactive
+  iconBox: (color: string) => `rounded-xl p-2.5 shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] flex items-center justify-center ${color}`,
+  btn: 'inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm rounded-xl text-white bg-[#006666] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff] active:shadow-[inset_3px_3px_7px_rgba(0,0,0,0.25)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-[var(--font-space-mono)]',
+  btnSm: 'inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs rounded-lg text-white bg-[#006666] shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] active:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.25)] transition-all duration-200 font-[var(--font-space-mono)]',
+  btnGhost: 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg text-[#FF2157] border border-[#FF2157]/25 shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff] hover:shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:bg-[#FF2157]/5 transition-all duration-200 font-[var(--font-space-mono)]',
+  btnOutline: 'inline-flex items-center gap-2 px-3 py-2 text-sm rounded-xl bg-[#E7E5E4] text-[#1E2938] border border-[#d4d2d0] shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[4px_4px_9px_#c8c6c4,-4px_-4px_9px_#ffffff] transition-all font-[var(--font-jetbrains-mono)]',
+  input: 'w-full bg-[#E7E5E4] rounded-xl px-3.5 py-2.5 text-sm text-[#1E2938] placeholder:text-[#888780] border-0 outline-none shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] focus:ring-1 focus:ring-[#006666]/50 transition-all font-[var(--font-jetbrains-mono)]',
+  inputErr: 'ring-1 ring-[#FF2157]/50',
+  checkTile: (a: boolean) => `flex items-center gap-2.5 p-3 rounded-xl cursor-pointer select-none transition-all duration-200 bg-[#E7E5E4] ${a ? 'shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] ring-1 ring-[#006666]/35' : 'shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[4px_4px_9px_#c8c6c4,-4px_-4px_9px_#ffffff]'}`,
+  checkbox: (a: boolean) => `w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-all duration-200 ${a ? 'bg-[#006666] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]' : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]'}`,
+  badge: 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-[var(--font-space-mono)] bg-[#E7E5E4] text-[#888780] shadow-[2px_2px_4px_#c8c6c4,-2px_-2px_4px_#ffffff] border border-[#d4d2d0]',
+  divider: 'border-t border-[#d4d2d0] my-5',
+
+  // alerts
+  alertErr: 'flex items-start gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#FF2157]/30 shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
+  alertOk: 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#00A63D]/30 shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
+  errText: 'text-xs text-[#FF2157] font-[var(--font-jetbrains-mono)] flex items-center gap-1 mt-1',
+
+  // typography
+  heading: 'font-[var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight',
+  subheading: 'font-[var(--font-space-mono)] font-semibold text-[#1E2938]',
+  label: 'font-[var(--font-space-mono)] font-medium text-sm text-[#1E2938]',
+  muted: 'font-[var(--font-jetbrains-mono)] text-xs text-[#888780]',
+  body: 'font-[var(--font-jetbrains-mono)] text-sm text-[#5a6270]',
+
+  // section colors
+  colorBlue: 'bg-[#E7E5E4] text-[#006666]',
+  colorAmber: 'bg-[#E7E5E4] text-[#FE9900]',
+  colorRed: 'bg-[#E7E5E4] text-[#FF2157]',
+  colorGray: 'bg-[#E7E5E4] text-[#888780]',
+};
+
+// ─── Label maps ──────────────────────────────────────────────────────────────
+const DISCOUNT_CAT_LABELS: Record<TourDiscount, string> = {
   [TOUR_DISCOUNT.FIXED]: 'Fixed',
   [TOUR_DISCOUNT.SEASONAL]: 'Seasonal',
   [TOUR_DISCOUNT.EARLY_BIRD]: 'Early Bird',
   [TOUR_DISCOUNT.GROUP]: 'Group',
   [TOUR_DISCOUNT.PROMO]: 'Promo Code',
 };
-
-const discountValueTypeLabels: Record<TourDiscountType, string> = {
+const DISCOUNT_TYPE_LABELS: Record<TourDiscountType, string> = {
   [TOUR_DISCOUNT_TYPE.PERCENTAGE]: 'Percentage (%)',
   [TOUR_DISCOUNT_TYPE.FLAT_AMOUNT]: 'Flat Amount',
 };
-
-const currencyLabels: Record<Currency, string> = {
+const CURRENCY_LABELS: Record<Currency, string> = {
   [CURRENCY.BDT]: 'BDT (৳)',
   [CURRENCY.USD]: 'USD ($)',
   [CURRENCY.INR]: 'INR (₹)',
 };
-
-const paymentMethodLabels: Record<PaymentMethod, string> = {
+const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   [PAYMENT_METHOD.BKASH]: 'bKash',
   [PAYMENT_METHOD.NAGAD]: 'Nagad',
   [PAYMENT_METHOD.CARD]: 'Credit/Debit Card',
@@ -114,90 +97,73 @@ const paymentMethodLabels: Record<PaymentMethod, string> = {
   [PAYMENT_METHOD.BANK_TRANSFER]: 'Bank Transfer',
 };
 
-const normalizeDiscount = (discount: Partial<DiscountDTO>): DiscountDTO => {
-  const discountValues = new Set<string>(Object.values(TOUR_DISCOUNT) as string[]);
-  const discountTypeValues = new Set<string>(Object.values(TOUR_DISCOUNT_TYPE) as string[]);
-
-  const rawType = discount.type as string | undefined;
-  const migratedCategory = rawType && discountValues.has(rawType)
-    ? (rawType as TourDiscount)
-    : (discount.discount ?? TOUR_DISCOUNT.SEASONAL);
-
-  const migratedType = rawType && discountTypeValues.has(rawType)
-    ? (rawType as TourDiscountType)
-    : TOUR_DISCOUNT_TYPE.PERCENTAGE;
-
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+const normalizeDiscount = (d: Partial<DiscountDTO>): DiscountDTO => {
+  const dVals = new Set<string>(Object.values(TOUR_DISCOUNT) as string[]);
+  const tVals = new Set<string>(Object.values(TOUR_DISCOUNT_TYPE) as string[]);
+  const raw = d.type as string | undefined;
   return {
-    type: migratedType,
-    discount: migratedCategory,
-    value: Number(discount.value ?? 0),
-    code: discount.code ?? '',
-    validFrom: discount.validFrom,
-    validUntil: discount.validUntil,
+    type: raw && tVals.has(raw) ? (raw as TourDiscountType) : TOUR_DISCOUNT_TYPE.PERCENTAGE,
+    discount: raw && dVals.has(raw) ? (raw as TourDiscount) : (d.discount ?? TOUR_DISCOUNT.SEASONAL),
+    value: Number(d.value ?? 0),
+    code: d.code ?? '',
+    validFrom: d.validFrom,
+    validUntil: d.validUntil,
   };
 };
 
-// Animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
+const fmtDate = (s: string) => { try { return format(new Date(s), 'PPP'); } catch { return 'Invalid date'; } };
+
+const fmtNum = (v: number | string): string => {
+  if (v === '' || v === null || v === undefined) return '';
+  const n = typeof v === 'string' ? parseFloat(v) : v;
+  if (isNaN(n)) return '';
+  return Number.isInteger(n) ? n.toString() : n.toFixed(2).replace(/\.00$/, '');
 };
 
-// Helper function to format number for display
-const formatNumberForDisplay = (value: number | string): string => {
-  if (value === '' || value === null || value === undefined) return '';
-
-  const num = typeof value === 'string' ? parseFloat(value) : value;
-  if (isNaN(num)) return '';
-
-  // For whole numbers, don't show decimal places
-  if (Number.isInteger(num)) {
-    return num.toString();
-  }
-
-  // For decimals, show up to 2 decimal places
-  return num.toFixed(2).replace(/\.00$/, '');
+const parseNum = (v: string): number => {
+  if (!v?.trim()) return 0;
+  const c = v.replace(/,/g, '').replace(/\s/g, '');
+  const n = parseFloat(c.startsWith('.') ? '0' + c : c);
+  return isNaN(n) ? 0 : n;
 };
 
-// Helper function to parse input value to number
-const parseInputToNumber = (value: string): number => {
-  if (!value || value.trim() === '') return 0;
+// ─── Accordion section id type ────────────────────────────────────────────────
+type SectionId = 'basePrice' | 'duration' | 'discounts' | 'windows' | 'departures' | 'payments';
 
-  // Remove commas and spaces, keep numbers and decimal point
-  const cleaned = value.replace(/,/g, '').replace(/\s/g, '');
+// ─── Props ────────────────────────────────────────────────────────────────────
+interface Step4PricingProps {
+  tourId: string;
+  initialData: UpdateTourPricingDTO;
+  onUpdateSuccess?: () => void;
+}
 
-  // Handle cases like ".5" -> "0.5"
-  let normalized = cleaned;
-  if (cleaned.startsWith('.')) {
-    normalized = '0' + cleaned;
-  } else if (cleaned === '.') {
-    normalized = '0';
-  }
-
-  // Parse as float
-  const num = parseFloat(normalized);
-
-  // Return 0 if NaN, otherwise return the number (don't round here)
-  return isNaN(num) ? 0 : num;
+// ─── Animation variants ───────────────────────────────────────────────────────
+const alertVariants = {
+  hidden: { opacity: 0, scale: 0.96, y: -8 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.25 } },
+  exit: { opacity: 0, scale: 0.96, y: -8, transition: { duration: 0.2 } },
+};
+const itemIn = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.2 } },
 };
 
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: Step4PricingProps) {
   const queryClient = useQueryClient();
-  const [mapDialogOpen, setMapDialogOpen] = useState(false);
-  const [editingDepartureIndex, setEditingDepartureIndex] = useState<number | null>(null);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [editDepIdx, setEditDepIdx] = useState<number | null>(null);
+  const [basePriceInput, setBasePriceInput] = useState(initialData.basePrice?.amount?.toString() ?? '');
+  const [openSections, setOpenSections] = useState<SectionId[]>(['basePrice', 'duration', 'discounts', 'windows', 'departures', 'payments']);
 
-  const [basePriceInput, setBasePriceInput] = useState(
-    initialData.basePrice?.amount?.toString() ?? ''
-  );
+  const toggleSection = (id: SectionId) =>
+    setOpenSections(p => p.includes(id) ? p.filter(s => s !== id) : [...p, id]);
+  const isOpen = (id: SectionId) => openSections.includes(id);
 
   const mutation = useMutation({
-    mutationFn: (data: UpdateTourPricingDTO) =>
-      tourUpdateService.updatePricing(tourId, data),
+    mutationFn: (data: UpdateTourPricingDTO) => tourUpdateService.updatePricing(tourId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
       queryClient.invalidateQueries({ queryKey: ['tours'] });
@@ -205,16 +171,14 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
       onUpdateSuccess?.();
     },
     onError: (error: Error) => {
-      toast.error('Failed to update pricing', {
-        description: error.message || 'Please try again',
-      });
+      toast.error('Failed to update pricing', { description: error.message || 'Please try again' });
     },
   });
 
   const formik = useFormik<UpdateTourPricingDTO>({
     initialValues: {
       basePrice: initialData.basePrice ?? { amount: 0, currency: CURRENCY.BDT },
-      discounts: initialData.discounts?.map((discount) => normalizeDiscount(discount)) ?? [],
+      discounts: initialData.discounts?.map(normalizeDiscount) ?? [],
       duration: initialData.duration ?? { days: 1, nights: 0 },
       operatingWindows: initialData.operatingWindows ?? [],
       departures: initialData.departures ?? [],
@@ -223,1213 +187,703 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
     validationSchema: Step4PricingSchema,
     validateOnChange: true,
     validateOnBlur: true,
-    onSubmit: (values) => {
-      mutation.mutate(values);
-    },
+    onSubmit: (values) => mutation.mutate(values),
   });
 
-  // Helper function to get nested errors
-  const getNestedError = (path: string): string | undefined => {
+  // ── Error helper ───────────────────────────────────────────────────────────
+  const getErr = (path: string): string | undefined => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const touched = formik.touched as any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const errors = formik.errors as any;
-
-    const pathParts = path.split('.');
-    let currentTouched = touched;
-    let currentError = errors;
-
-    for (const part of pathParts) {
-      if (currentTouched && currentTouched[part] !== undefined) {
-        currentTouched = currentTouched[part];
-      } else {
-        currentTouched = undefined;
-      }
-
-      if (currentError && currentError[part] !== undefined) {
-        currentError = currentError[part];
-      } else {
-        currentError = undefined;
-      }
+    const t = formik.touched as any, e = formik.errors as any;
+    const parts = path.split('.');
+    let ct = t, ce = e;
+    for (const p of parts) {
+      ct = ct?.[p];
+      ce = ce?.[p];
     }
-
-    if (currentTouched && currentError) {
-      return currentError.toString();
-    }
-
-    return undefined;
+    return ct && ce ? String(ce) : undefined;
   };
 
-  // Base Price management
-  const updateBasePrice = (field: keyof PriceDTO, value: unknown) => {
-    formik.setFieldValue(`basePrice.${field}`, value);
+  // ── Base price ────────────────────────────────────────────────────────────
+  const updateBasePrice = (field: keyof PriceDTO, val: unknown) => {
+    formik.setFieldValue(`basePrice.${field}`, val);
     formik.setFieldTouched(`basePrice.${field}`, true);
   };
 
-  // Discounts management
-  const addDiscount = () => {
-    const newDiscount: DiscountDTO = {
-      type: TOUR_DISCOUNT_TYPE.PERCENTAGE,
-      discount: TOUR_DISCOUNT.SEASONAL,
-      value: 0,
-      code: '',
-    };
-    formik.setFieldValue('discounts', [...(formik.values.discounts ?? []), newDiscount]);
+  // ── Discounts ─────────────────────────────────────────────────────────────
+  const addDiscount = () => formik.setFieldValue('discounts', [
+    ...(formik.values.discounts ?? []),
+    { type: TOUR_DISCOUNT_TYPE.PERCENTAGE, discount: TOUR_DISCOUNT.SEASONAL, value: 0, code: '' } as DiscountDTO,
+  ]);
+  const removeDiscount = (i: number) => { const a = [...(formik.values.discounts ?? [])]; a.splice(i, 1); formik.setFieldValue('discounts', a); };
+  const updateDiscount = (i: number, field: keyof DiscountDTO, val: unknown) => {
+    const a = [...(formik.values.discounts ?? [])];
+    a[i] = { ...a[i], [field]: field === 'value' && typeof val === 'string' ? parseNum(val) : val };
+    formik.setFieldValue('discounts', a);
+    formik.setFieldTouched(`discounts[${i}].${field}`, true);
   };
 
-  const removeDiscount = (index: number) => {
-    const discounts = [...(formik.values.discounts ?? [])];
-    discounts.splice(index, 1);
-    formik.setFieldValue('discounts', discounts);
+  // ── Operating Windows ─────────────────────────────────────────────────────
+  const addWindow = () => {
+    const t = new Date(); t.setDate(t.getDate() + 1);
+    const n = new Date(); n.setDate(n.getDate() + 7);
+    formik.setFieldValue('operatingWindows', [...(formik.values.operatingWindows ?? []), { startDate: t.toISOString(), endDate: n.toISOString() }]);
+  };
+  const removeWindow = (i: number) => { const a = [...(formik.values.operatingWindows ?? [])]; a.splice(i, 1); formik.setFieldValue('operatingWindows', a); };
+  const updateWindow = (i: number, field: keyof OperatingWindowDTO, val: unknown) => {
+    const a = [...(formik.values.operatingWindows ?? [])];
+    a[i] = { ...a[i], [field]: val };
+    formik.setFieldValue('operatingWindows', a);
+    formik.setFieldTouched(`operatingWindows[${i}].${field}`, true);
   };
 
-  const updateDiscount = (index: number, field: keyof DiscountDTO, value: unknown) => {
-    const discounts = [...(formik.values.discounts ?? [])];
-
-    // Handle discount value parsing
-    let processedValue = value;
-    if (field === 'value' && typeof value === 'string') {
-      processedValue = parseInputToNumber(value);
-    }
-
-    discounts[index] = { ...discounts[index], [field]: processedValue };
-    formik.setFieldValue('discounts', discounts);
-    formik.setFieldTouched(`discounts[${index}].${field}`, true);
-  };
-
-  // Operating Windows management
-  const addOperatingWindow = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const nextWeek = new Date();
-    nextWeek.setDate(nextWeek.getDate() + 7);
-
-    const newWindow: OperatingWindowDTO = {
-      startDate: tomorrow.toISOString(),
-      endDate: nextWeek.toISOString(),
-    };
-    formik.setFieldValue('operatingWindows', [...(formik.values.operatingWindows ?? []), newWindow]);
-  };
-
-  const removeOperatingWindow = (index: number) => {
-    const windows = [...(formik.values.operatingWindows ?? [])];
-    windows.splice(index, 1);
-    formik.setFieldValue('operatingWindows', windows);
-  };
-
-  const updateOperatingWindow = (index: number, field: keyof OperatingWindowDTO, value: unknown) => {
-    const windows = [...(formik.values.operatingWindows ?? [])];
-    windows[index] = { ...windows[index], [field]: value };
-    formik.setFieldValue('operatingWindows', windows);
-    formik.setFieldTouched(`operatingWindows[${index}].${field}`, true);
-  };
-
-  // Departures management
+  // ── Departures ────────────────────────────────────────────────────────────
   const addDeparture = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const newDeparture: DepartureDTO = {
-      date: tomorrow.toISOString(),
-      seatsTotal: 1,
-      seatsBooked: 0,
-    };
-    formik.setFieldValue('departures', [...(formik.values.departures ?? []), newDeparture]);
+    const t = new Date(); t.setDate(t.getDate() + 1);
+    formik.setFieldValue('departures', [...(formik.values.departures ?? []), { date: t.toISOString(), seatsTotal: 1, seatsBooked: 0 }]);
   };
-
-  const removeDeparture = (index: number) => {
-    const departures = [...(formik.values.departures ?? [])];
-    departures.splice(index, 1);
-    formik.setFieldValue('departures', departures);
+  const removeDeparture = (i: number) => { const a = [...(formik.values.departures ?? [])]; a.splice(i, 1); formik.setFieldValue('departures', a); };
+  const updateDeparture = (i: number, field: keyof DepartureDTO, val: unknown) => {
+    const a = [...(formik.values.departures ?? [])];
+    a[i] = { ...a[i], [field]: (field === 'seatsTotal' || field === 'seatsBooked') && typeof val === 'string' ? parseInt(val) || 0 : val };
+    formik.setFieldValue('departures', a);
+    formik.setFieldTouched(`departures[${i}].${field}`, true);
   };
-
-  const updateDeparture = (index: number, field: keyof DepartureDTO, value: unknown) => {
-    const departures = [...(formik.values.departures ?? [])];
-
-    // Handle numeric field parsing
-    let processedValue = value;
-    if ((field === 'seatsTotal' || field === 'seatsBooked') && typeof value === 'string') {
-      processedValue = parseInt(value) || 0;
-    }
-
-    departures[index] = { ...departures[index], [field]: processedValue };
-    formik.setFieldValue('departures', departures);
-    formik.setFieldTouched(`departures[${index}].${field}`, true);
-  };
-
-  // Handle map selection for departure
   const handleMapSelect = (lat: number, lng: number) => {
-    if (editingDepartureIndex !== null) {
-      const departures = [...(formik.values.departures ?? [])];
-      departures[editingDepartureIndex] = {
-        ...departures[editingDepartureIndex],
-        meetingCoordinates: { lat, lng }
-      };
-      formik.setFieldValue('departures', departures);
-      formik.setFieldTouched(`departures[${editingDepartureIndex}].meetingCoordinates`, true);
+    if (editDepIdx !== null) {
+      const a = [...(formik.values.departures ?? [])];
+      a[editDepIdx] = { ...a[editDepIdx], meetingCoordinates: { lat, lng } };
+      formik.setFieldValue('departures', a);
     }
   };
 
-  // Payment Methods management
-  const handlePaymentMethodToggle = (method: PaymentMethod) => {
-    const currentMethods = formik.values.paymentMethods || [];
-    const updatedMethods = currentMethods.includes(method)
-      ? currentMethods.filter(m => m !== method)
-      : [...currentMethods, method];
-
-    formik.setFieldValue('paymentMethods', updatedMethods);
+  // ── Payment methods ───────────────────────────────────────────────────────
+  const togglePayment = (m: PaymentMethod) => {
+    const cur = formik.values.paymentMethods || [];
+    formik.setFieldValue('paymentMethods', cur.includes(m) ? cur.filter(x => x !== m) : [...cur, m]);
   };
 
-  // Helper to format date for display
-  const formatDateForDisplay = (dateString: string): string => {
-    try {
-      return format(new Date(dateString), 'PPP');
-    } catch {
-      return 'Invalid date';
-    }
-  };
+  const errorCount = Object.keys(formik.errors).length;
 
+  // ── Section header helper component ───────────────────────────────────────
+  const SectionHeader = ({
+    id, icon: Icon, iconColor, title, description, action,
+  }: {
+    id: SectionId;
+    icon: React.ElementType;
+    iconColor: string;
+    title: string;
+    description: string;
+    action?: React.ReactNode;
+  }) => (
+    <div className="flex items-center justify-between px-5 md:px-6 py-4 border-b border-[#d4d2d0]">
+      <button type="button" onClick={() => toggleSection(id)} className="flex items-center gap-3 flex-1 text-left">
+        <div className={neu.iconBox(iconColor)}><Icon size={18} /></div>
+        <div className="flex-1 min-w-0">
+          <p className={`${neu.subheading} text-base`}>{title}</p>
+          <p className={`${neu.body} text-xs mt-0.5`}>{description}</p>
+        </div>
+        <motion.div animate={{ rotate: isOpen(id) ? 180 : 0 }} transition={{ duration: 0.2 }} className="mr-2 text-[#888780]">
+          <ChevronDown size={18} />
+        </motion.div>
+      </button>
+      {action}
+    </div>
+  );
+
+  // ── Date picker button ─────────────────────────────────────────────────────
+  const DateBtn = ({ value, placeholder }: { value?: string; placeholder?: string }) => (
+    <div className={`${neu.btnOutline} w-full justify-start`}>
+      <CalendarIcon size={15} className="text-[#888780] shrink-0" />
+      <span className={value ? 'text-[#1E2938]' : 'text-[#888780]'}>
+        {value ? fmtDate(value) : (placeholder ?? 'Select date')}
+      </span>
+    </div>
+  );
+
+  // ── Neu Select wrapper ─────────────────────────────────────────────────────
+  const NeuSelect = ({ children, ...props }: React.ComponentProps<typeof Select>) => (
+    <div className={`${neu.insetSm} overflow-hidden`}>
+      <Select {...props}>
+        <SelectTrigger className="border-0 bg-transparent shadow-none h-10 font-[var(--font-jetbrains-mono)] text-sm text-[#1E2938] focus:ring-0">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>{children}</SelectContent>
+      </Select>
+    </div>
+  );
+
+  // ─────────────────────────────────────────────────────────────────────────
   return (
     <>
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        <Card className="border-2 shadow-xl bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-          <CardHeader className="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-700 text-white border-b-2 border-emerald-600/20">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <CardTitle className="flex items-center gap-3 text-2xl font-bold">
-                <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm">
-                  <FaBangladeshiTakaSign className="h-6 w-6" />
+      <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="w-full">
+        <div className={`${neu.card} p-1 w-full`}>
+
+          {/* ── Header ── */}
+          <div className="px-6 md:px-8 pt-6 md:pt-7 pb-5 border-b border-[#d4d2d0]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className={neu.iconBox(neu.colorBlue)}>
+                  <FaBangladeshiTakaSign size={20} className="text-[#006666]" />
                 </div>
-                Pricing & Commerce
-              </CardTitle>
-              <CardDescription className="text-base mt-2 text-emerald-100">
-                Configure tour pricing, discounts, operating schedules, and payment methods
-              </CardDescription>
-            </motion.div>
-          </CardHeader>
-
-          <CardContent className="p-6 bg-white/60">
-            <form onSubmit={formik.handleSubmit} className="space-y-6">
-              <Accordion type="multiple" defaultValue={["basePrice", "duration", "discounts", "operatingWindows", "departures", "paymentMethods"]} className="space-y-4">
-                {/* Base Price Section */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <AccordionItem value="basePrice" className="border-2 border-emerald-200 rounded-lg bg-white shadow-md overflow-hidden">
-                    <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-emerald-50/50 transition-colors">
-                      <div className="flex items-center gap-3 flex-1 text-left">
-                        <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700">
-                          <Coins className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-800">Base Price</h3>
-                          <p className="text-sm text-slate-500 mt-0.5 font-normal">Set the base pricing for your tour</p>
-                        </div>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-6 pb-6 pt-2">
-                      <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-4"
-                      >
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="basePrice.amount">Amount *</Label>
-                  <div className="relative">
-                    <Input
-                      id="basePrice.amount"
-                      type="text"
-                      inputMode="decimal"
-                      placeholder="0.00"
-                      value={basePriceInput}
-                      onChange={(e) => {
-                        const value = e.target.value;
-
-                        // Allow only numbers + decimal
-                        if (!/^\d*\.?\d*$/.test(value)) return;
-
-                        setBasePriceInput(value);
-                      }}
-                      onBlur={() => {
-                        const num = parseFloat(basePriceInput);
-
-                        if (isNaN(num)) {
-                          formik.setFieldError('basePrice.amount', 'Amount is required');
-                          return;
-                        }
-
-                        if (num < 0) {
-                          formik.setFieldError('basePrice.amount', 'Amount cannot be negative');
-                          return;
-                        }
-
-                        // ✅ Save clean number to Formik
-                        formik.setFieldValue('basePrice.amount', Number(num.toFixed(2)));
-                        formik.setFieldTouched('basePrice.amount', true);
-                      }}
-                      className={cn(
-                        "pr-12",
-                        getNestedError('basePrice.amount') && "border-destructive"
-                      )}
-                    />
-
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <span className="text-muted-foreground">
-                        {currencyLabels[(formik.values?.basePrice?.currency ?? CURRENCY.BDT)]?.split(' ')[0] || ''}
-                      </span>
-                    </div>
-                  </div>
-                  {getNestedError('basePrice.amount') ? (
-                    <p className="text-sm text-destructive">{getNestedError('basePrice.amount')}</p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Enter a non-negative number (e.g., 98987 or 98987.50)
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="basePrice.currency">Currency *</Label>
-                  <Select
-                    value={(formik.values?.basePrice?.currency ?? CURRENCY.BDT)}
-                    onValueChange={(value) => updateBasePrice('currency', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values([CURRENCY.BDT]).map((currency) => (
-                        <SelectItem key={currency} value={currency}>
-                          {currencyLabels[currency]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {getNestedError('basePrice.currency') && (
-                    <p className="text-sm text-destructive">{getNestedError('basePrice.currency')}</p>
-                  )}
+                <div>
+                  <h2 className={`${neu.heading} text-xl`}>Pricing & Commerce</h2>
+                  <p className={`${neu.body} text-xs mt-0.5`}>Pricing, discounts, schedules, and payment methods</p>
                 </div>
               </div>
-                      </motion.div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </motion.div>
+              <span className={neu.badge}>Step 4 of 5</span>
+            </div>
+          </div>
 
-                {/* Duration Section */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <AccordionItem value="duration" className="border-2 border-teal-200 rounded-lg bg-white shadow-md overflow-hidden">
-                    <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-teal-50/50 transition-colors">
-                      <div className="flex items-center gap-3 flex-1 text-left">
-                        <div className="p-2 rounded-lg bg-teal-100 text-teal-700">
-                          <Timer className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-800">Tour Duration</h3>
-                          <p className="text-sm text-slate-500 mt-0.5 font-normal">Specify days and nights for the tour</p>
-                        </div>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-6 pb-6 pt-2">
-                      <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-4"
-                      >
+          <div className="px-4 md:px-6 py-6 md:py-7">
+            <form onSubmit={formik.handleSubmit}>
+              <div className="flex flex-col gap-5">
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="duration.days">Days *</Label>
-                  <Input
-                    id="duration.days"
-                    name="duration.days"
-                    type="number"
-                    min="1"
-                    placeholder="3"
-                    value={formik.values.duration?.days || 1}
-                    onChange={(e) => formik.setFieldValue('duration.days', parseInt(e.target.value) || 1)}
-                    onBlur={formik.handleBlur}
-                    className={getNestedError('duration.days') ? "border-destructive" : ""}
-                  />
-                  {getNestedError('duration.days') && (
-                    <p className="text-sm text-destructive">{getNestedError('duration.days')}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="duration.nights">Nights</Label>
-                  <Input
-                    id="duration.nights"
-                    name="duration.nights"
-                    type="number"
-                    min="0"
-                    placeholder="2"
-                    value={formik.values.duration?.nights || 0}
-                    onChange={(e) => formik.setFieldValue('duration.nights', parseInt(e.target.value) || 0)}
-                    onBlur={formik.handleBlur}
-                    className={getNestedError('duration.nights') ? "border-destructive" : ""}
-                  />
-                  {getNestedError('duration.nights') && (
-                    <p className="text-sm text-destructive">{getNestedError('duration.nights')}</p>
-                  )}
-                </div>
-              </div>
-                      </motion.div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </motion.div>
-
-                {/* Discounts Section */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <AccordionItem value="discounts" className="border-2 border-amber-200 rounded-lg bg-white shadow-md overflow-hidden">
-                    <div className="flex items-center justify-between px-6 py-4 border-b">
-                      <AccordionTrigger className="flex-1 hover:no-underline hover:bg-amber-50/50 transition-colors -ml-4">
-                        <div className="flex items-center gap-3 flex-1 text-left">
-                          <div className="p-2 rounded-lg bg-amber-100 text-amber-700">
-                            <Tag className="h-5 w-5" />
+                {/* ══════════════════════════════════════════════════════════
+                    SECTION 1 — Base Price
+                ══════════════════════════════════════════════════════════ */}
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className={neu.cardInner}>
+                  <SectionHeader id="basePrice" icon={Coins} iconColor={neu.colorBlue} title="Base Price" description="Set the base pricing for your tour" />
+                  <AnimatePresence>
+                    {isOpen('basePrice') && (
+                      <motion.div key="bp" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.27 }} className="overflow-hidden">
+                        <div className="px-5 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Amount */}
+                          <div className="flex flex-col gap-1.5">
+                            <label className={`${neu.label} flex items-center gap-1`}>Amount <span className="text-[#FF2157]">*</span></label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                placeholder="0.00"
+                                value={basePriceInput}
+                                onChange={(e) => { if (/^\d*\.?\d*$/.test(e.target.value)) setBasePriceInput(e.target.value); }}
+                                onBlur={() => {
+                                  const n = parseFloat(basePriceInput);
+                                  if (isNaN(n)) { formik.setFieldError('basePrice.amount', 'Amount is required'); return; }
+                                  if (n < 0) { formik.setFieldError('basePrice.amount', 'Amount cannot be negative'); return; }
+                                  formik.setFieldValue('basePrice.amount', Number(n.toFixed(2)));
+                                  formik.setFieldTouched('basePrice.amount', true);
+                                }}
+                                className={`${neu.input} pr-14 ${getErr('basePrice.amount') ? neu.inputErr : ''}`}
+                              />
+                              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                <span className={`${neu.muted} text-xs`}>
+                                  {CURRENCY_LABELS[(formik.values?.basePrice?.currency ?? CURRENCY.BDT)]?.split(' ')[0]}
+                                </span>
+                              </div>
+                            </div>
+                            {getErr('basePrice.amount')
+                              ? <p className={neu.errText}><AlertCircle size={11} />{getErr('basePrice.amount')}</p>
+                              : <p className={neu.muted}>e.g., 98987 or 98987.50</p>
+                            }
                           </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-slate-800">Discounts & Promotions</h3>
-                            <p className="text-sm text-slate-500 mt-0.5 font-normal">Create special offers and discount codes</p>
+                          {/* Currency */}
+                          <div className="flex flex-col gap-1.5">
+                            <label className={`${neu.label} flex items-center gap-1`}>Currency <span className="text-[#FF2157]">*</span></label>
+                            <NeuSelect value={formik.values?.basePrice?.currency ?? CURRENCY.BDT} onValueChange={(v) => updateBasePrice('currency', v)}>
+                              {Object.values(CURRENCY).map(c => <SelectItem key={c} value={c} className="font-[var(--font-jetbrains-mono)] text-sm">{CURRENCY_LABELS[c]}</SelectItem>)}
+                            </NeuSelect>
+                            {getErr('basePrice.currency') && <p className={neu.errText}><AlertCircle size={11} />{getErr('basePrice.currency')}</p>}
                           </div>
                         </div>
-                      </AccordionTrigger>
-                      <Button
-                        type="button"
-                        variant="default"
-                        size="sm"
-                        onClick={addDiscount}
-                        className="shadow-sm bg-amber-600 hover:bg-amber-700 text-white ml-4"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Discount
-                      </Button>
-                    </div>
-                    <AccordionContent className="px-6 pb-6 pt-2">
-                      <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-4"
-                      >
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
 
-                        <Accordion type="multiple" className="w-full space-y-2">
-                          <AnimatePresence>
-                            {(formik.values.discounts ?? []).map((discount, index) => (
-                              <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.2 }}
-                              >
-                                <AccordionItem value={`discount-${index}`} className="border-2 border-amber-200 rounded-lg bg-gradient-to-br from-amber-50/50 to-white">
-                                  <div className="flex items-center justify-between px-4 py-3 border-b border-amber-200">
-                                    <AccordionTrigger className="flex-1 hover:no-underline hover:bg-amber-50/70 -ml-4">
-                                      <div className="flex items-center gap-3 flex-1 text-left">
-                                        <TrendingDown className="h-4 w-4 text-amber-600" />
-                                        <span className="font-semibold text-slate-800">
-                                          {discountCategoryLabels[discount.discount]}: {formatNumberForDisplay(discount.value)}
-                                          {discount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE ? '%' : ` ${formik.values.basePrice?.currency ?? CURRENCY.BDT}`}
+                {/* ══════════════════════════════════════════════════════════
+                    SECTION 2 — Duration
+                ══════════════════════════════════════════════════════════ */}
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={neu.cardInner}>
+                  <SectionHeader id="duration" icon={Timer} iconColor={neu.colorGray} title="Tour Duration" description="Specify days and nights for the tour" />
+                  <AnimatePresence>
+                    {isOpen('duration') && (
+                      <motion.div key="dur" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.27 }} className="overflow-hidden">
+                        <div className="px-5 md:px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-1.5">
+                            <label className={`${neu.label} flex items-center gap-1`}>Days <span className="text-[#FF2157]">*</span></label>
+                            <input
+                              name="duration.days" type="number" min="1" placeholder="3"
+                              value={formik.values.duration?.days || 1}
+                              onChange={(e) => formik.setFieldValue('duration.days', parseInt(e.target.value) || 1)}
+                              onBlur={formik.handleBlur}
+                              className={`${neu.input} ${getErr('duration.days') ? neu.inputErr : ''}`}
+                            />
+                            {getErr('duration.days') && <p className={neu.errText}><AlertCircle size={11} />{getErr('duration.days')}</p>}
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className={neu.label}>Nights</label>
+                            <input
+                              name="duration.nights" type="number" min="0" placeholder="2"
+                              value={formik.values.duration?.nights || 0}
+                              onChange={(e) => formik.setFieldValue('duration.nights', parseInt(e.target.value) || 0)}
+                              onBlur={formik.handleBlur}
+                              className={`${neu.input} ${getErr('duration.nights') ? neu.inputErr : ''}`}
+                            />
+                            {getErr('duration.nights') && <p className={neu.errText}><AlertCircle size={11} />{getErr('duration.nights')}</p>}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+
+                {/* ══════════════════════════════════════════════════════════
+                    SECTION 3 — Discounts
+                ══════════════════════════════════════════════════════════ */}
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className={neu.cardInner}>
+                  <SectionHeader
+                    id="discounts" icon={Tag} iconColor={neu.colorAmber}
+                    title="Discounts & Promotions" description="Create special offers and discount codes"
+                    action={<button type="button" onClick={addDiscount} className={`${neu.btnSm} ml-3`}><Plus size={13} /> Add Discount</button>}
+                  />
+                  <AnimatePresence>
+                    {isOpen('discounts') && (
+                      <motion.div key="disc" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.27 }} className="overflow-hidden">
+                        <div className="px-5 md:px-6 py-5">
+                          {(formik.values.discounts ?? []).length === 0 ? (
+                            <div className={`${neu.inset} flex flex-col items-center justify-center py-10 gap-4`}>
+                              <div className={neu.iconBox(neu.colorAmber)}><Tag size={24} className="text-[#FE9900]" /></div>
+                              <div className="text-center">
+                                <p className={`${neu.subheading} text-sm`}>No discounts added</p>
+                                <p className={`${neu.body} text-xs mt-1`}>Create special offers and promotional codes to attract more customers</p>
+                              </div>
+                              <button type="button" onClick={addDiscount} className={neu.btnSm}><Plus size={13} /> Add First Discount</button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-4">
+                              <AnimatePresence>
+                                {(formik.values.discounts ?? []).map((disc, i) => (
+                                  <motion.div key={i} variants={itemIn} initial="hidden" animate="visible" exit="exit" className={neu.insetSm}>
+                                    <div className="p-4">
+                                      {/* Discount row header */}
+                                      <div className="flex items-center gap-3 mb-4">
+                                        <TrendingDown size={15} className="text-[#FE9900] shrink-0" />
+                                        <span className={`${neu.subheading} text-sm flex-1`}>
+                                          {DISCOUNT_CAT_LABELS[disc.discount]}: {fmtNum(disc.value)}
+                                          {disc.type === TOUR_DISCOUNT_TYPE.PERCENTAGE ? '%' : ` ${formik.values.basePrice?.currency ?? CURRENCY.BDT}`}
                                         </span>
-                                        {discount.code && (
-                                          <Badge variant="outline" className="ml-2 border-amber-300 text-amber-700 bg-amber-50">
-                                            <Gift className="h-3 w-3 mr-1" />
-                                            {discount.code}
-                                          </Badge>
+                                        {disc.code && (
+                                          <span className={`${neu.badge} text-[#FE9900] border-[#FE9900]/25`}>
+                                            <Gift size={10} />{disc.code}
+                                          </span>
+                                        )}
+                                        <button type="button" onClick={() => removeDiscount(i)} className={neu.btnGhost}><Trash2 size={12} /></button>
+                                      </div>
+
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="flex flex-col gap-1.5">
+                                          <label className={`${neu.label} flex items-center gap-1`}>Discount Value Type <span className="text-[#FF2157]">*</span></label>
+                                          <NeuSelect value={disc.type} onValueChange={(v) => updateDiscount(i, 'type', v)}>
+                                            {Object.values(TOUR_DISCOUNT_TYPE).map(t => <SelectItem key={t} value={t} className="font-[var(--font-jetbrains-mono)] text-sm">{DISCOUNT_TYPE_LABELS[t]}</SelectItem>)}
+                                          </NeuSelect>
+                                          {getErr(`discounts[${i}].type`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`discounts[${i}].type`)}</p>}
+                                        </div>
+                                        <div className="flex flex-col gap-1.5">
+                                          <label className={`${neu.label} flex items-center gap-1`}>Discount Category <span className="text-[#FF2157]">*</span></label>
+                                          <NeuSelect value={disc.discount} onValueChange={(v) => updateDiscount(i, 'discount', v)}>
+                                            {Object.values(TOUR_DISCOUNT).map(t => <SelectItem key={t} value={t} className="font-[var(--font-jetbrains-mono)] text-sm">{DISCOUNT_CAT_LABELS[t]}</SelectItem>)}
+                                          </NeuSelect>
+                                          {getErr(`discounts[${i}].discount`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`discounts[${i}].discount`)}</p>}
+                                        </div>
+                                        <div className="flex flex-col gap-1.5">
+                                          <label className={`${neu.label} flex items-center gap-1`}>
+                                            Value {disc.type === TOUR_DISCOUNT_TYPE.PERCENTAGE ? '(%)' : `(${formik.values.basePrice?.currency ?? CURRENCY.BDT})`} <span className="text-[#FF2157]">*</span>
+                                          </label>
+                                          <div className="relative">
+                                            <input
+                                              type="text" inputMode="decimal" placeholder="10.5"
+                                              value={fmtNum(disc.value)}
+                                              onChange={(e) => updateDiscount(i, 'value', e.target.value)}
+                                              onBlur={() => { const r = Math.round(disc.value * 10) / 10; updateDiscount(i, 'value', r); }}
+                                              className={`${neu.input} pr-10 ${getErr(`discounts[${i}].value`) ? neu.inputErr : ''}`}
+                                            />
+                                            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                              {disc.type === TOUR_DISCOUNT_TYPE.PERCENTAGE
+                                                ? <Percent size={14} className="text-[#888780]" />
+                                                : <FaBangladeshiTakaSign size={13} className="text-[#888780]" />}
+                                            </div>
+                                          </div>
+                                          {getErr(`discounts[${i}].value`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`discounts[${i}].value`)}</p>}
+                                        </div>
+                                        {disc.discount === TOUR_DISCOUNT.PROMO && (
+                                          <div className="flex flex-col gap-1.5">
+                                            <label className={`${neu.label} flex items-center gap-1`}>Promo Code <span className="text-[#FF2157]">*</span></label>
+                                            <input
+                                              placeholder="SUMMER2024" value={disc.code || ''}
+                                              onChange={(e) => updateDiscount(i, 'code', e.target.value)}
+                                              className={`${neu.input} ${getErr(`discounts[${i}].code`) ? neu.inputErr : ''}`}
+                                            />
+                                            {getErr(`discounts[${i}].code`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`discounts[${i}].code`)}</p>}
+                                          </div>
                                         )}
                                       </div>
-                                    </AccordionTrigger>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={removeDiscount.bind(null, index)}
-                                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 hover:border-red-300 ml-4"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                    <AccordionContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>Discount Value Type *</Label>
-                          <Select
-                            value={discount.type}
-                            onValueChange={(value) => updateDiscount(index, 'type', value)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.values(TOUR_DISCOUNT_TYPE).map((type) => (
-                                <SelectItem key={type} value={type}>
-                                  {discountValueTypeLabels[type]}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {getNestedError(`discounts[${index}].type`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`discounts[${index}].type`)}</p>
-                          )}
-                        </div>
 
-                        <div className="space-y-2">
-                          <Label>Discount Category *</Label>
-                          <Select
-                            value={discount.discount}
-                            onValueChange={(value) => updateDiscount(index, 'discount', value)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select discount" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.values(TOUR_DISCOUNT).map((type) => (
-                                <SelectItem key={type} value={type}>
-                                  {discountCategoryLabels[type]}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {getNestedError(`discounts[${index}].discount`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`discounts[${index}].discount`)}</p>
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>
-                            Discount Value {discount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE ? "(%)" : `(${formik.values.basePrice?.currency ?? CURRENCY.BDT})`} *
-                          </Label>
-                          <div className="relative">
-                            <Input
-                              type="text"
-                              inputMode="decimal"
-                              placeholder="10.5"
-                              value={formatNumberForDisplay(discount.value)}
-                              onChange={(e) => updateDiscount(index, 'value', e.target.value)}
-                              onBlur={() => {
-                                if (discount.value !== undefined) {
-                                  // Round to 1 decimal place for percentages
-                                  const rounded = Math.round(discount.value * 10) / 10;
-                                  updateDiscount(index, 'value', rounded);
-                                }
-                              }}
-                              className={getNestedError(`discounts[${index}].value`) ? "border-destructive" : ""}
-                            />
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                              {discount.type === TOUR_DISCOUNT_TYPE.PERCENTAGE ? (
-                                <Percent className="h-4 w-4 text-muted-foreground" />
-                              ) : (
-                                <FaBangladeshiTakaSign className="h-4 w-4 text-muted-foreground" />
-                              )}
-                            </div>
-                          </div>
-                          {getNestedError(`discounts[${index}].value`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`discounts[${index}].value`)}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {discount.discount === TOUR_DISCOUNT.PROMO && (
-                        <div className="space-y-2">
-                          <Label>Promo Code *</Label>
-                          <Input
-                            placeholder="SUMMER2024"
-                            value={discount.code || ''}
-                            onChange={(e) => updateDiscount(index, 'code', e.target.value)}
-                            className={getNestedError(`discounts[${index}].code`) ? "border-destructive" : ""}
-                          />
-                          {getNestedError(`discounts[${index}].code`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`discounts[${index}].code`)}</p>
-                          )}
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>Valid From</Label>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full justify-start text-left font-normal",
-                                  !discount.validFrom && "text-muted-foreground"
-                                )}
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {discount.validFrom ? formatDateForDisplay(discount.validFrom) : "Select date"}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                              <Calendar
-                                mode="single"
-                                selected={discount.validFrom ? new Date(discount.validFrom) : undefined}
-                                onSelect={(date) => updateDiscount(index, 'validFrom', date?.toISOString())}
-                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          {getNestedError(`discounts[${index}].validFrom`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`discounts[${index}].validFrom`)}</p>
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Valid Until</Label>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full justify-start text-left font-normal",
-                                  !discount.validUntil && "text-muted-foreground"
-                                )}
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {discount.validUntil ? formatDateForDisplay(discount.validUntil) : "Select date"}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-
-                              <Calendar
-                                mode="single"
-                                selected={discount.validUntil ? new Date(discount.validUntil) : undefined}
-                                onSelect={(date) =>
-                                  updateDiscount(index, 'validUntil', date?.toISOString())
-                                }
-                                disabled={(date) => {
-                                  const today = new Date();
-                                  today.setHours(0, 0, 0, 0);
-
-                                  const isBeforeToday = date < today;
-                                  const isBeforeValidFrom =
-                                    discount.validFrom
-                                      ? date < new Date(discount.validFrom)
-                                      : false;
-
-                                  return isBeforeToday || isBeforeValidFrom;
-                                }}
-                                initialFocus
-                              />
-
-                            </PopoverContent>
-                          </Popover>
-                          {getNestedError(`discounts[${index}].validUntil`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`discounts[${index}].validUntil`)}</p>
-                          )}
-                        </div>
-                      </div>
-                                  </AccordionContent>
-                                </AccordionItem>
-                              </motion.div>
-                            ))}
-                          </AnimatePresence>
-                        </Accordion>
-
-                        {(formik.values.discounts ?? []).length === 0 && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="text-center py-12 border-2 border-dashed border-amber-300 rounded-lg bg-gradient-to-br from-amber-50/50 to-white hover:from-amber-50 hover:to-amber-50/50 transition-all"
-                          >
-                            <div className="p-3 rounded-full bg-amber-100 w-fit mx-auto mb-4">
-                              <Tag className="h-8 w-8 text-amber-600" />
-                            </div>
-                            <h4 className="font-semibold text-slate-800 mb-2">No discounts added</h4>
-                            <p className="text-sm text-slate-600 mb-6 max-w-md mx-auto">
-                              Create special offers and promotional codes to attract more customers
-                            </p>
-                            <Button
-                              type="button"
-                              variant="default"
-                              onClick={addDiscount}
-                              className="shadow-md bg-amber-600 hover:bg-amber-700 text-white"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Add First Discount
-                            </Button>
-                          </motion.div>
-                        )}
-                      </motion.div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </motion.div>
-
-                {/* Operating Windows Section */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <AccordionItem value="operatingWindows" className="border-2 border-blue-200 rounded-lg bg-white shadow-md overflow-hidden">
-                    <div className="flex items-center justify-between px-6 py-4 border-b">
-                      <AccordionTrigger className="flex-1 hover:no-underline hover:bg-blue-50/50 transition-colors -ml-4">
-                        <div className="flex items-center gap-3 flex-1 text-left">
-                          <div className="p-2 rounded-lg bg-blue-100 text-blue-700">
-                            <CalendarDays className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-slate-800">Operating Windows</h3>
-                            <p className="text-sm text-slate-500 mt-0.5 font-normal">Define available booking periods</p>
-                          </div>
-                        </div>
-                      </AccordionTrigger>
-                      <Button
-                        type="button"
-                        variant="default"
-                        size="sm"
-                        onClick={addOperatingWindow}
-                        className="shadow-sm bg-blue-600 hover:bg-blue-700 text-white ml-4"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Window
-                      </Button>
-                    </div>
-                    <AccordionContent className="px-6 pb-6 pt-2">
-                      <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-4"
-                      >
-
-                        <AnimatePresence>
-                          {(formik.values.operatingWindows ?? []).map((window, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <Card className="border-2 border-blue-200 shadow-md hover:shadow-lg transition-all bg-gradient-to-br from-blue-50/50 to-white">
-                                <CardContent className="p-4 space-y-4">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <CalendarDays className="h-4 w-4 text-blue-600" />
-                                      <span className="font-semibold text-slate-800">Window {index + 1}</span>
+                                      {/* Date pickers */}
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                        {([
+                                          { field: 'validFrom' as keyof DiscountDTO, label: 'Valid From' },
+                                          { field: 'validUntil' as keyof DiscountDTO, label: 'Valid Until' },
+                                        ] as { field: keyof DiscountDTO; label: string }[]).map(({ field, label }) => (
+                                          <div key={field} className="flex flex-col gap-1.5">
+                                            <label className={neu.label}>{label}</label>
+                                            <Popover>
+                                              <PopoverTrigger asChild>
+                                                <button type="button" className="w-full">
+                                                  <DateBtn value={disc[field] as string | undefined} placeholder="Select date" />
+                                                </button>
+                                              </PopoverTrigger>
+                                              <PopoverContent className="w-auto p-0">
+                                                <Calendar
+                                                  mode="single"
+                                                  selected={disc[field] ? new Date(disc[field] as string) : undefined}
+                                                  onSelect={(d) => updateDiscount(i, field, d?.toISOString())}
+                                                  disabled={(d) => {
+                                                    const today = new Date(); today.setHours(0, 0, 0, 0);
+                                                    if (d < today) return true;
+                                                    if (field === 'validUntil' && disc.validFrom) return d < new Date(disc.validFrom);
+                                                    return false;
+                                                  }}
+                                                  initialFocus
+                                                />
+                                              </PopoverContent>
+                                            </Popover>
+                                            {getErr(`discounts[${i}].${field}`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`discounts[${i}].${field}`)}</p>}
+                                          </div>
+                                        ))}
+                                      </div>
                                     </div>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => removeOperatingWindow(index)}
-                                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 hover:border-red-300"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>Start Date *</Label>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full justify-start text-left font-normal",
-                                  !window.startDate && "text-muted-foreground"
-                                )}
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {window.startDate ? formatDateForDisplay(window.startDate) : "Select date"}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                              <Calendar
-                                mode="single"
-                                selected={new Date(window.startDate)}
-                                onSelect={(date) => updateOperatingWindow(index, 'startDate', date?.toISOString())}
-                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          {getNestedError(`operatingWindows[${index}].startDate`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`operatingWindows[${index}].startDate`)}</p>
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>End Date *</Label>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full justify-start text-left font-normal",
-                                  !window.endDate && "text-muted-foreground"
-                                )}
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {window.endDate ? formatDateForDisplay(window.endDate) : "Select date"}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                              <Calendar
-                                mode="single"
-                                selected={new Date(window.endDate)}
-                                onSelect={(date) => updateOperatingWindow(index, 'endDate', date?.toISOString())}
-                                disabled={(date) =>
-                                  date < new Date(new Date().setHours(0, 0, 0, 0)) ||
-                                  date < new Date(window.startDate)
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          {getNestedError(`operatingWindows[${index}].endDate`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`operatingWindows[${index}].endDate`)}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor={`operatingWindows[${index}].seatsTotal`}>Total Seats</Label>
-                        <Input
-                          id={`operatingWindows[${index}].seatsTotal`}
-                          type="number"
-                          min="0"
-                          placeholder="50"
-                          value={window.seatsTotal || ''}
-                          onChange={(e) => updateOperatingWindow(index, 'seatsTotal', parseInt(e.target.value) || 0)}
-                          className={getNestedError(`operatingWindows[${index}].seatsTotal`) ? "border-destructive" : ""}
-                        />
-                        {getNestedError(`operatingWindows[${index}].seatsTotal`) && (
-                          <p className="text-sm text-destructive">{getNestedError(`operatingWindows[${index}].seatsTotal`)}</p>
-                        )}
-                      </div>
-                                </CardContent>
-                              </Card>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
-
-                        {(formik.values.operatingWindows ?? []).length === 0 && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="text-center py-12 border-2 border-dashed border-blue-300 rounded-lg bg-gradient-to-br from-blue-50/50 to-white hover:from-blue-50 hover:to-blue-50/50 transition-all"
-                          >
-                            <div className="p-3 rounded-full bg-blue-100 w-fit mx-auto mb-4">
-                              <CalendarDays className="h-8 w-8 text-blue-600" />
+                                  </motion.div>
+                                ))}
+                              </AnimatePresence>
                             </div>
-                            <h4 className="font-semibold text-slate-800 mb-2">No operating windows added</h4>
-                            <p className="text-sm text-slate-600 mb-6 max-w-md mx-auto">
-                              Define time periods when your tour is available for booking
-                            </p>
-                            <Button
-                              type="button"
-                              variant="default"
-                              onClick={addOperatingWindow}
-                              className="shadow-md bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Add First Window
-                            </Button>
-                          </motion.div>
-                        )}
+                          )}
+                        </div>
                       </motion.div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </motion.div>
-
-                {/* Departures Section */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <AccordionItem value="departures" className="border-2 border-purple-200 rounded-lg bg-white shadow-md overflow-hidden">
-                    <div className="flex items-center justify-between px-6 py-4 border-b">
-                      <AccordionTrigger className="flex-1 hover:no-underline hover:bg-purple-50/50 transition-colors -ml-4">
-                        <div className="flex items-center gap-3 flex-1 text-left">
-                          <div className="p-2 rounded-lg bg-purple-100 text-purple-700">
-                            <Plane className="h-5 w-5" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-slate-800">Departure Schedules</h3>
-                            <p className="text-sm text-slate-500 mt-0.5 font-normal">Schedule specific departure dates and times</p>
-                          </div>
-                        </div>
-                      </AccordionTrigger>
-                      <Button
-                        type="button"
-                        variant="default"
-                        size="sm"
-                        onClick={addDeparture}
-                        className="shadow-sm bg-purple-600 hover:bg-purple-700 text-white ml-4"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Departure
-                      </Button>
-                    </div>
-                    <AccordionContent className="px-6 pb-6 pt-2">
-                      <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-4"
-                      >
-
-                        <AnimatePresence>
-                          {(formik.values.departures ?? []).map((departure, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <Card className="border-2 border-purple-200 shadow-md hover:shadow-lg transition-all bg-gradient-to-br from-purple-50/50 to-white">
-                                <CardContent className="p-4 space-y-4">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <Navigation className="h-4 w-4 text-purple-600" />
-                                      <span className="font-semibold text-slate-800">Departure {index + 1}</span>
-                                    </div>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => removeDeparture(index)}
-                                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 hover:border-red-300"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-
-                      <div className="space-y-2">
-                        <Label>Departure Date *</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !departure.date && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {departure.date ? formatDateForDisplay(departure.date) : "Select date"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={new Date(departure.date)}
-                              onSelect={(date) => updateDeparture(index, 'date', date?.toISOString())}
-                              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        {getNestedError(`departures[${index}].date`) && (
-                          <p className="text-sm text-destructive">{getNestedError(`departures[${index}].date`)}</p>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor={`departures[${index}].seatsTotal`}>Total Seats *</Label>
-                          <div className="relative">
-                            <Input
-                              id={`departures[${index}].seatsTotal`}
-                              type="number"
-                              min="1"
-                              placeholder="20"
-                              value={departure.seatsTotal}
-                              onChange={(e) => updateDeparture(index, 'seatsTotal', e.target.value)}
-                              className={getNestedError(`departures[${index}].seatsTotal`) ? "border-destructive" : ""}
-                            />
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                              <Users className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                          </div>
-                          {getNestedError(`departures[${index}].seatsTotal`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`departures[${index}].seatsTotal`)}</p>
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor={`departures[${index}].meetingPoint`}>Meeting Point</Label>
-                          <div className="relative">
-                            <Input
-                              id={`departures[${index}].meetingPoint`}
-                              placeholder="Hotel lobby, airport gate, etc."
-                              value={departure.meetingPoint || ''}
-                              onChange={(e) => updateDeparture(index, 'meetingPoint', e.target.value)}
-                              className={getNestedError(`departures[${index}].meetingPoint`) ? "border-destructive" : ""}
-                            />
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                              <MapPin className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                          </div>
-                          {getNestedError(`departures[${index}].meetingPoint`) && (
-                            <p className="text-sm text-destructive">{getNestedError(`departures[${index}].meetingPoint`)}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Meeting Coordinates</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            type="text"
-                            placeholder="Latitude, Longitude"
-                            value={
-                              departure.meetingCoordinates?.lat && departure.meetingCoordinates?.lng
-                                ? `${departure.meetingCoordinates.lat.toFixed(6)}, ${departure.meetingCoordinates.lng.toFixed(6)}`
-                                : ''
-                            }
-                            readOnly
-                            className="flex-1"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => {
-                              setEditingDepartureIndex(index);
-                              setMapDialogOpen(true);
-                            }}
-                          >
-                            <MapPin className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        {getNestedError(`departures[${index}].meetingCoordinates`) && (
-                          <p className="text-sm text-destructive">{getNestedError(`departures[${index}].meetingCoordinates`)}</p>
-                        )}
-                      </div>
-                                </CardContent>
-                              </Card>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
-
-                        {(formik.values.departures ?? []).length === 0 && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="text-center py-12 border-2 border-dashed border-purple-300 rounded-lg bg-gradient-to-br from-purple-50/50 to-white hover:from-purple-50 hover:to-purple-50/50 transition-all"
-                          >
-                            <div className="p-3 rounded-full bg-purple-100 w-fit mx-auto mb-4">
-                              <Plane className="h-8 w-8 text-purple-600" />
-                            </div>
-                            <h4 className="font-semibold text-slate-800 mb-2">No departure schedules added</h4>
-                            <p className="text-sm text-slate-600 mb-6 max-w-md mx-auto">
-                              Schedule specific dates and times when your tour will depart
-                            </p>
-                            <Button
-                              type="button"
-                              variant="default"
-                              onClick={addDeparture}
-                              className="shadow-md bg-purple-600 hover:bg-purple-700 text-white"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Add First Departure
-                            </Button>
-                          </motion.div>
-                        )}
-                      </motion.div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </motion.div>
-
-                {/* Payment Methods Section */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <AccordionItem value="paymentMethods" className="border-2 border-indigo-200 rounded-lg bg-white shadow-md overflow-hidden">
-                    <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-indigo-50/50 transition-colors">
-                      <div className="flex items-center gap-3 flex-1 text-left">
-                        <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700">
-                          <Wallet className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-800">Payment Methods *</h3>
-                          <p className="text-sm text-slate-500 mt-0.5 font-normal">Select accepted payment options</p>
-                        </div>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-6 pb-6 pt-2">
-                      <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-4"
-                      >
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                          {Object.values([PAYMENT_METHOD.CARD]).map((method) => {
-                            const isSelected = (formik.values.paymentMethods ?? []).includes(method);
-                            return (
-                              <motion.div
-                                key={method}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                className={`
-                                  flex items-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-all
-                                  ${isSelected
-                                    ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                                    : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
-                                  }
-                                `}
-                              >
-                                <Checkbox
-                                  id={`payment-${method}`}
-                                  checked={isSelected}
-                                  onCheckedChange={() => handlePaymentMethodToggle(method)}
-                                  className="data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
-                                />
-                                <Label
-                                  htmlFor={`payment-${method}`}
-                                  className={`text-sm font-medium cursor-pointer flex-1 ${
-                                    isSelected ? 'text-indigo-900' : 'text-slate-700'
-                                  }`}
-                                >
-                                  {paymentMethodLabels[method]}
-                                </Label>
-                                {isSelected && (
-                                  <CheckCircle2 className="h-4 w-4 text-indigo-600" />
-                                )}
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                        {formik.touched.paymentMethods && formik.errors.paymentMethods && (
-                          <Alert variant="destructive" className="border-red-200 bg-red-50">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertDescription>
-                              {formik.errors.paymentMethods as string}
-                            </AlertDescription>
-                          </Alert>
-                        )}
-                      </motion.div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </motion.div>
-              </Accordion>
-
-              {/* Error/Success Alerts */}
-              <AnimatePresence>
-                {mutation.isError && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                  >
-                    <Alert variant="destructive" className="border-red-300 bg-red-50 shadow-md">
-                      <XCircle className="h-4 w-4" />
-                      <AlertDescription className="font-medium">
-                        Failed to update pricing: {mutation.error.message}
-                      </AlertDescription>
-                    </Alert>
-                  </motion.div>
-                )}
-
-                {mutation.isSuccess && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                  >
-                    <Alert className="border-emerald-300 bg-emerald-50 shadow-md">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                      <AlertDescription className="font-medium text-emerald-800">
-                        Pricing & commerce updated successfully
-                      </AlertDescription>
-                    </Alert>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Submit Button */}
-              <CardFooter className="border-t-2 border-slate-300 px-6 py-5 bg-gradient-to-r from-slate-100 via-emerald-50 to-slate-100 mt-6">
-                <div className="flex items-center justify-between w-full">
-                  <div className="text-sm">
-                    {Object.keys(formik.errors).length > 0 && (
-                      <Alert variant="destructive" className="py-2 px-4 inline-flex items-center gap-2 border-red-300 bg-red-50">
-                        <X className="h-4 w-4" />
-                        <span className="font-medium text-red-800">
-                          {Object.keys(formik.errors).length} validation issue(s) found
-                        </span>
-                      </Alert>
                     )}
-                    {Object.keys(formik.errors).length === 0 && (
-                      <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-200">
-                        <Check className="h-4 w-4" />
-                        <span className="font-medium">All fields validated</span>
+                  </AnimatePresence>
+                </motion.div>
+
+                {/* ══════════════════════════════════════════════════════════
+                    SECTION 4 — Operating Windows
+                ══════════════════════════════════════════════════════════ */}
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className={neu.cardInner}>
+                  <SectionHeader
+                    id="windows" icon={CalendarDays} iconColor={neu.colorBlue}
+                    title="Operating Windows" description="Define available booking periods"
+                    action={<button type="button" onClick={addWindow} className={`${neu.btnSm} ml-3`}><Plus size={13} /> Add Window</button>}
+                  />
+                  <AnimatePresence>
+                    {isOpen('windows') && (
+                      <motion.div key="win" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.27 }} className="overflow-hidden">
+                        <div className="px-5 md:px-6 py-5">
+                          {(formik.values.operatingWindows ?? []).length === 0 ? (
+                            <div className={`${neu.inset} flex flex-col items-center justify-center py-10 gap-4`}>
+                              <div className={neu.iconBox(neu.colorBlue)}><CalendarDays size={24} className="text-[#006666]" /></div>
+                              <div className="text-center">
+                                <p className={`${neu.subheading} text-sm`}>No operating windows added</p>
+                                <p className={`${neu.body} text-xs mt-1`}>Define time periods when your tour is available for booking</p>
+                              </div>
+                              <button type="button" onClick={addWindow} className={neu.btnSm}><Plus size={13} /> Add First Window</button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-4">
+                              <AnimatePresence>
+                                {(formik.values.operatingWindows ?? []).map((win, i) => (
+                                  <motion.div key={i} variants={itemIn} initial="hidden" animate="visible" exit="exit" className={neu.insetSm}>
+                                    <div className="p-4">
+                                      <div className="flex items-center gap-2 mb-4">
+                                        <CalendarDays size={15} className="text-[#006666] shrink-0" />
+                                        <span className={`${neu.subheading} text-sm flex-1`}>Window {i + 1}</span>
+                                        <button type="button" onClick={() => removeWindow(i)} className={neu.btnGhost}><Trash2 size={12} /></button>
+                                      </div>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {([
+                                          { field: 'startDate' as keyof OperatingWindowDTO, label: 'Start Date' },
+                                          { field: 'endDate' as keyof OperatingWindowDTO, label: 'End Date' },
+                                        ] as { field: keyof OperatingWindowDTO; label: string }[]).map(({ field, label }) => (
+                                          <div key={field} className="flex flex-col gap-1.5">
+                                            <label className={`${neu.label} flex items-center gap-1`}>{label} <span className="text-[#FF2157]">*</span></label>
+                                            <Popover>
+                                              <PopoverTrigger asChild>
+                                                <button type="button" className="w-full">
+                                                  <DateBtn value={win[field] as string | undefined} />
+                                                </button>
+                                              </PopoverTrigger>
+                                              <PopoverContent className="w-auto p-0">
+                                                <Calendar
+                                                  mode="single"
+                                                  selected={win[field] ? new Date(win[field] as string) : undefined}
+                                                  onSelect={(d) => updateWindow(i, field, d?.toISOString())}
+                                                  disabled={(d) => {
+                                                    const today = new Date(); today.setHours(0, 0, 0, 0);
+                                                    if (d < today) return true;
+                                                    if (field === 'endDate') return d < new Date(win.startDate);
+                                                    return false;
+                                                  }}
+                                                  initialFocus
+                                                />
+                                              </PopoverContent>
+                                            </Popover>
+                                            {getErr(`operatingWindows[${i}].${field}`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`operatingWindows[${i}].${field}`)}</p>}
+                                          </div>
+                                        ))}
+                                      </div>
+                                      <div className="flex flex-col gap-1.5 mt-4">
+                                        <label className={neu.label}>Total Seats</label>
+                                        <input
+                                          type="number" min="0" placeholder="50"
+                                          value={win.seatsTotal || ''}
+                                          onChange={(e) => updateWindow(i, 'seatsTotal', parseInt(e.target.value) || 0)}
+                                          className={`${neu.input} ${getErr(`operatingWindows[${i}].seatsTotal`) ? neu.inputErr : ''}`}
+                                        />
+                                        {getErr(`operatingWindows[${i}].seatsTotal`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`operatingWindows[${i}].seatsTotal`)}</p>}
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                ))}
+                              </AnimatePresence>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+
+                {/* ══════════════════════════════════════════════════════════
+                    SECTION 5 — Departures
+                ══════════════════════════════════════════════════════════ */}
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className={neu.cardInner}>
+                  <SectionHeader
+                    id="departures" icon={Plane} iconColor={neu.colorGray}
+                    title="Departure Schedules" description="Schedule specific departure dates and times"
+                    action={<button type="button" onClick={addDeparture} className={`${neu.btnSm} ml-3`}><Plus size={13} /> Add Departure</button>}
+                  />
+                  <AnimatePresence>
+                    {isOpen('departures') && (
+                      <motion.div key="dep" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.27 }} className="overflow-hidden">
+                        <div className="px-5 md:px-6 py-5">
+                          {(formik.values.departures ?? []).length === 0 ? (
+                            <div className={`${neu.inset} flex flex-col items-center justify-center py-10 gap-4`}>
+                              <div className={neu.iconBox(neu.colorGray)}><Plane size={24} className="text-[#888780]" /></div>
+                              <div className="text-center">
+                                <p className={`${neu.subheading} text-sm`}>No departure schedules added</p>
+                                <p className={`${neu.body} text-xs mt-1`}>Schedule specific dates and times when your tour will depart</p>
+                              </div>
+                              <button type="button" onClick={addDeparture} className={neu.btnSm}><Plus size={13} /> Add First Departure</button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-4">
+                              <AnimatePresence>
+                                {(formik.values.departures ?? []).map((dep, i) => (
+                                  <motion.div key={i} variants={itemIn} initial="hidden" animate="visible" exit="exit" className={neu.insetSm}>
+                                    <div className="p-4">
+                                      <div className="flex items-center gap-2 mb-4">
+                                        <Navigation size={15} className="text-[#888780] shrink-0" />
+                                        <span className={`${neu.subheading} text-sm flex-1`}>Departure {i + 1}</span>
+                                        <button type="button" onClick={() => removeDeparture(i)} className={neu.btnGhost}><Trash2 size={12} /></button>
+                                      </div>
+
+                                      {/* Date */}
+                                      <div className="flex flex-col gap-1.5 mb-4">
+                                        <label className={`${neu.label} flex items-center gap-1`}>Departure Date <span className="text-[#FF2157]">*</span></label>
+                                        <Popover>
+                                          <PopoverTrigger asChild>
+                                            <button type="button" className="w-full">
+                                              <DateBtn value={dep.date} />
+                                            </button>
+                                          </PopoverTrigger>
+                                          <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                              mode="single"
+                                              selected={dep.date ? new Date(dep.date) : undefined}
+                                              onSelect={(d) => updateDeparture(i, 'date', d?.toISOString())}
+                                              disabled={(d) => { const t = new Date(); t.setHours(0, 0, 0, 0); return d < t; }}
+                                              initialFocus
+                                            />
+                                          </PopoverContent>
+                                        </Popover>
+                                        {getErr(`departures[${i}].date`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departures[${i}].date`)}</p>}
+                                      </div>
+
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Total Seats */}
+                                        <div className="flex flex-col gap-1.5">
+                                          <label className={`${neu.label} flex items-center gap-1`}>Total Seats <span className="text-[#FF2157]">*</span></label>
+                                          <div className="relative">
+                                            <input
+                                              type="number" min="1" placeholder="20"
+                                              value={dep.seatsTotal}
+                                              onChange={(e) => updateDeparture(i, 'seatsTotal', e.target.value)}
+                                              className={`${neu.input} pr-10 ${getErr(`departures[${i}].seatsTotal`) ? neu.inputErr : ''}`}
+                                            />
+                                            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                              <Users size={14} className="text-[#888780]" />
+                                            </div>
+                                          </div>
+                                          {getErr(`departures[${i}].seatsTotal`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departures[${i}].seatsTotal`)}</p>}
+                                        </div>
+                                        {/* Meeting Point */}
+                                        <div className="flex flex-col gap-1.5">
+                                          <label className={neu.label}>Meeting Point</label>
+                                          <div className="relative">
+                                            <input
+                                              placeholder="Hotel lobby, airport gate…"
+                                              value={dep.meetingPoint || ''}
+                                              onChange={(e) => updateDeparture(i, 'meetingPoint', e.target.value)}
+                                              className={`${neu.input} pr-10 ${getErr(`departures[${i}].meetingPoint`) ? neu.inputErr : ''}`}
+                                            />
+                                            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                              <MapPin size={14} className="text-[#888780]" />
+                                            </div>
+                                          </div>
+                                          {getErr(`departures[${i}].meetingPoint`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departures[${i}].meetingPoint`)}</p>}
+                                        </div>
+                                      </div>
+
+                                      {/* Map coordinates */}
+                                      <div className="flex flex-col gap-1.5 mt-4">
+                                        <label className={neu.label}>Meeting Coordinates</label>
+                                        <div className="flex gap-2">
+                                          <input
+                                            readOnly
+                                            placeholder="Latitude, Longitude"
+                                            value={
+                                              dep.meetingCoordinates?.lat && dep.meetingCoordinates?.lng
+                                                ? `${dep.meetingCoordinates.lat.toFixed(6)}, ${dep.meetingCoordinates.lng.toFixed(6)}`
+                                                : ''
+                                            }
+                                            className={`${neu.input} flex-1`}
+                                          />
+                                          <button
+                                            type="button"
+                                            onClick={() => { setEditDepIdx(i); setMapOpen(true); }}
+                                            className={`${neu.btnOutline} shrink-0 px-3`}
+                                          >
+                                            <MapPin size={15} className="text-[#006666]" />
+                                          </button>
+                                        </div>
+                                        {getErr(`departures[${i}].meetingCoordinates`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departures[${i}].meetingCoordinates`)}</p>}
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                ))}
+                              </AnimatePresence>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+
+                {/* ══════════════════════════════════════════════════════════
+                    SECTION 6 — Payment Methods
+                ══════════════════════════════════════════════════════════ */}
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className={neu.cardInner}>
+                  <SectionHeader id="payments" icon={Wallet} iconColor={neu.colorBlue} title="Payment Methods" description="Select accepted payment options" />
+                  <AnimatePresence>
+                    {isOpen('payments') && (
+                      <motion.div key="pay" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.27 }} className="overflow-hidden">
+                        <div className="px-5 md:px-6 py-5">
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {Object.values(PAYMENT_METHOD).map((m) => {
+                              const active = (formik.values.paymentMethods ?? []).includes(m);
+                              return (
+                                <div key={m} className={neu.checkTile(active)} onClick={() => togglePayment(m)}>
+                                  <div className={neu.checkbox(active)}>
+                                    {active && <Check size={12} className="text-white" />}
+                                  </div>
+                                  <span className={`${neu.label} text-xs flex-1`}>{PAYMENT_LABELS[m]}</span>
+                                  {active && <CheckCircle2 size={14} className="text-[#006666] shrink-0" />}
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {formik.touched.paymentMethods && formik.errors.paymentMethods && (
+                            <div className={`${neu.alertErr} mt-4`}>
+                              <AlertCircle size={15} className="text-[#FF2157] shrink-0 mt-0.5" />
+                              <span className="text-[#FF2157] text-xs font-[var(--font-jetbrains-mono)]">{formik.errors.paymentMethods as string}</span>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+
+                {/* ── Mutation alerts ── */}
+                <AnimatePresence mode="wait">
+                  {mutation.isError && (
+                    <motion.div key="err" variants={alertVariants} initial="hidden" animate="visible" exit="exit">
+                      <div className={neu.alertErr}>
+                        <XCircle size={17} className="text-[#FF2157] shrink-0 mt-0.5" />
+                        <span className="text-[#FF2157] text-sm font-[var(--font-jetbrains-mono)]">
+                          Failed to update pricing: {mutation.error?.message}
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                  {mutation.isSuccess && (
+                    <motion.div key="ok" variants={alertVariants} initial="hidden" animate="visible" exit="exit">
+                      <div className={neu.alertOk}>
+                        <CheckCircle2 size={17} className="text-[#00A63D] shrink-0" />
+                        <span className="text-[#00A63D] text-sm font-[var(--font-jetbrains-mono)]">
+                          Pricing & commerce updated successfully
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* ── Footer / Submit ── */}
+                <div className={`${neu.inset} flex flex-col sm:flex-row items-center justify-between gap-4 px-5 py-4`}>
+                  <div>
+                    {errorCount > 0 ? (
+                      <div className={`${neu.alertErr} py-2 px-4`}>
+                        <X size={14} className="text-[#FF2157] shrink-0" />
+                        <span className="text-[#FF2157] text-xs font-[var(--font-space-mono)]">
+                          {errorCount} validation issue{errorCount > 1 ? 's' : ''} found
+                        </span>
+                      </div>
+                    ) : (
+                      <div className={`${neu.alertOk} py-2 px-4`}>
+                        <Check size={14} className="text-[#00A63D] shrink-0" />
+                        <span className="text-[#00A63D] text-xs font-[var(--font-space-mono)]">All fields validated</span>
                       </div>
                     )}
                   </div>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+
+                  <motion.button
+                    type="submit"
+                    disabled={mutation.isPending || !formik.isValid}
+                    whileHover={!mutation.isPending && formik.isValid ? { scale: 1.02 } : {}}
+                    whileTap={!mutation.isPending && formik.isValid ? { scale: 0.97 } : {}}
+                    className={`${neu.btn} min-w-[220px] font-bold`}
                   >
-                    <Button
-                      type="submit"
-                      disabled={mutation.isPending || !formik.isValid}
-                      className="min-w-[220px] shadow-lg hover:shadow-xl transition-all bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-800 hover:to-teal-800 text-white font-semibold"
-                      size="lg"
-                    >
-                      {mutation.isPending ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          Updating...
-                        </>
-                      ) : (
-                        <>
-                          <Check className="h-4 w-4 mr-2" />
-                          Update Pricing & Commerce
-                        </>
-                      )}
-                    </Button>
-                  </motion.div>
+                    {mutation.isPending ? (
+                      <><Loader2 size={16} className="animate-spin" /><span>Updating...</span></>
+                    ) : (
+                      <><Check size={16} /><span>Update Pricing & Commerce</span></>
+                    )}
+                  </motion.button>
                 </div>
-              </CardFooter>
+
+              </div>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </motion.div>
 
+      {/* ── Map Picker (retained exactly) ── */}
       <MapPickerDialog
-        open={mapDialogOpen}
-        onClose={() => {
-          setMapDialogOpen(false);
-          setEditingDepartureIndex(null);
-        }}
+        open={mapOpen}
+        onClose={() => { setMapOpen(false); setEditDepIdx(null); }}
         onSelect={handleMapSelect}
         initialPosition={
-          editingDepartureIndex !== null &&
-            formik.values.departures?.[editingDepartureIndex]?.meetingCoordinates
-            ? [
-              formik.values.departures[editingDepartureIndex].meetingCoordinates!.lat,
-              formik.values.departures[editingDepartureIndex].meetingCoordinates!.lng
-            ]
+          editDepIdx !== null && formik.values.departures?.[editDepIdx]?.meetingCoordinates
+            ? [formik.values.departures[editDepIdx].meetingCoordinates!.lat, formik.values.departures[editDepIdx].meetingCoordinates!.lng]
             : undefined
         }
       />

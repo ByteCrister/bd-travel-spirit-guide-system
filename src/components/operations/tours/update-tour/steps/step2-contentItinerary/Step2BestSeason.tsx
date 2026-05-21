@@ -2,237 +2,128 @@
 
 import { useFormikContext } from "formik";
 import { UpdateTourContentItineraryDTO } from "@/types/tour/tour.types";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-    Sun,
-    Cloud,
-    Snowflake,
-    Leaf,
-    Calendar,
-    Check,
-    X,
-    CloudRain,
-    Wind,
-    Sparkles,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Sun, Cloud, Snowflake, Leaf, Calendar, Check, X, CloudRain, Wind, Sparkles } from "lucide-react";
 import { Season, SEASON } from "@/constants/tour/tour.const";
 
-// Season configuration matching your enum
+// ── Neumorphism Style Tokens ──────────────────────────────────
+const NEU_CARD = 'rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60';
+const NEU_SURFACE_INSET = 'bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]';
+const NEU_HEADING = 'font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight';
+const NEU_LABEL = 'font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest';
+const NEU_MUTED = 'font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50';
+const NEU_BADGE_PRIMARY = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]';
+const NEU_DIVIDER = 'border-[#1E2938]/10';
+const NEU_ICON_WELL = 'p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]';
+const NEU_BTN_DANGER_SM = 'inline-flex items-center gap-1 text-xs font-[family-name:var(--font-space-mono)] text-[#1E2938]/50 hover:text-[#FF2157] transition-colors duration-200';
+// ─────────────────────────────────────────────────────────────
+
 const SEASON_CONFIG = {
-    [SEASON.SPRING]: {
-        label: "Spring",
-        icon: Leaf,
-        color: "bg-green-500",
-        lightBg: "bg-green-50 dark:bg-green-950/30",
-        borderColor: "border-green-500",
-        textColor: "text-green-700 dark:text-green-400",
-        description: "Blooming season",
-    },
-    [SEASON.SUMMER]: {
-        label: "Summer",
-        icon: Sun,
-        color: "bg-yellow-500",
-        lightBg: "bg-yellow-50 dark:bg-yellow-950/30",
-        borderColor: "border-yellow-500",
-        textColor: "text-yellow-700 dark:text-yellow-400",
-        description: "Hot and dry season",
-    },
-    [SEASON.MONSOON]: {
-        label: "Monsoon",
-        icon: CloudRain,
-        color: "bg-sky-500",
-        lightBg: "bg-sky-50 dark:bg-sky-950/30",
-        borderColor: "border-sky-500",
-        textColor: "text-sky-700 dark:text-sky-400",
-        description: "Rainy season",
-    },
-    [SEASON.AUTUMN]: {
-        label: "Autumn",
-        icon: Wind,
-        color: "bg-orange-500",
-        lightBg: "bg-orange-50 dark:bg-orange-950/30",
-        borderColor: "border-orange-500",
-        textColor: "text-orange-700 dark:text-orange-400",
-        description: "After monsoon",
-    },
-    [SEASON.LATE_AUTUMN]: {
-        label: "Late Autumn",
-        icon: Cloud,
-        color: "bg-amber-500",
-        lightBg: "bg-amber-50 dark:bg-amber-950/30",
-        borderColor: "border-amber-500",
-        textColor: "text-amber-700 dark:text-amber-400",
-        description: "Dry transition",
-    },
-    [SEASON.WINTER]: {
-        label: "Winter",
-        icon: Snowflake,
-        color: "bg-blue-500",
-        lightBg: "bg-blue-50 dark:bg-blue-950/30",
-        borderColor: "border-blue-500",
-        textColor: "text-blue-700 dark:text-blue-400",
-        description: "Cool season",
-    },
-    [SEASON.YEAR_ROUND]: {
-        label: "Year Round",
-        icon: Sparkles,
-        color: "bg-purple-500",
-        lightBg: "bg-purple-50 dark:bg-purple-950/30",
-        borderColor: "border-purple-500",
-        textColor: "text-purple-700 dark:text-purple-400",
-        description: "All seasons suitable",
-    },
+    [SEASON.SPRING]: { label: 'Spring', icon: Leaf, accentBg: 'bg-green-500', accentText: 'text-green-600', accentBorder: 'border-green-400', description: 'Blooming season' },
+    [SEASON.SUMMER]: { label: 'Summer', icon: Sun, accentBg: 'bg-yellow-500', accentText: 'text-yellow-600', accentBorder: 'border-yellow-400', description: 'Hot and dry season' },
+    [SEASON.MONSOON]: { label: 'Monsoon', icon: CloudRain, accentBg: 'bg-sky-500', accentText: 'text-sky-600', accentBorder: 'border-sky-400', description: 'Rainy season' },
+    [SEASON.AUTUMN]: { label: 'Autumn', icon: Wind, accentBg: 'bg-orange-500', accentText: 'text-orange-600', accentBorder: 'border-orange-400', description: 'After monsoon' },
+    [SEASON.LATE_AUTUMN]: { label: 'Late Autumn', icon: Cloud, accentBg: 'bg-amber-500', accentText: 'text-amber-600', accentBorder: 'border-amber-400', description: 'Dry transition' },
+    [SEASON.WINTER]: { label: 'Winter', icon: Snowflake, accentBg: 'bg-blue-500', accentText: 'text-blue-600', accentBorder: 'border-blue-400', description: 'Cool season' },
+    [SEASON.YEAR_ROUND]: { label: 'Year Round', icon: Sparkles, accentBg: 'bg-purple-500', accentText: 'text-purple-600', accentBorder: 'border-purple-400', description: 'All seasons suitable' },
 };
 
 function Step2BestSeason() {
-    const { values, setFieldValue, touched, errors } =
-        useFormikContext<UpdateTourContentItineraryDTO>();
+    const { values, setFieldValue, touched, errors } = useFormikContext<UpdateTourContentItineraryDTO>();
 
     const toggleSeason = (season: Season) => {
-        const currentSeasons = values.bestSeason || [];
-
-        if (currentSeasons.includes(season)) {
-            setFieldValue(
-                "bestSeason",
-                currentSeasons.filter((s: string) => s !== season)
-            );
-        } else {
-            setFieldValue("bestSeason", [...currentSeasons, season]);
-        }
+        const current = values.bestSeason || [];
+        setFieldValue('bestSeason',
+            current.includes(season) ? current.filter((s: string) => s !== season) : [...current, season]
+        );
     };
 
-    const clearAll = () => {
-        setFieldValue("bestSeason", []);
-    };
+    const clearAll = () => setFieldValue("bestSeason", []);
 
     const selectedSeasons = values.bestSeason || [];
     const hasError = touched.bestSeason && errors.bestSeason;
 
     return (
-        <Card
-            className={cn(
-                "border-2 transition-colors",
-                hasError ? "border-destructive" : "hover:border-primary/50"
-            )}
-        >
-            <CardHeader>
+        <div className={`${NEU_CARD} ${hasError ? 'ring-2 ring-[#FF2157]/50' : ''} overflow-hidden`}>
+            {/* Header */}
+            <div className={`px-6 py-5 border-b ${NEU_DIVIDER}`}>
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5 text-primary" />
-                        <CardTitle className="text-lg">Best Season to Visit</CardTitle>
+                    <div className="flex items-center gap-3">
+                        <div className={NEU_ICON_WELL}>
+                            <Calendar className="w-4 h-4 text-[#006666]" />
+                        </div>
+                        <div>
+                            <h3 className={`${NEU_HEADING} text-base`}>Best Season to Visit</h3>
+                            <p className={`${NEU_MUTED} mt-0.5`}>Select the ideal seasons for this tour</p>
+                        </div>
                     </div>
                     {selectedSeasons.length > 0 && (
-                        <Badge variant="secondary" className="text-xs">
-                            {selectedSeasons.length} selected
-                        </Badge>
+                        <span className={NEU_BADGE_PRIMARY}>{selectedSeasons.length} selected</span>
                     )}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                    Select the ideal seasons for this tour
-                </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {/* Selected Seasons Summary */}
+            </div>
+
+            <div className="px-6 py-5 space-y-5">
+                {/* Selected summary strip */}
                 {selectedSeasons.length > 0 && (
-                    <div className="p-4 rounded-lg bg-muted/50 border-2 border-dashed">
-                        <div className="flex items-center justify-between mb-2">
-                            <Label className="text-sm font-medium">Selected Seasons</Label>
-                            <button
-                                type="button"
-                                onClick={clearAll}
-                                className="text-xs text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1"
-                            >
-                                <X className="h-3 w-3" />
-                                Clear all
+                    <div className={`${NEU_SURFACE_INSET} rounded-xl p-4`}>
+                        <div className="flex items-center justify-between mb-3">
+                            <span className={NEU_LABEL}>Selected</span>
+                            <button type="button" onClick={clearAll} className={NEU_BTN_DANGER_SM}>
+                                <X className="h-3 w-3" /> Clear all
                             </button>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                            {selectedSeasons.map((season: string) => {
-                                const config =
-                                    SEASON_CONFIG[season as keyof typeof SEASON_CONFIG];
-                                if (!config) return null;
-                                const Icon = config.icon;
+                            {selectedSeasons.map((s: string) => {
+                                const cfg = SEASON_CONFIG[s as keyof typeof SEASON_CONFIG];
+                                if (!cfg) return null;
+                                const Icon = cfg.icon;
                                 return (
-                                    <Badge
-                                        key={season}
-                                        variant="secondary"
-                                        className={cn(
-                                            "px-3 py-1.5 gap-1.5",
-                                            config.lightBg,
-                                            config.textColor
-                                        )}
-                                    >
-                                        <Icon className="h-3 w-3" />
-                                        {config.label}
-                                    </Badge>
+                                    <span key={s} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#E7E5E4] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff] text-[#1E2938]">
+                                        <Icon className="h-3 w-3" /> {cfg.label}
+                                    </span>
                                 );
                             })}
                         </div>
                     </div>
                 )}
 
-                {/* Season Selection Grid */}
+                {/* Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {Object.entries(SEASON_CONFIG).map(([seasonValue, config]) => {
-                        const Icon = config.icon;
-                        const isSelected = selectedSeasons.includes(seasonValue as Season);
-
+                    {Object.entries(SEASON_CONFIG).map(([seasonValue, cfg]) => {
+                        const Icon = cfg.icon;
+                        const selected = selectedSeasons.includes(seasonValue as Season);
                         return (
                             <button
                                 key={seasonValue}
                                 type="button"
                                 onClick={() => toggleSeason(seasonValue as Season)}
-                                className={cn(
-                                    "relative p-4 rounded-lg border-2 transition-all duration-200",
-                                    "hover:scale-[1.02] active:scale-[0.98]",
-                                    "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                                    isSelected
-                                        ? cn(config.borderColor, config.lightBg, "shadow-md")
-                                        : "border-border hover:border-primary/50 bg-card"
-                                )}
+                                className={[
+                                    'relative p-4 rounded-xl text-left transition-all duration-200',
+                                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50',
+                                    selected
+                                        ? `bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-2 ${cfg.accentBorder}`
+                                        : 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border-2 border-transparent hover:shadow-[6px_6px_14px_#c8c6c5,-6px_-6px_14px_#ffffff] hover:-translate-y-0.5',
+                                ].join(' ')}
                             >
-                                {/* Selection Indicator */}
-                                <div
-                                    className={cn(
-                                        "absolute top-2 right-2 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all",
-                                        isSelected
-                                            ? cn(config.color, "border-transparent")
-                                            : "border-muted-foreground/30"
-                                    )}
-                                >
-                                    {isSelected && <Check className="h-3 w-3 text-white" />}
+                                <div className={[
+                                    'absolute top-2.5 right-2.5 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all duration-200',
+                                    selected ? `${cfg.accentBg} border-transparent` : 'border-[#1E2938]/20 bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c5,inset_-1px_-1px_3px_#ffffff]',
+                                ].join(' ')}>
+                                    {selected && <Check className="h-3 w-3 text-white" />}
                                 </div>
 
-                                {/* Season Content */}
-                                <div className="flex items-start gap-3">
-                                    <div
-                                        className={cn(
-                                            "h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0",
-                                            isSelected ? config.color : "bg-muted"
-                                        )}
-                                    >
-                                        <Icon
-                                            className={cn(
-                                                "h-5 w-5",
-                                                isSelected ? "text-white" : "text-muted-foreground"
-                                            )}
-                                        />
+                                <div className="flex items-center gap-3">
+                                    <div className={[
+                                        'h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0',
+                                        selected ? cfg.accentBg : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]',
+                                    ].join(' ')}>
+                                        <Icon className={`h-5 w-5 ${selected ? 'text-white' : 'text-[#1E2938]/40'}`} />
                                     </div>
-                                    <div className="flex-1 text-left">
-                                        <div
-                                            className={cn(
-                                                "font-semibold mb-0.5",
-                                                isSelected ? config.textColor : "text-foreground"
-                                            )}
-                                        >
-                                            {config.label}
-                                        </div>
-                                        <div className="text-xs text-muted-foreground">
-                                            {config.description}
-                                        </div>
+                                    <div>
+                                        <p className={`font-[family-name:var(--font-space-mono)] font-bold text-sm ${selected ? cfg.accentText : 'text-[#1E2938]'}`}>
+                                            {cfg.label}
+                                        </p>
+                                        <p className={NEU_MUTED}>{cfg.description}</p>
                                     </div>
                                 </div>
                             </button>
@@ -240,22 +131,17 @@ function Step2BestSeason() {
                     })}
                 </div>
 
-                {/* Error Message */}
                 {hasError && (
-                    <p className="text-sm text-destructive flex items-center gap-1">
-                        <X className="h-4 w-4" />
-                        {errors.bestSeason}
+                    <p className="flex items-center gap-1.5 text-sm font-[family-name:var(--font-space-mono)] text-[#FF2157]">
+                        <X className="h-4 w-4" /> {String(errors.bestSeason)}
                     </p>
                 )}
 
-                {/* Helper Text */}
                 {selectedSeasons.length === 0 && !hasError && (
-                    <p className="text-xs text-center text-muted-foreground pt-2">
-                        Select one or more seasons when this tour is best to visit
-                    </p>
+                    <p className={`${NEU_MUTED} text-center pt-1`}>Select one or more seasons when this tour is best to visit</p>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }
 

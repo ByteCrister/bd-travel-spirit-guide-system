@@ -3,227 +3,184 @@
 import { DIFFICULTY_LEVEL, DifficultyLevel } from '@/constants/tour/tour.const';
 import { useFormikContext } from 'formik';
 import { UpdateTourContentItineraryDTO } from '@/types/tour/tour.types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    Mountain,
-    Leaf,
-    MountainIcon,
-    Activity,
-} from 'lucide-react';
+import { Mountain, Leaf, MountainIcon, Activity } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 
-// Define the interface for difficulty config
+// ── Neumorphism Style Tokens ──────────────────────────────────
+const NEU_CARD = 'rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60';
+const NEU_CARD_SM = 'rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60';
+const NEU_SURFACE_INSET = 'bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]';
+const NEU_INPUT = 'rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 font-[family-name:var(--font-jetbrains-mono)] text-sm shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200 px-3 h-11 w-full';
+const NEU_HEADING = 'font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight';
+const NEU_MUTED = 'font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50';
+const NEU_DIVIDER = 'border-[#1E2938]/10';
+const NEU_ICON_WELL = 'p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]';
+// ─────────────────────────────────────────────────────────────
+
 interface DifficultyConfig {
-    [key: string]: {
-        color: string;
-        icon: React.ReactNode;
-        description: string;
-    };
+    label: string;
+    accentBg: string;
+    accentText: string;
+    dotColor: string;
+    icon: React.ReactNode;
+    description: string;
+    details: string[];
 }
 
-// Difficulty Component
+const DIFFICULTY_CONFIG: Record<string, DifficultyConfig> = {
+    [DIFFICULTY_LEVEL.EASY]: {
+        label: 'Easy',
+        accentBg: 'bg-green-500',
+        accentText: 'text-green-600',
+        dotColor: 'bg-green-500',
+        icon: <Leaf className="h-4 w-4" />,
+        description: 'Suitable for beginners and families',
+        details: [
+            'Flat terrain with minimal elevation gain',
+            'Suitable for all ages and fitness levels',
+            'Typically involves walking on paved or well-maintained paths',
+        ],
+    },
+    [DIFFICULTY_LEVEL.MODERATE]: {
+        label: 'Moderate',
+        accentBg: 'bg-blue-500',
+        accentText: 'text-blue-600',
+        dotColor: 'bg-blue-500',
+        icon: <MountainIcon className="h-4 w-4" />,
+        description: 'Some physical effort required',
+        details: [
+            'May include some hills or uneven terrain',
+            'Requires basic level of fitness',
+            'Suitable for most active travelers',
+        ],
+    },
+    [DIFFICULTY_LEVEL.CHALLENGING]: {
+        label: 'Challenging',
+        accentBg: 'bg-yellow-500',
+        accentText: 'text-yellow-600',
+        dotColor: 'bg-yellow-500',
+        icon: <Activity className="h-4 w-4" />,
+        description: 'Requires good physical fitness',
+        details: [
+            'Significant elevation changes and uneven terrain',
+            'Requires good physical condition',
+            'May involve longer distances or time commitments',
+        ],
+    },
+};
+
 function Step2Difficulty() {
     const { values, setFieldValue } = useFormikContext<UpdateTourContentItineraryDTO>();
-
-    const difficultyConfig: DifficultyConfig = {
-        [DIFFICULTY_LEVEL.EASY]: {
-            color: 'bg-green-500',
-            icon: <Leaf className="h-4 w-4" />,
-            description: 'Suitable for beginners and families'
-        },
-        [DIFFICULTY_LEVEL.MODERATE]: {
-            color: 'bg-blue-500',
-            icon: <MountainIcon className="h-4 w-4" />,
-            description: 'Some physical effort required'
-        },
-        [DIFFICULTY_LEVEL.CHALLENGING]: {
-            color: 'bg-yellow-500',
-            icon: <Activity className="h-4 w-4" />,
-            description: 'Requires good physical fitness'
-        },
-    };
-
-    // Get all difficulty levels as an array
     const difficultyLevels = Object.values(DIFFICULTY_LEVEL) as DIFFICULTY_LEVEL[];
+    const currentCfg = values.difficulty ? DIFFICULTY_CONFIG[values.difficulty] : null;
+    const selectedIndex = values.difficulty ? difficultyLevels.indexOf(values.difficulty as DIFFICULTY_LEVEL) : -1;
 
-    // Helper to get current difficulty config
-    const getCurrentDifficulty = () => {
-        if (!values.difficulty) return null;
-        return difficultyConfig[values.difficulty];
-    };
-
-    // Handle difficulty change
     const handleDifficultyChange = (value: string) => {
         setFieldValue('difficulty', value as DifficultyLevel);
     };
 
-    // Get the index of the current difficulty for the progress indicator
-    const getSelectedIndex = (): number => {
-        if (!values.difficulty) return -1;
-        return difficultyLevels.indexOf(values.difficulty as DIFFICULTY_LEVEL);
-    };
-
     return (
-        <Card className="border-2 hover:border-primary/50 transition-colors">
-            <CardHeader>
-                <div className="flex items-center gap-2">
-                    <Mountain className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-lg">Difficulty Level</CardTitle>
+        <div className={`${NEU_CARD} overflow-hidden`}>
+            {/* Header */}
+            <div className={`px-6 py-5 border-b ${NEU_DIVIDER}`}>
+                <div className="flex items-center gap-3">
+                    <div className={NEU_ICON_WELL}>
+                        <Mountain className="w-4 h-4 text-[#006666]" />
+                    </div>
+                    <div>
+                        <h3 className={`${NEU_HEADING} text-base`}>Difficulty Level</h3>
+                        <p className={`${NEU_MUTED} mt-0.5`}>Select the physical difficulty of this tour</p>
+                    </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                    Select the physical difficulty of this tour. This helps travelers understand the physical requirements.
-                </p>
-            </CardHeader>
-            <CardContent>
-                <Select
-                    value={values.difficulty || ''}
-                    onValueChange={handleDifficultyChange}
-                >
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Choose difficulty level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {difficultyLevels.map((level) => {
-                            const config = difficultyConfig[level];
-                            return (
-                                <SelectItem key={level} value={level}>
-                                    <div className="flex items-center gap-2 py-1">
-                                        <div className={`w-8 h-8 rounded-lg ${config?.color} flex items-center justify-center`}>
-                                            {config?.icon}
-                                        </div>
-                                        <div className="flex flex-col items-start">
-                                            <span className="font-medium capitalize">{level}</span>
-                                            <span className="text-xs text-muted-foreground">
-                                                {config?.description}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </SelectItem>
-                            );
-                        })}
-                    </SelectContent>
-                </Select>
+            </div>
 
-                {/* Current selection display */}
-                {values.difficulty && getCurrentDifficulty() && (
-                    <div className="mt-4 p-4 rounded-lg border bg-card">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className={`h-8 w-8 rounded-lg ${getCurrentDifficulty()?.color} flex items-center justify-center`}>
-                                {getCurrentDifficulty()?.icon}
+            <div className="px-6 py-5 space-y-5">
+                {/* Select */}
+                <div>
+                    <Select value={values.difficulty || ''} onValueChange={handleDifficultyChange}>
+                        <SelectTrigger className={`${NEU_INPUT} !h-12`}>
+                            <SelectValue placeholder="Choose difficulty level" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#E7E5E4] border border-white/60 shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] rounded-xl">
+                            {difficultyLevels.map((level) => {
+                                const cfg = DIFFICULTY_CONFIG[level];
+                                return (
+                                    <SelectItem key={level} value={level} className="focus:bg-[#006666]/10 rounded-lg">
+                                        <div className="flex items-center gap-3 py-1">
+                                            <div className={`w-8 h-8 rounded-xl ${cfg?.accentBg} flex items-center justify-center text-white shadow-[2px_2px_4px_rgba(0,0,0,0.15)]`}>
+                                                {cfg?.icon}
+                                            </div>
+                                            <div>
+                                                <p className="font-[family-name:var(--font-space-mono)] font-bold text-sm capitalize text-[#1E2938]">{level}</p>
+                                                <p className={NEU_MUTED}>{cfg?.description}</p>
+                                            </div>
+                                        </div>
+                                    </SelectItem>
+                                );
+                            })}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Selected display */}
+                {values.difficulty && currentCfg && (
+                    <div className={`${NEU_CARD_SM} p-5 space-y-4`}>
+                        {/* Selected badge row */}
+                        <div className="flex items-center gap-3">
+                            <div className={`h-10 w-10 rounded-xl ${currentCfg.accentBg} flex items-center justify-center text-white shadow-[2px_2px_5px_rgba(0,0,0,0.15)]`}>
+                                {currentCfg.icon}
                             </div>
                             <div>
-                                <h4 className="font-semibold capitalize">Selected: {values.difficulty}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    {getCurrentDifficulty()?.description}
+                                <p className={`font-[family-name:var(--font-space-mono)] font-bold ${currentCfg.accentText} capitalize`}>
+                                    {values.difficulty}
                                 </p>
+                                <p className={NEU_MUTED}>{currentCfg.description}</p>
                             </div>
                         </div>
 
-                        {/* Difficulty indicators */}
-                        <div className="mt-3 flex items-center gap-2">
-                            {difficultyLevels.map((level, index) => {
-                                const isSelected = values.difficulty === level;
-                                const selectedIndex = getSelectedIndex();
-                                const isBeforeSelected = selectedIndex >= index;
-                                
+                        {/* Progress dots */}
+                        <div className="flex items-center gap-2">
+                            {difficultyLevels.map((level, i) => {
+                                const cfg = DIFFICULTY_CONFIG[level];
+                                const filled = selectedIndex >= i;
                                 return (
                                     <div key={level} className="flex items-center">
-                                        <div
-                                            className={cn(
-                                                "h-3 w-3 rounded-full transition-all duration-200",
-                                                isSelected
-                                                    ? difficultyConfig[level]?.color
-                                                    : isBeforeSelected
-                                                        ? difficultyConfig[level]?.color?.replace('bg-', 'bg-').replace('500', '300')
-                                                        : 'bg-gray-200'
-                                            )}
-                                        />
-                                        {index < difficultyLevels.length - 1 && (
-                                            <div
-                                                className={cn(
-                                                    "h-1 w-6 transition-all duration-200",
-                                                    isBeforeSelected
-                                                        ? difficultyConfig[level]?.color?.replace('bg-', 'bg-').replace('500', '300')
-                                                        : 'bg-gray-200'
-                                                )}
-                                            />
+                                        <div className={[
+                                            'h-3 w-3 rounded-full transition-all duration-300',
+                                            filled ? cfg?.dotColor : 'bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c5,inset_-1px_-1px_3px_#ffffff]',
+                                        ].join(' ')} />
+                                        {i < difficultyLevels.length - 1 && (
+                                            <div className={`h-1 w-8 transition-all duration-300 ${filled ? cfg?.dotColor + ' opacity-40' : 'bg-[#E7E5E4] shadow-[inset_1px_1px_2px_#c8c6c5]'}`} />
                                         )}
                                     </div>
                                 );
                             })}
                         </div>
 
-                        {/* Additional info based on difficulty */}
-                        <div className="mt-4 text-sm text-muted-foreground border-t pt-3">
-                            {values.difficulty === DIFFICULTY_LEVEL.EASY && (
-                                <div className="space-y-1">
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                        Flat terrain with minimal elevation gain
-                                    </p>
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                        Suitable for all ages and fitness levels
-                                    </p>
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                        Typically involves walking on paved or well-maintained paths
-                                    </p>
-                                </div>
-                            )}
-                            {values.difficulty === DIFFICULTY_LEVEL.MODERATE && (
-                                <div className="space-y-1">
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                        May include some hills or uneven terrain
-                                    </p>
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                        Requires basic level of fitness
-                                    </p>
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                        Suitable for most active travelers
-                                    </p>
-                                </div>
-                            )}
-                            {values.difficulty === DIFFICULTY_LEVEL.CHALLENGING && (
-                                <div className="space-y-1">
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
-                                        Significant elevation changes and uneven terrain
-                                    </p>
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
-                                        Requires good physical condition
-                                    </p>
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
-                                        May involve longer distances or time commitments
-                                    </p>
-                                </div>
-                            )}
+                        {/* Detail bullets */}
+                        <div className={`${NEU_SURFACE_INSET} rounded-xl p-4 border-t ${NEU_DIVIDER} space-y-2`}>
+                            {currentCfg.details.map((d, i) => (
+                                <p key={i} className={`${NEU_MUTED} flex items-center gap-2`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${currentCfg.dotColor}`} />
+                                    {d}
+                                </p>
+                            ))}
                         </div>
                     </div>
                 )}
 
-                {/* Empty state guidance */}
+                {/* Empty state */}
                 {!values.difficulty && (
-                    <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-dashed">
-                        <div className="flex items-center gap-3">
-                            <Mountain className="h-5 w-5 text-muted-foreground" />
-                            <div>
-                                <p className="text-sm font-medium">No difficulty level selected</p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    Select a difficulty level above to help travelers understand the physical requirements of this tour.
-                                </p>
-                            </div>
+                    <div className={`${NEU_SURFACE_INSET} rounded-xl p-5 flex items-center gap-3`}>
+                        <Mountain className="h-5 w-5 text-[#1E2938]/30 flex-shrink-0" />
+                        <div>
+                            <p className="font-[family-name:var(--font-space-mono)] font-bold text-sm text-[#1E2938]/50">No difficulty level selected</p>
+                            <p className={`${NEU_MUTED} mt-0.5`}>Select a difficulty level above to help travelers understand the physical requirements.</p>
                         </div>
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }
 

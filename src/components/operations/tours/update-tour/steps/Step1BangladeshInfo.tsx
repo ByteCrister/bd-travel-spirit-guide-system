@@ -19,62 +19,48 @@ import { ComboBox } from '@/components/ui/combobox';
 import { getDistrictsByDivision } from '@/utils/helpers/conversions.tour';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  MapPin,
-  Building2,
-  Users,
-  Car,
-  Phone,
-  Shield,
-  Ambulance,
-  Flame,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
-  X,
-  Map,
+  MapPin, Building2, Users, Car, Phone, Shield,
+  Ambulance, Flame, CheckCircle2, AlertCircle, Loader2, X, Map,
 } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { ValidationError } from 'yup';
+import { spaceMono } from '@/styles/fonts'; 
+
+// ─── Neumorphism Style Constants ───────────────────────────────────────────────
+const neu = {
+  surface: 'bg-[#E7E5E4]',
+  card: 'bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_18px_#c8c6c4,-8px_-8px_18px_#ffffff]',
+  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[inset_4px_4px_9px_#c8c6c4,inset_-4px_-4px_9px_#ffffff]',
+  sectionBox: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
+  iconBox: 'bg-[#E7E5E4] rounded-xl p-2.5 shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] flex items-center justify-center',
+  iconBoxRed: 'bg-[#E7E5E4] rounded-xl p-2.5 shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] flex items-center justify-center',
+  checkboxRow: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] flex items-center gap-3 px-4 py-3 cursor-pointer select-none transition-all duration-200',
+  badge: 'bg-[#E7E5E4] text-[#006666] border border-[#006666]/25 rounded-lg px-3 py-1 text-xs font-[Space_Mono] shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff] inline-flex items-center gap-1.5',
+  btn: 'bg-[#006666] text-white rounded-xl shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff] active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] transition-all duration-200',
+  btnDisabled: 'opacity-50 cursor-not-allowed bg-[#888780] rounded-xl shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff]',
+  label: 'text-[#1E2938] font-medium text-sm font-[Space_Mono] flex items-center gap-1.5',
+  headingFont: 'font-[Space_Mono] font-semibold tracking-tight text-[#1E2938]',
+  subText: 'text-[#5a6270] text-sm font-[Space_Mono]',
+  inputOverride: 'font-[Space_Mono] text-sm rounded-xl bg-[#E7E5E4] border-0 shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] focus:ring-1 focus:ring-[#006666] focus:shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] outline-none placeholder:text-[#888780]',
+  alertError: 'bg-[#E7E5E4] border border-[#FF2157]/30 rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] flex items-center gap-3 px-4 py-3',
+  alertSuccess: 'bg-[#E7E5E4] border border-[#00A63D]/30 rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] flex items-center gap-3 px-4 py-3',
+  divider: 'border-t border-[#c8c6c4]/70 my-6',
+  errorText: 'text-xs text-[#FF2157] font-[Space_Mono] flex items-center gap-1 mt-1.5',
+};
 
 interface Step1BangladeshInfoProps {
   tourId: string;
   initialData: UpdateTourBangladeshFieldsDTO;
 }
 
-type ComboBoxOption = {
-  label: string;
-  value: string;
-};
+type ComboBoxOption = { label: string; value: string };
 
 export default function Step1BangladeshInfo({ tourId, initialData }: Step1BangladeshInfoProps) {
   const queryClient = useQueryClient();
   const [districtOptions, setDistrictOptions] = useState<ComboBoxOption[]>([]);
 
-  const tourTypeOptions: ComboBoxOption[] = Object.values(TRAVEL_TYPE).map(type => ({
-    label: type,
-    value: type,
-  }));
-
-  const divisionOptions: ComboBoxOption[] = Object.values(DIVISION).map(div => ({
-    label: div,
-    value: div,
-  }));
-
-  const accommodationTypeOptions: ComboBoxOption[] = Object.values(ACCOMMODATION_TYPE).map(type => ({
-    label: type,
-    value: type,
-  }));
+  const tourTypeOptions: ComboBoxOption[] = Object.values(TRAVEL_TYPE).map(t => ({ label: t, value: t }));
+  const divisionOptions: ComboBoxOption[] = Object.values(DIVISION).map(d => ({ label: d, value: d }));
+  const accommodationTypeOptions: ComboBoxOption[] = Object.values(ACCOMMODATION_TYPE).map(a => ({ label: a, value: a }));
 
   const mutation = useMutation({
     mutationFn: (data: UpdateTourBangladeshFieldsDTO) =>
@@ -93,32 +79,20 @@ export default function Step1BangladeshInfo({ tourId, initialData }: Step1Bangla
       guideIncluded: initialData.guideIncluded ?? true,
       transportIncluded: initialData.transportIncluded ?? true,
       emergencyContacts: initialData.emergencyContacts || {
-        policeNumber: '',
-        ambulanceNumber: '',
-        fireServiceNumber: '',
-        localEmergency: '',
+        policeNumber: '', ambulanceNumber: '', fireServiceNumber: '', localEmergency: '',
       },
     },
     validationSchema: Step1BangladeshSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        // Validate the form before submission
         await Step1BangladeshSchema.validate(values, { abortEarly: false });
-
-        // Only submit if validation passes
         mutation.mutate(values);
       } catch (error) {
-        // Handle validation errors
         if (error instanceof ValidationError) {
           const errors: { [key: string]: string } = {};
-          error.inner.forEach((err) => {
-            if (err.path) {
-              errors[err.path] = err.message;
-            }
-          });
+          error.inner.forEach((err) => { if (err.path) errors[err.path] = err.message; });
           formik.setErrors(errors);
         }
-        // Don't submit on validation error
       } finally {
         setSubmitting(false);
       }
@@ -128,12 +102,7 @@ export default function Step1BangladeshInfo({ tourId, initialData }: Step1Bangla
   useEffect(() => {
     if (formik.values.division) {
       const districts = getDistrictsByDivision(formik.values.division as Division);
-      const districtOpts = districts.map(dist => ({
-        label: dist,
-        value: dist,
-      }));
-      setDistrictOptions(districtOpts);
-
+      setDistrictOptions(districts.map(d => ({ label: d, value: d })));
       if (formik.values.district && !districts.includes(formik.values.district as District)) {
         formik.setFieldValue('district', '');
       }
@@ -146,76 +115,53 @@ export default function Step1BangladeshInfo({ tourId, initialData }: Step1Bangla
   useEffect(() => {
     if (formik.values.division) {
       const districts = getDistrictsByDivision(formik.values.division as Division);
-      const districtOpts = districts.map(dist => ({
-        label: dist,
-        value: dist,
-      }));
-      setDistrictOptions(districtOpts);
+      setDistrictOptions(districts.map(d => ({ label: d, value: d })));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4, staggerChildren: 0.1 }
-    }
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45, staggerChildren: 0.08 } },
   };
-
   const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.3 }
-    }
+    hidden: { opacity: 0, x: -16 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
   };
-
   const alertVariants = {
-    hidden: { opacity: 0, scale: 0.95, y: -10 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: { duration: 0.3 }
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.95,
-      y: -10,
-      transition: { duration: 0.2 }
-    }
+    hidden: { opacity: 0, scale: 0.95, y: -8 },
+    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3 } },
+    exit: { opacity: 0, scale: 0.95, y: -8, transition: { duration: 0.2 } },
   };
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <Card className="mb-6 border-slate-200 shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50/30 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/20">
-              <Map className="h-6 w-6 text-white" />
-            </div>
-            <CardTitle className="text-xl font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              Bangladesh Specific Information
-            </CardTitle>
-          </div>
-        </CardHeader>
+    <motion.div variants={containerVariants} initial="hidden" animate="visible" className={`w-full ${spaceMono.className}`}>
 
-        <CardContent className="pt-6 pb-8 px-6">
+      <div className={`${neu.card} p-1 w-full`}>
+        {/* ─── Header ─── */}
+        <div className="px-6 md:px-8 pt-6 md:pt-8 pb-5 border-b border-[#c8c6c4]/60">
+          <div className="flex items-center gap-3">
+            <div className={`${neu.iconBox}`}>
+              <Map className="text-[#006666]" size={22} />
+            </div>
+            <div>
+              <h2 className={`${neu.headingFont} text-lg`}>Bangladesh Specific Information</h2>
+              <p className={neu.subText}>Location, services, and emergency contacts</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 md:px-8 py-6 md:py-8">
           <form onSubmit={formik.handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* ─── Main Grid ─── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
               {/* Tour Type */}
-              <motion.div variants={itemVariants} className="space-y-2">
-                <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-slate-500" />
-                  Tour Type <span className="text-red-500">*</span>
-                </Label>
+              <motion.div variants={itemVariants} className="flex flex-col gap-2">
+                <label className={neu.label}>
+                  <MapPin size={14} className="text-[#5a6270]" />
+                  Tour Type <span className="text-[#FF2157]">*</span>
+                </label>
                 <ComboBox
                   options={tourTypeOptions}
                   value={formik.values.tourType}
@@ -223,23 +169,18 @@ export default function Step1BangladeshInfo({ tourId, initialData }: Step1Bangla
                   onChange={(value) => formik.setFieldValue('tourType', value)}
                 />
                 {formik.touched.tourType && formik.errors.tourType && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-xs text-red-600 flex items-center gap-1 mt-1"
-                  >
-                    <AlertCircle className="h-3 w-3" />
-                    {formik.errors.tourType}
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={neu.errorText}>
+                    <AlertCircle size={11} />{formik.errors.tourType}
                   </motion.p>
                 )}
               </motion.div>
 
               {/* Division */}
-              <motion.div variants={itemVariants} className="space-y-2">
-                <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <Map className="h-4 w-4 text-slate-500" />
-                  Division <span className="text-red-500">*</span>
-                </Label>
+              <motion.div variants={itemVariants} className="flex flex-col gap-2">
+                <label className={neu.label}>
+                  <Map size={14} className="text-[#5a6270]" />
+                  Division <span className="text-[#FF2157]">*</span>
+                </label>
                 <ComboBox
                   options={divisionOptions}
                   value={formik.values.division}
@@ -247,48 +188,38 @@ export default function Step1BangladeshInfo({ tourId, initialData }: Step1Bangla
                   onChange={(value) => formik.setFieldValue('division', value)}
                 />
                 {formik.touched.division && formik.errors.division && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-xs text-red-600 flex items-center gap-1 mt-1"
-                  >
-                    <AlertCircle className="h-3 w-3" />
-                    {formik.errors.division}
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={neu.errorText}>
+                    <AlertCircle size={11} />{formik.errors.division}
                   </motion.p>
                 )}
               </motion.div>
 
               {/* District */}
-              <motion.div variants={itemVariants} className="space-y-2">
-                <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-slate-500" />
-                  District <span className="text-red-500">*</span>
-                </Label>
+              <motion.div variants={itemVariants} className="flex flex-col gap-2">
+                <label className={neu.label}>
+                  <MapPin size={14} className="text-[#5a6270]" />
+                  District <span className="text-[#FF2157]">*</span>
+                </label>
                 <ComboBox
                   options={districtOptions}
                   value={formik.values.district}
-                  placeholder={formik.values.division ? "Select district" : "Select division first"}
+                  placeholder={formik.values.division ? 'Select district' : 'Select division first'}
                   onChange={(value) => formik.setFieldValue('district', value)}
                   disabled={!formik.values.division}
                 />
                 {formik.touched.district && formik.errors.district && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-xs text-red-600 flex items-center gap-1 mt-1"
-                  >
-                    <AlertCircle className="h-3 w-3" />
-                    {formik.errors.district}
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={neu.errorText}>
+                    <AlertCircle size={11} />{formik.errors.district}
                   </motion.p>
                 )}
               </motion.div>
 
               {/* Accommodation Type */}
-              <motion.div variants={itemVariants} className="space-y-2">
-                <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-slate-500" />
+              <motion.div variants={itemVariants} className="flex flex-col gap-2">
+                <label className={neu.label}>
+                  <Building2 size={14} className="text-[#5a6270]" />
                   Accommodation Types
-                </Label>
+                </label>
                 <ComboBox
                   options={accommodationTypeOptions}
                   value={formik.values.accommodationType?.[0]}
@@ -303,7 +234,7 @@ export default function Step1BangladeshInfo({ tourId, initialData }: Step1Bangla
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="flex flex-wrap gap-2 mt-2"
+                    className="flex flex-wrap gap-2 mt-1"
                   >
                     {formik.values.accommodationType.map((type, index) => (
                       <motion.div
@@ -312,222 +243,145 @@ export default function Step1BangladeshInfo({ tourId, initialData }: Step1Bangla
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
                       >
-                        <Badge
-                          variant="secondary"
-                          className="pl-3 pr-1 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
-                        >
+                        <span className={neu.badge}>
                           {type}
-                          <Button
+                          <button
                             type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-5 w-5 p-0 ml-2 hover:bg-blue-200 rounded-full"
-                            onClick={() => {
-                              const newTypes = formik.values.accommodationType.filter(t => t !== type);
-                              formik.setFieldValue('accommodationType', newTypes);
-                            }}
+                            onClick={() => formik.setFieldValue('accommodationType',
+                              formik.values.accommodationType.filter(t => t !== type))}
+                            className="hover:text-[#FF2157] transition-colors ml-0.5"
+                            aria-label={`Remove ${type}`}
                           >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </Badge>
+                            <X size={11} />
+                          </button>
+                        </span>
                       </motion.div>
                     ))}
                   </motion.div>
                 )}
               </motion.div>
 
-              {/* Guide and Transport Checkboxes */}
-              <motion.div variants={itemVariants} className="space-y-3">
-                <div className="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
-                  <Checkbox
-                    id="guideIncluded"
-                    checked={formik.values.guideIncluded}
-                    onCheckedChange={(checked) => formik.setFieldValue('guideIncluded', checked)}
-                    className="border-slate-400 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                  />
-                  <Label
-                    htmlFor="guideIncluded"
-                    className="text-sm font-medium text-slate-700 cursor-pointer flex items-center gap-2 flex-1"
+              {/* Guide Included */}
+              <motion.div variants={itemVariants}>
+                <div
+                  className={`${neu.checkboxRow} ${formik.values.guideIncluded ? 'ring-1 ring-[#006666]/30' : ''}`}
+                  onClick={() => formik.setFieldValue('guideIncluded', !formik.values.guideIncluded)}
+                >
+                  <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-all duration-200 shrink-0
+                    ${formik.values.guideIncluded
+                      ? 'bg-[#006666] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]'
+                      : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]'}`}
                   >
-                    <Users className="h-4 w-4 text-slate-500" />
-                    Guide Included
-                  </Label>
+                    {formik.values.guideIncluded && <CheckCircle2 size={13} className="text-white" />}
+                  </div>
+                  <Users size={16} className="text-[#5a6270] shrink-0" />
+                  <span className="text-[#1E2938] text-sm font-[Space_Mono]">Guide Included</span>
                 </div>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="space-y-3">
-                <div className="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
-                  <Checkbox
-                    id="transportIncluded"
-                    checked={formik.values.transportIncluded}
-                    onCheckedChange={(checked) => formik.setFieldValue('transportIncluded', checked)}
-                    className="border-slate-400 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                  />
-                  <Label
-                    htmlFor="transportIncluded"
-                    className="text-sm font-medium text-slate-700 cursor-pointer flex items-center gap-2 flex-1"
+              {/* Transport Included */}
+              <motion.div variants={itemVariants}>
+                <div
+                  className={`${neu.checkboxRow} ${formik.values.transportIncluded ? 'ring-1 ring-[#006666]/30' : ''}`}
+                  onClick={() => formik.setFieldValue('transportIncluded', !formik.values.transportIncluded)}
+                >
+                  <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-all duration-200 shrink-0
+                    ${formik.values.transportIncluded
+                      ? 'bg-[#006666] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]'
+                      : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]'}`}
                   >
-                    <Car className="h-4 w-4 text-slate-500" />
-                    Transport Included
-                  </Label>
+                    {formik.values.transportIncluded && <CheckCircle2 size={13} className="text-white" />}
+                  </div>
+                  <Car size={16} className="text-[#5a6270] shrink-0" />
+                  <span className="text-[#1E2938] text-sm font-[Space_Mono]">Transport Included</span>
                 </div>
               </motion.div>
             </div>
 
-            {/* Emergency Contacts Section */}
-            <motion.div
-              variants={itemVariants}
-              className="mt-8 pt-8 border-t border-slate-200"
-            >
+            {/* ─── Emergency Contacts ─── */}
+            <motion.div variants={itemVariants} className="mt-8">
+              <div className={neu.divider} />
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-lg bg-red-50 border border-red-100">
-                  <Shield className="h-5 w-5 text-red-600" />
+                <div className={`${neu.iconBoxRed}`}>
+                  <Shield size={18} className="text-[#FF2157]" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-800">Emergency Contacts</h3>
+                <div>
+                  <h3 className={`${neu.headingFont} text-base`}>Emergency Contacts</h3>
+                  <p className={`${neu.subText} text-xs`}>Local safety numbers for travelers</p>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <motion.div variants={itemVariants} className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <Shield className="h-3.5 w-3.5 text-slate-500" />
-                    Police Number
-                  </Label>
-                  <Input
-                    name="emergencyContacts.policeNumber"
-                    value={formik.values.emergencyContacts?.policeNumber || ''}
-                    onChange={formik.handleChange}
-                    placeholder="999"
-                    className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </motion.div>
-
-                <motion.div variants={itemVariants} className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <Ambulance className="h-3.5 w-3.5 text-slate-500" />
-                    Ambulance Number
-                  </Label>
-                  <Input
-                    name="emergencyContacts.ambulanceNumber"
-                    value={formik.values.emergencyContacts?.ambulanceNumber || ''}
-                    onChange={formik.handleChange}
-                    placeholder="16263"
-                    className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </motion.div>
-
-                <motion.div variants={itemVariants} className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <Flame className="h-3.5 w-3.5 text-slate-500" />
-                    Fire Service Number
-                  </Label>
-                  <Input
-                    name="emergencyContacts.fireServiceNumber"
-                    value={formik.values.emergencyContacts?.fireServiceNumber || ''}
-                    onChange={formik.handleChange}
-                    placeholder="102"
-                    className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </motion.div>
-
-                <motion.div variants={itemVariants} className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <Phone className="h-3.5 w-3.5 text-slate-500" />
-                    Local Emergency
-                  </Label>
-                  <Input
-                    name="emergencyContacts.localEmergency"
-                    value={formik.values.emergencyContacts?.localEmergency || ''}
-                    onChange={formik.handleChange}
-                    placeholder="Local contact"
-                    className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </motion.div>
+                {[
+                  { name: 'emergencyContacts.policeNumber', icon: Shield, label: 'Police Number', placeholder: '999' },
+                  { name: 'emergencyContacts.ambulanceNumber', icon: Ambulance, label: 'Ambulance Number', placeholder: '16263' },
+                  { name: 'emergencyContacts.fireServiceNumber', icon: Flame, label: 'Fire Service', placeholder: '102' },
+                  { name: 'emergencyContacts.localEmergency', icon: Phone, label: 'Local Emergency', placeholder: 'Local contact' },
+                ].map(({ name, icon: Icon, label, placeholder }) => (
+                  <motion.div key={name} variants={itemVariants} className="flex flex-col gap-2">
+                    <label className={neu.label}>
+                      <Icon size={13} className="text-[#5a6270]" />
+                      {label}
+                    </label>
+                    <input
+                      name={name}
+                      value={(formik.values as Record<string, unknown>)[name.split('.')[0]]
+                        ? (formik.values.emergencyContacts as Record<string, string>)[name.split('.')[1]]
+                        : ''}
+                      onChange={formik.handleChange}
+                      placeholder={placeholder}
+                      className={`${neu.inputOverride} w-full px-3 py-2.5`}
+                    />
+                  </motion.div>
+                ))}
               </div>
             </motion.div>
 
-            {/* Error/Success Alerts */}
+            {/* ─── Alerts ─── */}
             <AnimatePresence mode="wait">
               {mutation.isError && (
-                <motion.div
-                  key="error"
-                  variants={alertVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="mt-6"
-                >
-                  <Alert variant="destructive" className="border-red-200 bg-red-50">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription className="text-red-800">
-                      Failed to update Bangladesh information
-                    </AlertDescription>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute top-2 right-2 h-6 w-6 p-0 text-red-600 hover:bg-red-100"
-                      onClick={() => mutation.reset()}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </Alert>
+                <motion.div key="error" variants={alertVariants} initial="hidden" animate="visible" exit="exit" className="mt-6">
+                  <div className={neu.alertError}>
+                    <AlertCircle size={17} className="text-[#FF2157] shrink-0" />
+                    <span className="text-[#FF2157] text-sm font-[Space_Mono] flex-1">Failed to update Bangladesh information</span>
+                    <button type="button" onClick={() => mutation.reset()} className="text-[#FF2157] hover:opacity-70">
+                      <X size={15} />
+                    </button>
+                  </div>
                 </motion.div>
               )}
-
               {mutation.isSuccess && (
-                <motion.div
-                  key="success"
-                  variants={alertVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="mt-6"
-                >
-                  <Alert className="border-green-200 bg-green-50">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <AlertDescription className="text-green-800">
-                      Bangladesh information updated successfully
-                    </AlertDescription>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute top-2 right-2 h-6 w-6 p-0 text-green-600 hover:bg-green-100"
-                      onClick={() => mutation.reset()}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </Alert>
+                <motion.div key="success" variants={alertVariants} initial="hidden" animate="visible" exit="exit" className="mt-6">
+                  <div className={neu.alertSuccess}>
+                    <CheckCircle2 size={17} className="text-[#00A63D] shrink-0" />
+                    <span className="text-[#00A63D] text-sm font-[Space_Mono] flex-1">Bangladesh information updated successfully</span>
+                    <button type="button" onClick={() => mutation.reset()} className="text-[#00A63D] hover:opacity-70">
+                      <X size={15} />
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Submit Button */}
-            <motion.div
-              variants={itemVariants}
-              className="flex justify-end mt-8 pt-6 border-t border-slate-200"
-            >
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
+            {/* ─── Submit ─── */}
+            <div className="flex justify-end mt-8 pt-6 border-t border-[#c8c6c4]/60">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                <button
                   type="submit"
                   disabled={mutation.isPending}
-                  className="px-8 py-5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/30 transition-all duration-200"
+                  className={`inline-flex items-center gap-2 px-7 py-3 text-sm font-[Space_Mono] font-medium text-white ${mutation.isPending ? neu.btnDisabled : neu.btn}`}
                 >
                   {mutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Updating...
-                    </>
+                    <><Loader2 size={16} className="animate-spin" /><span>Updating...</span></>
                   ) : (
-                    <>
-                      <CheckCircle2 className="mr-2 h-5 w-5" />
-                      Update Bangladesh Info
-                    </>
+                    <><CheckCircle2 size={16} /><span>Update Bangladesh Info</span></>
                   )}
-                </Button>
+                </button>
               </motion.div>
-            </motion.div>
+            </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }

@@ -1,4 +1,3 @@
-// app/operations/tours/[tourId]/update-tour/components/steps/Step6Policies.tsx
 'use client';
 
 import React from 'react';
@@ -25,12 +24,6 @@ import {
   ChevronDown,
   Info,
 } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -45,6 +38,29 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { ValidationError } from 'yup';
 import { FaBangladeshiTakaSign } from 'react-icons/fa6';
+
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+const NEU = {
+  surface: 'bg-[#E7E5E4]',
+  card: 'bg-[#E7E5E4] rounded-2xl shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff]',
+  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
+  raised: 'bg-[#E7E5E4] rounded-xl shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff]',
+  iconBox: 'rounded-xl shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff] flex items-center justify-center bg-[#E7E5E4]',
+  primaryText: 'text-[#1E2938]',
+  secondaryText: 'text-[#4a5568]',
+  mutedText: 'text-[#718096]',
+  primaryBg: 'bg-[#006666]',
+  primaryColor: '#006666',
+  inputBase: 'bg-[#E7E5E4] shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] border-0 rounded-xl focus:ring-2 focus:ring-[#006666]/30 outline-none transition-all duration-200',
+  labelFont: 'font-[Space_Mono,monospace] tracking-wide',
+  bodyFont: 'font-[JetBrains_Mono,monospace]',
+  btnPrimary: 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff] active:shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] transition-all duration-200 rounded-xl',
+  btnSubmit: 'bg-[#006666] text-white rounded-xl shadow-[4px_4px_10px_#004d4d,-4px_-4px_10px_#008080] hover:shadow-[2px_2px_6px_#004d4d,-2px_-2px_6px_#008080] active:shadow-[inset_2px_2px_6px_#004d4d,inset_-2px_-2px_6px_#008080] transition-all duration-200',
+  btnDanger: 'text-red-500 bg-[#E7E5E4] rounded-lg shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[1px_1px_4px_#c8c6c4,-1px_-1px_4px_#ffffff] active:shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] transition-all duration-200',
+  divider: 'border-t border-[#d1cfcd]',
+  badge: 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] border-0 text-xs rounded-md px-2.5 py-0.5',
+  infoBox: 'rounded-lg shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+};
 
 interface Step6PoliciesProps {
   tourId: string;
@@ -79,33 +95,27 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
     validationSchema: Step6PolicySchema,
     onSubmit: async (values) => {
       try {
-        // Validate the form before submission
         await Step6PolicySchema.validate(values, { abortEarly: false });
-
-        // Only submit if validation passes
         mutation.mutate(values);
       } catch (error) {
-        // Handle validation errors
         if (error instanceof ValidationError) {
           const errors: { [key: string]: string } = {};
           error.inner.forEach((err) => {
-            if (err.path) {
-              errors[err.path] = err.message;
-            }
+            if (err.path) errors[err.path] = err.message;
           });
           formik.setErrors(errors);
         }
-        // Don't submit on validation error
       }
     },
   });
 
+  // ─── Helpers ─────────────────────────────────────────────────────────────────
   const addCancellationRule = () => {
     const rules = [...(formik.values.cancellationPolicy?.rules || [])];
-    const lastRule = rules[rules.length - 1];
+    const last = rules[rules.length - 1];
     rules.push({
-      daysBefore: lastRule ? lastRule.daysBefore + 7 : 0,
-      refundPercent: lastRule ? Math.max(lastRule.refundPercent - 20, 0) : 100,
+      daysBefore: last ? last.daysBefore + 7 : 0,
+      refundPercent: last ? Math.max(last.refundPercent - 20, 0) : 100,
     });
     formik.setFieldValue('cancellationPolicy.rules', rules);
   };
@@ -123,61 +133,31 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
   };
 
   const togglePaymentMethod = (method: PaymentMethod) => {
-    const currentMethods = formik.values.refundPolicy?.method || [];
-    const newMethods = currentMethods.includes(method)
-      ? currentMethods.filter(m => m !== method)
-      : [...currentMethods, method];
-    formik.setFieldValue('refundPolicy.method', newMethods);
+    const current = formik.values.refundPolicy?.method || [];
+    const next = current.includes(method)
+      ? current.filter((m) => m !== method)
+      : [...current, method];
+    formik.setFieldValue('refundPolicy.method', next);
   };
 
+  // ─── Animation Variants ──────────────────────────────────────────────────────
   const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4, staggerChildren: 0.1 }
-    }
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45, staggerChildren: 0.1 } },
   };
-
   const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.3 }
-    }
+    hidden: { opacity: 0, x: -16 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
   };
-
   const ruleVariants = {
-    hidden: { opacity: 0, height: 0, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      height: 'auto',
-      scale: 1,
-      transition: { duration: 0.3 }
-    },
-    exit: {
-      opacity: 0,
-      height: 0,
-      scale: 0.95,
-      transition: { duration: 0.2 }
-    }
+    hidden: { opacity: 0, height: 0, scale: 0.96 },
+    visible: { opacity: 1, height: 'auto', scale: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, height: 0, scale: 0.96, transition: { duration: 0.2 } },
   };
-
   const alertVariants = {
-    hidden: { opacity: 0, scale: 0.95, y: -10 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: { duration: 0.3 }
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.95,
-      y: -10,
-      transition: { duration: 0.2 }
-    }
+    hidden: { opacity: 0, scale: 0.96, y: -8 },
+    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3 } },
+    exit: { opacity: 0, scale: 0.96, y: -8, transition: { duration: 0.2 } },
   };
 
   return (
@@ -185,385 +165,398 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
       variants={containerVariants}
       initial="hidden"
       animate="visible"
+      className={`${NEU.surface} min-h-screen p-4 sm:p-6`}
     >
-      <Card className="mb-6 border-slate-200 shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-emerald-50/30 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/20">
-              <ShieldCheck className="h-6 w-6 text-white" />
-            </div>
-            <CardTitle className="text-xl font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              Policies & Terms
-            </CardTitle>
+      <div className={`${NEU.card} p-6 sm:p-8 max-w-3xl mx-auto`}>
+
+        {/* ── Header ───────────────────────────────────────────────────── */}
+        <motion.div variants={itemVariants} className="flex items-center gap-4 mb-8">
+          <div className={`${NEU.iconBox} w-12 h-12 sm:w-14 sm:h-14`}>
+            <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7" style={{ color: '#006666' }} />
           </div>
-        </CardHeader>
+          <div>
+            <h2 className={`text-xl sm:text-2xl font-bold ${NEU.primaryText} ${NEU.labelFont}`}>
+              Policies & Terms
+            </h2>
+            <p className={`text-sm mt-0.5 ${NEU.mutedText} ${NEU.bodyFont}`}>
+              Cancellation rules, refund methods, and tour terms
+            </p>
+          </div>
+        </motion.div>
 
-        <CardContent className="pt-6 pb-8 px-6">
-          <form onSubmit={formik.handleSubmit}>
-            <div className="space-y-6">
-              {/* Cancellation Policy Section */}
-              <motion.div variants={itemVariants}>
-                <Collapsible open={isCancellationOpen} onOpenChange={setIsCancellationOpen}>
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between p-4 h-auto hover:bg-slate-50 rounded-xl border border-slate-200"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-blue-50 border border-blue-100">
-                          <Calendar className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div className="text-left">
-                          <h3 className="text-base font-semibold text-slate-800">Cancellation Policy</h3>
-                          <p className="text-sm text-slate-600">Define refund rules and conditions</p>
-                        </div>
-                      </div>
-                      <motion.div
-                        animate={{ rotate: isCancellationOpen ? 180 : 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <ChevronDown className="h-5 w-5 text-slate-500" />
-                      </motion.div>
-                    </Button>
-                  </CollapsibleTrigger>
+        <form onSubmit={formik.handleSubmit} className="space-y-5">
 
-                  <CollapsibleContent>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.1 }}
-                      className="mt-4 p-6 bg-slate-50/50 rounded-xl border border-slate-200 space-y-6"
-                    >
-                      {/* Refundable Toggle */}
-                      <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-200">
-                        <div className="flex items-center gap-3">
-                          <FaBangladeshiTakaSign className="h-5 w-5 text-slate-500" />
-                          <div>
-                            <Label className="text-sm font-semibold text-slate-800">Refundable Tour</Label>
-                            <p className="text-xs text-slate-600 mt-0.5">Allow customers to request refunds</p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={formik.values.cancellationPolicy?.refundable ?? true}
-                          onCheckedChange={(checked) => formik.setFieldValue('cancellationPolicy.refundable', checked)}
-                          className="data-[state=checked]:bg-emerald-600"
-                        />
-                      </div>
+          {/* ── Cancellation Policy ──────────────────────────────────────── */}
+          <motion.div variants={itemVariants}>
+            <Collapsible open={isCancellationOpen} onOpenChange={setIsCancellationOpen}>
+              <CollapsibleTrigger asChild>
+                <button
+                  type="button"
+                  className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-200 outline-none
+                    ${isCancellationOpen
+                      ? 'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]'
+                      : 'shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff]'
+                    } bg-[#E7E5E4]`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`${NEU.iconBox} w-9 h-9`}>
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div className="text-left">
+                      <p className={`text-sm font-bold ${NEU.primaryText} ${NEU.labelFont}`}>
+                        Cancellation Policy
+                      </p>
+                      <p className={`text-xs ${NEU.mutedText} ${NEU.bodyFont}`}>
+                        Define refund rules and conditions
+                      </p>
+                    </div>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: isCancellationOpen ? 180 : 0 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <ChevronDown className={`h-5 w-5 ${NEU.mutedText}`} />
+                  </motion.div>
+                </button>
+              </CollapsibleTrigger>
 
-                      {/* Cancellation Rules */}
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Percent className="h-4 w-4 text-slate-500" />
-                            <Label className="text-sm font-semibold text-slate-700">Cancellation Rules</Label>
-                          </div>
-                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={addCancellationRule}
-                              className="gap-2 border-blue-300 text-blue-700 hover:bg-blue-50"
-                            >
-                              <Plus className="h-4 w-4" />
-                              Add Rule
-                            </Button>
-                          </motion.div>
-                        </div>
-
-                        <AnimatePresence mode="popLayout">
-                          {formik.values.cancellationPolicy?.rules?.map((rule, index) => (
-                            <motion.div
-                              key={index}
-                              variants={ruleVariants}
-                              initial="hidden"
-                              animate="visible"
-                              exit="exit"
-                              layout
-                              className="p-4 bg-white rounded-lg border border-slate-200 space-y-3"
-                            >
-                              <div className="flex items-center justify-between mb-2">
-                                <Badge variant="outline" className="text-xs font-medium">
-                                  Rule {index + 1}
-                                </Badge>
-                                {formik.values.cancellationPolicy?.rules
-                                  && formik.values.cancellationPolicy?.rules?.length > 1 && (
-                                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => removeCancellationRule(index)}
-                                        className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </motion.div>
-                                  )}
-                              </div>
-
-                              <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-medium text-slate-700 flex items-center gap-1.5">
-                                    <Calendar className="h-3.5 w-3.5 text-slate-500" />
-                                    Days Before Tour
-                                  </Label>
-                                  <Input
-                                    type="number"
-                                    value={rule.daysBefore}
-                                    onChange={(e) => updateCancellationRule(index, 'daysBefore', parseInt(e.target.value))}
-                                    className="border-slate-300"
-                                    min={0}
-                                  />
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label className="text-xs font-medium text-slate-700 flex items-center gap-1.5">
-                                    <Percent className="h-3.5 w-3.5 text-slate-500" />
-                                    Refund Percentage
-                                  </Label>
-                                  <div className="relative">
-                                    <Input
-                                      type="number"
-                                      value={rule.refundPercent}
-                                      onChange={(e) => updateCancellationRule(index, 'refundPercent', parseInt(e.target.value))}
-                                      className="border-slate-300 pr-8"
-                                      min={0}
-                                      max={100}
-                                    />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">%</span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="flex items-start gap-2 mt-2 p-2 bg-blue-50 rounded-md border border-blue-100">
-                                <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                                <p className="text-xs text-blue-700">
-                                  Cancel {rule.daysBefore}+ days before → {rule.refundPercent}% refund
-                                </p>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
-                      </div>
-                    </motion.div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </motion.div>
-
-              {/* Refund Policy Section */}
-              <motion.div variants={itemVariants}>
-                <Collapsible open={isRefundOpen} onOpenChange={setIsRefundOpen}>
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between p-4 h-auto hover:bg-slate-50 rounded-xl border border-slate-200"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-purple-50 border border-purple-100">
-                          <CreditCard className="h-5 w-5 text-purple-600" />
-                        </div>
-                        <div className="text-left">
-                          <h3 className="text-base font-semibold text-slate-800">Refund Policy</h3>
-                          <p className="text-sm text-slate-600">Payment methods and processing time</p>
-                        </div>
-                      </div>
-                      <motion.div
-                        animate={{ rotate: isRefundOpen ? 180 : 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <ChevronDown className="h-5 w-5 text-slate-500" />
-                      </motion.div>
-                    </Button>
-                  </CollapsibleTrigger>
-
-                  <CollapsibleContent>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.1 }}
-                      className="mt-4 p-6 bg-slate-50/50 rounded-xl border border-slate-200 space-y-6"
-                    >
-                      {/* Payment Methods */}
-                      <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                          <CreditCard className="h-4 w-4 text-slate-500" />
-                          Refund Methods
-                        </Label>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {Object.values([PAYMENT_METHOD.CARD]).map((method) => {
-                            const isSelected = formik.values.refundPolicy?.method?.includes(method);
-                            return (
-                              <motion.div
-                                key={method}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                              >
-                                <button
-                                  type="button"
-                                  onClick={() => togglePaymentMethod(method)}
-                                  className={`w-full p-3 rounded-lg border-2 transition-all ${isSelected
-                                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                                    }`}
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-purple-500' : 'border-slate-300'
-                                      }`}>
-                                      {isSelected && (
-                                        <motion.div
-                                          initial={{ scale: 0 }}
-                                          animate={{ scale: 1 }}
-                                          className="w-2 h-2 rounded-full bg-purple-500"
-                                        />
-                                      )}
-                                    </div>
-                                    <span className="text-sm font-medium">{method}</span>
-                                  </div>
-                                </button>
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Processing Days */}
-                      <div className="space-y-2">
-                        <Label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-slate-500" />
-                          Processing Days
-                        </Label>
-                        <Input
-                          type="number"
-                          value={formik.values.refundPolicy?.processingDays || 0}
-                          onChange={(e) => formik.setFieldValue('refundPolicy.processingDays', parseInt(e.target.value))}
-                          className="border-slate-300"
-                          min={1}
-                          placeholder="7"
-                        />
-                        <p className="text-xs text-slate-600 flex items-center gap-1.5">
-                          <Info className="h-3.5 w-3.5" />
-                          Estimated time to process refund requests
+              <CollapsibleContent>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.08 }}
+                  className={`mt-3 ${NEU.cardInner} p-5 space-y-5`}
+                >
+                  {/* Refundable Toggle */}
+                  <div className={`${NEU.raised} flex items-center justify-between p-4 gap-3`}>
+                    <div className="flex items-center gap-3">
+                      <FaBangladeshiTakaSign className="h-5 w-5 text-[#006666]" />
+                      <div>
+                        <p className={`text-sm font-bold ${NEU.primaryText} ${NEU.labelFont}`}>
+                          Refundable Tour
+                        </p>
+                        <p className={`text-xs ${NEU.mutedText} ${NEU.bodyFont}`}>
+                          Allow customers to request refunds
                         </p>
                       </div>
-                    </motion.div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </motion.div>
-
-              {/* Terms & Conditions */}
-              <motion.div variants={itemVariants} className="space-y-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 rounded-lg bg-amber-50 border border-amber-100">
-                    <FileText className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <Switch
+                      checked={formik.values.cancellationPolicy?.refundable ?? true}
+                      onCheckedChange={(checked) =>
+                        formik.setFieldValue('cancellationPolicy.refundable', checked)
+                      }
+                      className="data-[state=checked]:bg-[#006666]"
+                    />
                   </div>
-                  <div>
-                    <Label className="text-base font-semibold text-slate-800">Terms & Conditions</Label>
-                    <p className="text-sm text-slate-600">Detailed terms for this tour</p>
+
+                  {/* Rules Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Percent className={`h-4 w-4 ${NEU.mutedText}`} />
+                      <Label className={`text-sm font-bold ${NEU.secondaryText} ${NEU.labelFont}`}>
+                        Cancellation Rules
+                      </Label>
+                    </div>
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={addCancellationRule}
+                      className={`${NEU.btnPrimary} flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-[#006666] ${NEU.labelFont}`}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add Rule
+                    </motion.button>
                   </div>
-                </div>
-                <Textarea
-                  name="terms"
-                  value={formik.values.terms}
-                  onChange={formik.handleChange}
-                  placeholder="Enter detailed terms and conditions for this tour..."
-                  rows={10}
-                  className="border-slate-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
-                />
-                {formik.touched.terms && formik.errors.terms && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-xs text-red-600 flex items-center gap-1"
-                  >
-                    <AlertCircle className="h-3 w-3" />
-                    {formik.errors.terms}
-                  </motion.p>
-                )}
-              </motion.div>
 
-              {/* Error/Success Alerts */}
-              <AnimatePresence mode="wait">
-                {mutation.isError && (
-                  <motion.div
-                    key="error"
-                    variants={alertVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                  >
-                    <Alert variant="destructive" className="border-red-200 bg-red-50">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription className="text-red-800">
-                        Failed to update policies
-                      </AlertDescription>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-2 right-2 h-6 w-6 p-0 text-red-600 hover:bg-red-100"
-                        onClick={() => mutation.reset()}
+                  {/* Rules List */}
+                  <AnimatePresence mode="popLayout">
+                    {formik.values.cancellationPolicy?.rules?.map((rule, index) => (
+                      <motion.div
+                        key={index}
+                        variants={ruleVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        layout
+                        className={`${NEU.raised} p-4 space-y-3`}
                       >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </Alert>
-                  </motion.div>
-                )}
+                        <div className="flex items-center justify-between">
+                          <Badge className={`${NEU.badge} ${NEU.labelFont} ${NEU.secondaryText} text-[10px]`}>
+                            Rule {index + 1}
+                          </Badge>
+                          {(formik.values.cancellationPolicy?.rules?.length ?? 0) > 1 && (
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => removeCancellationRule(index)}
+                              className={`${NEU.btnDanger} h-7 w-7 flex items-center justify-center`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </motion.button>
+                          )}
+                        </div>
 
-                {mutation.isSuccess && (
-                  <motion.div
-                    key="success"
-                    variants={alertVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                  >
-                    <Alert className="border-green-200 bg-green-50">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <AlertDescription className="text-green-800">
-                        Policies updated successfully
-                      </AlertDescription>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-2 right-2 h-6 w-6 p-0 text-green-600 hover:bg-green-100"
-                        onClick={() => mutation.reset()}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </Alert>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <Label className={`text-xs font-bold ${NEU.mutedText} ${NEU.labelFont} flex items-center gap-1`}>
+                              <Calendar className="h-3 w-3" /> Days Before
+                            </Label>
+                            <Input
+                              type="number"
+                              value={rule.daysBefore}
+                              onChange={(e) =>
+                                updateCancellationRule(index, 'daysBefore', parseInt(e.target.value))
+                              }
+                              min={0}
+                              className={`${NEU.inputBase} h-10 px-3 text-sm w-full ${NEU.primaryText} ${NEU.bodyFont}`}
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className={`text-xs font-bold ${NEU.mutedText} ${NEU.labelFont} flex items-center gap-1`}>
+                              <Percent className="h-3 w-3" /> Refund %
+                            </Label>
+                            <div className="relative">
+                              <Input
+                                type="number"
+                                value={rule.refundPercent}
+                                onChange={(e) =>
+                                  updateCancellationRule(index, 'refundPercent', parseInt(e.target.value))
+                                }
+                                min={0}
+                                max={100}
+                                className={`${NEU.inputBase} h-10 px-3 pr-7 text-sm w-full ${NEU.primaryText} ${NEU.bodyFont}`}
+                              />
+                              <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-sm ${NEU.mutedText}`}>%</span>
+                            </div>
+                          </div>
+                        </div>
 
-              {/* Submit Button */}
-              <motion.div
-                variants={itemVariants}
-                className="flex justify-end pt-6 border-t border-slate-200"
-              >
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    type="submit"
-                    disabled={mutation.isPending}
-                    className="px-8 py-5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-lg shadow-emerald-500/30 transition-all duration-200"
-                  >
-                    {mutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Updating...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="mr-2 h-5 w-5" />
-                        Update Policies
-                      </>
-                    )}
-                  </Button>
+                        <div className={`${NEU.infoBox} px-3 py-2 flex items-center gap-2`} style={{ background: '#e0f0f0' }}>
+                          <Info className="h-3.5 w-3.5 flex-shrink-0" style={{ color: '#006666' }} />
+                          <p className={`text-xs ${NEU.bodyFont}`} style={{ color: '#006666' }}>
+                            Cancel {rule.daysBefore}+ days before → {rule.refundPercent}% refund
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </motion.div>
-              </motion.div>
+              </CollapsibleContent>
+            </Collapsible>
+          </motion.div>
+
+          {/* ── Refund Policy ────────────────────────────────────────────── */}
+          <motion.div variants={itemVariants}>
+            <Collapsible open={isRefundOpen} onOpenChange={setIsRefundOpen}>
+              <CollapsibleTrigger asChild>
+                <button
+                  type="button"
+                  className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-200 outline-none bg-[#E7E5E4]
+                    ${isRefundOpen
+                      ? 'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]'
+                      : 'shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff]'
+                    }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`${NEU.iconBox} w-9 h-9`}>
+                      <CreditCard className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <div className="text-left">
+                      <p className={`text-sm font-bold ${NEU.primaryText} ${NEU.labelFont}`}>
+                        Refund Policy
+                      </p>
+                      <p className={`text-xs ${NEU.mutedText} ${NEU.bodyFont}`}>
+                        Payment methods and processing time
+                      </p>
+                    </div>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: isRefundOpen ? 180 : 0 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <ChevronDown className={`h-5 w-5 ${NEU.mutedText}`} />
+                  </motion.div>
+                </button>
+              </CollapsibleTrigger>
+
+              <CollapsibleContent>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.08 }}
+                  className={`mt-3 ${NEU.cardInner} p-5 space-y-5`}
+                >
+                  {/* Payment Methods */}
+                  <div className="space-y-3">
+                    <Label className={`text-xs font-bold ${NEU.secondaryText} ${NEU.labelFont} uppercase tracking-wider flex items-center gap-2`}>
+                      <CreditCard className="h-3.5 w-3.5" /> Refund Methods
+                    </Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {Object.values([PAYMENT_METHOD.CARD]).map((method) => {
+                        const isSelected = formik.values.refundPolicy?.method?.includes(method);
+                        return (
+                          <motion.button
+                            key={method}
+                            type="button"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => togglePaymentMethod(method)}
+                            className={`p-3 rounded-xl transition-all duration-200 outline-none flex items-center gap-2 bg-[#E7E5E4]
+                              ${isSelected
+                                ? 'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] ring-2 ring-purple-400/50'
+                                : 'shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff] hover:shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff]'
+                              }`}
+                          >
+                            <div
+                              className={`w-4 h-4 rounded-full flex items-center justify-center transition-all duration-200 ${isSelected
+                                  ? 'bg-purple-500 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.15)]'
+                                  : 'shadow-[2px_2px_4px_#c8c6c4,-2px_-2px_4px_#ffffff] bg-[#E7E5E4]'
+                                }`}
+                            >
+                              {isSelected && (
+                                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+                                  className="w-2 h-2 rounded-full bg-white"
+                                />
+                              )}
+                            </div>
+                            <span className={`text-sm font-bold ${isSelected ? 'text-purple-700' : NEU.secondaryText} ${NEU.labelFont}`}>
+                              {method}
+                            </span>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Processing Days */}
+                  <div className="space-y-2">
+                    <Label className={`text-xs font-bold ${NEU.secondaryText} ${NEU.labelFont} uppercase tracking-wider flex items-center gap-2`}>
+                      <Clock className="h-3.5 w-3.5" /> Processing Days
+                    </Label>
+                    <Input
+                      type="number"
+                      value={formik.values.refundPolicy?.processingDays || 0}
+                      onChange={(e) =>
+                        formik.setFieldValue('refundPolicy.processingDays', parseInt(e.target.value))
+                      }
+                      min={1}
+                      placeholder="7"
+                      className={`${NEU.inputBase} h-11 px-4 text-sm w-full ${NEU.primaryText} ${NEU.bodyFont}`}
+                    />
+                    <p className={`text-xs ${NEU.mutedText} flex items-center gap-1.5 ${NEU.bodyFont}`}>
+                      <Info className="h-3.5 w-3.5 flex-shrink-0" />
+                      Estimated business days to process a refund request
+                    </p>
+                  </div>
+                </motion.div>
+              </CollapsibleContent>
+            </Collapsible>
+          </motion.div>
+
+          {/* ── Terms & Conditions ───────────────────────────────────────── */}
+          <motion.div variants={itemVariants} className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className={`${NEU.iconBox} w-9 h-9`}>
+                <FileText className="w-4 h-4 text-amber-600" />
+              </div>
+              <div>
+                <Label className={`text-sm font-bold ${NEU.primaryText} ${NEU.labelFont}`}>
+                  Terms & Conditions
+                </Label>
+                <p className={`text-xs ${NEU.mutedText} ${NEU.bodyFont}`}>
+                  Detailed terms for this tour
+                </p>
+              </div>
             </div>
-          </form>
-        </CardContent>
-      </Card>
+            <Textarea
+              name="terms"
+              value={formik.values.terms}
+              onChange={formik.handleChange}
+              placeholder="Enter detailed terms and conditions for this tour..."
+              rows={10}
+              className={`${NEU.inputBase} w-full p-4 text-sm resize-none ${NEU.primaryText} ${NEU.bodyFont}`}
+            />
+            {formik.touched.terms && formik.errors.terms && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className={`text-xs text-red-600 flex items-center gap-1 ${NEU.bodyFont}`}
+              >
+                <AlertCircle className="h-3 w-3" />
+                {formik.errors.terms}
+              </motion.p>
+            )}
+          </motion.div>
+
+          {/* ── Alerts ───────────────────────────────────────────────────── */}
+          <AnimatePresence mode="wait">
+            {mutation.isError && (
+              <motion.div key="error" variants={alertVariants} initial="hidden" animate="visible" exit="exit">
+                <Alert
+                  variant="destructive"
+                  className={`${NEU.cardInner} border-0 bg-red-50 relative`}
+                >
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <AlertDescription className={`text-red-800 text-sm ${NEU.bodyFont}`}>
+                    Failed to update policies
+                  </AlertDescription>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 h-7 w-7 p-0 text-red-500 hover:bg-red-100 rounded-lg"
+                    onClick={() => mutation.reset()}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </Alert>
+              </motion.div>
+            )}
+            {mutation.isSuccess && (
+              <motion.div key="success" variants={alertVariants} initial="hidden" animate="visible" exit="exit">
+                <Alert className={`${NEU.cardInner} border-0 bg-green-50 relative`}>
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <AlertDescription className={`text-green-800 text-sm ${NEU.bodyFont}`}>
+                    Policies updated successfully
+                  </AlertDescription>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 h-7 w-7 p-0 text-green-600 hover:bg-green-100 rounded-lg"
+                    onClick={() => mutation.reset()}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </Alert>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Submit ───────────────────────────────────────────────────── */}
+          <motion.div variants={itemVariants} className={`flex justify-end pt-5 ${NEU.divider}`}>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className={`${NEU.btnSubmit} h-12 px-7 text-sm gap-2 font-semibold disabled:opacity-60`}
+              >
+                {mutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className={NEU.labelFont}>Updating…</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span className={NEU.labelFont}>Update Policies</span>
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          </motion.div>
+        </form>
+      </div>
     </motion.div>
   );
 }

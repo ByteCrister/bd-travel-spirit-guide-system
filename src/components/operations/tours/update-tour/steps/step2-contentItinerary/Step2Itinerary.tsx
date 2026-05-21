@@ -15,12 +15,6 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -30,7 +24,9 @@ import {
 } from "@/components/ui/select";
 import { ItineraryEntryDTO, UpdateTourContentItineraryDTO } from "@/types/tour/tour.types";
 import { MealsProvided, TransportMode } from "@/constants/tour/tour.const";
-// Mock constants - replace with your actual imports
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
 const MEALS_PROVIDED = {
   BREAKFAST: "Breakfast",
   LUNCH: "Lunch",
@@ -45,6 +41,598 @@ const TRANSPORT_MODE = {
   BOAT: "Boat",
   WALKING: "Walking",
 };
+
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+
+const NEU = {
+  surface: "bg-[#E7E5E4] dark:bg-[#1a1918]",
+  surfaceDeep: "bg-[#dedad8] dark:bg-[#141312]",
+
+  raised:
+    "shadow-[6px_6px_12px_#c8c6c4,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0d0d0c,-6px_-6px_12px_#272624]",
+  raisedSm:
+    "shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0d0d0c,-4px_-4px_8px_#272624]",
+  raisedXs:
+    "shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff] dark:shadow-[2px_2px_5px_#0d0d0c,-2px_-2px_5px_#272624]",
+
+  inset:
+    "shadow-[inset_3px_3px_6px_#c8c6c4,inset_-3px_-3px_6px_#ffffff] dark:shadow-[inset_3px_3px_6px_#0d0d0c,inset_-3px_-3px_6px_#272624]",
+  insetSm:
+    "shadow-[inset_2px_2px_4px_#c8c6c4,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#0d0d0c,inset_-2px_-2px_4px_#272624]",
+
+  radius: "rounded-2xl",
+  radiusMd: "rounded-xl",
+  radiusSm: "rounded-lg",
+  radiusFull: "rounded-full",
+
+  border: "border border-[#d4d2d0] dark:border-[#2a2926]",
+  borderLight: "border border-[#e0dedd] dark:border-[#232120]",
+
+  text: {
+    primary: "text-[#1E2938] dark:text-[#e8e6e4]",
+    secondary: "text-[#4a5568] dark:text-[#9a9896]",
+    muted: "text-[#8a8886] dark:text-[#6a6866]",
+    accent: "text-[#006666]",
+    danger: "text-red-600 dark:text-red-400",
+    amber: "text-amber-700 dark:text-amber-400",
+    teal: "text-[#006666] dark:text-[#00aaaa]",
+  },
+
+  iconBg: {
+    teal: "bg-[#006666]/10 dark:bg-[#006666]/20",
+    amber: "bg-amber-100 dark:bg-amber-900/30",
+    danger: "bg-red-100 dark:bg-red-900/30",
+    purple: "bg-purple-100 dark:bg-purple-900/30",
+    slate: "bg-slate-100 dark:bg-slate-800/50",
+  },
+
+  divider: "border-t border-[#d4d2d0] dark:border-[#2a2926]",
+
+  font: 'font-["Space_Mono",monospace]',
+  fontSans: "font-sans",
+} as const;
+
+// ─── Shared input class ───────────────────────────────────────────────────────
+
+const inputCls = [
+  "w-full",
+  NEU.surface,
+  NEU.inset,
+  NEU.radiusMd,
+  NEU.border,
+  NEU.text.primary,
+  "placeholder:text-[#9a9896] dark:placeholder:text-[#6a6866]",
+  "px-4 py-2.5 text-sm transition-all duration-200 outline-none",
+  "focus:ring-2 focus:ring-[#006666]/25 focus:ring-offset-0",
+  NEU.font,
+].join(" ");
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+interface NeuLabelProps {
+  htmlFor?: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  iconColor?: string;
+}
+const NeuLabel = ({ htmlFor, icon, children, iconColor = NEU.text.secondary }: NeuLabelProps) => (
+  <label
+    htmlFor={htmlFor}
+    className={`flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest ${NEU.text.secondary} ${NEU.font} mb-2`}
+  >
+    <span className={iconColor}>{icon}</span>
+    {children}
+  </label>
+);
+
+// Meal toggle pill
+interface MealPillProps {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}
+const MealPill = ({ label, active, onClick }: MealPillProps) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={[
+      "px-3 py-1.5 text-xs font-semibold transition-all duration-200",
+      NEU.radiusSm,
+      NEU.font,
+      active
+        ? [
+          "bg-[#006666]/15 dark:bg-[#006666]/30",
+          "text-[#006666] dark:text-[#00cccc]",
+          NEU.insetSm,
+          NEU.border,
+        ].join(" ")
+        : [
+          NEU.surface,
+          NEU.text.secondary,
+          NEU.raisedXs,
+          NEU.border,
+          "hover:shadow-[1px_1px_3px_#c8c6c4,-1px_-1px_3px_#ffffff] dark:hover:shadow-[1px_1px_3px_#0d0d0c,-1px_-1px_3px_#272624]",
+        ].join(" "),
+    ].join(" ")}
+  >
+    {label}
+  </button>
+);
+
+// Activity / Note chip
+interface ChipProps {
+  label: string;
+  variant?: "default" | "danger";
+}
+const Chip = ({ label, variant = "default" }: ChipProps) => (
+  <span
+    className={[
+      "inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium",
+      NEU.radiusSm,
+      NEU.insetSm,
+      NEU.border,
+      NEU.font,
+      variant === "danger"
+        ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800"
+        : [NEU.surface, NEU.text.secondary].join(" "),
+    ].join(" ")}
+  >
+    {variant === "danger" && <AlertCircle className="w-2.5 h-2.5" />}
+    {label}
+  </span>
+);
+
+// Day number badge
+const DayBadge = ({ day }: { day: number }) => (
+  <div
+    className={[
+      "flex items-center justify-center w-10 h-10 flex-shrink-0",
+      NEU.radiusFull,
+      NEU.surface,
+      NEU.raisedSm,
+      NEU.border,
+      "text-sm font-bold",
+      NEU.text.teal,
+      NEU.font,
+    ].join(" ")}
+  >
+    {day}
+  </div>
+);
+
+// Section divider
+const SectionDivider = ({ label }: { label: string }) => (
+  <div className="relative my-1">
+    <div className={`absolute inset-0 flex items-center`}>
+      <div className={`w-full ${NEU.divider}`} />
+    </div>
+    <div className="relative flex justify-start pl-4">
+      <span
+        className={[
+          "pr-3 text-[10px] font-semibold uppercase tracking-widest",
+          NEU.text.muted,
+          NEU.font,
+          "bg-[#dedad8] dark:bg-[#141312]",
+        ].join(" ")}
+      >
+        {label}
+      </span>
+    </div>
+  </div>
+);
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
+
+const EmptyState = ({ onAdd }: { onAdd: () => void }) => (
+  <div
+    className={[
+      NEU.surface,
+      NEU.raised,
+      NEU.radius,
+      NEU.border,
+      "flex flex-col items-center justify-center py-16 px-8 text-center",
+    ].join(" ")}
+  >
+    <div
+      className={[
+        "p-5 mb-5",
+        NEU.radiusFull,
+        NEU.surface,
+        NEU.raisedSm,
+        NEU.border,
+        NEU.iconBg.teal,
+      ].join(" ")}
+    >
+      <Calendar className={`w-10 h-10 ${NEU.text.teal}`} />
+    </div>
+    <p className={`text-base font-semibold mb-1 ${NEU.text.primary} ${NEU.font}`}>
+      No itinerary days yet
+    </p>
+    <p className={`text-sm mb-6 ${NEU.text.secondary}`}>
+      Start building your tour schedule by adding your first day
+    </p>
+    <button
+      type="button"
+      onClick={onAdd}
+      className={[
+        "flex items-center gap-2 px-5 py-2.5 text-sm font-semibold",
+        NEU.radius,
+        NEU.surface,
+        NEU.raisedSm,
+        NEU.border,
+        NEU.text.teal,
+        NEU.font,
+        "transition-all duration-200 hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff] dark:hover:shadow-[2px_2px_6px_#0d0d0c,-2px_-2px_6px_#272624]",
+        "active:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-2px_-2px_4px_#ffffff] dark:active:shadow-[inset_2px_2px_4px_#0d0d0c,inset_-2px_-2px_4px_#272624]",
+      ].join(" ")}
+    >
+      <Plus className="w-4 h-4" />
+      Add First Day
+    </button>
+  </div>
+);
+
+// ─── Day Card ─────────────────────────────────────────────────────────────────
+
+interface DayCardProps {
+  day: ItineraryEntryDTO;
+  index: number;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onRemove: (e: React.MouseEvent) => void;
+  onFieldChange: (field: keyof ItineraryEntryDTO, value: unknown) => void;
+  onMealToggle: (meal: MealsProvided) => void;
+}
+
+const DayCard = ({
+  day,
+  index,
+  isExpanded,
+  onToggle,
+  onRemove,
+  onFieldChange,
+  onMealToggle,
+}: DayCardProps) => {
+  return (
+    <div
+      className={[
+        NEU.surface,
+        NEU.raised,
+        NEU.radius,
+        NEU.border,
+        "overflow-hidden transition-all duration-300",
+      ].join(" ")}
+    >
+      {/* ── Card Header ── */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onToggle}
+        onKeyDown={(e) => e.key === "Enter" && onToggle()}
+        className={[
+          "flex items-center gap-3 px-5 py-4 cursor-pointer",
+          "hover:bg-[#dedad8] dark:hover:bg-[#141312]",
+          "transition-colors duration-150",
+          isExpanded ? NEU.divider : "",
+        ].join(" ")}
+      >
+        <DayBadge day={day.day} />
+
+        {/* Title & description preview */}
+        <div className="flex-1 min-w-0">
+          <h3 className={`text-sm font-semibold truncate ${NEU.text.primary} ${NEU.font}`}>
+            {day.title || (
+              <span className={NEU.text.muted}>Day {day.day} — Untitled</span>
+            )}
+          </h3>
+          {day.description && (
+            <p className={`text-xs truncate mt-0.5 ${NEU.text.secondary}`}>
+              {day.description}
+            </p>
+          )}
+        </div>
+
+        {/* Meta chips */}
+        <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
+          {day.mealsProvided && day.mealsProvided.length > 0 && (
+            <span
+              className={[
+                "inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold",
+                NEU.radiusSm,
+                NEU.insetSm,
+                NEU.border,
+                NEU.font,
+                "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+              ].join(" ")}
+            >
+              <Utensils className="w-2.5 h-2.5" />
+              {day.mealsProvided.length}
+            </span>
+          )}
+          {day.activities && day.activities.length > 0 && (
+            <span
+              className={[
+                "inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold",
+                NEU.radiusSm,
+                NEU.insetSm,
+                NEU.border,
+                NEU.font,
+                "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800",
+              ].join(" ")}
+            >
+              <Activity className="w-2.5 h-2.5" />
+              {day.activities.length}
+            </span>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 flex-shrink-0 ml-1">
+          <button
+            type="button"
+            onClick={onRemove}
+            className={[
+              "w-8 h-8 flex items-center justify-center",
+              NEU.radiusSm,
+              NEU.surface,
+              NEU.raisedXs,
+              NEU.border,
+              "text-red-400 hover:text-red-600 dark:hover:text-red-400",
+              "transition-all duration-150",
+              "hover:bg-red-50 dark:hover:bg-red-900/20",
+            ].join(" ")}
+            aria-label={`Remove Day ${day.day}`}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+
+          <div
+            className={[
+              "w-8 h-8 flex items-center justify-center",
+              NEU.radiusSm,
+              NEU.surface,
+              NEU.raisedXs,
+              NEU.border,
+              "transition-all duration-200",
+            ].join(" ")}
+          >
+            <ChevronDown
+              className={`w-4 h-4 ${NEU.text.secondary} transition-transform duration-300 ${isExpanded ? "rotate-180" : ""
+                }`}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Expanded Body ── */}
+      {isExpanded && (
+        <div className={["px-5 py-6", NEU.surfaceDeep].join(" ")}>
+          <div className="space-y-6">
+
+            {/* — Basics — */}
+            <SectionDivider label="Basics" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Day Title */}
+              <div className="md:col-span-2 space-y-1">
+                <NeuLabel htmlFor={`title-${index}`} icon={<MapPin className="w-3.5 h-3.5" />}>
+                  Day Title
+                </NeuLabel>
+                <input
+                  id={`title-${index}`}
+                  type="text"
+                  placeholder="e.g., Arrival in Dhaka"
+                  value={day.title || ""}
+                  onChange={(e) => onFieldChange("title", e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+
+              {/* Description */}
+              <div className="md:col-span-2 space-y-1">
+                <NeuLabel htmlFor={`description-${index}`} icon={<Activity className="w-3.5 h-3.5" />}>
+                  Description
+                </NeuLabel>
+                <textarea
+                  id={`description-${index}`}
+                  placeholder="Describe the day's activities and highlights..."
+                  rows={4}
+                  value={day.description || ""}
+                  onChange={(e) => onFieldChange("description", e.target.value)}
+                  className={`${inputCls} resize-none leading-relaxed`}
+                />
+              </div>
+            </div>
+
+            {/* — Meals — */}
+            <SectionDivider label="Meals Provided" />
+            <div className="flex flex-wrap gap-2 pt-1">
+              {Object.values(MEALS_PROVIDED).map((meal) => (
+                <MealPill
+                  key={meal}
+                  label={meal}
+                  active={(day.mealsProvided || []).includes(meal as MealsProvided)}
+                  onClick={() => onMealToggle(meal as MealsProvided)}
+                />
+              ))}
+            </div>
+
+            {/* — Accommodation — */}
+            <SectionDivider label="Accommodation" />
+            <div className="space-y-1">
+              <NeuLabel
+                htmlFor={`accommodation-${index}`}
+                icon={<Hotel className="w-3.5 h-3.5" />}
+              >
+                Hotel / Stay
+              </NeuLabel>
+              <input
+                id={`accommodation-${index}`}
+                type="text"
+                placeholder="e.g., 4-star Hotel in City Center"
+                value={day.accommodation || ""}
+                onChange={(e) => onFieldChange("accommodation", e.target.value)}
+                className={inputCls}
+              />
+            </div>
+
+            {/* — Activities — */}
+            <SectionDivider label="Activities" />
+            <div className="space-y-2">
+              <NeuLabel
+                htmlFor={`activities-${index}`}
+                icon={<Activity className="w-3.5 h-3.5" />}
+                iconColor="text-purple-600 dark:text-purple-400"
+              >
+                Activities
+              </NeuLabel>
+              <input
+                id={`activities-${index}`}
+                type="text"
+                placeholder="Comma-separated (e.g., Museum tour, City walk)"
+                value={day.activities?.join(", ") || ""}
+                onChange={(e) =>
+                  onFieldChange(
+                    "activities",
+                    e.target.value.split(",").map((a) => a.trim()).filter(Boolean)
+                  )
+                }
+                className={inputCls}
+              />
+              {day.activities && day.activities.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {day.activities.map((activity, i) => (
+                    <Chip key={i} label={activity} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* — Travel — */}
+            <SectionDivider label="Travel" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+              {/* Distance */}
+              <div className="space-y-1">
+                <NeuLabel
+                  htmlFor={`distance-${index}`}
+                  icon={<Navigation className="w-3.5 h-3.5" />}
+                >
+                  Distance
+                </NeuLabel>
+                <input
+                  id={`distance-${index}`}
+                  type="text"
+                  placeholder="e.g., 150 km"
+                  value={day.travelDistance || ""}
+                  onChange={(e) => onFieldChange("travelDistance", e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+
+              {/* Mode */}
+              <div className="space-y-1">
+                <NeuLabel
+                  htmlFor={`mode-${index}`}
+                  icon={<Navigation className="w-3.5 h-3.5" />}
+                >
+                  Mode
+                </NeuLabel>
+                <Select
+                  value={day.travelMode || ""}
+                  onValueChange={(value) => onFieldChange("travelMode", value)}
+                >
+                  <SelectTrigger
+                    id={`mode-${index}`}
+                    className={[
+                      inputCls,
+                      "flex items-center justify-between",
+                      "[&>svg]:text-[#4a5568] [&>svg]:dark:text-[#9a9896]",
+                    ].join(" ")}
+                  >
+                    <SelectValue placeholder="Select mode" />
+                  </SelectTrigger>
+                  <SelectContent
+                    className={[
+                      NEU.surface,
+                      NEU.raised,
+                      NEU.radiusMd,
+                      NEU.border,
+                      NEU.font,
+                    ].join(" ")}
+                  >
+                    {Object.values(TRANSPORT_MODE).map((mode) => (
+                      <SelectItem
+                        key={mode}
+                        value={mode}
+                        className={`${NEU.text.primary} ${NEU.font} text-sm cursor-pointer`}
+                      >
+                        {mode}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Time */}
+              <div className="space-y-1">
+                <NeuLabel
+                  htmlFor={`time-${index}`}
+                  icon={<Clock className="w-3.5 h-3.5" />}
+                >
+                  Est. Time
+                </NeuLabel>
+                <input
+                  id={`time-${index}`}
+                  type="text"
+                  placeholder="e.g., 3 hours"
+                  value={day.estimatedTime || ""}
+                  onChange={(e) => onFieldChange("estimatedTime", e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+            </div>
+
+            {/* — Notes — */}
+            <SectionDivider label="Important Notes" />
+            <div className="space-y-2">
+              <NeuLabel
+                htmlFor={`notes-${index}`}
+                icon={<AlertCircle className="w-3.5 h-3.5" />}
+                iconColor={NEU.text.danger}
+              >
+                Notes
+              </NeuLabel>
+              <textarea
+                id={`notes-${index}`}
+                placeholder="Comma-separated (e.g., Passport required, Dress code: formal)"
+                rows={2}
+                value={day.importantNotes?.join(", ") || ""}
+                onChange={(e) =>
+                  onFieldChange(
+                    "importantNotes",
+                    e.target.value.split(",").map((n) => n.trim()).filter(Boolean)
+                  )
+                }
+                className={`${inputCls} resize-none`}
+              />
+              {day.importantNotes && day.importantNotes.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {day.importantNotes.map((note, i) => (
+                    <Chip key={i} label={note} variant="danger" />
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function Step2Itinerary() {
   const { values, setFieldValue } = useFormikContext<UpdateTourContentItineraryDTO>();
@@ -102,355 +690,102 @@ export default function Step2Itinerary() {
     updateItineraryField(index, "mealsProvided", newMeals);
   };
 
+  const itinerary = values.itinerary ?? [];
+
   return (
-    <div className="space-y-6">
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+    <div className="space-y-5">
 
-        @keyframes slideDown {
-          from {
-            max-height: 0;
-            opacity: 0;
-          }
-          to {
-            max-height: 2000px;
-            opacity: 1;
-          }
-        }
-
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-out;
-        }
-
-        .animate-slide-down {
-          animation: slideDown 0.3s ease-out;
-          overflow: hidden;
-        }
-
-        .rotate-180 {
-          transform: rotate(180deg);
-        }
-
-        .transition-transform {
-          transition: transform 0.2s ease;
-        }
-
-        .scale-hover:hover {
-          transform: scale(1.05);
-        }
-      `}</style>
-
-      <div className="flex items-center justify-between animate-fade-in">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Tour Itinerary</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Plan your day-by-day tour schedule
-          </p>
+      {/* ── Page Header ── */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div
+            className={[
+              "p-2.5",
+              NEU.radiusMd,
+              NEU.surface,
+              NEU.raisedSm,
+              NEU.border,
+              NEU.iconBg.teal,
+            ].join(" ")}
+          >
+            <Calendar className={`w-4 h-4 ${NEU.text.teal}`} />
+          </div>
+          <div>
+            <h2 className={`text-base font-bold tracking-tight ${NEU.text.primary} ${NEU.font}`}>
+              Tour Itinerary
+            </h2>
+            <p className={`text-xs mt-0.5 ${NEU.text.secondary}`}>
+              Plan your day-by-day schedule
+            </p>
+          </div>
         </div>
-        <Button onClick={addItineraryDay} className="gap-2">
-          <Plus className="h-4 w-4" />
+
+        {/* Add Day Button */}
+        <button
+          type="button"
+          onClick={addItineraryDay}
+          className={[
+            "flex items-center gap-2 px-4 py-2.5 text-xs font-semibold",
+            NEU.radiusMd,
+            NEU.surface,
+            NEU.raisedSm,
+            NEU.border,
+            NEU.text.teal,
+            NEU.font,
+            "transition-all duration-200",
+            "hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff] dark:hover:shadow-[2px_2px_6px_#0d0d0c,-2px_-2px_6px_#272624]",
+            "active:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-2px_-2px_4px_#ffffff] dark:active:shadow-[inset_2px_2px_4px_#0d0d0c,inset_-2px_-2px_4px_#272624]",
+            "whitespace-nowrap",
+          ].join(" ")}
+        >
+          <Plus className="w-3.5 h-3.5" />
           Add Day
-        </Button>
+        </button>
       </div>
 
-      {(values.itinerary ?? []).length === 0 ? (
-        <Card className="border-dashed animate-fade-in">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <div className="rounded-full bg-primary/10 p-4 mb-4">
-              <Calendar className="h-12 w-12 text-primary" />
-            </div>
-            <p className="text-muted-foreground text-center font-medium">
-              No itinerary days added yet
-            </p>
-            <p className="text-sm text-muted-foreground text-center mt-1">
-              Start building your tour schedule by adding your first day
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {(values.itinerary ?? []).map((day, index) => (
-            <Card key={index} className="overflow-hidden animate-fade-in">
-              <div
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-accent/50 transition-colors"
-                onClick={() => toggleDay(index)}
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
-                    {day.day}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold truncate">
-                      {day.title || "Untitled Day"}
-                    </h3>
-                    {day.description && (
-                      <p className="text-sm text-muted-foreground truncate">
-                        {day.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {day.mealsProvided && day.mealsProvided.length > 0 && (
-                    <Badge variant="secondary" className="gap-1">
-                      <Utensils className="h-3 w-3" />
-                      {day.mealsProvided.length}
-                    </Badge>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeItineraryDay(index);
-                    }}
-                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  <div
-                    className={`transition-transform ${expandedDays.includes(index) ? "rotate-180" : ""
-                      }`}
-                  >
-                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                </div>
-              </div>
-
-              {expandedDays.includes(index) && (
-                <div className="border-t p-6 space-y-6 bg-muted/20 animate-slide-down">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2 md:col-span-2">
-                      <Label
-                        htmlFor={`title-${index}`}
-                        className="flex items-center gap-2"
-                      >
-                        <MapPin className="h-4 w-4" />
-                        Day Title
-                      </Label>
-                      <Input
-                        id={`title-${index}`}
-                        placeholder="e.g., Arrival in Paris"
-                        value={day.title || ""}
-                        onChange={(e) =>
-                          updateItineraryField(index, "title", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2 md:col-span-2">
-                      <Label
-                        htmlFor={`description-${index}`}
-                        className="flex items-center gap-2"
-                      >
-                        <Activity className="h-4 w-4" />
-                        Description
-                      </Label>
-                      <Textarea
-                        id={`description-${index}`}
-                        placeholder="Describe the day's activities and highlights..."
-                        rows={4}
-                        value={day.description || ""}
-                        onChange={(e) =>
-                          updateItineraryField(index, "description", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2 md:col-span-2">
-                      <Label className="flex items-center gap-2">
-                        <Utensils className="h-4 w-4" />
-                        Meals Provided
-                      </Label>
-                      <div className="flex flex-wrap gap-2">
-                        {Object.values(MEALS_PROVIDED).map((meal) => (
-                          <Badge
-                            key={meal}
-                            variant={
-                              (day.mealsProvided || []).includes(meal as MealsProvided)
-                                ? "default"
-                                : "outline"
-                            }
-                            className="cursor-pointer transition-all scale-hover"
-                            onClick={() => toggleMeal(index, meal as MealsProvided)}
-                          >
-                            {meal}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 md:col-span-2">
-                      <Label
-                        htmlFor={`accommodation-${index}`}
-                        className="flex items-center gap-2"
-                      >
-                        <Hotel className="h-4 w-4" />
-                        Accommodation
-                      </Label>
-                      <Input
-                        id={`accommodation-${index}`}
-                        placeholder="e.g., 4-star Hotel in City Center"
-                        value={day.accommodation || ""}
-                        onChange={(e) =>
-                          updateItineraryField(index, "accommodation", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2 md:col-span-2">
-                      <Label
-                        htmlFor={`activities-${index}`}
-                        className="flex items-center gap-2"
-                      >
-                        <Activity className="h-4 w-4" />
-                        Activities
-                      </Label>
-                      <Input
-                        id={`activities-${index}`}
-                        placeholder="Comma-separated activities (e.g., Museum tour, City walk)"
-                        value={day.activities?.join(", ") || ""}
-                        onChange={(e) =>
-                          updateItineraryField(
-                            index,
-                            "activities",
-                            e.target.value
-                              .split(",")
-                              .map((a) => a.trim())
-                              .filter(Boolean)
-                          )
-                        }
-                      />
-                      {day.activities && day.activities.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {day.activities.map((activity, i) => (
-                            <Badge key={i} variant="secondary" className="text-xs">
-                              {activity}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor={`distance-${index}`}
-                        className="flex items-center gap-2"
-                      >
-                        <Navigation className="h-4 w-4" />
-                        Travel Distance
-                      </Label>
-                      <Input
-                        id={`distance-${index}`}
-                        placeholder="e.g., 150 km"
-                        value={day.travelDistance || ""}
-                        onChange={(e) =>
-                          updateItineraryField(index, "travelDistance", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor={`mode-${index}`}
-                        className="flex items-center gap-2"
-                      >
-                        <Navigation className="h-4 w-4" />
-                        Travel Mode
-                      </Label>
-                      <Select
-                        value={day.travelMode || ""}
-                        onValueChange={(value) =>
-                          updateItineraryField(index, "travelMode", value)
-                        }
-                      >
-                        <SelectTrigger id={`mode-${index}`}>
-                          <SelectValue placeholder="Select mode" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.values(TRANSPORT_MODE).map((mode) => (
-                            <SelectItem key={mode} value={mode}>
-                              {mode}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor={`time-${index}`}
-                        className="flex items-center gap-2"
-                      >
-                        <Clock className="h-4 w-4" />
-                        Estimated Time
-                      </Label>
-                      <Input
-                        id={`time-${index}`}
-                        placeholder="e.g., 3 hours"
-                        value={day.estimatedTime || ""}
-                        onChange={(e) =>
-                          updateItineraryField(index, "estimatedTime", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2 md:col-span-2">
-                      <Label
-                        htmlFor={`notes-${index}`}
-                        className="flex items-center gap-2"
-                      >
-                        <AlertCircle className="h-4 w-4" />
-                        Important Notes
-                      </Label>
-                      <Textarea
-                        id={`notes-${index}`}
-                        placeholder="Comma-separated notes (e.g., Passport required, Dress code: formal)"
-                        rows={2}
-                        value={day.importantNotes?.join(", ") || ""}
-                        onChange={(e) =>
-                          updateItineraryField(
-                            index,
-                            "importantNotes",
-                            e.target.value
-                              .split(",")
-                              .map((n) => n.trim())
-                              .filter(Boolean)
-                          )
-                        }
-                      />
-                      {day.importantNotes && day.importantNotes.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {day.importantNotes.map((note, i) => (
-                            <Badge
-                              key={i}
-                              variant="destructive"
-                              className="text-xs gap-1"
-                            >
-                              <AlertCircle className="h-3 w-3" />
-                              {note}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </Card>
+      {/* ── Progress strip ── */}
+      {itinerary.length > 0 && (
+        <div className="flex items-center gap-1.5 px-1">
+          {itinerary.map((_, i) => (
+            <div
+              key={i}
+              onClick={() => toggleDay(i)}
+              className={[
+                "h-1.5 flex-1 cursor-pointer transition-all duration-200",
+                NEU.radiusFull,
+                expandedDays.includes(i)
+                  ? "bg-[#006666]"
+                  : "bg-[#c8c6c4] dark:bg-[#3a3836]",
+              ].join(" ")}
+              title={`Day ${i + 1}`}
+            />
           ))}
         </div>
       )}
+
+      {/* ── Content ── */}
+      {itinerary.length === 0 ? (
+        <EmptyState onAdd={addItineraryDay} />
+      ) : (
+        <div className="space-y-4">
+          {itinerary.map((day, index) => (
+            <DayCard
+              key={index}
+              day={day}
+              index={index}
+              isExpanded={expandedDays.includes(index)}
+              onToggle={() => toggleDay(index)}
+              onRemove={(e) => {
+                e.stopPropagation();
+                removeItineraryDay(index);
+              }}
+              onFieldChange={(field, value) => updateItineraryField(index, field, value)}
+              onMealToggle={(meal) => toggleMeal(index, meal)}
+            />
+          ))}
+        </div>
+      )}
+
     </div>
   );
 }

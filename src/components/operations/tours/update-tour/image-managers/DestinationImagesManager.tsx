@@ -4,10 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Trash2,
   Save,
@@ -16,7 +13,8 @@ import {
   MapPin,
   Sparkles,
   Upload,
-  Loader2
+  Loader2,
+  ChevronDown
 } from 'lucide-react';
 import api from '@/utils/axios/axios';
 import { fileToBase64, IMAGE_EXTENSIONS, isAllowedExtension } from '@/utils/helpers/file-conversion';
@@ -25,18 +23,63 @@ import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
 import { DestinationBlockDTO, TourDetailDTO } from '@/types/tour/tour.types';
 import { ApiResponse } from '@/types/common/api.types';
 
-const getDestinationUrl = (tourId: string) => {
-  return `/operations/tours/v1/${tourId}/destinations/images-bulk`;
-};
+// ── Neumorphism Style Tokens ──────────────────────────────────
+const NEU_SURFACE = 'bg-[#E7E5E4]';
+const NEU_CARD =
+  'rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60';
+const NEU_CARD_SM =
+  'rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60';
+const NEU_SURFACE_INSET =
+  'bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]';
+const NEU_BTN_PRIMARY =
+  'rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide ' +
+  'shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] ' +
+  'hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] ' +
+  'active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] ' +
+  'transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50 ' +
+  'disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none';
+const NEU_BTN_GHOST =
+  'rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] ' +
+  'shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] ' +
+  'hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] ' +
+  'active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] ' +
+  'transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40 ' +
+  'disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none';
+const NEU_BTN_DANGER =
+  'rounded-xl bg-[#E7E5E4] text-[#FF2157] font-[family-name:var(--font-space-mono)] ' +
+  'shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] ' +
+  'hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] ' +
+  'transition-all duration-200 ' +
+  'disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none';
+const NEU_BADGE =
+  'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold ' +
+  'bg-[#E7E5E4] text-[#1E2938] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]';
+const NEU_BADGE_WARNING =
+  'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold ' +
+  'bg-[#FE9900]/10 text-[#FE9900] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]';
 
-const getAttractionUrl = (tourId: string) => {
-  return `/operations/tours/v1/${tourId}/destinations/attractions/images-bulk`;
-};
+const NEU_HEADING =
+  'font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight';
+const NEU_LABEL =
+  'font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest';
+const NEU_MUTED =
+  'font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50';
+const NEU_ICON_WELL =
+  'p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]';
+const NEU_ICON_WELL_PRIMARY =
+  'p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]';
+const NEU_DIVIDER = 'border-[#1E2938]/10';
+
+// ─────────────────────────────────────────────────────────────
+
+const getDestinationUrl = (tourId: string) =>
+  `/operations/tours/v1/${tourId}/destinations/images-bulk`;
+const getAttractionUrl = (tourId: string) =>
+  `/operations/tours/v1/${tourId}/destinations/attractions/images-bulk`;
 
 type SelectedFile = { file: File; preview: string };
-
 type ImageDraft = {
-  existing: Array<{ id: string, url: string }>;
+  existing: Array<{ id: string; url: string }>;
   toDelete: Set<string>;
   toAdd: SelectedFile[];
 };
@@ -50,32 +93,22 @@ interface Props {
 export default function DestinationImagesManager({ tourId, destinations, updateData }: Props) {
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState<string[]>([]);
-
-  // Separate loading states
   const [destSaving, setDestSaving] = useState<Record<string, boolean>>({});
   const [attrSaving, setAttrSaving] = useState<Record<string, boolean>>({});
 
-  // Destination-level drafts keyed by destination ID
   const [destDrafts, setDestDrafts] = useState<Map<string, ImageDraft>>(
-    new Map(destinations
-      .filter(d => d.id)
-      .map(d => [d.id!, {
-        existing: d.imageIds ?? [],
-        toDelete: new Set(),
-        toAdd: []
-      }])
+    new Map(
+      destinations
+        .filter(d => d.id)
+        .map(d => [d.id!, { existing: d.imageIds ?? [], toDelete: new Set(), toAdd: [] }])
     )
   );
 
-  // Attraction-level drafts keyed by attraction ID
   const [attrDrafts, setAttrDrafts] = useState<Map<string, ImageDraft>>(
-    new Map(destinations
-      .flatMap(d => d.attractions?.filter(a => a.id) ?? [])
-      .map(a => [a.id!, {
-        existing: a.imageIds ?? [],
-        toDelete: new Set(),
-        toAdd: []
-      }])
+    new Map(
+      destinations
+        .flatMap(d => d.attractions?.filter(a => a.id) ?? [])
+        .map(a => [a.id!, { existing: a.imageIds ?? [], toDelete: new Set(), toAdd: [] }])
     )
   );
 
@@ -99,23 +132,15 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
     return draft ? draft.toDelete.size > 0 || draft.toAdd.length > 0 : false;
   };
 
-  /* ------------------------- File Selection ------------------------- */
-
   const onSelectDestFiles = (destId: string, files: FileList | null) => {
     if (!files) return;
     const valid = Array.from(files).filter(f => isAllowedExtension(f.name, IMAGE_EXTENSIONS));
     if (!valid.length) return showToast.warning('Invalid files', 'Only image files are allowed');
-
     const mapped = valid.map(f => ({ file: f, preview: URL.createObjectURL(f) }));
     setDestDrafts(prev => {
       const next = new Map(prev);
       const draft = next.get(destId);
-      if (draft) {
-        next.set(destId, {
-          ...draft,
-          toAdd: [...draft.toAdd, ...mapped]
-        });
-      }
+      if (draft) next.set(destId, { ...draft, toAdd: [...draft.toAdd, ...mapped] });
       return next;
     });
   };
@@ -124,17 +149,11 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
     if (!files) return;
     const valid = Array.from(files).filter(f => isAllowedExtension(f.name, IMAGE_EXTENSIONS));
     if (!valid.length) return showToast.warning('Invalid files', 'Only image files are allowed');
-
     const mapped = valid.map(f => ({ file: f, preview: URL.createObjectURL(f) }));
     setAttrDrafts(prev => {
       const next = new Map(prev);
       const draft = next.get(attrId);
-      if (draft) {
-        next.set(attrId, {
-          ...draft,
-          toAdd: [...draft.toAdd, ...mapped]
-        });
-      }
+      if (draft) next.set(attrId, { ...draft, toAdd: [...draft.toAdd, ...mapped] });
       return next;
     });
   };
@@ -142,18 +161,11 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
   const removeDestDraftFile = (destId: string, idx: number) => {
     const draft = destDrafts.get(destId);
     if (!draft) return;
-
-    const f = draft.toAdd[idx];
-    URL.revokeObjectURL(f.preview);
+    URL.revokeObjectURL(draft.toAdd[idx].preview);
     setDestDrafts(prev => {
       const next = new Map(prev);
-      const draft = next.get(destId);
-      if (draft) {
-        next.set(destId, {
-          ...draft,
-          toAdd: draft.toAdd.filter((_, i) => i !== idx)
-        });
-      }
+      const d = next.get(destId);
+      if (d) next.set(destId, { ...d, toAdd: d.toAdd.filter((_, i) => i !== idx) });
       return next;
     });
   };
@@ -161,18 +173,11 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
   const removeAttrDraftFile = (attrId: string, idx: number) => {
     const draft = attrDrafts.get(attrId);
     if (!draft) return;
-
-    const f = draft.toAdd[idx];
-    URL.revokeObjectURL(f.preview);
+    URL.revokeObjectURL(draft.toAdd[idx].preview);
     setAttrDrafts(prev => {
       const next = new Map(prev);
-      const draft = next.get(attrId);
-      if (draft) {
-        next.set(attrId, {
-          ...draft,
-          toAdd: draft.toAdd.filter((_, i) => i !== idx)
-        });
-      }
+      const d = next.get(attrId);
+      if (d) next.set(attrId, { ...d, toAdd: d.toAdd.filter((_, i) => i !== idx) });
       return next;
     });
   };
@@ -181,12 +186,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
     setDestDrafts(prev => {
       const next = new Map(prev);
       const draft = next.get(destId);
-      if (draft) {
-        next.set(destId, {
-          ...draft,
-          toDelete: new Set([...draft.toDelete, imageId])
-        });
-      }
+      if (draft) next.set(destId, { ...draft, toDelete: new Set([...draft.toDelete, imageId]) });
       return next;
     });
   };
@@ -195,12 +195,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
     setAttrDrafts(prev => {
       const next = new Map(prev);
       const draft = next.get(attrId);
-      if (draft) {
-        next.set(attrId, {
-          ...draft,
-          toDelete: new Set([...draft.toDelete, imageId])
-        });
-      }
+      if (draft) next.set(attrId, { ...draft, toDelete: new Set([...draft.toDelete, imageId]) });
       return next;
     });
   };
@@ -208,13 +203,9 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
   const markRemoveAllDest = (destId: string) => {
     const draft = destDrafts.get(destId);
     if (!draft) return;
-
     setDestDrafts(prev => {
       const next = new Map(prev);
-      next.set(destId, {
-        ...draft,
-        toDelete: new Set(draft.existing.map(img => img.id))
-      });
+      next.set(destId, { ...draft, toDelete: new Set(draft.existing.map(img => img.id)) });
       return next;
     });
   };
@@ -222,70 +213,45 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
   const markRemoveAllAttr = (attrId: string) => {
     const draft = attrDrafts.get(attrId);
     if (!draft) return;
-
     setAttrDrafts(prev => {
       const next = new Map(prev);
-      next.set(attrId, {
-        ...draft,
-        toDelete: new Set(draft.existing.map(img => img.id))
-      });
+      next.set(attrId, { ...draft, toDelete: new Set(draft.existing.map(img => img.id)) });
       return next;
     });
   };
 
-  /* ---------------------------- Save Functions ---------------------------- */
-
   const saveDestinationImages = async (destId: string) => {
     const draft = destDrafts.get(destId);
     if (!draft) throw new Error('Destination draft not found');
-
     try {
       setDestSaving(prev => ({ ...prev, [destId]: true }));
-
-      const base64 = await Promise.all(draft.toAdd.map(f =>
-        fileToBase64(f.file, {
-          compressImages: true,
-          maxWidth: 1600,
-          quality: 0.8,
-          maxFileBytes: 5 * 1024 * 1024,
-          allowedExtensions: IMAGE_EXTENSIONS
-        })
-      ));
-
-      const response = await api.patch<ApiResponse<Array<{ id: string, url: string }>>>(
-        getDestinationUrl(tourId),
-        {
-          destinationId: destId,
-          deleteImageIds: [...draft.toDelete],
-          newImages: base64
-        }
+      const base64 = await Promise.all(
+        draft.toAdd.map(f =>
+          fileToBase64(f.file, {
+            compressImages: true,
+            maxWidth: 1600,
+            quality: 0.8,
+            maxFileBytes: 5 * 1024 * 1024,
+            allowedExtensions: IMAGE_EXTENSIONS,
+          })
+        )
       );
-
-      // API returns the complete updated list of images
+      const response = await api.patch<ApiResponse<Array<{ id: string; url: string }>>>(
+        getDestinationUrl(tourId),
+        { destinationId: destId, deleteImageIds: [...draft.toDelete], newImages: base64 }
+      );
       const allImages = response.data.data ?? [];
-
-      // Update local state with the complete list from API
       updateData({
         destinations: destinations.map(d =>
-          d.id === destId ? {
-            ...d,
-            imageIds: allImages
-          } : d
-        )
+          d.id === destId ? { ...d, imageIds: allImages } : d
+        ),
       });
-
-      // Clean up and reset draft with the new complete list
       draft.toAdd.forEach(f => URL.revokeObjectURL(f.preview));
       setDestDrafts(prev => {
         const next = new Map(prev);
-        next.set(destId, {
-          existing: allImages,
-          toDelete: new Set(),
-          toAdd: []
-        });
+        next.set(destId, { existing: allImages, toDelete: new Set(), toAdd: [] });
         return next;
       });
-
       queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
       showToast.success('Destination images saved');
     } catch (error) {
@@ -299,60 +265,47 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
   const saveAttractionImages = async (attrId: string, destId: string) => {
     const draft = attrDrafts.get(attrId);
     if (!draft) throw new Error('Attraction draft not found');
-
     try {
       setAttrSaving(prev => ({ ...prev, [attrId]: true }));
-
-      const base64 = await Promise.all(draft.toAdd.map(f =>
-        fileToBase64(f.file, {
-          compressImages: true,
-          maxWidth: 1600,
-          quality: 0.8,
-          maxFileBytes: 5 * 1024 * 1024,
-          allowedExtensions: IMAGE_EXTENSIONS
-        })
-      ));
-
-      const response = await api.patch<ApiResponse<Array<{ id: string, url: string }>>>(
+      const base64 = await Promise.all(
+        draft.toAdd.map(f =>
+          fileToBase64(f.file, {
+            compressImages: true,
+            maxWidth: 1600,
+            quality: 0.8,
+            maxFileBytes: 5 * 1024 * 1024,
+            allowedExtensions: IMAGE_EXTENSIONS,
+          })
+        )
+      );
+      const response = await api.patch<ApiResponse<Array<{ id: string; url: string }>>>(
         getAttractionUrl(tourId),
         {
           destinationId: destId,
           attractionId: attrId,
           deleteImageIds: [...draft.toDelete],
-          newImages: base64
+          newImages: base64,
         }
       );
-
-      // API returns the complete updated list of images
       const allImages = response.data.data ?? [];
-
-      // Update local state with the complete list from API
       updateData({
         destinations: destinations.map(d =>
-          d.id === destId ? {
-            ...d,
-            attractions: d.attractions?.map(a =>
-              a.id === attrId ? {
-                ...a,
-                imageIds: allImages
-              } : a
-            )
-          } : d
-        )
+          d.id === destId
+            ? {
+              ...d,
+              attractions: d.attractions?.map(a =>
+                a.id === attrId ? { ...a, imageIds: allImages } : a
+              ),
+            }
+            : d
+        ),
       });
-
-      // Clean up and reset draft with the new complete list
       draft.toAdd.forEach(f => URL.revokeObjectURL(f.preview));
       setAttrDrafts(prev => {
         const next = new Map(prev);
-        next.set(attrId, {
-          existing: allImages,
-          toDelete: new Set(),
-          toAdd: []
-        });
+        next.set(attrId, { existing: allImages, toDelete: new Set(), toAdd: [] });
         return next;
       });
-
       queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
       showToast.success('Attraction images saved');
     } catch (error) {
@@ -363,49 +316,45 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
     }
   };
 
-  /* --------------------------------- UI --------------------------------- */
-
+  /* ── Animation Variants ── */
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
   };
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.2 }
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.9,
-      transition: { duration: 0.15 }
-    }
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, scale: 0.9, transition: { duration: 0.15 } },
   };
 
   return (
-    <Card className="shadow-lg border-slate-200 dark:border-slate-800">
-      <CardHeader className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 border-b">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <ImageIcon className="w-6 h-6 text-primary" />
+    <div className={`${NEU_CARD} overflow-hidden`}>
+      {/* ── Card Header ── */}
+      <div className={`px-6 py-5 border-b ${NEU_DIVIDER} ${NEU_SURFACE}`}>
+        <div className="flex items-center gap-4">
+          <div className={NEU_ICON_WELL_PRIMARY}>
+            <ImageIcon className="w-5 h-5 text-[#006666]" />
           </div>
-          <div className="flex-1">
-            <CardTitle className="text-xl">Destination & Attraction Images</CardTitle>
-            <CardDescription className="mt-1">Manage images with add, remove, and save actions</CardDescription>
+          <div className="flex-1 min-w-0">
+            <h2 className={`${NEU_HEADING} text-lg`}>Destination & Attraction Images</h2>
+            <p className={`${NEU_MUTED} mt-0.5`}>Manage images with add, remove, and save actions</p>
           </div>
-          <Badge variant="secondary" className="text-xs">
+          <span className={NEU_BADGE}>
             {destinations.length} {destinations.length === 1 ? 'Destination' : 'Destinations'}
-          </Badge>
+          </span>
         </div>
-      </CardHeader>
-      <CardContent className="p-6">
-        <Accordion type="multiple" value={expanded} onValueChange={setExpanded} className="space-y-3">
-          {destinations.map((destination) => {
+      </div>
+
+      {/* ── Accordion ── */}
+      <div className={`p-6 ${NEU_SURFACE}`}>
+        <Accordion
+          type="multiple"
+          value={expanded}
+          onValueChange={setExpanded}
+          className="space-y-4"
+        >
+          {destinations.map(destination => {
             if (!destination.id) return null;
             const destDraft = destDrafts.get(destination.id);
             if (!destDraft) return null;
@@ -414,26 +363,28 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
               <AccordionItem
                 key={destination.id}
                 value={`dest-${destination.id}`}
-                className="border rounded-xl bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 shadow-sm overflow-hidden"
+                className={`${NEU_CARD_SM} overflow-hidden border-0`}
               >
-                <AccordionTrigger className="px-5 py-4 hover:no-underline group">
+                <AccordionTrigger className="px-5 py-4 hover:no-underline [&>svg]:hidden group">
                   <div className="flex items-center gap-3 w-full">
-                    <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 transition-colors">
-                      <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <div className={`${NEU_ICON_WELL} group-hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] transition-all duration-200`}>
+                      <MapPin className="w-4 h-4 text-[#006666]" />
                     </div>
-                    <span className="text-base font-semibold">Destination: {destination.description?.substring(0, 50)}...</span>
-                    <div className="ml-auto flex items-center gap-2">
+                    <span className={`${NEU_HEADING} text-sm truncate max-w-[200px] sm:max-w-xs`}>
+                      {destination.description?.substring(0, 50)}…
+                    </span>
+                    <div className="ml-auto flex items-center gap-2 shrink-0">
                       {hasDestChanges(destination.id) && (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                          Unsaved Changes
-                        </Badge>
+                        <span className={NEU_BADGE_WARNING}>Unsaved</span>
                       )}
-                      <Badge variant="secondary" className="text-xs">
-                        {visibleDestImages(destination.id).length + destDraft.toAdd.length} images
-                      </Badge>
+                      <span className={NEU_BADGE}>
+                        {visibleDestImages(destination.id).length + destDraft.toAdd.length} imgs
+                      </span>
+                      <ChevronDown className="w-4 h-4 text-[#1E2938]/40 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </div>
                   </div>
                 </AccordionTrigger>
+
                 <AccordionContent className="px-5 pb-5">
                   <motion.div
                     initial="hidden"
@@ -441,18 +392,22 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                     variants={containerVariants}
                     className="space-y-6 pt-4"
                   >
-                    {/* ---------- Destination Images ---------- */}
-                    <motion.div variants={itemVariants} className="space-y-3">
+                    {/* ── Destination Images Section ── */}
+                    <motion.div variants={itemVariants} className="space-y-4">
+                      {/* Section header */}
                       <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                          <ImageIcon className="w-4 h-4 text-slate-500" />
-                          Destination Images
-                        </h4>
-                        <span className="text-xs text-slate-500">
+                        <div className="flex items-center gap-2">
+                          <div className={`${NEU_ICON_WELL} !p-1.5`}>
+                            <ImageIcon className="w-3.5 h-3.5 text-[#1E2938]/60" />
+                          </div>
+                          <span className={NEU_LABEL}>Destination Images</span>
+                        </div>
+                        <span className={NEU_MUTED}>
                           {visibleDestImages(destination.id).length + destDraft.toAdd.length} total
                         </span>
                       </div>
 
+                      {/* Action bar */}
                       <div className="flex flex-wrap gap-2">
                         <input
                           type="file"
@@ -463,26 +418,21 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                           onChange={e => onSelectDestFiles(destination.id!, e.target.files)}
                         />
                         <label htmlFor={`file-${destination.id}`}>
-                          <Button variant="outline" size="sm" className="gap-2" asChild>
-                            <span>
-                              <Upload className="h-4 w-4" />
-                              Add Images
-                            </span>
-                          </Button>
+                          <span className={`${NEU_BTN_GHOST} inline-flex items-center gap-2 px-3 py-2 text-sm cursor-pointer`}>
+                            <Upload className="h-4 w-4" />
+                            Add Images
+                          </span>
                         </label>
-                        <Button
-                          size="sm"
-                          variant="destructive"
+                        <button
+                          className={`${NEU_BTN_DANGER} inline-flex items-center gap-2 px-3 py-2 text-sm`}
                           onClick={() => markRemoveAllDest(destination.id!)}
                           disabled={!visibleDestImages(destination.id).length}
-                          className="gap-2"
                         >
                           <Trash2 className="h-4 w-4" />
                           Remove All
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="ml-auto gap-2"
+                        </button>
+                        <button
+                          className={`${NEU_BTN_PRIMARY} inline-flex items-center gap-2 px-3 py-2 text-sm ml-auto`}
                           onClick={() => saveDestinationImages(destination.id!)}
                           disabled={!hasDestChanges(destination.id) || destSaving[destination.id]}
                         >
@@ -492,7 +442,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                             <Save className="h-4 w-4" />
                           )}
                           Save Changes
-                        </Button>
+                        </button>
                       </div>
 
                       {/* Draft previews */}
@@ -504,10 +454,10 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                             exit={{ opacity: 0, height: 0 }}
                             className="overflow-hidden"
                           >
-                            <div className="bg-blue-50 dark:bg-blue-950/30 rounded-lg p-3 space-y-2">
-                              <div className="flex items-center gap-2 text-sm font-medium text-blue-700 dark:text-blue-400">
-                                <Sparkles className="w-4 h-4" />
-                                New Images to Upload
+                            <div className={`${NEU_SURFACE_INSET} rounded-xl p-4 space-y-3`}>
+                              <div className="flex items-center gap-2">
+                                <Sparkles className="w-4 h-4 text-[#006666]" />
+                                <span className={`${NEU_LABEL} text-[#006666]`}>New Images to Upload</span>
                               </div>
                               <motion.div
                                 variants={containerVariants}
@@ -520,14 +470,14 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                                     key={i}
                                     variants={itemVariants}
                                     layout
-                                    className="relative aspect-square rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-800 shadow-sm group"
+                                    className="relative aspect-square rounded-xl overflow-hidden shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] border-2 border-[#006666]/20 group"
                                   >
-                                    <Image src={f.preview} alt="" fill className="object-cover" sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw" />
+                                    <Image src={f.preview} alt="" fill className="object-cover" sizes="(max-width: 768px) 50vw, 20vw" />
                                     <motion.button
                                       whileHover={{ scale: 1.1 }}
                                       whileTap={{ scale: 0.9 }}
                                       onClick={() => removeDestDraftFile(destination.id!, i)}
-                                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                      className="absolute top-1.5 right-1.5 bg-[#FF2157] hover:bg-[#e0001e] text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
                                       <X className="h-3 w-3" />
                                     </motion.button>
@@ -548,19 +498,19 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"
                         >
                           <AnimatePresence mode="popLayout">
-                            {visibleDestImages(destination.id).map((img) => (
+                            {visibleDestImages(destination.id).map(img => (
                               <motion.div
                                 key={img.id}
                                 variants={itemVariants}
                                 layout
-                                className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm group"
+                                className="relative aspect-square rounded-xl overflow-hidden shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] group"
                               >
-                                <Image src={img.url} alt="" fill className="object-cover" sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw" />
+                                <Image src={img.url} alt="" fill className="object-cover" sizes="(max-width: 768px) 50vw, 20vw" />
                                 <motion.button
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => markDestDelete(destination.id!, img.id)}
-                                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="absolute top-1.5 right-1.5 bg-[#FF2157] hover:bg-[#e0001e] text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                   <Trash2 className="h-3 w-3" />
                                 </motion.button>
@@ -571,16 +521,16 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                       ) : (
                         <motion.div
                           variants={itemVariants}
-                          className="flex flex-col items-center justify-center py-12 bg-slate-50 dark:bg-slate-900/50 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700"
+                          className={`${NEU_SURFACE_INSET} rounded-xl flex flex-col items-center justify-center py-12 border-2 border-dashed border-[#1E2938]/10`}
                         >
-                          <ImageIcon className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
-                          <p className="text-sm text-slate-500 dark:text-slate-400">No images yet</p>
+                          <ImageIcon className="w-10 h-10 text-[#1E2938]/20 mb-3" />
+                          <p className={NEU_MUTED}>No images yet</p>
                         </motion.div>
                       )}
                     </motion.div>
 
-                    {/* ---------- Attractions ---------- */}
-                    {destination.attractions?.map((attraction) => {
+                    {/* ── Attraction Sections ── */}
+                    {destination.attractions?.map(attraction => {
                       if (!attraction.id) return null;
                       const attrDraft = attrDrafts.get(attraction.id);
                       if (!attrDraft) return null;
@@ -589,18 +539,22 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                         <motion.div
                           key={attraction.id}
                           variants={itemVariants}
-                          className="border-t pt-6 space-y-3"
+                          className={`border-t ${NEU_DIVIDER} pt-6 space-y-4`}
                         >
+                          {/* Attraction header */}
                           <div className="flex items-center justify-between">
-                            <h5 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                              <Sparkles className="w-4 h-4 text-purple-500" />
-                              {attraction.title} Images
-                            </h5>
-                            <span className="text-xs text-slate-500">
+                            <div className="flex items-center gap-2">
+                              <div className={`${NEU_ICON_WELL} !p-1.5`}>
+                                <Sparkles className="w-3.5 h-3.5 text-[#006666]" />
+                              </div>
+                              <span className={`${NEU_LABEL}`}>{attraction.title} Images</span>
+                            </div>
+                            <span className={NEU_MUTED}>
                               {visibleAttrImages(attraction.id).length + attrDraft.toAdd.length} total
                             </span>
                           </div>
 
+                          {/* Action bar */}
                           <div className="flex flex-wrap gap-2">
                             <input
                               type="file"
@@ -611,26 +565,21 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                               onChange={e => onSelectAttrFiles(attraction.id!, e.target.files)}
                             />
                             <label htmlFor={`attr-${attraction.id}`}>
-                              <Button variant="outline" size="sm" className="gap-2" asChild>
-                                <span>
-                                  <Upload className="h-4 w-4" />
-                                  Add Images
-                                </span>
-                              </Button>
+                              <span className={`${NEU_BTN_GHOST} inline-flex items-center gap-2 px-3 py-2 text-sm cursor-pointer`}>
+                                <Upload className="h-4 w-4" />
+                                Add Images
+                              </span>
                             </label>
-                            <Button
-                              size="sm"
-                              variant="destructive"
+                            <button
+                              className={`${NEU_BTN_DANGER} inline-flex items-center gap-2 px-3 py-2 text-sm`}
                               onClick={() => markRemoveAllAttr(attraction.id!)}
                               disabled={!visibleAttrImages(attraction.id).length}
-                              className="gap-2"
                             >
                               <Trash2 className="h-4 w-4" />
                               Remove All
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="ml-auto gap-2"
+                            </button>
+                            <button
+                              className={`${NEU_BTN_PRIMARY} inline-flex items-center gap-2 px-3 py-2 text-sm ml-auto`}
                               onClick={() => saveAttractionImages(attraction.id!, destination.id!)}
                               disabled={!hasAttrChanges(attraction.id) || attrSaving[attraction.id]}
                             >
@@ -640,7 +589,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                                 <Save className="h-4 w-4" />
                               )}
                               Save Changes
-                            </Button>
+                            </button>
                           </div>
 
                           {/* Draft previews */}
@@ -652,10 +601,10 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                                 exit={{ opacity: 0, height: 0 }}
                                 className="overflow-hidden"
                               >
-                                <div className="bg-purple-50 dark:bg-purple-950/30 rounded-lg p-3 space-y-2">
-                                  <div className="flex items-center gap-2 text-sm font-medium text-purple-700 dark:text-purple-400">
-                                    <Sparkles className="w-4 h-4" />
-                                    New Images to Upload
+                                <div className={`${NEU_SURFACE_INSET} rounded-xl p-4 space-y-3`}>
+                                  <div className="flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4 text-[#006666]" />
+                                    <span className={`${NEU_LABEL} text-[#006666]`}>New Images to Upload</span>
                                   </div>
                                   <motion.div
                                     variants={containerVariants}
@@ -668,14 +617,14 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                                         key={i}
                                         variants={itemVariants}
                                         layout
-                                        className="relative aspect-square rounded-lg overflow-hidden border-2 border-purple-200 dark:border-purple-800 shadow-sm group"
+                                        className="relative aspect-square rounded-xl overflow-hidden shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] border-2 border-[#006666]/20 group"
                                       >
-                                        <Image src={f.preview} alt="" fill className="object-cover" sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw" />
+                                        <Image src={f.preview} alt="" fill className="object-cover" sizes="(max-width: 768px) 50vw, 20vw" />
                                         <motion.button
                                           whileHover={{ scale: 1.1 }}
                                           whileTap={{ scale: 0.9 }}
                                           onClick={() => removeAttrDraftFile(attraction.id!, i)}
-                                          className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                          className="absolute top-1.5 right-1.5 bg-[#FF2157] hover:bg-[#e0001e] text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
                                           <X className="h-3 w-3" />
                                         </motion.button>
@@ -696,19 +645,19 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"
                             >
                               <AnimatePresence mode="popLayout">
-                                {visibleAttrImages(attraction.id).map((img) => (
+                                {visibleAttrImages(attraction.id).map(img => (
                                   <motion.div
                                     key={img.id}
                                     variants={itemVariants}
                                     layout
-                                    className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm group"
+                                    className="relative aspect-square rounded-xl overflow-hidden shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] group"
                                   >
-                                    <Image src={img.url} alt="" fill className="object-cover" sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw" />
+                                    <Image src={img.url} alt="" fill className="object-cover" sizes="(max-width: 768px) 50vw, 20vw" />
                                     <motion.button
                                       whileHover={{ scale: 1.1 }}
                                       whileTap={{ scale: 0.9 }}
                                       onClick={() => markAttrDelete(attraction.id!, img.id)}
-                                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                      className="absolute top-1.5 right-1.5 bg-[#FF2157] hover:bg-[#e0001e] text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
                                       <Trash2 className="h-3 w-3" />
                                     </motion.button>
@@ -719,10 +668,10 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
                           ) : (
                             <motion.div
                               variants={itemVariants}
-                              className="flex flex-col items-center justify-center py-8 bg-slate-50 dark:bg-slate-900/50 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700"
+                              className={`${NEU_SURFACE_INSET} rounded-xl flex flex-col items-center justify-center py-10 border-2 border-dashed border-[#1E2938]/10`}
                             >
-                              <ImageIcon className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-2" />
-                              <p className="text-sm text-slate-500 dark:text-slate-400">No images yet</p>
+                              <ImageIcon className="w-9 h-9 text-[#1E2938]/20 mb-2" />
+                              <p className={NEU_MUTED}>No images yet</p>
                             </motion.div>
                           )}
                         </motion.div>
@@ -734,7 +683,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
             );
           })}
         </Accordion>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
