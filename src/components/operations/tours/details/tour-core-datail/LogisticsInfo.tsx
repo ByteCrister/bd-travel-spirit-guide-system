@@ -1,12 +1,50 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TRANSPORT_MODE, TransportMode } from "@/constants/tour/tour.const";
 import { TourDetailDTO } from "@/types/tour/tour.types";
-import { AlertCircle, Bus, Car, CheckCircle, Home, Luggage, Navigation, Plane, Ship, Train, MapPin, Phone } from "lucide-react";
-import { motion } from "framer-motion";
-import { Separator } from "@/components/ui/separator";
+import {
+    AlertCircle,
+    Bus,
+    Car,
+    CheckCircle,
+    Home,
+    Luggage,
+    Navigation,
+    Plane,
+    Ship,
+    Train,
+    MapPin,
+} from "lucide-react";
+import { motion, HTMLMotionProps } from "framer-motion";
+
+// ─── Style Constants (Neumorphism Design System) ────────────────────────────
+
+const NEU = {
+    surface:   "bg-[#E7E5E4]",
+    card:      "bg-[#E7E5E4] rounded-2xl",
+    raised:    "shadow-[6px_6px_12px_#c8c6c4,-6px_-6px_12px_#ffffff] rounded-2xl",
+    inset:     "shadow-[inset_4px_4px_8px_#c8c6c4,inset_-4px_-4px_8px_#ffffff] rounded-xl",
+    insetSm:   "shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] rounded-lg",
+    pill:      "shadow-[3px_3px_6px_#c8c6c4,-3px_-3px_6px_#ffffff] rounded-full",
+    iconWrap:  "flex items-center justify-center w-10 h-10 rounded-xl bg-[#E7E5E4] shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff]",
+    label:     "text-xs font-mono font-semibold uppercase tracking-widest text-[#006666]",
+    heading:   "font-bold text-[#1E2938] font-[Space_Mono,monospace]",
+    muted:     "text-sm text-[#1E2938]/50 font-[Space_Mono,monospace]",
+    body:      "text-sm text-[#1E2938]/80 font-[Space_Mono,monospace]",
+    divider:   "border-t border-[#1E2938]/10 my-4",
+    accent:    "text-[#006666]",
+    required:  "bg-[#E7E5E4] border-l-4 border-[#00A63D] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] rounded-lg",
+    optional:  "bg-[#E7E5E4] border-l-4 border-[#FE9900] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] rounded-lg",
+} as const;
+
+// Fixed: proper easing type for Framer Motion
+const fadeUpProps = (delay = 0): HTMLMotionProps<"div"> => ({
+    initial: { opacity: 0, y: 18 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.45, ease: "easeOut", delay },
+});
+
+// ────────────────────────────────────────────────────────────────────────────
 
 interface LogisticsInfoProps {
     tour: TourDetailDTO;
@@ -14,184 +52,199 @@ interface LogisticsInfoProps {
 
 const LogisticsInfo = ({ tour }: LogisticsInfoProps) => {
     const getTransportIcon = (mode: TransportMode) => {
+        const cls = `h-4 w-4 ${NEU.accent}`;
         switch (mode) {
-            case TRANSPORT_MODE.BUS: return <Bus className="h-4 w-4" />
-            case TRANSPORT_MODE.TRAIN: return <Train className="h-4 w-4" />
-            case TRANSPORT_MODE.DOMESTIC_FLIGHT: return <Plane className="h-4 w-4" />
-            case TRANSPORT_MODE.BOAT: return <Ship className="h-4 w-4" />
-            case TRANSPORT_MODE.PRIVATE_CAR: return <Car className="h-4 w-4" />
-            case TRANSPORT_MODE.RIDE_SHARE: return <Car className="h-4 w-4" />
-            default: return <Navigation className="h-4 w-4" />
+            case TRANSPORT_MODE.BUS:             return <Bus className={cls} />;
+            case TRANSPORT_MODE.TRAIN:           return <Train className={cls} />;
+            case TRANSPORT_MODE.DOMESTIC_FLIGHT: return <Plane className={cls} />;
+            case TRANSPORT_MODE.BOAT:            return <Ship className={cls} />;
+            case TRANSPORT_MODE.PRIVATE_CAR:
+            case TRANSPORT_MODE.RIDE_SHARE:      return <Car className={cls} />;
+            default:                             return <Navigation className={cls} />;
         }
-    }
+    };
 
     return (
-        <Card className="border-2 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-transparent">
-                <CardTitle className="flex items-center gap-3 text-2xl">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                        <Navigation className="h-5 w-5 text-primary" />
+        <div className={`${NEU.card} ${NEU.raised} p-1`}>
+            {/* Header */}
+            <div className="flex items-center gap-4 px-6 pt-6 pb-4">
+                <div className={NEU.iconWrap}>
+                    <Navigation className={`h-5 w-5 ${NEU.accent}`} />
+                </div>
+                <div>
+                    <p className={NEU.label}>Tour Details</p>
+                    <h2 className={`${NEU.heading} text-xl mt-0.5`}>Logistics</h2>
+                </div>
+            </div>
+
+            <div className={`mx-4 ${NEU.divider}`} />
+
+            {/* Body */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 p-5">
+
+                {/* ── Main Location ────────────────────────── */}
+                <motion.div {...fadeUpProps(0)} className={`${NEU.inset} p-5 space-y-4`}>
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className={`${NEU.iconWrap} w-8 h-8`}>
+                            <Home className={`h-4 w-4 ${NEU.accent}`} />
+                        </div>
+                        <span className={NEU.label}>Main Location</span>
                     </div>
-                    Logistics
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Main Location */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4 }}
-                        className="space-y-4 p-5 bg-muted/30 rounded-xl border"
-                    >
-                        <div>
-                            <h4 className="font-bold text-lg mb-4 flex items-center gap-2">
-                                <Home className="h-5 w-5 text-primary" />
-                                Main Location
-                            </h4>
-                            {tour.mainLocation ? (
-                                <div className="space-y-3">
-                                    {tour.mainLocation.address && (
-                                        <div className="p-3 bg-background rounded-lg border">
-                                            <div className="font-semibold text-sm text-muted-foreground mb-2 flex items-center gap-1">
-                                                <MapPin className="h-3 w-3" />
-                                                Address:
-                                            </div>
-                                            <div className="text-sm space-y-1">
-                                                {tour.mainLocation.address.line1 && <div>{tour.mainLocation.address.line1}</div>}
-                                                {tour.mainLocation.address.line2 && <div>{tour.mainLocation.address.line2}</div>}
-                                                {tour.mainLocation.address.city && <div>{tour.mainLocation.address.city}</div>}
-                                                {tour.mainLocation.address.district && <div>{tour.mainLocation.address.district}</div>}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {tour.mainLocation.coordinates && (
-                                        <div className="p-3 bg-background rounded-lg border">
-                                            <div className="font-semibold text-sm text-muted-foreground mb-1">Coordinates:</div>
-                                            <div className="text-sm font-mono text-muted-foreground">
-                                                {tour.mainLocation.coordinates.lat.toFixed(6)}, {tour.mainLocation.coordinates.lng.toFixed(6)}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground p-3 bg-muted/50 rounded-lg">No main location specified</p>
-                            )}
-                        </div>
 
-                        {tour.meetingPoint && (
-                            <div className="pt-4 border-t">
-                                <h4 className="font-semibold mb-2 text-sm">Meeting Point</h4>
-                                <p className="text-sm text-muted-foreground p-3 bg-background rounded-lg border">{tour.meetingPoint}</p>
+                    {tour.mainLocation ? (
+                        <div className="space-y-3">
+                            {tour.mainLocation.address ? (
+                                <div className={`${NEU.insetSm} p-3`}>
+                                    <div className={`flex items-center gap-1 ${NEU.label} mb-2`}>
+                                        <MapPin className="h-3 w-3" />
+                                        Address
+                                    </div>
+                                    <div className={`${NEU.body} space-y-0.5`}>
+                                        {tour.mainLocation.address.line1 && <div>{tour.mainLocation.address.line1}</div>}
+                                        {tour.mainLocation.address.line2 && <div>{tour.mainLocation.address.line2}</div>}
+                                        {tour.mainLocation.address.city && <div>{tour.mainLocation.address.city}</div>}
+                                        {tour.mainLocation.address.district && <div>{tour.mainLocation.address.district}</div>}
+                                    </div>
+                                </div>
+                            ) : null}
+                            {tour.mainLocation.coordinates ? (
+                                <div className={`${NEU.insetSm} p-3`}>
+                                    <div className={`${NEU.label} mb-1`}>Coordinates</div>
+                                    <div className="text-xs font-mono text-[#1E2938]/60">
+                                        {tour.mainLocation.coordinates.lat.toFixed(6)},{" "}
+                                        {tour.mainLocation.coordinates.lng.toFixed(6)}
+                                    </div>
+                                </div>
+                            ) : null}
+                        </div>
+                    ) : (
+                        <p className={`${NEU.muted} ${NEU.insetSm} p-3`}>No main location specified</p>
+                    )}
+
+                    {tour.meetingPoint ? (
+                        <>
+                            <div className={NEU.divider} />
+                            <div>
+                                <p className={`${NEU.label} mb-2`}>Meeting Point</p>
+                                <p className={`${NEU.body} ${NEU.insetSm} p-3`}>{tour.meetingPoint}</p>
                             </div>
-                        )}
-                    </motion.div>
+                        </>
+                    ) : null}
+                </motion.div>
 
-                    {/* Transport & Pickup */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.1 }}
-                        className="space-y-4 p-5 bg-muted/30 rounded-xl border"
-                    >
-                        <div>
-                            <h4 className="font-bold text-lg mb-4">Transport Modes</h4>
-                            {tour.transportModes && tour.transportModes.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {tour.transportModes.map((mode, idx) => (
-                                        <Badge key={idx} variant="outline" className="flex items-center gap-1 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900">
-                                            {getTransportIcon(mode)}
-                                            {mode}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground p-3 bg-muted/50 rounded-lg">No transport modes specified</p>
-                            )}
+                {/* ── Transport & Pickup ───────────────────── */}
+                <motion.div {...fadeUpProps(0.1)} className={`${NEU.inset} p-5 space-y-4`}>
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className={`${NEU.iconWrap} w-8 h-8`}>
+                            <Navigation className={`h-4 w-4 ${NEU.accent}`} />
                         </div>
+                        <span className={NEU.label}>Transport Modes</span>
+                    </div>
 
-                        {tour.pickupOptions && tour.pickupOptions.length > 0 && (
-                            <div className="pt-4 border-t">
-                                <h4 className="font-semibold mb-3 text-sm">Pickup Options</h4>
+                    {tour.transportModes && tour.transportModes.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {tour.transportModes.map((mode, idx) => (
+                                <span
+                                    key={idx}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 ${NEU.pill} text-xs font-mono font-semibold text-[#1E2938]/70 bg-[#E7E5E4]`}
+                                >
+                                    {getTransportIcon(mode)}
+                                    {mode}
+                                </span>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className={`${NEU.muted} ${NEU.insetSm} p-3`}>No transport modes specified</p>
+                    )}
+
+                    {tour.pickupOptions && tour.pickupOptions.length > 0 ? (
+                        <>
+                            <div className={NEU.divider} />
+                            <div>
+                                <p className={`${NEU.label} mb-3`}>Pickup Options</p>
                                 <div className="space-y-2">
                                     {tour.pickupOptions.slice(0, 3).map((option, idx) => (
                                         <motion.div
                                             key={idx}
-                                            initial={{ opacity: 0, x: -10 }}
+                                            initial={{ opacity: 0, x: -8 }}
                                             animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.2 + idx * 0.05 }}
-                                            className="text-sm p-3 bg-background rounded-lg border hover:shadow-md transition-shadow"
+                                            transition={{ delay: 0.25 + idx * 0.06 }}
+                                            className={`${NEU.raised} p-3 flex items-center justify-between bg-[#E7E5E4]`}
                                         >
-                                            <div className="font-semibold flex items-center gap-2 mb-1">
-                                                <MapPin className="h-3 w-3 text-primary" />
-                                                {option.city}
+                                            <div className="flex items-center gap-2">
+                                                <MapPin className={`h-3.5 w-3.5 ${NEU.accent} flex-shrink-0`} />
+                                                <span className={`font-semibold text-sm text-[#1E2938] font-[Space_Mono,monospace]`}>
+                                                    {option.city}
+                                                </span>
                                             </div>
-                                            {option.price && (
-                                                <div className="text-muted-foreground text-xs">
+                                            {option.price ? (
+                                                <span className={`text-xs font-mono text-[#006666] font-bold`}>
                                                     {option.price} {option.currency}
-                                                </div>
-                                            )}
+                                                </span>
+                                            ) : null}
                                         </motion.div>
                                     ))}
-                                    {tour.pickupOptions.length > 3 && (
-                                        <div className="text-sm text-muted-foreground p-2 text-center bg-muted/50 rounded-lg">
+                                    {tour.pickupOptions.length > 3 ? (
+                                        <div className={`${NEU.insetSm} p-2 text-center ${NEU.muted}`}>
                                             +{tour.pickupOptions.length - 3} more options
                                         </div>
-                                    )}
+                                    ) : null}
                                 </div>
                             </div>
-                        )}
-                    </motion.div>
+                        </>
+                    ) : null}
+                </motion.div>
 
-                    {/* Packing List */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.2 }}
-                        className="space-y-4 p-5 bg-muted/30 rounded-xl border"
-                    >
-                        <h4 className="font-bold text-lg mb-4 flex items-center gap-2">
-                            <Luggage className="h-5 w-5 text-primary" />
-                            Packing List
-                        </h4>
-                        {tour.packingList && tour.packingList.length > 0 ? (
-                            <div className="space-y-2 max-h-96 overflow-y-auto">
-                                {tour.packingList.map((item, idx) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.3 + idx * 0.03 }}
-                                        className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
-                                            item.required 
-                                                ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900' 
-                                                : 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900'
-                                        }`}
-                                    >
-                                        <div className="flex items-center gap-2 flex-1">
-                                            {item.required ? (
-                                                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                                            ) : (
-                                                <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
-                                            )}
-                                            <span className={`text-sm ${item.required ? "font-semibold" : ""}`}>{item.item}</span>
-                                        </div>
-                                        {item.notes && (
-                                            <Badge variant="outline" className="text-xs ml-2">
-                                                Note
-                                            </Badge>
+                {/* ── Packing List ─────────────────────────── */}
+                <motion.div {...fadeUpProps(0.2)} className={`${NEU.inset} p-5 space-y-4`}>
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className={`${NEU.iconWrap} w-8 h-8`}>
+                            <Luggage className={`h-4 w-4 ${NEU.accent}`} />
+                        </div>
+                        <span className={NEU.label}>Packing List</span>
+                    </div>
+
+                    {tour.packingList && tour.packingList.length > 0 ? (
+                        <div className="space-y-2 max-h-[26rem] overflow-y-auto pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#006666]/30">
+                            {tour.packingList.map((item, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    initial={{ opacity: 0, x: -8 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3 + idx * 0.04 }}
+                                    className={`flex items-center justify-between px-3 py-2.5 ${
+                                        item.required ? NEU.required : NEU.optional
+                                    }`}
+                                >
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                        {item.required ? (
+                                            <CheckCircle className="h-4 w-4 text-[#00A63D] flex-shrink-0" />
+                                        ) : (
+                                            <AlertCircle className="h-4 w-4 text-[#FE9900] flex-shrink-0" />
                                         )}
-                                    </motion.div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-sm text-muted-foreground p-3 bg-muted/50 rounded-lg">No packing list provided</p>
-                        )}
-                    </motion.div>
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
+                                        <span
+                                            className={`text-sm truncate font-[Space_Mono,monospace] ${
+                                                item.required ? "font-semibold text-[#1E2938]" : "text-[#1E2938]/70"
+                                            }`}
+                                        >
+                                            {item.item}
+                                        </span>
+                                    </div>
+                                    {item.notes ? (
+                                        <span className="ml-2 text-[10px] font-mono font-bold uppercase tracking-wider text-[#006666] bg-[#006666]/10 px-2 py-0.5 rounded-full flex-shrink-0">
+                                            Note
+                                        </span>
+                                    ) : null}
+                                </motion.div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className={`${NEU.muted} ${NEU.insetSm} p-3`}>No packing list provided</p>
+                    )}
+                </motion.div>
+            </div>
+        </div>
+    );
+};
 
 export default LogisticsInfo;

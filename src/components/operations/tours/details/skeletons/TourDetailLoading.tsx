@@ -1,660 +1,440 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 
+// ─────────────────────────────────────────────────────────────
+// Neumorphism skeleton tokens
+// ─────────────────────────────────────────────────────────────
+const NEU_PAGE_BG = "min-h-screen bg-[#E7E5E4]";
+const NEU_CARD = "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+const NEU_CARD_HDR = "px-6 py-4 rounded-t-2xl shadow-[inset_0_-1px_0_#c8c6c5]";
+const NEU_INSET_SM = "bg-[#E7E5E4] rounded-xl shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+const NEU_RAISED_SM = "bg-[#E7E5E4] rounded-xl shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+
+// Skeleton pulse on the neu surface
+const SK_BASE = "animate-pulse rounded-lg bg-[#d0cecd]";          // neutral
+const SK_TEAL = "animate-pulse rounded-lg bg-[#006666]/15";        // primary accent
+const SK_WARM = "animate-pulse rounded-lg bg-[#FE9900]/15";        // warning accent
+const SK_GREEN = "animate-pulse rounded-lg bg-[#00A63D]/15";        // success accent
+const SK_MUTED = "animate-pulse rounded-lg bg-[#1E2938]/10";        // muted
+
+// ─────────────────────────────────────────────────────────────
+// Tiny helper so JSX stays readable
+// ─────────────────────────────────────────────────────────────
+function Sk({ h, w, cls = SK_BASE }: { h: string; w: string; cls?: string }) {
+    return <div className={`${cls} ${h} ${w}`} />;
+}
+
+// Inset row (mirrors NEU_ROW in the real component)
+function SkRow({ wLeft = "w-24", wRight = "w-20", cls = SK_BASE }: { wLeft?: string; wRight?: string; cls?: string }) {
+    return (
+        <div className={`${NEU_INSET_SM} flex justify-between items-center p-3`}>
+            <Sk h="h-4" w={wLeft} />
+            <Sk h="h-4" w={wRight} cls={cls} />
+        </div>
+    );
+}
+
+// Section card shell
+function SkCard({ children, headerW = "w-48" }: { children: React.ReactNode; headerW?: string }) {
+    return (
+        <div className={NEU_CARD}>
+            <div className={NEU_CARD_HDR}>
+                <div className="flex items-center gap-3">
+                    <div className={`${NEU_RAISED_SM} p-2 w-9 h-9`} />
+                    <Sk h="h-5" w={headerW} cls={SK_TEAL} />
+                </div>
+            </div>
+            <div className="px-6 py-5">{children}</div>
+        </div>
+    );
+}
+
+// ─────────────────────────────────────────────────────────────
 interface TourDetailLoadingProps {
     showFullLayout?: boolean;
 }
 
 export default function TourDetailLoading({ showFullLayout = true }: TourDetailLoadingProps) {
-    // Primary and accent colors for better contrast
-    const primaryBg = "bg-blue-400/20";
-    const accentBg = "bg-purple-400/20";
-    const secondaryBg = "bg-green-400/15";
-    const highlightBg = "bg-amber-400/20";
-    const neutralBg = "bg-gray-300/30";
-
     return (
-        <div className="container mx-auto p-6 max-w-7xl">
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="space-y-8"
-            >
-                {/* Header skeleton */}
-                <div className="flex items-center justify-between mb-8 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-                    <div className="flex items-center gap-4">
-                        <Skeleton className={`h-10 w-10 rounded-lg ${primaryBg}`} />
-                        <div>
-                            <Skeleton className={`h-8 w-64 rounded-lg mb-2 ${accentBg}`} />
-                            <Skeleton className={`h-4 w-32 rounded-lg ${secondaryBg}`} />
+        <div className={`${NEU_PAGE_BG} p-4 sm:p-6`}>
+            <div className="container mx-auto max-w-7xl">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-8"
+                >
+                    {/* ── Page header ──────────────────────────── */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            {/* back button well */}
+                            <div className={`${NEU_RAISED_SM} w-10 h-10`} />
+                            <div className="space-y-2">
+                                <Sk h="h-7" w="w-48 sm:w-64" cls={SK_TEAL} />
+                                <Sk h="h-4" w="w-32" />
+                            </div>
+                        </div>
+                        {/* action buttons */}
+                        <div className="flex gap-2">
+                            <div className={`${NEU_RAISED_SM} h-10 w-24`} />
+                            <div className={`${NEU_RAISED_SM} h-10 w-24`} />
                         </div>
                     </div>
-                    <Skeleton className={`h-10 w-24 rounded-lg ${highlightBg}`} />
-                </div>
 
-                {/* TourBasicInfo skeleton */}
-                <Card className="border-2 shadow-lg">
-                    <CardHeader className="bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-gray-900/50 dark:to-gray-800/50">
-                        <div className="flex justify-between items-start">
-                            <div className="space-y-2 flex-1">
-                                <div className="flex items-center gap-2">
-                                    <Skeleton className={`h-7 w-3/4 rounded-lg ${primaryBg}`} />
-                                    <Skeleton className={`h-5 w-16 rounded-full ${highlightBg}`} />
+                    {/* ── TourBasicInfo skeleton ────────────────── */}
+                    <SkCard headerW="w-72">
+                        {/* title + badges */}
+                        <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <Sk h="h-6" w="w-3/4" cls={SK_TEAL} />
+                                    <Sk h="h-5" w="w-16" cls={SK_WARM} />
                                 </div>
-                                <Skeleton className={`h-4 w-full rounded-lg ${neutralBg}`} />
-                                <Skeleton className={`h-4 w-2/3 rounded-lg ${neutralBg}`} />
+                                <Sk h="h-4" w="w-full" />
+                                <Sk h="h-4" w="w-2/3" />
                             </div>
-                            <div className="flex gap-2">
-                                <Skeleton className={`h-6 w-20 rounded-full ${accentBg}`} />
-                                <Skeleton className={`h-6 w-24 rounded-full ${secondaryBg}`} />
-                                <Skeleton className={`h-6 w-16 rounded-full ${primaryBg}`} />
+                            <div className="flex gap-2 flex-wrap">
+                                <Sk h="h-6" w="w-20" cls={SK_TEAL} />
+                                <Sk h="h-6" w="w-20" cls={SK_GREEN} />
                             </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        {/* Hero image skeleton */}
-                        <div className="space-y-2 mb-6">
-                            <Skeleton className={`h-4 w-24 rounded-lg ${neutralBg}`} />
-                            <Skeleton className={`w-full h-64 rounded-xl ${primaryBg}`} />
                         </div>
 
-                        {/* Gallery skeleton */}
-                        <div className="space-y-2 mb-8">
-                            <div className="flex items-center justify-between">
-                                <Skeleton className={`h-4 w-40 rounded-lg ${accentBg}`} />
-                                <Skeleton className={`h-5 w-12 rounded-full ${secondaryBg}`} />
+                        {/* hero image */}
+                        <div className="space-y-2 mb-6">
+                            <Sk h="h-4" w="w-24" />
+                            <div className={`${NEU_INSET_SM} w-full h-56 sm:h-64`} />
+                        </div>
+
+                        {/* gallery */}
+                        <div className="space-y-2 mb-6">
+                            <div className="flex justify-between">
+                                <Sk h="h-4" w="w-40" />
+                                <Sk h="h-5" w="w-12" cls={SK_GREEN} />
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <Skeleton key={i} className={`aspect-square rounded-lg ${
-                                        i % 2 === 0 ? accentBg : primaryBg
-                                    }`} />
+                                {[0, 1, 2, 3].map((i) => (
+                                    <div key={i} className={`${NEU_INSET_SM} aspect-square`} />
                                 ))}
                             </div>
                         </div>
 
-                        {/* Info grid skeleton */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="space-y-3 p-4 rounded-lg bg-gradient-to-br from-blue-50/30 to-purple-50/30">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <Skeleton className={`h-4 w-4 rounded-full ${highlightBg}`} />
-                                    <Skeleton className={`h-4 w-32 rounded-lg ${accentBg}`} />
-                                </div>
-                                {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center gap-2">
-                                        <Skeleton className={`h-4 w-4 rounded-full ${
-                                            i === 1 ? primaryBg : i === 2 ? secondaryBg : highlightBg
-                                        }`} />
-                                        <Skeleton className={`h-4 w-16 rounded-lg ${neutralBg}`} />
-                                        <Skeleton className={`h-4 w-24 rounded-lg ml-auto ${
-                                            i === 1 ? accentBg : i === 2 ? primaryBg : secondaryBg
-                                        }`} />
+                        {/* info grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {[SK_TEAL, SK_GREEN, SK_WARM].map((accent, col) => (
+                                <div key={col} className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-4 w-4 rounded-full animate-pulse bg-[#1E2938]/10" />
+                                        <Sk h="h-4" w="w-28" cls={accent} />
                                     </div>
+                                    {[0, 1, 2].map((r) => (
+                                        <div key={r} className="flex items-center gap-2">
+                                            <Sk h="h-3" w="w-3" />
+                                            <Sk h="h-4" w="w-16" />
+                                            <Sk h="h-4" w="w-20 ml-auto" cls={accent} />
+                                        </div>
+                                    ))}
+                                    <div className="flex gap-1 flex-wrap pt-2">
+                                        {[0, 1, 2].map((b) => (
+                                            <Sk key={b} h="h-5" w="w-12" cls={b === 0 ? SK_TEAL : b === 1 ? SK_GREEN : SK_WARM} />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </SkCard>
+
+                    {showFullLayout && (
+                        <>
+                            {/* ── Tabs bar skeleton ─────────────── */}
+                            <div className={`${NEU_INSET_SM} p-1.5 flex flex-wrap gap-1`}>
+                                {[0, 1, 2, 3, 4, 5].map((i) => (
+                                    <div key={i} className={`${NEU_RAISED_SM} flex-1 min-w-[80px] h-10`} />
                                 ))}
-                                <div className="flex gap-1 flex-wrap pt-3">
-                                    {[1, 2, 3].map((i) => (
-                                        <Skeleton key={i} className={`h-5 w-12 rounded-full ${
-                                            i === 1 ? primaryBg : i === 2 ? accentBg : secondaryBg
-                                        }`} />
+                            </div>
+
+                            {/* ── BangladeshInfo skeleton ───────── */}
+                            <SkCard headerW="w-64">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {[0, 1].map((col) => (
+                                        <div key={col} className="space-y-4">
+                                            <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                                <Sk h="h-5" w="w-32" cls={col === 0 ? SK_TEAL : SK_WARM} />
+                                                <SkRow wRight="w-32" cls={col === 0 ? SK_TEAL : SK_WARM} />
+                                                <SkRow wRight="w-28" />
+                                            </div>
+                                            <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                                <Sk h="h-5" w="w-40" cls={SK_GREEN} />
+                                                <SkRow wRight="w-24" cls={SK_WARM} />
+                                                <div className={`${NEU_RAISED_SM} p-3 space-y-2`}>
+                                                    <Sk h="h-4" w="w-24" />
+                                                    <div className="flex gap-2 flex-wrap">
+                                                        {[0, 1, 2].map((b) => (
+                                                            <Sk key={b} h="h-5" w="w-16" cls={b === 0 ? SK_TEAL : b === 1 ? SK_GREEN : SK_WARM} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
-                            </div>
+                            </SkCard>
 
-                            <div className="space-y-3 p-4 rounded-lg bg-gradient-to-br from-green-50/30 to-cyan-50/30">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <Skeleton className={`h-4 w-4 rounded-full ${highlightBg}`} />
-                                    <Skeleton className={`h-4 w-32 rounded-lg ${secondaryBg}`} />
+                            {/* ── InclusionsExclusions skeleton ─── */}
+                            <SkCard headerW="w-72">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* inclusions */}
+                                    <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                        <div className="flex items-center gap-2">
+                                            <Sk h="h-5" w="w-5" cls={SK_GREEN} />
+                                            <Sk h="h-5" w="w-24" cls={SK_GREEN} />
+                                        </div>
+                                        {[0, 1, 2, 3].map((r) => (
+                                            <div key={r} className={`${NEU_RAISED_SM} flex items-start gap-3 p-3`}>
+                                                <Sk h="h-5" w="w-5" cls={SK_GREEN} />
+                                                <div className="flex-1 space-y-1.5">
+                                                    <Sk h="h-4" w="w-3/4" />
+                                                    <Sk h="h-3" w="w-full" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* exclusions */}
+                                    <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                        <div className="flex items-center gap-2">
+                                            <Sk h="h-5" w="w-5" cls={SK_MUTED} />
+                                            <Sk h="h-5" w="w-24" cls={SK_WARM} />
+                                        </div>
+                                        {[0, 1, 2].map((r) => (
+                                            <div key={r} className={`${NEU_RAISED_SM} flex items-start gap-3 p-3`}>
+                                                <Sk h="h-5" w="w-5" cls={SK_WARM} />
+                                                <div className="flex-1 space-y-1.5">
+                                                    <Sk h="h-4" w="w-3/4" />
+                                                    <Sk h="h-3" w="w-full" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                                {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center gap-2">
-                                        <Skeleton className={`h-4 w-4 rounded-full ${
-                                            i === 1 ? secondaryBg : i === 2 ? primaryBg : accentBg
-                                        }`} />
-                                        <Skeleton className={`h-4 w-16 rounded-lg ${neutralBg}`} />
-                                        <Skeleton className={`h-4 w-24 rounded-lg ml-auto ${
-                                            i === 1 ? secondaryBg : i === 2 ? primaryBg : highlightBg
-                                        }`} />
-                                    </div>
-                                ))}
-                            </div>
+                            </SkCard>
 
-                            <div className="space-y-3 p-4 rounded-lg bg-gradient-to-br from-amber-50/30 to-orange-50/30">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <Skeleton className={`h-4 w-4 rounded-full ${highlightBg}`} />
-                                    <Skeleton className={`h-4 w-32 rounded-lg ${accentBg}`} />
+                            {/* ── PricingInfo skeleton ──────────── */}
+                            <SkCard headerW="w-48">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {/* base price */}
+                                    <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                        <Sk h="h-5" w="w-32" cls={SK_WARM} />
+                                        <Sk h="h-8" w="w-40" cls={SK_TEAL} />
+                                        <Sk h="h-4" w="w-24" />
+                                        <div className="flex gap-2">
+                                            <Sk h="h-6" w="w-16" cls={SK_GREEN} />
+                                            <Sk h="h-6" w="w-16" cls={SK_TEAL} />
+                                        </div>
+                                    </div>
+                                    {/* tier pricing */}
+                                    <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                        <Sk h="h-5" w="w-32" cls={SK_GREEN} />
+                                        {[0, 1].map((r) => (
+                                            <div key={r} className={`${NEU_RAISED_SM} flex justify-between p-3`}>
+                                                <div className="space-y-1 flex-1">
+                                                    <Sk h="h-4" w="w-24" />
+                                                    <Sk h="h-3" w="w-20" />
+                                                </div>
+                                                <Sk h="h-5" w="w-12" cls={r === 0 ? SK_WARM : SK_TEAL} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* discounts */}
+                                    <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                        <Sk h="h-5" w="w-40" cls={SK_TEAL} />
+                                        <div className="flex flex-wrap gap-2">
+                                            {[0, 1, 2].map((b) => (
+                                                <Sk key={b} h="h-5" w="w-16" cls={b === 0 ? SK_TEAL : b === 1 ? SK_GREEN : SK_WARM} />
+                                            ))}
+                                        </div>
+                                        <Sk h="h-4" w="w-32" />
+                                        {[0, 1].map((r) => (
+                                            <div key={r} className={`${NEU_RAISED_SM} p-3 space-y-1`}>
+                                                <Sk h="h-4" w="w-20" />
+                                                <Sk h="h-3" w="w-16" cls={SK_TEAL} />
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div key={i} className="flex items-center gap-2">
-                                        <Skeleton className={`h-4 w-4 rounded-full ${
-                                            i === 1 ? highlightBg : i === 2 ? accentBg : i === 3 ? primaryBg : secondaryBg
-                                        }`} />
-                                        <Skeleton className={`h-4 w-16 rounded-lg ${neutralBg}`} />
-                                        <Skeleton className={`h-4 w-12 rounded-lg ml-auto ${
-                                            i === 1 ? highlightBg : i === 2 ? accentBg : i === 3 ? secondaryBg : primaryBg
-                                        }`} />
+                            </SkCard>
+
+                            {/* ── LogisticsInfo skeleton ────────── */}
+                            <SkCard headerW="w-36">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {/* transport */}
+                                    <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                        <Sk h="h-5" w="w-36" cls={SK_TEAL} />
+                                        <div className={`${NEU_RAISED_SM} p-3 space-y-2`}>
+                                            <Sk h="h-4" w="w-16" />
+                                            <Sk h="h-3" w="w-full" />
+                                            <Sk h="h-3" w="w-3/4" />
+                                        </div>
+                                        <div className={`${NEU_RAISED_SM} p-3 space-y-1`}>
+                                            <Sk h="h-4" w="w-28" />
+                                            <Sk h="h-3" w="w-40" />
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {showFullLayout && (
-                    <>
-                        {/* Tabs skeleton */}
-                        <div className="w-full space-y-6">
-                            <div className="grid grid-cols-3 md:grid-cols-6 gap-2 p-1 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-                                {[1, 2, 3, 4, 5, 6].map((i) => (
-                                    <Skeleton key={i} className={`h-10 rounded-lg ${
-                                        i % 2 === 0 ? primaryBg : i % 3 === 0 ? secondaryBg : accentBg
-                                    }`} />
-                                ))}
-                            </div>
-
-                            {/* Tab content skeleton - Overview tab (first tab) */}
-                            <div className="space-y-6">
-                                {/* BangladeshInfo skeleton */}
-                                <Card className="border-2">
-                                    <CardHeader className="bg-gradient-to-r from-blue-100/30 to-purple-100/30">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className={`h-10 w-10 rounded-lg ${primaryBg}`} />
-                                            <Skeleton className={`h-6 w-64 rounded-lg ${accentBg}`} />
+                                    {/* accommodation */}
+                                    <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                        <Sk h="h-5" w="w-36" cls={SK_GREEN} />
+                                        <div className="flex flex-wrap gap-2">
+                                            {[0, 1, 2, 3].map((b) => (
+                                                <Sk key={b} h="h-5" w="w-16" cls={b % 2 === 0 ? SK_TEAL : SK_WARM} />
+                                            ))}
                                         </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-4">
-                                                <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-blue-50/50 to-purple-50/50">
-                                                    <Skeleton className={`h-5 w-32 rounded-lg ${primaryBg}`} />
-                                                    <div className="space-y-3">
-                                                        <div className="flex justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <Skeleton className={`h-4 w-20 rounded-lg ${neutralBg}`} />
-                                                            <Skeleton className={`h-4 w-32 rounded-lg ${accentBg}`} />
-                                                        </div>
-                                                        <div className="flex justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <Skeleton className={`h-4 w-20 rounded-lg ${neutralBg}`} />
-                                                            <Skeleton className={`h-4 w-32 rounded-lg ${secondaryBg}`} />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-green-50/50 to-cyan-50/50">
-                                                    <Skeleton className={`h-5 w-48 rounded-lg ${secondaryBg}`} />
-                                                    <div className="space-y-3">
-                                                        <div className="flex justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <Skeleton className={`h-4 w-24 rounded-lg ${neutralBg}`} />
-                                                            <Skeleton className={`h-5 w-24 rounded-full ${highlightBg}`} />
-                                                        </div>
-                                                        <div className="p-3 space-y-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <Skeleton className={`h-4 w-20 rounded-lg ${neutralBg}`} />
-                                                            <div className="flex gap-2">
-                                                                {[1, 2, 3].map((i) => (
-                                                                    <Skeleton key={i} className={`h-5 w-16 rounded-full ${
-                                                                        i === 1 ? primaryBg : i === 2 ? secondaryBg : accentBg
-                                                                    }`} />
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        {[0, 1, 2].map((r) => (
+                                            <div key={r} className={`${NEU_RAISED_SM} p-3 space-y-1`}>
+                                                <Sk h="h-4" w="w-20" />
+                                                <Sk h="h-3" w="w-12" cls={SK_GREEN} />
                                             </div>
-
-                                            <div className="space-y-4">
-                                                <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-amber-50/50 to-orange-50/50">
-                                                    <Skeleton className={`h-5 w-32 rounded-lg ${highlightBg}`} />
-                                                    <div className="space-y-3">
-                                                        {[1, 2].map((i) => (
-                                                            <div key={i} className="flex items-center gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                                <Skeleton className={`h-5 w-5 rounded-full ${
-                                                                    i === 1 ? primaryBg : secondaryBg
-                                                                }`} />
-                                                                <Skeleton className={`h-4 w-32 rounded-lg ${neutralBg}`} />
-                                                            </div>
-                                                        ))}
-                                                        <div className="space-y-2">
-                                                            <Skeleton className={`h-4 w-40 rounded-lg ${neutralBg}`} />
-                                                            <div className="flex gap-2">
-                                                                {[1, 2].map((i) => (
-                                                                    <Skeleton key={i} className={`h-5 w-16 rounded-full ${
-                                                                        i === 1 ? accentBg : primaryBg
-                                                                    }`} />
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/50">
-                                                    <Skeleton className={`h-5 w-48 rounded-lg ${accentBg}`} />
-                                                    <div className="space-y-3">
-                                                        {[1, 2, 3].map((i) => (
-                                                            <div key={i} className="flex justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                                <Skeleton className={`h-4 w-24 rounded-lg ${neutralBg}`} />
-                                                                <Skeleton className={`h-4 w-20 rounded-lg ${
-                                                                    i === 1 ? highlightBg : i === 2 ? secondaryBg : primaryBg
-                                                                }`} />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* stops */}
+                                    <div className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                        <div className="flex items-center gap-2">
+                                            <Sk h="h-5" w="w-5" cls={SK_GREEN} />
+                                            <Sk h="h-5" w="w-28" />
                                         </div>
-                                    </CardContent>
-                                </Card>
-
-                                {/* InclusionsExclusions skeleton */}
-                                <Card className="border-2">
-                                    <CardHeader className="bg-gradient-to-r from-green-100/30 to-cyan-100/30">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className={`h-10 w-10 rounded-lg ${secondaryBg}`} />
-                                            <Skeleton className={`h-6 w-72 rounded-lg ${accentBg}`} />
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-green-50/50 to-emerald-50/50">
-                                                <div className="flex items-center gap-2">
-                                                    <Skeleton className={`h-5 w-5 rounded-full ${primaryBg}`} />
-                                                    <Skeleton className={`h-5 w-24 rounded-lg ${secondaryBg}`} />
+                                        {[0, 1, 2, 3, 4].map((r) => (
+                                            <div key={r} className={`${NEU_RAISED_SM} flex items-center justify-between p-3`}>
+                                                <div className="flex items-center gap-2 flex-1">
+                                                    <Sk h="h-4" w="w-4" cls={r % 2 === 0 ? SK_TEAL : SK_GREEN} />
+                                                    <Sk h="h-4" w="w-32" />
                                                 </div>
-                                                <div className="space-y-3">
-                                                    {[1, 2, 3, 4].map((i) => (
-                                                        <div key={i} className="flex items-start gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <Skeleton className={`h-5 w-5 rounded-full mt-0.5 ${
-                                                                i % 2 === 0 ? secondaryBg : primaryBg
-                                                            }`} />
-                                                            <div className="flex-1 space-y-2">
-                                                                <Skeleton className={`h-4 w-3/4 rounded-lg ${neutralBg}`} />
-                                                                <Skeleton className={`h-3 w-full rounded-lg ${neutralBg}`} />
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                                                <Sk h="h-4" w="w-8" cls={SK_WARM} />
                                             </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </SkCard>
 
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-rose-50/50 to-red-50/50">
-                                                <div className="flex items-center gap-2">
-                                                    <Skeleton className={`h-5 w-5 rounded-full ${accentBg}`} />
-                                                    <Skeleton className={`h-5 w-24 rounded-lg ${highlightBg}`} />
+                            {/* ── ComplianceInfo skeleton ───────── */}
+                            <SkCard headerW="w-64">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {[SK_TEAL, SK_WARM, SK_GREEN].map((accent, col) => (
+                                        <div key={col} className={`${NEU_INSET_SM} p-4 space-y-3`}>
+                                            <Sk h="h-5" w="w-36" cls={accent} />
+                                            {[0, 1, 2].map((r) => (
+                                                <div key={r} className={`${NEU_RAISED_SM} flex justify-between items-center p-3`}>
+                                                    <Sk h="h-4" w="w-28" />
+                                                    <Sk h="h-5" w="w-16" cls={accent} />
                                                 </div>
-                                                <div className="space-y-3">
-                                                    {[1, 2, 3].map((i) => (
-                                                        <div key={i} className="flex items-start gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <Skeleton className={`h-5 w-5 rounded-full mt-0.5 ${
-                                                                i === 1 ? accentBg : i === 2 ? highlightBg : primaryBg
-                                                            }`} />
-                                                            <div className="flex-1 space-y-2">
-                                                                <Skeleton className={`h-4 w-3/4 rounded-lg ${neutralBg}`} />
-                                                                <Skeleton className={`h-3 w-full rounded-lg ${neutralBg}`} />
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                {/* PricingInfo skeleton */}
-                                <Card className="border-2">
-                                    <CardHeader className="bg-gradient-to-r from-amber-100/30 to-orange-100/30">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className={`h-10 w-10 rounded-lg ${highlightBg}`} />
-                                            <Skeleton className={`h-6 w-48 rounded-lg ${accentBg}`} />
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-amber-50/50 to-yellow-50/50">
-                                                <div className="space-y-2">
-                                                    <Skeleton className={`h-5 w-32 rounded-lg ${highlightBg}`} />
-                                                    <Skeleton className={`h-8 w-40 rounded-lg ${primaryBg}`} />
-                                                </div>
-                                                <div className="pt-4 space-y-2">
-                                                    <Skeleton className={`h-4 w-24 rounded-lg ${neutralBg}`} />
-                                                    <div className="flex gap-2">
-                                                        <Skeleton className={`h-6 w-16 rounded-full ${secondaryBg}`} />
-                                                        <Skeleton className={`h-6 w-16 rounded-full ${accentBg}`} />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-emerald-50/50 to-teal-50/50">
-                                                <Skeleton className={`h-5 w-32 rounded-lg ${secondaryBg}`} />
-                                                <div className="space-y-3">
-                                                    {[1, 2].map((i) => (
-                                                        <div key={i} className="flex justify-between p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <div className="space-y-1 flex-1">
-                                                                <Skeleton className={`h-4 w-24 rounded-lg ${neutralBg}`} />
-                                                                <Skeleton className={`h-3 w-20 rounded-lg ${neutralBg}`} />
-                                                            </div>
-                                                            <Skeleton className={`h-5 w-12 rounded-full ${
-                                                                i === 1 ? highlightBg : primaryBg
-                                                            }`} />
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/50">
-                                                <div className="space-y-2">
-                                                    <Skeleton className={`h-5 w-40 rounded-lg ${primaryBg}`} />
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {[1, 2, 3].map((i) => (
-                                                            <Skeleton key={i} className={`h-5 w-16 rounded-full ${
-                                                                i === 1 ? accentBg : i === 2 ? secondaryBg : highlightBg
-                                                            }`} />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <div className="pt-4 space-y-2">
-                                                    <Skeleton className={`h-4 w-32 rounded-lg ${neutralBg}`} />
-                                                    <div className="space-y-2">
-                                                        <div className="flex justify-between p-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <Skeleton className={`h-3 w-20 rounded-lg ${neutralBg}`} />
-                                                            <Skeleton className={`h-5 w-12 rounded-full ${accentBg}`} />
-                                                        </div>
-                                                        <div className="flex justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <Skeleton className={`h-3 w-28 rounded-lg ${neutralBg}`} />
-                                                            <Skeleton className={`h-4 w-24 rounded-lg ${secondaryBg}`} />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                {/* LogisticsInfo skeleton */}
-                                <Card className="border-2">
-                                    <CardHeader className="bg-gradient-to-r from-cyan-100/30 to-blue-100/30">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className={`h-10 w-10 rounded-lg ${primaryBg}`} />
-                                            <Skeleton className={`h-6 w-32 rounded-lg ${accentBg}`} />
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-blue-50/50 to-indigo-50/50">
-                                                <Skeleton className={`h-5 w-36 rounded-lg ${primaryBg}`} />
-                                                <div className="space-y-3">
-                                                    <div className="p-3 space-y-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                        <Skeleton className={`h-4 w-16 rounded-lg ${neutralBg}`} />
-                                                        <Skeleton className={`h-3 w-full rounded-lg ${neutralBg}`} />
-                                                        <Skeleton className={`h-3 w-3/4 rounded-lg ${neutralBg}`} />
-                                                    </div>
-                                                    <div className="p-3 space-y-1 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                        <Skeleton className={`h-4 w-28 rounded-lg ${neutralBg}`} />
-                                                        <Skeleton className={`h-3 w-40 rounded-lg ${neutralBg}`} />
-                                                    </div>
-                                                </div>
-                                                <div className="pt-4 space-y-2">
-                                                    <Skeleton className={`h-4 w-28 rounded-lg ${neutralBg}`} />
-                                                    <Skeleton className={`h-3 w-full rounded-lg ${neutralBg}`} />
-                                                </div>
-                                            </div>
-
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/50">
-                                                <div className="space-y-2">
-                                                    <Skeleton className={`h-5 w-36 rounded-lg ${accentBg}`} />
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {[1, 2, 3, 4].map((i) => (
-                                                            <Skeleton key={i} className={`h-5 w-16 rounded-full ${
-                                                                i === 1 ? primaryBg : i === 2 ? accentBg : i === 3 ? secondaryBg : highlightBg
-                                                            }`} />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <div className="pt-4 space-y-2">
-                                                    <Skeleton className={`h-4 w-32 rounded-lg ${neutralBg}`} />
-                                                    <div className="space-y-2">
-                                                        {[1, 2, 3].map((i) => (
-                                                            <div key={i} className="p-3 space-y-1 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                                <Skeleton className={`h-4 w-16 rounded-lg ${neutralBg}`} />
-                                                                <Skeleton className={`h-3 w-12 rounded-lg ${
-                                                                    i === 1 ? secondaryBg : i === 2 ? highlightBg : accentBg
-                                                                }`} />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-green-50/50 to-emerald-50/50">
-                                                <div className="flex items-center gap-2">
-                                                    <Skeleton className={`h-5 w-5 rounded-full ${secondaryBg}`} />
-                                                    <Skeleton className={`h-5 w-28 rounded-lg ${primaryBg}`} />
-                                                </div>
-                                                <div className="space-y-2 max-h-96 overflow-y-auto">
-                                                    {[1, 2, 3, 4, 5].map((i) => (
-                                                        <div key={i} className="flex items-center justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <div className="flex items-center gap-2 flex-1">
-                                                                <Skeleton className={`h-4 w-4 rounded-full ${
-                                                                    i % 2 === 0 ? primaryBg : secondaryBg
-                                                                }`} />
-                                                                <Skeleton className={`h-4 w-32 rounded-lg ${neutralBg}`} />
-                                                            </div>
-                                                            <Skeleton className={`h-4 w-8 rounded-full ${
-                                                                i % 3 === 0 ? highlightBg : i % 2 === 0 ? accentBg : primaryBg
-                                                            }`} />
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                {/* ComplianceInfo skeleton */}
-                                <Card className="border-2">
-                                    <CardHeader className="bg-gradient-to-r from-emerald-100/30 to-teal-100/30">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className={`h-10 w-10 rounded-lg ${secondaryBg}`} />
-                                            <Skeleton className={`h-6 w-64 rounded-lg ${accentBg}`} />
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-cyan-50/50 to-blue-50/50">
-                                                <div className="space-y-2">
-                                                    <Skeleton className={`h-5 w-40 rounded-lg ${primaryBg}`} />
-                                                    <div className="space-y-3">
-                                                        {[1, 2, 3].map((i) => (
-                                                            <div key={i} className="flex justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                                <Skeleton className={`h-4 w-28 rounded-lg ${neutralBg}`} />
-                                                                <Skeleton className={`h-5 w-16 rounded-full ${
-                                                                    i === 1 ? secondaryBg : i === 2 ? highlightBg : accentBg
-                                                                }`} />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <div className="pt-4 space-y-2">
-                                                    <Skeleton className={`h-4 w-28 rounded-lg ${neutralBg}`} />
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {[1, 2, 3].map((i) => (
-                                                            <Skeleton key={i} className={`h-5 w-16 rounded-full ${
-                                                                i === 1 ? primaryBg : i === 2 ? accentBg : secondaryBg
-                                                            }`} />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-amber-50/50 to-orange-50/50">
-                                                <Skeleton className={`h-5 w-36 rounded-lg ${highlightBg}`} />
-                                                <div className="space-y-3">
-                                                    {[1, 2, 3].map((i) => (
-                                                        <div key={i} className="flex items-center gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <Skeleton className={`h-5 w-5 rounded-full ${
-                                                                i === 1 ? primaryBg : i === 2 ? secondaryBg : accentBg
-                                                            }`} />
-                                                            <Skeleton className={`h-4 w-32 rounded-lg ${neutralBg}`} />
-                                                        </div>
-                                                    ))}
-                                                    <div className="p-3 space-y-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                        <div className="flex items-center gap-2">
-                                                            <Skeleton className={`h-4 w-4 rounded-full ${primaryBg}`} />
-                                                            <Skeleton className={`h-4 w-16 rounded-lg ${neutralBg}`} />
-                                                        </div>
-                                                        <Skeleton className={`h-3 w-full rounded-lg ${neutralBg}`} />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-5 space-y-4 rounded-xl bg-gradient-to-br from-purple-50/50 to-fuchsia-50/50">
-                                                <Skeleton className={`h-5 w-24 rounded-lg ${accentBg}`} />
-                                                <div className="space-y-3">
-                                                    {[1, 2, 3].map((i) => (
-                                                        <div key={i} className="p-4 space-y-2 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                            <div className="flex items-center gap-2">
-                                                                <Skeleton className={`h-4 w-4 rounded-full ${
-                                                                    i === 1 ? accentBg : i === 2 ? highlightBg : primaryBg
-                                                                }`} />
-                                                                <Skeleton className={`h-4 w-32 rounded-lg ${neutralBg}`} />
-                                                            </div>
-                                                            <Skeleton className={`h-4 w-20 rounded-full ml-6 ${
-                                                                i === 1 ? secondaryBg : i === 2 ? accentBg : highlightBg
-                                                            }`} />
-                                                            <Skeleton className={`h-3 w-40 rounded-lg ml-6 ${neutralBg}`} />
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                {/* ComputedInfo skeleton */}
-                                <Card className="border-2">
-                                    <CardHeader className="bg-gradient-to-r from-indigo-100/30 to-purple-100/30">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className={`h-10 w-10 rounded-lg ${accentBg}`} />
-                                            <Skeleton className={`h-6 w-56 rounded-lg ${primaryBg}`} />
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="p-6 space-y-4 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/50">
-                                                <div className="flex items-center gap-3">
-                                                    <Skeleton className={`h-10 w-10 rounded-lg ${primaryBg}`} />
-                                                    <Skeleton className={`h-5 w-36 rounded-lg ${accentBg}`} />
-                                                </div>
-                                                <div className="space-y-4">
-                                                    <div className="p-4 space-y-1 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                        <Skeleton className={`h-4 w-24 rounded-lg ${neutralBg}`} />
-                                                        <Skeleton className={`h-7 w-48 rounded-lg ${highlightBg}`} />
-                                                    </div>
-                                                    <div className="p-4 space-y-1 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                        <div className="flex items-center gap-2">
-                                                            <Skeleton className={`h-4 w-4 rounded-full ${primaryBg}`} />
-                                                            <Skeleton className={`h-4 w-32 rounded-lg ${neutralBg}`} />
-                                                        </div>
-                                                        <Skeleton className={`h-6 w-40 rounded-lg ml-6 ${secondaryBg}`} />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-6 space-y-4 rounded-xl bg-gradient-to-br from-green-50/50 to-teal-50/50">
-                                                <div className="flex items-center gap-3">
-                                                    <Skeleton className={`h-10 w-10 rounded-lg ${secondaryBg}`} />
-                                                    <Skeleton className={`h-5 w-36 rounded-lg ${accentBg}`} />
-                                                </div>
-                                                <div className="space-y-4">
-                                                    <div className="grid grid-cols-3 gap-3">
-                                                        {[1, 2, 3].map((i) => (
-                                                            <div key={i} className="p-3 space-y-1 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                                <Skeleton className={`h-3 w-16 rounded-lg ${neutralBg}`} />
-                                                                <Skeleton className={`h-5 w-12 rounded-lg ${
-                                                                    i === 1 ? primaryBg : i === 2 ? secondaryBg : highlightBg
-                                                                }`} />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <div className="flex justify-between">
-                                                            <Skeleton className={`h-4 w-20 rounded-lg ${neutralBg}`} />
-                                                            <Skeleton className={`h-4 w-12 rounded-lg ${neutralBg}`} />
-                                                        </div>
-                                                        <Skeleton className={`h-2 w-full rounded-full ${primaryBg}`} />
-                                                    </div>
-                                                    <div className="flex justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                        <Skeleton className={`h-4 w-16 rounded-lg ${neutralBg}`} />
-                                                        <Skeleton className={`h-5 w-16 rounded-full ${accentBg}`} />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                {[1, 2, 3].map((i) => (
-                                                    <div key={i} className="p-5 space-y-2 rounded-xl bg-gradient-to-br ${
-                                                        i === 1 ? 'from-purple-50/50 to-pink-50/50' : 
-                                                        i === 2 ? 'from-amber-50/50 to-orange-50/50' : 
-                                                        'from-cyan-50/50 to-blue-50/50'
-                                                    }">
-                                                        <div className="flex items-center gap-3">
-                                                            <Skeleton className={`h-5 w-5 rounded-full ${
-                                                                i === 1 ? accentBg : i === 2 ? highlightBg : primaryBg
-                                                            }`} />
-                                                            <Skeleton className={`h-4 w-24 rounded-lg ${neutralBg}`} />
-                                                        </div>
-                                                        <Skeleton className={`h-7 w-12 rounded-lg ${
-                                                            i === 1 ? secondaryBg : i === 2 ? primaryBg : accentBg
-                                                        }`} />
-                                                    </div>
+                                            ))}
+                                            <div className="pt-2 flex flex-wrap gap-2">
+                                                {[0, 1, 2].map((b) => (
+                                                    <Sk key={b} h="h-5" w="w-16" cls={b === 0 ? SK_TEAL : b === 1 ? SK_WARM : SK_GREEN} />
                                                 ))}
                                             </div>
                                         </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
+                                    ))}
+                                </div>
+                            </SkCard>
 
-                            {/* Moderation & System Info skeleton */}
-                            <Card className="border-2">
-                                <CardHeader className="bg-gradient-to-r from-gray-100/30 to-slate-100/30">
-                                    <div className="flex items-center gap-2">
-                                        <Skeleton className={`h-5 w-5 rounded-full ${primaryBg}`} />
-                                        <Skeleton className={`h-6 w-64 rounded-lg ${accentBg}`} />
+                            {/* ── ComputedInfo skeleton ─────────── */}
+                            <SkCard headerW="w-56">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* availability */}
+                                    <div className={`${NEU_INSET_SM} p-5 space-y-4`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`${NEU_RAISED_SM} w-10 h-10`} />
+                                            <Sk h="h-5" w="w-36" cls={SK_TEAL} />
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {[SK_TEAL, SK_GREEN, SK_WARM].map((accent, i) => (
+                                                <div key={i} className={`${NEU_RAISED_SM} p-3 space-y-1`}>
+                                                    <Sk h="h-3" w="w-16" />
+                                                    <Sk h="h-5" w="w-12" cls={accent} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between">
+                                                <Sk h="h-4" w="w-20" />
+                                                <Sk h="h-4" w="w-12" />
+                                            </div>
+                                            <div className={`${NEU_INSET_SM} h-2 w-full`}>
+                                                <div className="h-full w-3/5 rounded-full animate-pulse bg-[#006666]/30" />
+                                            </div>
+                                        </div>
+                                        <SkRow wRight="w-16" cls={SK_GREEN} />
                                     </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div className="space-y-4">
-                                            <Skeleton className={`h-5 w-40 rounded-lg ${primaryBg}`} />
-                                            <div className="space-y-3">
-                                                {[1, 2, 3, 4].map((i) => (
-                                                    <div key={i} className="flex justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                        <Skeleton className={`h-4 w-24 rounded-lg ${neutralBg}`} />
-                                                        <Skeleton className={`h-5 w-20 rounded-full ${
-                                                            i === 1 ? highlightBg : i === 2 ? secondaryBg : i === 3 ? accentBg : primaryBg
-                                                        }`} />
-                                                    </div>
+
+                                    {/* pricing summary */}
+                                    <div className={`${NEU_INSET_SM} p-5 space-y-4`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`${NEU_RAISED_SM} w-10 h-10`} />
+                                            <Sk h="h-5" w="w-36" cls={SK_WARM} />
+                                        </div>
+                                        <div className="space-y-3">
+                                            {[0, 1, 2].map((r) => (
+                                                <SkRow key={r} wRight="w-20" cls={r === 0 ? SK_TEAL : r === 1 ? SK_WARM : SK_GREEN} />
+                                            ))}
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2 pt-2">
+                                            {[SK_GREEN, SK_WARM, SK_TEAL].map((accent, i) => (
+                                                <div key={i} className={`${NEU_RAISED_SM} p-3 space-y-1`}>
+                                                    <Sk h="h-4" w="w-16" />
+                                                    <Sk h="h-7" w="w-10" cls={accent} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </SkCard>
+
+                            {/* ── Moderation & System skeleton ─────── */}
+                            <SkCard headerW="w-72">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* moderation */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className={`${NEU_RAISED_SM} w-8 h-8`} />
+                                            <Sk h="h-3" w="w-32" cls={SK_MUTED} />
+                                        </div>
+                                        {[SK_WARM, SK_BASE, SK_GREEN].map((accent, r) => (
+                                            <SkRow key={r} wRight="w-20" cls={accent} />
+                                        ))}
+                                    </div>
+
+                                    {/* system */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className={`${NEU_RAISED_SM} w-8 h-8`} />
+                                            <Sk h="h-3" w="w-32" cls={SK_MUTED} />
+                                        </div>
+                                        <SkRow wRight="w-20" cls={SK_GREEN} />
+                                        <SkRow wRight="w-24" cls={SK_TEAL} />
+                                        <div className={`${NEU_INSET_SM} p-3 space-y-2`}>
+                                            <Sk h="h-3" w="w-10" cls={SK_MUTED} />
+                                            <div className="flex gap-1.5 flex-wrap">
+                                                {[0, 1, 2].map((b) => (
+                                                    <Sk key={b} h="h-5" w="w-12" />
                                                 ))}
                                             </div>
                                         </div>
-
-                                        <div className="space-y-4">
-                                            <Skeleton className={`h-5 w-40 rounded-lg ${secondaryBg}`} />
-                                            <div className="space-y-3">
-                                                {[1, 2, 3, 4].map((i) => (
-                                                    <div key={i} className="flex justify-between p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-                                                        <Skeleton className={`h-4 w-24 rounded-lg ${neutralBg}`} />
-                                                        <Skeleton className={`h-4 w-32 rounded-lg ${
-                                                            i === 1 ? neutralBg : i === 2 ? neutralBg : neutralBg
-                                                        }`} />
-                                                    </div>
-                                                ))}
-                                            </div>
+                                        <SkRow wRight="w-32" />
+                                        <div className={`${NEU_INSET_SM} p-3 space-y-1`}>
+                                            <Sk h="h-3" w="w-20" cls={SK_MUTED} />
+                                            <Sk h="h-4" w="w-full" />
                                         </div>
                                     </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </>
-                )}
-            </motion.div>
+                                </div>
+
+                                {/* footer */}
+                                <div className="mt-5 pt-3 border-t border-[#1E2938]/10 flex items-center gap-2">
+                                    <div className={`${NEU_RAISED_SM} w-6 h-6`} />
+                                    <Sk h="h-3" w="w-48" />
+                                </div>
+                            </SkCard>
+                        </>
+                    )}
+                </motion.div>
+            </div>
         </div>
     );
 }

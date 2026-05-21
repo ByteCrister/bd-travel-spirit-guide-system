@@ -1,9 +1,11 @@
 "use client";
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { tourDetailErrorKey, tourDetailLoadingKey, useTourDetailStore } from "@/store/tour-detail.store";
-import { AlertCircle, ArrowLeft, Edit, Shield, LayoutDashboard, MapPin, Calendar, Package, FileCheck, Archive, Trash2, RotateCcw } from "lucide-react";
+import {
+    AlertCircle, ArrowLeft, Edit, Shield, LayoutDashboard,
+    MapPin, Calendar, Package, FileCheck, Archive, Trash2,
+    RotateCcw,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import TourBasicInfo from "./tour-core-datail/TourBasicInfo";
@@ -16,9 +18,7 @@ import ComplianceInfo from "./tour-core-datail/ComplianceInfo";
 import ComputedInfo from "./tour-core-datail/ComputedInfo";
 import ItineraryInfo from "./tour-core-datail/ItineraryInfo";
 import DestinationsInfo from "./tour-core-datail/DestinationsInfo";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
-import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import TourDetailLoading from "./skeletons/TourDetailLoading";
 import { FaBangladeshiTakaSign } from "react-icons/fa6";
@@ -26,35 +26,191 @@ import { encodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { archiveTourApi, terminateTourApi, restoreTourApi } from "@/utils/api/tour.api";
 import ModerationAlert from "./tour-core-datail/ModerationAlert";
 
+// ─────────────────────────────────────────────────────────────
+// Neumorphism Design-System Tokens
+// ─────────────────────────────────────────────────────────────
+
+// Surfaces
+const NEU_PAGE_BG = "min-h-screen bg-[#E7E5E4]";
+const NEU_CARD =
+    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+const NEU_CARD_HEADER =
+    "rounded-t-2xl bg-[#E7E5E4] shadow-[inset_0_-1px_0_#c8c6c5]";
+const NEU_SURFACE_INSET =
+    "bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]";
+const NEU_SURFACE_INSET_SM =
+    "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+
+// Buttons
+const NEU_BTN_PRIMARY =
+    "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#006666] text-white text-sm " +
+    "font-[family-name:var(--font-space-mono)] font-bold tracking-wide " +
+    "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
+    "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
+    "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+    "disabled:opacity-40 disabled:cursor-not-allowed " +
+    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
+
+const NEU_BTN_GHOST =
+    "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E7E5E4] text-[#1E2938] text-sm " +
+    "font-[family-name:var(--font-space-mono)] " +
+    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    "disabled:opacity-40 disabled:cursor-not-allowed " +
+    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
+
+const NEU_BTN_WARNING =
+    "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E7E5E4] text-[#FE9900] text-sm " +
+    "font-[family-name:var(--font-space-mono)] " +
+    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+    "hover:bg-[#FE9900]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    "disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200";
+
+const NEU_BTN_DANGER =
+    "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E7E5E4] text-[#FF2157] text-sm " +
+    "font-[family-name:var(--font-space-mono)] " +
+    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+    "hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    "disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200";
+
+const NEU_BTN_SUCCESS =
+    "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E7E5E4] text-[#00A63D] text-sm " +
+    "font-[family-name:var(--font-space-mono)] " +
+    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+    "hover:bg-[#00A63D]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    "disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200";
+
+const NEU_BTN_ICON =
+    "w-10 h-10 flex items-center justify-center rounded-xl bg-[#E7E5E4] text-[#1E2938]/60 " +
+    "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
+    "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
+
+// Badges
+const NEU_BADGE_BASE =
+    "inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
+    "shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+
+const NEU_BADGE_SUCCESS = `${NEU_BADGE_BASE} bg-[#00A63D]/10 text-[#00A63D]`;
+const NEU_BADGE_WARNING = `${NEU_BADGE_BASE} bg-[#FE9900]/10 text-[#FE9900]`;
+const NEU_BADGE_DANGER  = `${NEU_BADGE_BASE} bg-[#FF2157]/10 text-[#FF2157]`;
+const NEU_BADGE_PRIMARY = `${NEU_BADGE_BASE} bg-[#006666]/10 text-[#006666]`;
+const NEU_BADGE_NEUTRAL = `${NEU_BADGE_BASE} bg-[#1E2938]/10 text-[#1E2938]/70`;
+
+// Typography
+const NEU_HEADING =
+    "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
+const NEU_LABEL =
+    "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
+const NEU_MONO =
+    "font-[family-name:var(--font-jetbrains-mono)] text-[#1E2938]";
+const NEU_MUTED =
+    "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
+
+// Icon well
+const NEU_ICON_WELL =
+    "p-2 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+const NEU_ICON_WELL_PRIMARY =
+    "p-2 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+
+// Row item inside cards
+const NEU_ROW =
+    "flex justify-between items-center p-3 rounded-xl " + NEU_SURFACE_INSET_SM;
+
+// ─────────────────────────────────────────────────────────────
+// Helper: moderation-status badge
+// ─────────────────────────────────────────────────────────────
+function ModerationBadge({ status }: { status: string }) {
+    const cls =
+        status === MODERATION_STATUS.APPROVED ? NEU_BADGE_SUCCESS :
+        status === MODERATION_STATUS.PENDING   ? NEU_BADGE_WARNING :
+        status === MODERATION_STATUS.DENIED    ? NEU_BADGE_DANGER  :
+        NEU_BADGE_NEUTRAL;
+    return <span className={cls}>{status}</span>;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Helper: tour-status badge
+// ─────────────────────────────────────────────────────────────
+function TourStatusBadge({ status }: { status: string }) {
+    const cls =
+        status === TOUR_STATUS.ACTIVE    ? NEU_BADGE_SUCCESS :
+        status === TOUR_STATUS.DRAFT     ? NEU_BADGE_PRIMARY :
+        status === TOUR_STATUS.SUBMITTED ? NEU_BADGE_WARNING :
+        status === TOUR_STATUS.COMPLETED ? `${NEU_BADGE_BASE} bg-purple-100 text-purple-700` :
+        status === TOUR_STATUS.ARCHIVED  ? NEU_BADGE_NEUTRAL :
+        NEU_BADGE_DANGER;
+    return <span className={cls}>{status}</span>;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tab configuration
+// ─────────────────────────────────────────────────────────────
+const TABS = [
+    { value: "overview",     label: "Overview",     Icon: LayoutDashboard },
+    { value: "itinerary",    label: "Itinerary",    Icon: Calendar },
+    { value: "destinations", label: "Destinations", Icon: MapPin },
+    { value: "logistics",    label: "Logistics",    Icon: Package },
+    { value: "compliance",   label: "Compliance",   Icon: FileCheck },
+    { value: "pricing",      label: "Pricing",      Icon: FaBangladeshiTakaSign },
+] as const;
+
+// ─────────────────────────────────────────────────────────────
+// Framer-motion fade-up helper
+// ─────────────────────────────────────────────────────────────
+const FadeUp = ({
+    children,
+    delay = 0,
+    className = "",
+}: {
+    children: React.ReactNode;
+    delay?: number;
+    className?: string;
+}) => (
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay }}
+        className={className}
+    >
+        {children}
+    </motion.div>
+);
+
+// ─────────────────────────────────────────────────────────────
+// Props
+// ─────────────────────────────────────────────────────────────
 interface TourCoreDetailPageProps {
     tourId: string;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Component
+// ─────────────────────────────────────────────────────────────
 export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
-
     const router = useRouter();
-    const { tourDetails, loading, error } = useTourDetailStore()
-    const tour = tourDetails[tourId]
+    const { tourDetails, loading, error } = useTourDetailStore();
+    const tour = tourDetails[tourId];
 
-    // State for moderation dialogs
     const [terminateDialogOpen, setTerminateDialogOpen] = useState(false);
-    const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
-    const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
-    const [terminateReason, setTerminateReason] = useState("");
-    const [isProcessing, setIsProcessing] = useState(false);
+    const [archiveDialogOpen,   setArchiveDialogOpen]   = useState(false);
+    const [restoreDialogOpen,   setRestoreDialogOpen]   = useState(false);
+    const [terminateReason,     setTerminateReason]     = useState("");
+    const [isProcessing,        setIsProcessing]        = useState(false);
 
-    const loadingKey = tourDetailLoadingKey(tourId)
-    const errorKey = tourDetailErrorKey(tourId)
+    const loadingKey = tourDetailLoadingKey(tourId);
+    const errorKey   = tourDetailErrorKey(tourId);
 
-    // Moderation action handlers
+    // ── Moderation handlers ────────────────────────────────
     const handleArchive = async () => {
         if (!tour) return;
         setIsProcessing(true);
         try {
             await archiveTourApi(tourId);
             setArchiveDialogOpen(false);
-        } catch (error) {
-            console.error("Failed to archive tour:", error);
+        } catch (err) {
+            console.error("Failed to archive tour:", err);
         } finally {
             setIsProcessing(false);
         }
@@ -67,8 +223,8 @@ export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
             await terminateTourApi(tourId, terminateReason.trim());
             setTerminateDialogOpen(false);
             setTerminateReason("");
-        } catch (error) {
-            console.error("Failed to terminate tour:", error);
+        } catch (err) {
+            console.error("Failed to terminate tour:", err);
         } finally {
             setIsProcessing(false);
         }
@@ -80,495 +236,381 @@ export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
         try {
             await restoreTourApi(tourId);
             setRestoreDialogOpen(false);
-        } catch (error) {
-            console.error("Failed to restore tour:", error);
+        } catch (err) {
+            console.error("Failed to restore tour:", err);
         } finally {
             setIsProcessing(false);
         }
     };
 
-    // Determine which moderation buttons to show based on tour status
-    const showArchiveButton = tour && (
-        tour.status === TOUR_STATUS.DRAFT ||
-        tour.status === TOUR_STATUS.SUBMITTED ||
-        tour.status === TOUR_STATUS.COMPLETED
-    );
-
+    // ── Button visibility ─────────────────────────────────
+    const showArchiveButton  = tour && [TOUR_STATUS.DRAFT, TOUR_STATUS.SUBMITTED, TOUR_STATUS.COMPLETED].includes(tour.status as never);
     const showTerminateButton = tour && tour.status === TOUR_STATUS.ACTIVE;
-    const showRestoreButton = tour && tour.status === TOUR_STATUS.ARCHIVED;
+    const showRestoreButton   = tour && tour.status === TOUR_STATUS.ARCHIVED;
+    const showEditButton      = tour && tour.status !== TOUR_STATUS.ARCHIVED;
 
-    const showEditButton = tour && tour.status !== TOUR_STATUS.ARCHIVED;
-
+    // ── Loading state ─────────────────────────────────────
     if (loading[loadingKey]) {
-        return (
-            <TourDetailLoading />
-        )
+        return <TourDetailLoading />;
     }
 
+    // ── Error state ───────────────────────────────────────
     if (error[errorKey] || !tour) {
         return (
-            <div className="container mx-auto p-6 max-w-7xl">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    <Alert variant="destructive" className="mb-4">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Error Loading Tour</AlertTitle>
-                        <AlertDescription>
-                            {error[errorKey] || 'Tour not found'}
-                        </AlertDescription>
-                    </Alert>
-                    <Button onClick={() => router.back()} className="mt-4">
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Go Back
-                    </Button>
-                </motion.div>
+            <div className={`${NEU_PAGE_BG} p-4 sm:p-6`}>
+                <div className="container mx-auto max-w-7xl">
+                    <FadeUp>
+                        <div className={`${NEU_CARD} p-6 border-l-4 border-l-[#FF2157]`}>
+                            <div className="flex items-start gap-3 mb-4">
+                                <div className={`${NEU_ICON_WELL} text-[#FF2157]`}>
+                                    <AlertCircle className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <p className={`${NEU_HEADING} text-base text-[#FF2157]`}>
+                                        Error Loading Tour
+                                    </p>
+                                    <p className={`${NEU_MUTED} mt-1`}>
+                                        {error[errorKey] || "Tour not found"}
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                className={NEU_BTN_GHOST}
+                                onClick={() => router.back()}
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                                Go Back
+                            </button>
+                        </div>
+                    </FadeUp>
+                </div>
             </div>
-        )
+        );
     }
 
+    // ── Main render ───────────────────────────────────────
     return (
-        <div className="container mx-auto p-6 max-w-7xl">
-            {/* Header with back button */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="flex items-center justify-between mb-8"
-            >
-                <div className="flex items-center gap-4">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => router.back()}
-                        className="rounded-lg hover:bg-accent transition-colors"
-                    >
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                            Tour Details
-                        </h1>
-                    </div>
-                </div>
-                <div className="flex gap-2">
-                    {/* Archive Button (for draft, submitted, completed) */}
-                    {showArchiveButton && (
-                        <Button
-                            variant="outline"
-                            onClick={() => setArchiveDialogOpen(true)}
-                            disabled={isProcessing}
-                            className="rounded-lg border-amber-500 text-amber-600 hover:bg-amber-50 hover:text-amber-700"
-                        >
-                            <Archive className="h-4 w-4 mr-2" />
-                            Archive
-                        </Button>
-                    )}
+        <div className={`${NEU_PAGE_BG} p-4 sm:p-6`}>
+            <div className="container mx-auto max-w-7xl space-y-8">
 
-                    {/* Terminate Button (for active tours) */}
-                    {showTerminateButton && (
-                        <Button
-                            variant="outline"
-                            onClick={() => setTerminateDialogOpen(true)}
-                            disabled={isProcessing}
-                            className="rounded-lg border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
-                        >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Terminate
-                        </Button>
-                    )}
-
-                    {/* Restore Button (for archived tours) */}
-                    {showRestoreButton && (
-                        <Button
-                            variant="outline"
-                            onClick={() => setRestoreDialogOpen(true)}
-                            disabled={isProcessing}
-                            className="rounded-lg border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
-                        >
-                            <RotateCcw className="h-4 w-4 mr-2" />
-                            Restore
-                        </Button>
-                    )}
-
-                    {
-                        showEditButton
-                        && (<Button
-                            variant="outline"
-                            onClick={() => router.push(`/operations/tours/${encodeURIComponent(encodeId(tourId))}/update-tour`)}
-                            className="rounded-lg"
-                        >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Tour
-                        </Button>)
-                    }
-                </div>
-            </motion.div>
-
-            {/* Terminate Confirmation Alert */}
-            <ModerationAlert
-                open={terminateDialogOpen}
-                onOpenChange={setTerminateDialogOpen}
-                title="Terminate Tour"
-                description="Are you sure you want to terminate this tour? This action cannot be undone. Please provide a reason for termination."
-                confirmText="Confirm Termination"
-                variant="destructive"
-                onConfirm={handleTerminate}
-                isProcessing={isProcessing}
-                requireReason={true}
-                reason={terminateReason}
-                onReasonChange={setTerminateReason}
-            />
-
-            {/* Archive Confirmation Alert */}
-            <ModerationAlert
-                open={archiveDialogOpen}
-                onOpenChange={setArchiveDialogOpen}
-                title="Archive Tour"
-                description="Are you sure you want to archive this tour? The tour will be moved to the archived section and will no longer be visible to users."
-                confirmText="Archive Tour"
-                variant="warning"
-                onConfirm={handleArchive}
-                isProcessing={isProcessing}
-                requireReason={false}
-            />
-
-            {/* Restore Confirmation Alert */}
-            <ModerationAlert
-                open={restoreDialogOpen}
-                onOpenChange={setRestoreDialogOpen}
-                title="Restore Tour"
-                description="Are you sure you want to restore this tour? The tour will be moved from the archived section and become available again."
-                confirmText="Restore Tour"
-                variant="success"
-                onConfirm={handleRestore}
-                isProcessing={isProcessing}
-                requireReason={false}
-            />
-
-            {/* Main Content */}
-            <div className="space-y-8">
-                {/* Basic Info */}
+                {/* ── Page Header ──────────────────────────────── */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
+                    transition={{ duration: 0.4 }}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
-                    <TourBasicInfo tour={tour} />
+                    {/* Left: back + title */}
+                    <div className="flex items-center gap-3">
+                        <button
+                            aria-label="Go back"
+                            className={NEU_BTN_ICON}
+                            onClick={() => router.back()}
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                        </button>
+                        <div>
+                            <h1 className={`${NEU_HEADING} text-2xl sm:text-3xl`}>
+                                Tour Details
+                            </h1>
+                            <p className={`${NEU_MUTED} mt-0.5`}>
+                                {tour.tourCode && (
+                                    <span className={`${NEU_BADGE_PRIMARY} mr-2`}>{tour.tourCode}</span>
+                                )}
+                                {tour.title ?? "–"}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Right: action buttons */}
+                    <div className="flex flex-wrap gap-2">
+                        {showArchiveButton && (
+                            <button
+                                className={NEU_BTN_WARNING}
+                                disabled={isProcessing}
+                                onClick={() => setArchiveDialogOpen(true)}
+                            >
+                                <Archive className="h-4 w-4" />
+                                Archive
+                            </button>
+                        )}
+                        {showTerminateButton && (
+                            <button
+                                className={NEU_BTN_DANGER}
+                                disabled={isProcessing}
+                                onClick={() => setTerminateDialogOpen(true)}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                                Terminate
+                            </button>
+                        )}
+                        {showRestoreButton && (
+                            <button
+                                className={NEU_BTN_SUCCESS}
+                                disabled={isProcessing}
+                                onClick={() => setRestoreDialogOpen(true)}
+                            >
+                                <RotateCcw className="h-4 w-4" />
+                                Restore
+                            </button>
+                        )}
+                        {showEditButton && (
+                            <button
+                                className={NEU_BTN_PRIMARY}
+                                onClick={() =>
+                                    router.push(`/operations/tours/${encodeURIComponent(encodeId(tourId))}/update-tour`)
+                                }
+                            >
+                                <Edit className="h-4 w-4" />
+                                Edit Tour
+                            </button>
+                        )}
+                    </div>
                 </motion.div>
 
-                {/* Tabs for detailed sections */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
-                >
+                {/* ── Moderation Dialogs ────────────────────────── */}
+                <ModerationAlert
+                    open={terminateDialogOpen}
+                    onOpenChange={setTerminateDialogOpen}
+                    title="Terminate Tour"
+                    description="Are you sure you want to terminate this tour? This action cannot be undone. Please provide a reason for termination."
+                    confirmText="Confirm Termination"
+                    variant="destructive"
+                    onConfirm={handleTerminate}
+                    isProcessing={isProcessing}
+                    requireReason={true}
+                    reason={terminateReason}
+                    onReasonChange={setTerminateReason}
+                />
+                <ModerationAlert
+                    open={archiveDialogOpen}
+                    onOpenChange={setArchiveDialogOpen}
+                    title="Archive Tour"
+                    description="Are you sure you want to archive this tour? The tour will be moved to the archived section and will no longer be visible to users."
+                    confirmText="Archive Tour"
+                    variant="warning"
+                    onConfirm={handleArchive}
+                    isProcessing={isProcessing}
+                    requireReason={false}
+                />
+                <ModerationAlert
+                    open={restoreDialogOpen}
+                    onOpenChange={setRestoreDialogOpen}
+                    title="Restore Tour"
+                    description="Are you sure you want to restore this tour? The tour will be moved from the archived section and become available again."
+                    confirmText="Restore Tour"
+                    variant="success"
+                    onConfirm={handleRestore}
+                    isProcessing={isProcessing}
+                    requireReason={false}
+                />
+
+                {/* ── Basic Info ────────────────────────────────── */}
+                <FadeUp delay={0.1}>
+                    <TourBasicInfo tour={tour} />
+                </FadeUp>
+
+                {/* ── Tabs ──────────────────────────────────────── */}
+                <FadeUp delay={0.2}>
                     <Tabs defaultValue="overview" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 gap-2 bg-muted/50 p-1 rounded-lg">
-                            <TabsTrigger value="overview" className="rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                                <LayoutDashboard className="h-4 w-4 mr-2" />
-                                <span className="hidden sm:inline">Overview</span>
-                            </TabsTrigger>
-                            <TabsTrigger value="itinerary" className="rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                                <Calendar className="h-4 w-4 mr-2" />
-                                <span className="hidden sm:inline">Itinerary</span>
-                            </TabsTrigger>
-                            <TabsTrigger value="destinations" className="rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                                <MapPin className="h-4 w-4 mr-2" />
-                                <span className="hidden sm:inline">Destinations</span>
-                            </TabsTrigger>
-                            <TabsTrigger value="logistics" className="rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                                <Package className="h-4 w-4 mr-2" />
-                                <span className="hidden sm:inline">Logistics</span>
-                            </TabsTrigger>
-                            <TabsTrigger value="compliance" className="rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                                <FileCheck className="h-4 w-4 mr-2" />
-                                <span className="hidden sm:inline">Compliance</span>
-                            </TabsTrigger>
-                            <TabsTrigger value="pricing" className="rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                                <FaBangladeshiTakaSign className="h-4 w-4 mr-2" />
-                                <span className="hidden sm:inline">Pricing</span>
-                            </TabsTrigger>
-                        </TabsList>
+                        {/* Tab bar */}
+                        <div className={`${NEU_SURFACE_INSET} rounded-2xl p-1.5`}>
+                            <TabsList className="flex flex-wrap gap-1 bg-transparent h-auto p-0 w-full">
+                                {TABS.map(({ value, label, Icon }) => (
+                                    <TabsTrigger
+                                        key={value}
+                                        value={value}
+                                        className={
+                                            "flex-1 min-w-[80px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl " +
+                                            "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 " +
+                                            "transition-all duration-200 " +
+                                            "data-[state=active]:bg-[#E7E5E4] " +
+                                            "data-[state=active]:shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+                                            "data-[state=active]:text-[#006666] " +
+                                            "hover:text-[#1E2938] " +
+                                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40"
+                                        }
+                                    >
+                                        <Icon className="h-3.5 w-3.5 shrink-0" />
+                                        <span className="hidden sm:inline">{label}</span>
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+                        </div>
 
+                        {/* ── Overview tab ─────────────────────── */}
                         <TabsContent value="overview" className="space-y-6 mt-6">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <BangladeshInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.1 }}
-                            >
-                                <InclusionsExclusions tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.2 }}
-                            >
-                                <PricingInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.3 }}
-                            >
-                                <LogisticsInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.4 }}
-                            >
-                                <ComplianceInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.5 }}
-                            >
-                                <ComputedInfo tour={tour} />
-                            </motion.div>
+                            <FadeUp delay={0}><BangladeshInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.08}><InclusionsExclusions tour={tour} /></FadeUp>
+                            <FadeUp delay={0.12}><PricingInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.16}><LogisticsInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.20}><ComplianceInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.24}><ComputedInfo tour={tour} /></FadeUp>
                         </TabsContent>
 
+                        {/* ── Itinerary tab ─────────────────────── */}
                         <TabsContent value="itinerary" className="space-y-6 mt-6">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <ItineraryInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.1 }}
-                            >
-                                <InclusionsExclusions tour={tour} />
-                            </motion.div>
+                            <FadeUp delay={0}><ItineraryInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.08}><InclusionsExclusions tour={tour} /></FadeUp>
                         </TabsContent>
 
+                        {/* ── Destinations tab ──────────────────── */}
                         <TabsContent value="destinations" className="space-y-6 mt-6">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <DestinationsInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.1 }}
-                            >
-                                <ComplianceInfo tour={tour} />
-                            </motion.div>
+                            <FadeUp delay={0}><DestinationsInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.08}><ComplianceInfo tour={tour} /></FadeUp>
                         </TabsContent>
 
+                        {/* ── Logistics tab ─────────────────────── */}
                         <TabsContent value="logistics" className="space-y-6 mt-6">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <LogisticsInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.1 }}
-                            >
-                                <ComplianceInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.2 }}
-                            >
-                                <InclusionsExclusions tour={tour} />
-                            </motion.div>
+                            <FadeUp delay={0}><LogisticsInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.08}><ComplianceInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.12}><InclusionsExclusions tour={tour} /></FadeUp>
                         </TabsContent>
 
+                        {/* ── Compliance tab ────────────────────── */}
                         <TabsContent value="compliance" className="space-y-6 mt-6">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <ComplianceInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.1 }}
-                            >
-                                <BangladeshInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.2 }}
-                            >
-                                <LogisticsInfo tour={tour} />
-                            </motion.div>
+                            <FadeUp delay={0}><ComplianceInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.08}><BangladeshInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.12}><LogisticsInfo tour={tour} /></FadeUp>
                         </TabsContent>
 
+                        {/* ── Pricing tab ───────────────────────── */}
                         <TabsContent value="pricing" className="space-y-6 mt-6">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <PricingInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.1 }}
-                            >
-                                <ComputedInfo tour={tour} />
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.2 }}
-                            >
-                                <InclusionsExclusions tour={tour} />
-                            </motion.div>
+                            <FadeUp delay={0}><PricingInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.08}><ComputedInfo tour={tour} /></FadeUp>
+                            <FadeUp delay={0.12}><InclusionsExclusions tour={tour} /></FadeUp>
                         </TabsContent>
                     </Tabs>
-                </motion.div>
+                </FadeUp>
 
-                {/* Moderation & System Info */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.3 }}
-                >
-                    <Card className="border-2 shadow-lg">
-                        <CardHeader className="bg-gradient-to-r from-muted/50 to-muted/30 pb-4">
-                            <CardTitle className="flex items-center gap-2 text-xl">
-                                <Shield className="h-5 w-5 text-primary" />
-                                Moderation & System Information
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-4">
-                                    <h4 className="font-semibold text-base flex items-center gap-2">
-                                        <Shield className="h-4 w-4 text-primary" />
-                                        Moderation Details
-                                    </h4>
-                                    <div className="space-y-3 text-sm">
-                                        <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                            <span className="text-muted-foreground font-medium">Status:</span>
-                                            <Badge className={
-                                                tour.moderationStatus === MODERATION_STATUS.APPROVED ? "bg-green-500 hover:bg-green-600" :
-                                                    tour.moderationStatus === MODERATION_STATUS.PENDING ? "bg-yellow-500 hover:bg-yellow-600" :
-                                                        tour.moderationStatus === MODERATION_STATUS.DENIED ? "bg-red-500 hover:bg-red-600" :
-                                                            "bg-gray-500 hover:bg-gray-600"
-                                            }>
-                                                {tour.moderationStatus}
-                                            </Badge>
-                                        </div>
-                                        {tour.rejectionReason && (
-                                            <div className="flex justify-between items-start p-3 bg-muted/50 rounded-lg">
-                                                <span className="text-muted-foreground font-medium">Rejection Reason:</span>
-                                                <span className="font-medium text-right max-w-xs">{tour.rejectionReason}</span>
-                                            </div>
-                                        )}
-                                        {tour.completedAt && (
-                                            <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                                <span className="text-muted-foreground font-medium">Completed At:</span>
-                                                <span>{new Date(tour.completedAt).toLocaleDateString()}</span>
-                                            </div>
-                                        )}
-                                        {tour.reApprovalRequestedAt && (
-                                            <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                                <span className="text-muted-foreground font-medium">Re-approval Requested:</span>
-                                                <span>{new Date(tour.reApprovalRequestedAt).toLocaleDateString()}</span>
-                                            </div>
+                {/* ── Moderation & System Info card ─────────────── */}
+                <FadeUp delay={0.3}>
+                    <div className={NEU_CARD}>
+                        {/* Card header */}
+                        <div className={`${NEU_CARD_HEADER} px-6 py-4 flex items-center gap-3`}>
+                            <div className={NEU_ICON_WELL_PRIMARY}>
+                                <Shield className="h-4 w-4 text-[#006666]" />
+                            </div>
+                            <h2 className={`${NEU_HEADING} text-lg`}>
+                                Moderation &amp; System Information
+                            </h2>
+                        </div>
+
+                        {/* Card body */}
+                        <div className="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                            {/* ── Moderation column ─────────────── */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className={NEU_ICON_WELL}>
+                                        <Shield className="h-3.5 w-3.5 text-[#1E2938]/60" />
+                                    </div>
+                                    <span className={NEU_LABEL}>Moderation Details</span>
+                                </div>
+
+                                <div className={NEU_ROW}>
+                                    <span className={`${NEU_MUTED} font-medium`}>Status</span>
+                                    <ModerationBadge status={tour.moderationStatus} />
+                                </div>
+
+                                {tour.rejectionReason && (
+                                    <div className={`${NEU_SURFACE_INSET_SM} rounded-xl p-3 flex flex-col gap-1`}>
+                                        <span className={`${NEU_LABEL} text-[#FF2157]`}>Rejection Reason</span>
+                                        <span className={`${NEU_MONO} text-sm`}>{tour.rejectionReason}</span>
+                                    </div>
+                                )}
+
+                                {tour.completedAt && (
+                                    <div className={NEU_ROW}>
+                                        <span className={`${NEU_MUTED} font-medium`}>Completed At</span>
+                                        <span className={`${NEU_MONO} text-sm`}>
+                                            {new Date(tour.completedAt).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {tour.reApprovalRequestedAt && (
+                                    <div className={NEU_ROW}>
+                                        <span className={`${NEU_MUTED} font-medium`}>Re-approval Requested</span>
+                                        <span className={`${NEU_MONO} text-sm`}>
+                                            {new Date(tour.reApprovalRequestedAt).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* ── System column ─────────────────── */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className={NEU_ICON_WELL}>
+                                        <LayoutDashboard className="h-3.5 w-3.5 text-[#1E2938]/60" />
+                                    </div>
+                                    <span className={NEU_LABEL}>System Information</span>
+                                </div>
+
+                                <div className={NEU_ROW}>
+                                    <span className={`${NEU_MUTED} font-medium`}>Tour Status</span>
+                                    <TourStatusBadge status={tour.status} />
+                                </div>
+
+                                <div className={NEU_ROW}>
+                                    <span className={`${NEU_MUTED} font-medium`}>Tour Code</span>
+                                    <span className={`${NEU_BADGE_NEUTRAL} font-mono tracking-wide`}>
+                                        {tour.tourCode || "N/A"}
+                                    </span>
+                                </div>
+
+                                <div className={`${NEU_SURFACE_INSET_SM} rounded-xl p-3 flex flex-col gap-2`}>
+                                    <span className={NEU_LABEL}>Tags</span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {tour.tags && tour.tags.length > 0 ? (
+                                            tour.tags.map((tag) => (
+                                                <span key={tag} className={NEU_BADGE_NEUTRAL}>{tag}</span>
+                                            ))
+                                        ) : (
+                                            <span className={NEU_MUTED}>No tags</span>
                                         )}
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <h4 className="font-semibold text-base flex items-center gap-2">
-                                        <LayoutDashboard className="h-4 w-4 text-primary" />
-                                        System Information
-                                    </h4>
-                                    <div className="space-y-3 text-sm">
-                                        <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                            <span className="text-muted-foreground font-medium">Tour Status:</span>
-                                            <Badge variant="outline" className={
-                                                tour.status === TOUR_STATUS.ACTIVE ? "bg-green-100 text-green-800" :
-                                                    tour.status === TOUR_STATUS.DRAFT ? "bg-blue-100 text-blue-800" :
-                                                        tour.status === TOUR_STATUS.SUBMITTED ? "bg-yellow-100 text-yellow-800" :
-                                                            tour.status === TOUR_STATUS.COMPLETED ? "bg-purple-100 text-purple-800" :
-                                                                tour.status === TOUR_STATUS.ARCHIVED ? "bg-gray-100 text-gray-800" :
-                                                                    "bg-red-100 text-red-800"
-                                            }>
-                                                {tour.status}
-                                            </Badge>
-                                        </div>
-                                        <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                            <span className="text-muted-foreground font-medium">Tour Code:</span>
-                                            <Badge variant="secondary" className="font-mono tracking-wide">
-                                                {tour.tourCode || "N/A"}
-                                            </Badge>
-                                        </div>
-                                        <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                            <span className="text-muted-foreground font-medium">Tags:</span>
-                                            <div className="flex gap-1 flex-wrap justify-end max-w-xs">
-                                                {tour.tags && tour.tags.length > 0 ? (
-                                                    tour.tags.map((tag) => (
-                                                        <Badge key={tag} variant="outline" className="text-xs">
-                                                            {tag}
-                                                        </Badge>
-                                                    ))
-                                                ) : (
-                                                    <span className="text-muted-foreground text-xs">No tags</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        {tour.deletedAt && (
-                                            <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900">
-                                                <span className="text-muted-foreground font-medium">Deleted At:</span>
-                                                <span className="font-medium text-red-600 dark:text-red-400">
-                                                    {new Date(tour.deletedAt).toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                        )}
-                                        <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                            <span className="text-muted-foreground font-medium">SEO Title:</span>
-                                            <span className="max-w-xs truncate text-right">{tour.seo?.metaTitle || 'Not set'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-start p-3 bg-muted/50 rounded-lg">
-                                            <span className="text-muted-foreground font-medium">SEO Description:</span>
-                                            <span className="max-w-xs text-right text-xs line-clamp-2">
-                                                {tour.seo?.metaDescription || 'Not set'}
-                                            </span>
-                                        </div>
+                                {tour.deletedAt && (
+                                    <div className="flex justify-between items-center p-3 rounded-xl bg-[#FF2157]/5 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] border border-[#FF2157]/20">
+                                        <span className={`${NEU_MUTED} font-medium`}>Deleted At</span>
+                                        <span className="font-[family-name:var(--font-jetbrains-mono)] text-sm font-semibold text-[#FF2157]">
+                                            {new Date(tour.deletedAt).toLocaleDateString()}
+                                        </span>
                                     </div>
+                                )}
+
+                                <div className={NEU_ROW}>
+                                    <span className={`${NEU_MUTED} font-medium`}>SEO Title</span>
+                                    <span className={`${NEU_MONO} text-sm max-w-[14rem] truncate text-right`}>
+                                        {tour.seo?.metaTitle || "Not set"}
+                                    </span>
+                                </div>
+
+                                <div className={`${NEU_SURFACE_INSET_SM} rounded-xl p-3 flex flex-col gap-1`}>
+                                    <span className={NEU_LABEL}>SEO Description</span>
+                                    <span className={`${NEU_MONO} text-xs line-clamp-2`}>
+                                        {tour.seo?.metaDescription || "Not set"}
+                                    </span>
                                 </div>
                             </div>
-                        </CardContent>
-                        <CardFooter className="text-xs text-muted-foreground bg-muted/30 pt-4">
-                            <div className="flex items-center gap-2">
-                                <Calendar className="h-3 w-3" />
+                        </div>
+
+                        {/* Card footer */}
+                        <div className="px-6 py-3 rounded-b-2xl border-t border-[#1E2938]/10 flex items-center gap-2">
+                            <div className={NEU_ICON_WELL}>
+                                <Calendar className="h-3 w-3 text-[#1E2938]/50" />
+                            </div>
+                            <span className={`${NEU_MUTED} text-xs`}>
                                 Last updated: {new Date(tour.updatedAt).toLocaleString()}
-                            </div>
-                        </CardFooter>
-                    </Card>
-                </motion.div>
+                            </span>
+                        </div>
+                    </div>
+                </FadeUp>
+
             </div>
         </div>
-    )
+    );
 }

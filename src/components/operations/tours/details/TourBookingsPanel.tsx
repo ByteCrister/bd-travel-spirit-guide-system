@@ -19,15 +19,6 @@ import {
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import {
     Tooltip,
     TooltipContent,
@@ -44,6 +35,50 @@ import { BookingListItemDTO } from "@/types/tour/tour-detail-booking.types";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 
+// ─── Neumorphism Design Tokens ─────────────────────────────────────────────────
+const NEU_CARD =
+    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+const NEU_CARD_SM =
+    "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+const NEU_SURFACE_RAISED =
+    "bg-[#E7E5E4] shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff]";
+const NEU_SURFACE_INSET_SM =
+    "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+
+const NEU_BTN_GHOST =
+    "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] " +
+    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none";
+
+const NEU_BTN_ICON =
+    "rounded-xl w-9 h-9 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/60 " +
+    "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
+    "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
+    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
+
+const NEU_BTN_ICON_ACTIVE =
+    "rounded-xl w-9 h-9 flex items-center justify-center bg-[#006666] text-white " +
+    "shadow-[inset_2px_2px_5px_#004d4d,inset_-2px_-2px_5px_#008080]";
+
+const NEU_INPUT =
+    "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
+    "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
+    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
+
+const NEU_SKELETON = "rounded-lg bg-[#d0cecd] animate-pulse";
+
+const NEU_HEADING = "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
+const NEU_LABEL = "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
+const NEU_MUTED = "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
+const NEU_MONO = "font-[family-name:var(--font-jetbrains-mono)] text-[#1E2938]";
+const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+const NEU_DIVIDER = "border-[#1E2938]/10";
+
+// ─── Types ─────────────────────────────────────────────────────────────────────
 interface TourBookingsPanelProps {
     tourId: string;
 }
@@ -51,6 +86,7 @@ interface TourBookingsPanelProps {
 type SortField = "bookingTime" | "totalParticipants" | "totalPaid";
 type SortOrder = "asc" | "desc";
 
+// ─── Layout Grid ───────────────────────────────────────────────────────────────
 /** avatar | traveler | pax (sm+) | amount (md+) | booked */
 const BOOKINGS_TABLE_GRID =
     "grid grid-cols-[36px_minmax(0,1fr)_7rem] sm:grid-cols-[36px_minmax(0,1fr)_4.5rem_7rem] md:grid-cols-[36px_minmax(0,1fr)_4.5rem_6rem_7.5rem] gap-x-3 items-center";
@@ -66,22 +102,24 @@ const AVATAR_GRADIENTS = [
     "from-fuchsia-400 to-purple-500",
 ];
 
+// ─── Sub-components ────────────────────────────────────────────────────────────
+
 function SkeletonRow({ index }: { index: number }) {
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.04 }}
-            className={cn(TABLE_ROW_CLASS, "py-4 border-b border-border/50 last:border-0")}
+            className={cn(TABLE_ROW_CLASS, "py-4 border-b last:border-0", NEU_DIVIDER)}
         >
-            <div className="w-9 h-9 rounded-xl bg-muted animate-pulse" />
+            <div className={cn("w-9 h-9 rounded-xl", NEU_SKELETON)} />
             <div className="min-w-0 space-y-2">
-                <div className="h-3.5 bg-muted rounded-full animate-pulse w-32" />
-                <div className="h-2.5 bg-muted/60 rounded-full animate-pulse w-48" />
+                <div className={cn("h-3.5 rounded-full w-32", NEU_SKELETON)} />
+                <div className={cn("h-2.5 rounded-full w-48 opacity-60", NEU_SKELETON)} />
             </div>
-            <div className="hidden sm:block h-6 w-full max-w-[4.5rem] justify-self-center bg-muted rounded-full animate-pulse" />
-            <div className="hidden md:block h-3.5 w-full max-w-[6rem] justify-self-end bg-muted rounded-full animate-pulse" />
-            <div className="h-3 w-full max-w-[7.5rem] justify-self-end bg-muted/60 rounded-full animate-pulse" />
+            <div className={cn("hidden sm:block h-6 w-full max-w-[4.5rem] justify-self-center rounded-full", NEU_SKELETON)} />
+            <div className={cn("hidden md:block h-3.5 w-full max-w-[6rem] justify-self-end rounded-full", NEU_SKELETON)} />
+            <div className={cn("h-3 w-full max-w-[7.5rem] justify-self-end rounded-full opacity-60", NEU_SKELETON)} />
         </motion.div>
     );
 }
@@ -94,14 +132,14 @@ function EmptyState({ hasSearch }: { hasSearch: boolean }) {
             transition={{ duration: 0.3 }}
             className="flex flex-col items-center justify-center py-20 gap-4"
         >
-            <div className="w-16 h-16 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center">
-                <Ticket size={26} className="text-muted-foreground/40" />
+            <div className={cn("w-16 h-16 flex items-center justify-center", NEU_SURFACE_RAISED, "rounded-2xl")}>
+                <Ticket size={26} className="text-[#1E2938]/30" />
             </div>
             <div className="text-center space-y-1">
-                <p className="text-sm font-semibold text-foreground/70">
+                <p className={cn("text-sm", NEU_HEADING)}>
                     {hasSearch ? "No matching bookings" : "No bookings yet"}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className={NEU_MUTED}>
                     {hasSearch
                         ? "Try a different traveler name or email"
                         : "Bookings for this tour will appear here"}
@@ -118,17 +156,21 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-16 gap-4"
         >
-            <div className="w-14 h-14 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center">
-                <AlertCircle size={24} className="text-destructive/60" />
+            <div className={cn("w-14 h-14 flex items-center justify-center rounded-2xl bg-[#FF2157]/10", NEU_SURFACE_RAISED)}>
+                <AlertCircle size={24} className="text-[#FF2157]/70" />
             </div>
             <div className="text-center space-y-1">
-                <p className="text-sm font-semibold text-foreground/80">Failed to load bookings</p>
-                <p className="text-xs text-muted-foreground max-w-xs">{message}</p>
+                <p className={cn("text-sm", NEU_HEADING)}>Failed to load bookings</p>
+                <p className={cn(NEU_MUTED, "max-w-xs")}>{message}</p>
             </div>
-            <Button variant="outline" size="sm" onClick={onRetry} className="gap-2 mt-1 h-8">
+            <button
+                type="button"
+                onClick={onRetry}
+                className={cn(NEU_BTN_GHOST, "flex items-center gap-2 px-4 py-2 text-sm mt-1")}
+            >
                 <RefreshCw size={12} />
                 Try again
-            </Button>
+            </button>
         </motion.div>
     );
 }
@@ -137,13 +179,13 @@ function StatCard({
     icon: Icon,
     label,
     value,
-    colorClass,
+    accentClass,
     index = 0,
 }: {
     icon: React.ElementType;
     label: string;
     value: string | number;
-    colorClass: string;
+    accentClass: string;
     index?: number;
 }) {
     return (
@@ -151,16 +193,19 @@ function StatCard({
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className={cn("flex items-center gap-3 px-4 py-3 rounded-xl border", colorClass)}
+            className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-xl flex-1 min-w-[120px]",
+                NEU_CARD_SM
+            )}
         >
-            <div className="shrink-0 opacity-80">
-                <Icon size={15} />
+            <div className={cn(NEU_ICON_WELL_PRIMARY, accentClass, "shrink-0")}>
+                <Icon size={14} />
             </div>
             <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-wider font-medium opacity-60 leading-none mb-0.5">
+                <p className={cn(NEU_LABEL, "mb-0.5 leading-none")}>
                     {label}
                 </p>
-                <p className="text-sm font-bold leading-none">{value}</p>
+                <p className={cn(NEU_HEADING, "text-sm leading-none")}>{value}</p>
             </div>
         </motion.div>
     );
@@ -184,12 +229,13 @@ function SortBtn({
             type="button"
             onClick={onClick}
             className={cn(
-                "inline-flex items-center gap-1 w-full text-[10.5px] font-semibold uppercase tracking-wider transition-colors select-none",
+                "inline-flex items-center gap-1 w-full transition-colors select-none",
+                NEU_LABEL,
                 align === "center" && "justify-center",
                 align === "end" && "justify-end",
                 active
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground/70"
+                    ? "text-[#006666]"
+                    : "text-[#1E2938]/40 hover:text-[#1E2938]/60"
             )}
         >
             {label}
@@ -212,16 +258,9 @@ function BookingsTableHeader({
     onSort: (field: SortField) => void;
 }) {
     return (
-        <div
-            className={cn(
-                TABLE_ROW_CLASS,
-                "py-2.5 bg-muted/10 border-b border-border/40"
-            )}
-        >
+        <div className={cn(TABLE_ROW_CLASS, "py-3", NEU_SURFACE_INSET_SM)}>
             <div aria-hidden className="w-9" />
-            <span className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Traveler
-            </span>
+            <span className={NEU_LABEL}>Traveler</span>
             <div className="hidden sm:block">
                 <SortBtn
                     label="Pax"
@@ -270,11 +309,13 @@ function BookingRow({ booking, index }: { booking: BookingListItemDTO; index: nu
             transition={{ duration: 0.22, delay: index * 0.028, ease: "easeOut" }}
             className={cn(
                 TABLE_ROW_CLASS,
-                "group py-3.5 border-b border-border/40 last:border-0 hover:bg-muted/25 transition-colors duration-100 cursor-default"
+                "group py-3.5 border-b last:border-0 cursor-default",
+                "hover:bg-white/40 transition-colors duration-150",
+                NEU_DIVIDER
             )}
         >
             {/* Avatar */}
-            <Avatar className="w-9 h-9 rounded-xl ring-1 ring-border/50">
+            <Avatar className="w-9 h-9 rounded-xl shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]">
                 {booking.user.avatarUrl && (
                     <AvatarImage src={booking.user.avatarUrl} alt={booking.user.name} />
                 )}
@@ -290,10 +331,10 @@ function BookingRow({ booking, index }: { booking: BookingListItemDTO; index: nu
 
             {/* Name & email */}
             <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate leading-tight">
+                <p className={cn("text-sm truncate leading-tight", NEU_HEADING, "font-semibold")}>
                     {booking.user.name}
                 </p>
-                <p className="text-[11px] text-muted-foreground truncate leading-tight mt-0.5">
+                <p className={cn("text-[11px] truncate leading-tight mt-0.5", NEU_MUTED)}>
                     {booking.user.email}
                 </p>
             </div>
@@ -302,9 +343,13 @@ function BookingRow({ booking, index }: { booking: BookingListItemDTO; index: nu
             <TooltipProvider delayDuration={180}>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <div className="hidden sm:flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/60 border border-border/50 text-muted-foreground justify-self-center w-fit mx-auto">
+                        <div className={cn(
+                            "hidden sm:flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-full justify-self-center w-fit mx-auto",
+                            NEU_SURFACE_INSET_SM,
+                            "text-[#1E2938]/60"
+                        )}>
                             <Users size={11} />
-                            <span className="text-xs font-semibold tabular-nums">
+                            <span className={cn("text-xs font-semibold tabular-nums", NEU_MONO)}>
                                 {booking.totalParticipants}
                             </span>
                         </div>
@@ -318,7 +363,7 @@ function BookingRow({ booking, index }: { booking: BookingListItemDTO; index: nu
 
             {/* Amount (md+) */}
             <div className="hidden md:block justify-self-end text-right">
-                <span className="text-sm font-bold text-foreground font-mono tabular-nums">
+                <span className={cn("text-sm font-bold tabular-nums", NEU_MONO)}>
                     ৳{booking.totalPaid.toLocaleString()}
                 </span>
             </div>
@@ -327,9 +372,9 @@ function BookingRow({ booking, index }: { booking: BookingListItemDTO; index: nu
             <TooltipProvider delayDuration={180}>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <div className="flex items-center justify-end gap-1.5 text-muted-foreground justify-self-end w-full min-w-0">
-                            <CalendarDays size={11} className="shrink-0" />
-                            <span className="text-[11px] whitespace-nowrap tabular-nums">
+                        <div className="flex items-center justify-end gap-1.5 justify-self-end w-full min-w-0">
+                            <CalendarDays size={11} className="shrink-0 text-[#1E2938]/40" />
+                            <span className={cn("text-[11px] whitespace-nowrap tabular-nums", NEU_MUTED)}>
                                 {formatDistanceToNow(new Date(booking.bookingTime), {
                                     addSuffix: true,
                                 })}
@@ -345,6 +390,7 @@ function BookingRow({ booking, index }: { booking: BookingListItemDTO; index: nu
     );
 }
 
+// ─── Main Component ────────────────────────────────────────────────────────────
 export default function TourBookingsPanel({ tourId }: TourBookingsPanelProps) {
     const { fetchBookings, listCache, activeCacheKey, loading, error, params: storeParams } =
         useTourDetailStore();
@@ -447,48 +493,51 @@ export default function TourBookingsPanel({ tourId }: TourBookingsPanelProps) {
             icon: Ticket,
             label: "Total Bookings",
             value: total.toLocaleString(),
-            colorClass: "bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/40 dark:text-indigo-300",
+            accentClass: "text-[#006666]",
         },
         {
             icon: Users,
             label: "Participants",
             value: pagePax.toLocaleString(),
-            colorClass: "bg-emerald-50 border-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-900/40 dark:text-emerald-300",
+            accentClass: "text-[#00A63D]",
         },
         {
             icon: Banknote,
             label: "Page Revenue",
             value: `৳${pageRevenue.toLocaleString()}`,
-            colorClass: "bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-950/30 dark:border-amber-900/40 dark:text-amber-300",
+            accentClass: "text-[#FE9900]",
         },
     ];
 
     return (
         <div className="space-y-5">
+            {/* ── Panel Header ── */}
             <div className="flex items-start justify-between gap-3">
-                <div>
-                    <h2 className="text-base font-bold text-foreground flex items-center gap-2">
-                        <Ticket size={16} className="text-primary" />
-                        Tour Bookings
-                    </h2>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                        {total > 0
-                            ? `${total.toLocaleString()} total booking${total !== 1 ? "s" : ""}`
-                            : "Manage and review traveler bookings for this tour"}
-                    </p>
+                <div className="flex items-center gap-3">
+                    <div className={cn(NEU_ICON_WELL_PRIMARY, "shrink-0")}>
+                        <Ticket size={16} className="text-[#006666]" />
+                    </div>
+                    <div>
+                        <h2 className={cn(NEU_HEADING, "text-base")}>Tour Bookings</h2>
+                        <p className={cn(NEU_MUTED, "text-xs mt-0.5")}>
+                            {total > 0
+                                ? `${total.toLocaleString()} total booking${total !== 1 ? "s" : ""}`
+                                : "Manage and review traveler bookings for this tour"}
+                        </p>
+                    </div>
                 </div>
-                <Button
-                    variant="outline"
-                    size="sm"
+                <button
+                    type="button"
                     onClick={handleRetry}
                     disabled={isLoading}
-                    className="h-8 gap-1.5 shrink-0"
+                    className={cn(NEU_BTN_GHOST, "flex items-center gap-1.5 px-3 py-2 text-xs shrink-0")}
                 >
                     <RefreshCw size={12} className={cn(isLoading && "animate-spin")} />
                     Refresh
-                </Button>
+                </button>
             </div>
 
+            {/* ── Stat Cards ── */}
             <AnimatePresence>
                 {!isLoading && bookings.length > 0 && (
                     <motion.div
@@ -496,7 +545,7 @@ export default function TourBookingsPanel({ tourId }: TourBookingsPanelProps) {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className="flex flex-wrap gap-2.5"
+                        className="flex flex-wrap gap-3"
                     >
                         {stats.map((s, i) => (
                             <StatCard key={i} {...s} index={i} />
@@ -505,27 +554,37 @@ export default function TourBookingsPanel({ tourId }: TourBookingsPanelProps) {
                 )}
             </AnimatePresence>
 
-            <div className="rounded-2xl border border-border/60 bg-card overflow-hidden shadow-[0_1px_4px_rgba(0,0,0,0.05),0_0_0_1px_rgba(0,0,0,0.02)]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3.5 border-b border-border/50 bg-muted/15">
+            {/* ── Table Card ── */}
+            <div className={cn(NEU_CARD, "overflow-hidden")}>
+
+                {/* Table toolbar */}
+                <div className={cn(
+                    "flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3.5 border-b",
+                    NEU_DIVIDER, NEU_SURFACE_INSET_SM
+                )}>
+                    {/* Search */}
                     <div className="relative max-w-xs w-full">
                         <Search
                             size={13}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#1E2938]/40 pointer-events-none"
                         />
-                        <Input
+                        <input
                             value={localSearch}
                             onChange={handleSearchChange}
                             placeholder="Search traveler name or email…"
-                            className="pl-8 h-8 text-xs bg-background border-border/60 focus-visible:ring-1 focus-visible:ring-primary/40"
+                            className={cn(NEU_INPUT, "w-full pl-8 pr-3 py-2 text-xs")}
                         />
                     </div>
 
+                    {/* Row count selector */}
                     <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs text-muted-foreground hidden sm:block">Show</span>
-                        <Select
+                        <span className={cn(NEU_LABEL, "hidden sm:block normal-case tracking-normal text-xs")}>
+                            Show
+                        </span>
+                        <select
                             value={String(limit)}
-                            onValueChange={(v) => {
-                                const n = Number(v);
+                            onChange={(e) => {
+                                const n = Number(e.target.value);
                                 setLimit(n);
                                 fetchBookings(
                                     tourId,
@@ -533,21 +592,18 @@ export default function TourBookingsPanel({ tourId }: TourBookingsPanelProps) {
                                     true
                                 );
                             }}
+                            className={cn(NEU_INPUT, "px-3 py-2 text-xs pr-8 appearance-none cursor-pointer")}
                         >
-                            <SelectTrigger className="h-8 w-[90px] text-xs border-border/60 bg-background">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {[5, 10, 20, 50].map((n) => (
-                                    <SelectItem key={n} value={String(n)} className="text-xs">
-                                        {n} rows
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                            {[5, 10, 20, 50].map((n) => (
+                                <option key={n} value={String(n)}>
+                                    {n} rows
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
+                {/* Table header */}
                 {!isLoading && !errorMsg && bookings.length > 0 && (
                     <BookingsTableHeader
                         sortField={sortField}
@@ -556,6 +612,7 @@ export default function TourBookingsPanel({ tourId }: TourBookingsPanelProps) {
                     />
                 )}
 
+                {/* Table body */}
                 {isLoading ? (
                     <div>
                         {[...Array(Math.min(limit, 6))].map((_, i) => (
@@ -574,55 +631,61 @@ export default function TourBookingsPanel({ tourId }: TourBookingsPanelProps) {
                     </AnimatePresence>
                 )}
 
+                {/* Pagination footer */}
                 {!isLoading && !errorMsg && bookings.length > 0 && (
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3.5 border-t border-border/40 bg-muted/10">
-                        <p className="text-xs text-muted-foreground">
+                    <div className={cn(
+                        "flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3.5 border-t",
+                        NEU_DIVIDER, NEU_SURFACE_INSET_SM
+                    )}>
+                        <p className={cn(NEU_MUTED, "text-xs")}>
                             Page{" "}
-                            <span className="font-semibold text-foreground">{currentPage}</span>{" "}
+                            <span className={cn("font-semibold text-[#1E2938]", NEU_MONO)}>{currentPage}</span>{" "}
                             of{" "}
-                            <span className="font-semibold text-foreground">{totalPages}</span>
+                            <span className={cn("font-semibold text-[#1E2938]", NEU_MONO)}>{totalPages}</span>
                             {total > 0 && (
                                 <>
-                                    {" "}· total{" "}
-                                    <span className="font-semibold text-foreground">
-                                        {total}
-                                    </span>
+                                    {" "}·{" "}
+                                    <span className={cn("font-semibold text-[#1E2938]", NEU_MONO)}>{total}</span>
+                                    {" "}total
                                 </>
                             )}
                         </p>
 
-                        <div className="flex items-center gap-1">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-7 w-7 rounded-lg"
+                        <div className="flex items-center gap-1.5">
+                            <button
+                                type="button"
+                                className={cn(NEU_BTN_ICON, "w-7 h-7")}
                                 disabled={currentPage <= 1}
                                 onClick={() => doFetch(currentPage - 1, sortField, sortOrder)}
+                                aria-label="Previous page"
                             >
                                 <ChevronLeft size={13} />
-                            </Button>
+                            </button>
 
                             {pageWindow.map((pg) => (
-                                <Button
+                                <button
                                     key={pg}
-                                    variant={pg === currentPage ? "default" : "outline"}
-                                    size="icon"
-                                    className="h-7 w-7 rounded-lg text-xs"
+                                    type="button"
+                                    className={cn(
+                                        pg === currentPage ? NEU_BTN_ICON_ACTIVE : NEU_BTN_ICON,
+                                        "w-7 h-7 text-xs font-semibold font-[family-name:var(--font-space-mono)]"
+                                    )}
                                     onClick={() => doFetch(pg, sortField, sortOrder)}
+                                    aria-current={pg === currentPage ? "page" : undefined}
                                 >
                                     {pg}
-                                </Button>
+                                </button>
                             ))}
 
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-7 w-7 rounded-lg"
+                            <button
+                                type="button"
+                                className={cn(NEU_BTN_ICON, "w-7 h-7")}
                                 disabled={currentPage >= totalPages}
                                 onClick={() => doFetch(currentPage + 1, sortField, sortOrder)}
+                                aria-label="Next page"
                             >
                                 <ChevronRight size={13} />
-                            </Button>
+                            </button>
                         </div>
                     </div>
                 )}

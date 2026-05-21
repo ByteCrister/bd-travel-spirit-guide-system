@@ -18,7 +18,34 @@ import { encodeId } from "@/utils/helpers/mongodb-id-conversions";
 import { Breadcrumbs } from "@/components/global/Breadcrumbs";
 import { LuCalendar } from "react-icons/lu";
 import TourBookingsPanel from "./TourBookingsPanel";
+import { cn } from "@/lib/utils";
 
+// ─── Neumorphism Design Tokens ─────────────────────────────────────────────────
+const NEU_SURFACE = "bg-[#E7E5E4]";
+// Tab button states
+const NEU_TAB_BASE =
+    "relative flex-1 min-w-[80px] max-w-[200px] flex flex-col items-center justify-center gap-1.5 " +
+    "px-3 py-3 rounded-xl cursor-pointer select-none outline-none " +
+    "transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[#006666]/40";
+
+const NEU_TAB_IDLE =
+    "bg-[#E7E5E4] text-[#1E2938]/50 " +
+    "shadow-[3px_3px_7px_#c8c6c5,-3px_-3px_7px_#ffffff] " +
+    "hover:text-[#1E2938]/80 hover:shadow-[4px_4px_9px_#c8c6c5,-4px_-4px_9px_#ffffff]";
+
+const NEU_TAB_ACTIVE =
+    "bg-[#E7E5E4] text-[#006666] " +
+    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]";
+
+const NEU_TAB_WRAPPER =
+    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_18px_#c8c6c5,-8px_-8px_18px_#ffffff] border border-white/60 p-2";
+
+const NEU_CONTENT_CARD =
+    "rounded-2xl bg-[#E7E5E4] shadow-[10px_10px_20px_#c8c6c5,-10px_-10px_20px_#ffffff] border border-white/60";
+const NEU_ACTIVE_DOT =
+    "w-1 h-1 rounded-full bg-[#006666] shadow-[0_0_6px_#006666]";
+
+// ─── Types ─────────────────────────────────────────────────────────────────────
 interface TourDetailProps {
     tourId: string;
 }
@@ -33,16 +60,16 @@ interface Tab {
 }
 
 const tabs: Tab[] = [
-    { value: "details", label: "Details", icon: LayoutDashboard, description: "Core tour information" },
+    { value: "details", label: "Details", icon: LayoutDashboard, description: "Core tour info" },
     { value: "bookings", label: "Bookings", icon: LuCalendar, description: "Manage bookings" },
     { value: "reviews", label: "Reviews", icon: MessageSquare, description: "Guest feedback" },
-    { value: "reports", label: "Reports", icon: Flag, description: "Analytics & reports" },
+    { value: "reports", label: "Reports", icon: Flag, description: "Analytics" },
     { value: "faqs", label: "FAQs", icon: HelpCircle, description: "Common questions" },
 ];
 
+// ─── Component ─────────────────────────────────────────────────────────────────
 export default function TourDetailPage({ tourId }: TourDetailProps) {
     const [activeTab, setActiveTab] = useState<TabValue>("details");
-    const [hoveredTab, setHoveredTab] = useState<TabValue | null>(null);
 
     const { tourDetails, fetchTourDetail } = useTourDetailStore();
     const tour = tourDetails[tourId];
@@ -62,165 +89,103 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
     }, [fetchTourDetail, tour?.id, tour?.title, tourId]);
 
     const contentVariants: Variants = {
-        hidden: { opacity: 0, y: 20, scale: 0.98 },
+        hidden: { opacity: 0, y: 16, scale: 0.985 },
         visible: {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            transition: { type: "spring", stiffness: 280, damping: 28 },
+            opacity: 1, y: 0, scale: 1,
+            transition: { type: "spring", stiffness: 300, damping: 28 },
         },
         exit: {
-            opacity: 0,
-            y: -20,
-            scale: 0.98,
-            transition: { duration: 0.2, ease: "easeInOut" },
+            opacity: 0, y: -12, scale: 0.985,
+            transition: { duration: 0.18, ease: "easeInOut" },
         },
     };
 
     return (
-        <div className="w-full space-y-6 overflow-x-hidden">
+        <div className={cn("w-full space-y-6 overflow-x-hidden", NEU_SURFACE, "min-h-screen p-0")}>
             <Breadcrumbs items={breadCrumbs} />
 
-            {/* ================= Enhanced Modern Tabs ================= */}
-            <div className="relative">
-                {/* Subtle glow effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-xl opacity-60" />
+            {/* ── Tab Bar ── */}
+            <div className={NEU_TAB_WRAPPER}>
+                <div className="flex flex-wrap gap-1.5">
+                    {tabs.map((tab, index) => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.value;
 
-                <div className="relative bg-gradient-to-br from-background via-card to-background border border-border/40 rounded-2xl shadow-2xl shadow-black/5 p-1.5">
-                    {/* Glass morphism overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none" />
-
-                    <div className="relative flex flex-wrap gap-1 p-1">
-                        {tabs.map((tab, index) => {
-                            const Icon = tab.icon;
-                            const isActive = activeTab === tab.value;
-                            const isHovered = hoveredTab === tab.value;
-
-                            return (
-                                <motion.button
-                                    key={tab.value}
-                                    onClick={() => setActiveTab(tab.value)}
-                                    onHoverStart={() => setHoveredTab(tab.value)}
-                                    onHoverEnd={() => setHoveredTab(null)}
-                                    className="relative flex-1 group min-w-[100px] max-w-[200px]"
-                                    initial={{ opacity: 0, y: -15 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{
-                                        delay: index * 0.06,
-                                        type: "spring",
-                                        stiffness: 300,
-                                        damping: 25
-                                    }}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                >
-                                    {/* Active background with gradient */}
-                                    {isActive && (
-                                        <motion.div
-                                            layoutId="activeTab"
-                                            className="absolute inset-0 bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 rounded-xl border border-primary/20 shadow-lg shadow-primary/10"
-                                            transition={{
-                                                type: "spring",
-                                                stiffness: 380,
-                                                damping: 30
-                                            }}
-                                        />
-                                    )}
-
-                                    {/* Hover background */}
-                                    {!isActive && isHovered && (
-                                        <motion.div
-                                            className="absolute inset-0 bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            transition={{ duration: 0.2 }}
-                                        />
-                                    )}
-
-                                    {/* Content */}
-                                    <div className="relative z-10 flex flex-col items-center justify-center gap-2 px-4 py-3.5 rounded-xl overflow-hidden">
-                                        {/* Icon with animated background */}
-                                        <div className="relative">
-                                            {isActive && (
-                                                <motion.div
-                                                    className="absolute inset-0 bg-primary/20 rounded-full blur-md"
-                                                    initial={{ scale: 0 }}
-                                                    animate={{ scale: 1.5 }}
-                                                    transition={{ duration: 0.3 }}
-                                                />
-                                            )}
-                                            <Icon
-                                                className={`h-5 w-5 transition-all duration-200 relative z-10 ${isActive
-                                                        ? "text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.3)]"
-                                                        : isHovered
-                                                            ? "text-foreground/90"
-                                                            : "text-muted-foreground"
-                                                    }`}
-                                                strokeWidth={isActive ? 2.5 : 2}
-                                            />
-                                        </div>
-
-                                        {/* Label */}
-                                        <span
-                                            className={`text-sm font-semibold transition-all duration-200 ${isActive
-                                                    ? "text-foreground"
-                                                    : isHovered
-                                                        ? "text-foreground/90"
-                                                        : "text-muted-foreground"
-                                                }`}
-                                        >
-                                            {tab.label}
-                                        </span>
-
-                                        {/* Description - shown on hover or active */}
-                                        <AnimatePresence>
-                                            {(isHovered || isActive) && (
-                                                <motion.span
-                                                    initial={{ opacity: 0, height: 0 }}
-                                                    animate={{ opacity: 1, height: "auto" }}
-                                                    exit={{ opacity: 0, height: 0 }}
-                                                    transition={{ duration: 0.2 }}
-                                                    className="text-[10px] text-muted-foreground/80 text-center leading-tight hidden md:block max-w-[140px]"
-                                                >
-                                                    {tab.description}
-                                                </motion.span>
-                                            )}
-                                        </AnimatePresence>
-
-                                        {/* Active indicator line */}
-                                        {isActive && (
-                                            <motion.div
-                                                layoutId="activeIndicator"
-                                                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full"
-                                                transition={{
-                                                    type: "spring",
-                                                    stiffness: 380,
-                                                    damping: 30
-                                                }}
-                                            />
+                        return (
+                            <motion.button
+                                key={tab.value}
+                                type="button"
+                                onClick={() => setActiveTab(tab.value)}
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{
+                                    delay: index * 0.055,
+                                    type: "spring",
+                                    stiffness: 320,
+                                    damping: 26,
+                                }}
+                                whileTap={{ scale: 0.97 }}
+                                aria-selected={isActive}
+                                aria-controls={`tabpanel-${tab.value}`}
+                                role="tab"
+                                className={cn(
+                                    NEU_TAB_BASE,
+                                    isActive ? NEU_TAB_ACTIVE : NEU_TAB_IDLE
+                                )}
+                            >
+                                {/* Icon */}
+                                <div className="relative">
+                                    <Icon
+                                        className={cn(
+                                            "h-[18px] w-[18px] transition-all duration-200",
+                                            isActive
+                                                ? "text-[#006666]"
+                                                : "text-[#1E2938]/40 group-hover:text-[#1E2938]/70"
                                         )}
-                                    </div>
+                                        strokeWidth={isActive ? 2.5 : 2}
+                                    />
+                                </div>
 
-                                    {/* Shimmer effect on hover */}
-                                    {isHovered && !isActive && (
-                                        <motion.div
-                                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-                                            initial={{ x: "-100%" }}
-                                            animate={{ x: "100%" }}
-                                            transition={{
-                                                duration: 0.6,
-                                                ease: "easeInOut"
-                                            }}
+                                {/* Label */}
+                                <span
+                                    className={cn(
+                                        "text-xs font-bold font-[family-name:var(--font-space-mono)] tracking-wide transition-colors duration-200",
+                                        isActive ? "text-[#006666]" : "text-[#1E2938]/50"
+                                    )}
+                                >
+                                    {tab.label}
+                                </span>
+
+                                {/* Description — visible on md+ */}
+                                <span
+                                    className={cn(
+                                        "hidden md:block text-[10px] font-[family-name:var(--font-jetbrains-mono)] text-center leading-tight transition-colors duration-200",
+                                        isActive ? "text-[#006666]/60" : "text-[#1E2938]/30"
+                                    )}
+                                >
+                                    {tab.description}
+                                </span>
+
+                                {/* Active pulse dot */}
+                                <AnimatePresence>
+                                    {isActive && (
+                                        <motion.span
+                                            key="dot"
+                                            initial={{ opacity: 0, scale: 0 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className={NEU_ACTIVE_DOT}
                                         />
                                     )}
-                                </motion.button>
-                            );
-                        })}
-                    </div>
+                                </AnimatePresence>
+                            </motion.button>
+                        );
+                    })}
                 </div>
             </div>
 
-            {/* ================= Content ================= */}
+            {/* ── Content Panel ── */}
             <AnimatePresence mode="wait">
                 <motion.div
                     key={activeTab}
@@ -228,17 +193,15 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                     initial="hidden"
                     animate="visible"
                     exit="exit"
-                    className="relative"
+                    id={`tabpanel-${activeTab}`}
+                    role="tabpanel"
+                    className={cn(NEU_CONTENT_CARD, "p-6 md:p-8 overflow-visible")}
                 >
-                    <div className="relative bg-card/90 rounded-xl border border-border/50 shadow-xl">
-                        <div className="relative p-8 md:p-10 overflow-visible">
-                            {activeTab === "details" && <TourCoreDetails tourId={tourId} />}
-                            {activeTab === "reviews" && <ReviewsPanel tourId={tourId} />}
-                            {activeTab === "reports" && <ReportsPanel tourId={tourId} />}
-                            {activeTab === "faqs" && <TourFaqsPanel tourId={tourId} />}
-                            {activeTab === "bookings" && <TourBookingsPanel tourId={tourId} />}
-                        </div>
-                    </div>
+                    {activeTab === "details" && <TourCoreDetails tourId={tourId} />}
+                    {activeTab === "bookings" && <TourBookingsPanel tourId={tourId} />}
+                    {activeTab === "reviews" && <ReviewsPanel tourId={tourId} />}
+                    {activeTab === "reports" && <ReportsPanel tourId={tourId} />}
+                    {activeTab === "faqs" && <TourFaqsPanel tourId={tourId} />}
                 </motion.div>
             </AnimatePresence>
         </div>
