@@ -1,29 +1,48 @@
 "use client";
 
 import { useState, useRef } from "react";
-import {
-    Box,
-    Typography,
-    IconButton,
-    Paper,
-    Button,
-    CircularProgress,
-    Grid,
-    Chip,
-} from "@mui/material";
-import {
-    Upload,
-    X,
-    Image as ImageIcon,
-    CheckCircle,
-    AlertCircle,
-} from "lucide-react";
+import { Upload, X, Image as ImageIcon, CheckCircle, AlertCircle, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { filesToDocumentDTOs } from "@/utils/helpers/file-conversion";
 import { showToast } from "@/components/global/showToast";
+import Image from "next/image";
 
+// ── Neumorphic style tokens ───────────────────────────────────
+const NEU_SURFACE = "bg-[#E7E5E4]";
+const NEU_CARD_SM =
+    "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+const NEU_INSET =
+    "bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
+const NEU_INSET_SM =
+    "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+
+const NEU_BTN_DANGER =
+    "rounded-xl bg-[#E7E5E4] text-[#FF2157] font-[family-name:var(--font-space-mono)] " +
+    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+    "hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    "transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed";
+
+const NEU_HEADING =
+    "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
+const NEU_MUTED =
+    "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
+const NEU_BADGE_PRIMARY =
+    "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
+    "bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+const NEU_BADGE_WARNING =
+    "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
+    "bg-[#FE9900]/10 text-[#FE9900] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+
+// ── Card animation variants ───────────────────────────────────
+const cardVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
+};
+
+// ── Props ─────────────────────────────────────────────────────
 interface UploadAttractionImageProps {
-    imageIds: string[]; // Array of base64 strings or image IDs
+    imageIds: string[];
     onImagesChange: (newImages: string[]) => void;
     maxImages?: number;
     maxSizeMB?: number;
@@ -46,7 +65,6 @@ export default function UploadAttractionImage({
 
         const fileArray = Array.from(files);
 
-        // Check if adding these files would exceed maxImages limit
         if (imageIds.length + fileArray.length > maxImages) {
             showToast.warning(
                 "Maximum images exceeded",
@@ -55,10 +73,8 @@ export default function UploadAttractionImage({
             return;
         }
 
-        // Validate file sizes
         const maxBytes = maxSizeMB * 1024 * 1024;
-        const oversizedFiles = fileArray.filter(file => file.size > maxBytes);
-
+        const oversizedFiles = fileArray.filter((f) => f.size > maxBytes);
         if (oversizedFiles.length > 0) {
             showToast.error(
                 "File too large",
@@ -68,36 +84,27 @@ export default function UploadAttractionImage({
         }
 
         setIsUploading(true);
-
         try {
-            // Convert files to DocumentDTO with compression
             const documentDTOs = await filesToDocumentDTOs(fileArray, {
                 compressImages: true,
-                maxWidth: 1200, // Good resolution for attraction images
+                maxWidth: 1200,
                 quality: 0.8,
                 maxFileBytes: maxBytes,
             });
 
-            // Extract base64 URLs from DocumentDTOs
             const newBase64Images = documentDTOs
-                .map(doc => doc.url as string) // Cast to string since we're storing base64
-                .filter(url => url && url.startsWith('data:image'));
+                .map((doc) => doc.url as string)
+                .filter((url) => url && url.startsWith("data:image"));
 
             if (newBase64Images.length > 0) {
-                // Combine with existing images
                 const updatedImages = [...imageIds, ...newBase64Images].slice(0, maxImages);
                 onImagesChange(updatedImages);
-
                 showToast.success(
                     "Images uploaded successfully",
                     `${newBase64Images.length} image(s) added.`
                 );
-
             } else {
-                showToast.error(
-                    "No valid images",
-                    `No valid images could be processed.`
-                );
+                showToast.error("No valid images", "No valid images could be processed.");
             }
         } catch (error) {
             console.error("Error uploading images:", error);
@@ -107,49 +114,34 @@ export default function UploadAttractionImage({
             );
         } finally {
             setIsUploading(false);
-            // Clear file input
-            if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-            }
+            if (fileInputRef.current) fileInputRef.current.value = "";
         }
     };
 
     const handleRemoveImage = (index: number) => {
-        const updatedImages = [...imageIds];
-        updatedImages.splice(index, 1);
-        onImagesChange(updatedImages);
-
-        showToast.success(
-            "Image removed",
-            "Image has been removed successfully."
-        );
+        const updated = [...imageIds];
+        updated.splice(index, 1);
+        onImagesChange(updated);
+        showToast.success("Image removed", "Image has been removed successfully.");
     };
 
     const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setDragOver(false);
-
         if (disabled || isUploading) return;
-
-        const files = Array.from(e.dataTransfer.files);
-        const imageFiles = files.filter(file => file.type.startsWith('image/'));
-
-        if (imageFiles.length === 0) {
-            showToast.error(
-                "No images found",
-                "Please drop image files only."
-            );
+        const files = Array.from(e.dataTransfer.files).filter((f) =>
+            f.type.startsWith("image/")
+        );
+        if (!files.length) {
+            showToast.error("No images found", "Please drop image files only.");
             return;
         }
-
-        await handleFileSelect(imageFiles);
+        await handleFileSelect(files);
     };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        if (!disabled && !isUploading) {
-            setDragOver(true);
-        }
+        if (!disabled && !isUploading) setDragOver(true);
     };
 
     const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
@@ -157,258 +149,196 @@ export default function UploadAttractionImage({
         setDragOver(false);
     };
 
-    const cardVariants = {
-        hidden: { opacity: 0, scale: 0.95 },
-        visible: {
-            opacity: 1,
-            scale: 1,
-            transition: {
-                duration: 0.2,
-            },
-        },
-        exit: {
-            opacity: 0,
-            scale: 0.95,
-            transition: {
-                duration: 0.2,
-            },
-        },
-    };
+    const atMax = imageIds.length >= maxImages;
 
     return (
-        <Box sx={{ width: "100%" }}>
+        <div className={`${NEU_SURFACE} w-full space-y-5`}>
+            {/* Hidden file input */}
             <input
                 type="file"
                 ref={fileInputRef}
                 accept="image/*"
                 multiple
                 onChange={(e) => handleFileSelect(e.target.files || [])}
-                style={{ display: "none" }}
+                className="hidden"
                 disabled={disabled || isUploading}
             />
 
-            {/* Upload Area */}
+            {/* ── Drop zone ──────────────────────────────────────── */}
             <motion.div
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
+                whileHover={{ scale: disabled || isUploading ? 1 : 1.005 }}
+                whileTap={{ scale: disabled || isUploading ? 1 : 0.995 }}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
             >
-                <Paper
-                    elevation={dragOver ? 3 : 0}
-                    sx={{
-                        p: 3,
-                        borderRadius: 3,
-                        border: "2px dashed",
-                        borderColor: dragOver ? "primary.main" : "divider",
-                        backgroundColor: dragOver ? "action.hover" : "background.paper",
-                        textAlign: "center",
-                        cursor: disabled || isUploading ? "not-allowed" : "pointer",
-                        opacity: disabled ? 0.6 : 1,
-                        transition: "all 0.2s ease",
-                        mb: 3,
-                    }}
-                    onClick={() => !disabled && !isUploading && fileInputRef.current?.click()}
+                <button
+                    type="button"
+                    disabled={disabled || isUploading || atMax}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={[
+                        "w-full rounded-2xl border-2 border-dashed py-10 px-6",
+                        "flex flex-col items-center gap-4 text-center",
+                        "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50",
+                        dragOver
+                            ? "border-[#006666]/60 bg-[#006666]/5 shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]"
+                            : "border-[#1E2938]/15 " + NEU_INSET,
+                        disabled || atMax ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:border-[#006666]/40",
+                    ].join(" ")}
                 >
-                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                        <Box
-                            sx={{
-                                p: 2,
-                                borderRadius: "50%",
-                                backgroundColor: dragOver ? "primary.light" : "action.hover",
-                                color: dragOver ? "primary.main" : "text.secondary",
-                            }}
-                        >
-                            {isUploading ? (
-                                <CircularProgress size={32} />
-                            ) : (
-                                <Upload className="w-8 h-8" />
-                            )}
-                        </Box>
-
-                        <Box>
-                            <Typography variant="h6" fontWeight="bold" gutterBottom>
-                                {dragOver ? "Drop images here" : "Upload attraction images"}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Drag & drop or click to browse
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
-                                Max {maxImages} images • Max {maxSizeMB}MB each • JPG, PNG, GIF, WEBP
-                            </Typography>
-                        </Box>
-
-                        {imageIds.length > 0 && (
-                            <Chip
-                                label={`${imageIds.length} / ${maxImages} images`}
-                                color="primary"
-                                size="small"
-                                sx={{ mt: 1 }}
+                    {/* Icon */}
+                    <div
+                        className={[
+                            "p-4 rounded-2xl transition-colors duration-200",
+                            dragOver
+                                ? "bg-[#006666]/20 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]"
+                                : "bg-[#006666]/10 shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+                        ].join(" ")}
+                    >
+                        {isUploading ? (
+                            <div className="w-8 h-8 rounded-full border-2 border-[#006666]/30 border-t-[#006666] animate-spin" />
+                        ) : (
+                            <Upload
+                                size={28}
+                                className={dragOver ? "text-[#006666]" : "text-[#006666]/70"}
                             />
                         )}
-                    </Box>
-                </Paper>
+                    </div>
+
+                    {/* Text */}
+                    <div className="space-y-1">
+                        <p className={`${NEU_HEADING} text-base`}>
+                            {dragOver
+                                ? "Drop images here"
+                                : isUploading
+                                    ? "Uploading…"
+                                    : "Upload attraction images"}
+                        </p>
+                        <p className={NEU_MUTED}>Drag & drop or click to browse</p>
+                        <p className="font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#1E2938]/40">
+                            Max {maxImages} images · Max {maxSizeMB} MB each · JPG, PNG, GIF, WEBP
+                        </p>
+                    </div>
+
+                    {/* Counter chip */}
+                    {imageIds.length > 0 && (
+                        <span className={atMax ? NEU_BADGE_WARNING : NEU_BADGE_PRIMARY}>
+                            {imageIds.length} / {maxImages} images
+                        </span>
+                    )}
+                </button>
             </motion.div>
 
-            {/* Image Grid */}
+            {/* ── Gallery grid ───────────────────────────────────── */}
             <AnimatePresence mode="popLayout">
                 {imageIds.length > 0 && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
+                        className="space-y-4"
                     >
-                        <Typography variant="subtitle2" fontWeight="600" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <ImageIcon className="w-4 h-4" />
-                            Uploaded Images ({imageIds.length})
-                        </Typography>
+                        {/* Header row */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="p-1.5 rounded-lg bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]">
+                                    <ImageIcon size={14} className="text-[#006666]" />
+                                </div>
+                                <span className={`${NEU_HEADING} text-sm`}>
+                                    Uploaded Images ({imageIds.length})
+                                </span>
+                            </div>
 
-                        <Grid container spacing={2} sx={{ mb: 3 }}>
-                            <AnimatePresence mode="popLayout">
-                                {imageIds.map((image, index) => (
-                                    <Grid size={{ xs: 6, sm: 4, md: 3 }} key={index}>
-                                        <motion.div
-                                            variants={cardVariants}
-                                            initial="hidden"
-                                            animate="visible"
-                                            exit="exit"
-                                            layout
-                                        >
-                                            <Paper
-                                                elevation={2}
-                                                sx={{
-                                                    position: "relative",
-                                                    borderRadius: 2,
-                                                    overflow: "hidden",
-                                                    height: 120,
-                                                    backgroundColor: "action.hover",
-                                                }}
-                                            >
-                                                {/* Image Preview */}
-                                                <Box
-                                                    component="img"
-                                                    src={image}
-                                                    alt={`Attraction image ${index + 1}`}
-                                                    sx={{
-                                                        width: "100%",
-                                                        height: "100%",
-                                                        objectFit: "cover",
-                                                        transition: "transform 0.3s ease",
-                                                        "&:hover": {
-                                                            transform: "scale(1.05)",
-                                                        },
-                                                    }}
-                                                />
-
-                                                {/* Remove Button */}
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleRemoveImage(index)}
-                                                    disabled={disabled}
-                                                    sx={{
-                                                        position: "absolute",
-                                                        top: 8,
-                                                        right: 8,
-                                                        backgroundColor: "background.paper",
-                                                        color: "error.main",
-                                                        "&:hover": {
-                                                            backgroundColor: "error.light",
-                                                            color: "error.dark",
-                                                        },
-                                                    }}
-                                                >
-                                                    <X className="w-3 h-3" />
-                                                </IconButton>
-
-                                                {/* Image Info */}
-                                                <Box
-                                                    sx={{
-                                                        position: "absolute",
-                                                        bottom: 0,
-                                                        left: 0,
-                                                        right: 0,
-                                                        background: "linear-gradient(transparent, rgba(0,0,0,0.7))",
-                                                        p: 1,
-                                                    }}
-                                                >
-                                                    <Typography
-                                                        variant="caption"
-                                                        sx={{
-                                                            color: "white",
-                                                            fontSize: 10,
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                            gap: 0.5,
-                                                        }}
-                                                    >
-                                                        <CheckCircle className="w-3 h-3" />
-                                                        Image {index + 1}
-                                                    </Typography>
-                                                </Box>
-                                            </Paper>
-                                        </motion.div>
-                                    </Grid>
-                                ))}
-                            </AnimatePresence>
-                        </Grid>
-
-                        {/* Clear All Button */}
-                        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                size="small"
-                                startIcon={<X className="w-4 h-4" />}
+                            {/* Clear all */}
+                            <button
+                                type="button"
+                                disabled={disabled || imageIds.length === 0}
                                 onClick={() => {
                                     if (imageIds.length > 0) {
                                         onImagesChange([]);
-                                        showToast.success(
-                                            "All images removed",
-                                            `All attraction images have been cleared.`
-                                        );
+                                        showToast.success("All images removed", "All attraction images have been cleared.");
                                     }
                                 }}
-                                disabled={disabled || imageIds.length === 0}
-                                sx={{ borderRadius: 2, textTransform: "none" }}
+                                className={`${NEU_BTN_DANGER} flex items-center gap-1.5 px-3 py-1.5 text-xs`}
                             >
-                                Clear All
-                            </Button>
-                        </Box>
+                                <Trash2 size={12} />
+                                Clear all
+                            </button>
+                        </div>
+
+                        {/* Image grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            <AnimatePresence mode="popLayout">
+                                {imageIds.map((image, index) => (
+                                    <motion.div
+                                        key={index}
+                                        variants={cardVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="exit"
+                                        layout
+                                        className={`${NEU_CARD_SM} relative aspect-square overflow-hidden group`}
+                                    >
+                                        {/* Image - using Next.js Image component */}
+                                        <div className="relative w-full h-full">
+                                            <Image
+                                                src={image}
+                                                alt={`Attraction image ${index + 1}`}
+                                                fill
+                                                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                                                unoptimized // required for base64 or external URLs without optimization
+                                            />
+                                        </div>
+
+                                        {/* Hover overlay */}
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 rounded-xl" />
+
+                                        {/* Remove button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveImage(index)}
+                                            disabled={disabled}
+                                            aria-label={`Remove image ${index + 1}`}
+                                            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-lg bg-[#E7E5E4]/90 text-[#FF2157] shadow-[2px_2px_4px_#c8c6c5,-1px_-1px_3px_#ffffff] opacity-0 group-hover:opacity-100 hover:bg-[#FF2157] hover:text-white transition-all duration-200 disabled:cursor-not-allowed"
+                                        >
+                                            <X size={12} />
+                                        </button>
+
+                                        {/* Index + check label */}
+                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 rounded-b-xl">
+                                            <span className="font-[family-name:var(--font-space-mono)] text-[10px] text-white flex items-center gap-1">
+                                                <CheckCircle size={10} />
+                                                Image {index + 1}
+                                            </span>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Upload Status */}
+            {/* ── Uploading indicator ─────────────────────────────── */}
             {isUploading && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}>
-                    <CircularProgress size={16} />
-                    <Typography variant="caption" color="text.secondary">
-                        Compressing and uploading images...
-                    </Typography>
-                </Box>
+                <div className={`${NEU_INSET_SM} rounded-xl px-4 py-3 flex items-center gap-2`}>
+                    <div className="w-4 h-4 rounded-full border-2 border-[#006666]/30 border-t-[#006666] animate-spin shrink-0" />
+                    <p className="font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#1E2938]/60">
+                        Compressing and uploading images…
+                    </p>
+                </div>
             )}
 
-            {/* Validation Messages */}
-            {imageIds.length >= maxImages && (
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        p: 2,
-                        borderRadius: 2,
-                        backgroundColor: "warning.light",
-                        color: "warning.dark",
-                        mt: 2,
-                    }}
-                >
-                    <AlertCircle className="w-4 h-4" />
-                    <Typography variant="body2">
-                        Maximum of {maxImages} images reached. Remove some images to add more.
-                    </Typography>
-                </Box>
+            {/* ── Max reached warning ──────────────────────────────── */}
+            {atMax && (
+                <div className={`${NEU_INSET} rounded-xl px-4 py-3 flex items-center gap-2.5`}>
+                    <AlertCircle size={16} className="text-[#FE9900] shrink-0" />
+                    <p className="font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#1E2938]/70">
+                        Maximum of {maxImages} images reached. Remove some to add more.
+                    </p>
+                </div>
             )}
-        </Box>
+        </div>
     );
 }

@@ -1,523 +1,460 @@
 "use client";
 
 import { Field, FieldArray, getIn, useFormikContext } from "formik";
-import {
-    TextField,
-    Grid,
-    Box,
-    Typography,
-    IconButton,
-    Paper,
-    Button,
-    Chip,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    FormGroup,
-    FormControlLabel,
-    Checkbox,
-    Alert,
-    FormHelperText,
-} from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { CreateTourDTO } from "@/types/tour/tour.types";
 import { PAYMENT_METHOD } from "@/constants/tour/tour.const";
 import {
-    FileText,
-    XCircle,
-    CreditCard,
-    Clock,
-    Plus,
-    Trash2,
-    AlertTriangle,
-    Info,
-    Shield,
-    CheckCircle2,
+    FileText, XCircle, CreditCard, Clock, Plus, Trash2,
+    AlertTriangle, Info, Shield, CheckCircle2,
 } from "lucide-react";
 
+// ─── Neumorphic Design Tokens ──────────────────────────────────────────────────
+const NEU_SURFACE = "bg-[#E7E5E4]";
+const NEU_CARD = "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+const NEU_CARD_SM = "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+
+const NEU_BTN_GHOST =
+    "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] " +
+    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
+
+const NEU_BTN_DANGER =
+    "rounded-xl bg-[#E7E5E4] text-[#FF2157] font-[family-name:var(--font-space-mono)] " +
+    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+    "hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    "transition-all duration-200 focus-visible:outline-none";
+
+const NEU_INPUT =
+    "w-full rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
+    "font-[family-name:var(--font-jetbrains-mono)] text-sm px-4 py-2.5 " +
+    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
+
+const NEU_TEXTAREA =
+    "w-full rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
+    "font-[family-name:var(--font-jetbrains-mono)] text-sm px-4 py-3 resize-none " +
+    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
+
+const NEU_HEADING = "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
+const NEU_LABEL = "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
+const NEU_MUTED = "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
+const NEU_DIVIDER = "border-[#1E2938]/10";
+
+const NEU_ICON_WELL = "p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+const NEU_ICON_WELL_SM = "p-2 rounded-lg bg-[#E7E5E4] shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+
+// Toggle (checkbox) pressed/unpressed states
+const NEU_TOGGLE_ON =
+    "w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 " +
+    "bg-[#006666] shadow-[inset_2px_2px_5px_#004d4d,inset_-1px_-1px_3px_#008080] " +
+    "transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#006666]/50";
+const NEU_TOGGLE_OFF =
+    "w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 " +
+    "bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
+    "transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#006666]/40";
+
+// Pill toggle for method selection
+const NEU_PILL_ON =
+    "px-3 py-1.5 rounded-xl text-xs font-[family-name:var(--font-space-mono)] font-bold cursor-pointer " +
+    "bg-[#006666] text-white shadow-[inset_2px_2px_5px_#004d4d,inset_-1px_-1px_3px_#008080] " +
+    "transition-all duration-200";
+const NEU_PILL_OFF =
+    "px-3 py-1.5 rounded-xl text-xs font-[family-name:var(--font-space-mono)] font-bold cursor-pointer " +
+    "bg-[#E7E5E4] text-[#1E2938]/70 shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
+    "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    "transition-all duration-200";
+
+// ─── Animation Variants ────────────────────────────────────────────────────────
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+};
+const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+};
+const cardVariants = {
+    hidden: { opacity: 0, scale: 0.97 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, scale: 0.97, transition: { duration: 0.15 } },
+};
+
+// ─── Sub-components ────────────────────────────────────────────────────────────
+function SectionTitle({
+    icon,
+    color,
+    title,
+    subtitle,
+    required,
+}: {
+    icon: React.ReactNode;
+    color: string;
+    title: string;
+    subtitle?: string;
+    required?: boolean;
+}) {
+    return (
+        <div className="flex items-center gap-3 mb-4">
+            <div
+                className="p-2.5 rounded-xl flex items-center justify-center text-white flex-shrink-0"
+                style={{ background: color }}
+            >
+                {icon}
+            </div>
+            <div>
+                <h3 className={`${NEU_HEADING} text-base`}>
+                    {title}
+                    {required && <span className="text-[#FF2157] ml-1">*</span>}
+                </h3>
+                {subtitle && <p className={NEU_MUTED}>{subtitle}</p>}
+            </div>
+        </div>
+    );
+}
+
+function NeuLabel({ children }: { children: React.ReactNode }) {
+    return <label className={`${NEU_LABEL} block mb-1.5`}>{children}</label>;
+}
+
+function FieldError({ message }: { message?: string }) {
+    if (!message) return null;
+    return (
+        <p className="font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#FF2157] mt-1.5 flex items-center gap-1">
+            <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+            {message}
+        </p>
+    );
+}
+
+// ─── Main Component ────────────────────────────────────────────────────────────
 export default function PoliciesStep() {
-    const { values, errors, touched, setFieldValue, handleChange, handleBlur } = useFormikContext<CreateTourDTO>();
+    const {
+        values, errors, touched, setFieldValue, handleChange, handleBlur,
+    } = useFormikContext<CreateTourDTO>();
 
-    // Helper function to get nested error messages
-    const getFieldError = (fieldPath: string): string => {
-        return getIn(errors, fieldPath) as string;
-    };
+    const getFieldError = (path: string): string => getIn(errors, path) as string;
+    const isFieldTouched = (path: string): boolean => getIn(touched, path) as boolean;
 
-    const isFieldTouched = (fieldPath: string): boolean => {
-        return getIn(touched, fieldPath) as boolean;
-    };
+    const isRefundable = values.cancellationPolicy?.refundable || false;
 
-    // Animation variants
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-            },
-        },
-    };
-
-    const itemVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: {
-                duration: 0.3,
-            },
-        },
-    };
-
-    const cardVariants = {
-        hidden: { opacity: 0, scale: 0.95 },
-        visible: {
-            opacity: 1,
-            scale: 1,
-            transition: {
-                duration: 0.2,
-            },
-        },
-        exit: {
-            opacity: 0,
-            scale: 0.95,
-            transition: {
-                duration: 0.2,
-            },
-        },
-    };
+    // All available payment methods for refund selection
+    const allMethods = Object.values(PAYMENT_METHOD);
 
     return (
         <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
+            className={`min-h-screen ${NEU_SURFACE} p-4 sm:p-6 lg:p-8`}
         >
-            <Box sx={{ mb: 4 }}>
-                <motion.div variants={itemVariants}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
-                        <Box
-                            sx={{
-                                p: 1.5,
-                                borderRadius: 2,
-                                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Shield className="w-6 h-6 text-white" />
-                        </Box>
-                        <Box>
-                            <Typography variant="h5" fontWeight="bold" sx={{ mb: 0.5 }}>
-                                Policies
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Set cancellation, refund policies, and terms & conditions
-                            </Typography>
-                        </Box>
-                    </Box>
-                </motion.div>
-            </Box>
+            {/* ── Page Header ───────────────────────────────────────────────────── */}
+            <motion.div variants={itemVariants} className="mb-8">
+                <div className="flex items-center gap-4">
+                    <div className={NEU_ICON_WELL_PRIMARY}>
+                        <Shield className="w-6 h-6 text-[#006666]" />
+                    </div>
+                    <div>
+                        <h2 className={`${NEU_HEADING} text-2xl`}>Policies</h2>
+                        <p className={NEU_MUTED}>
+                            Set cancellation, refund policies, and terms &amp; conditions
+                        </p>
+                    </div>
+                </div>
+                <div className={`mt-5 border-t ${NEU_DIVIDER}`} />
+            </motion.div>
 
-            <Grid container spacing={3}>
-                {/* Cancellation Policy */}
-                <Grid size={{ xs: 12 }}>
-                    <motion.div variants={itemVariants}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
-                            <Box
-                                sx={{
-                                    p: 1,
-                                    borderRadius: 2,
-                                    background: "linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
+            <div className="space-y-8">
+
+                {/* ── Cancellation Policy ───────────────────────────────────────────── */}
+                <motion.section variants={itemVariants}>
+                    <SectionTitle
+                        icon={<XCircle className="w-4 h-4" />}
+                        color="linear-gradient(135deg,#ee0979,#ff6a00)"
+                        title="Cancellation Policy"
+                    />
+
+                    <div className={`${NEU_CARD} p-5 sm:p-6`}>
+
+                        {/* Refundable toggle */}
+                        <label className="flex items-start gap-4 cursor-pointer group select-none">
+                            <button
+                                type="button"
+                                role="checkbox"
+                                aria-checked={isRefundable}
+                                onClick={() =>
+                                    setFieldValue("cancellationPolicy.refundable", !isRefundable)
+                                }
+                                className={isRefundable ? NEU_TOGGLE_ON : NEU_TOGGLE_OFF}
                             >
-                                <XCircle className="w-4 h-4 text-white" />
-                            </Box>
-                            <Typography variant="h6" fontWeight="bold">
-                                Cancellation Policy
-                            </Typography>
-                        </Box>
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                p: 3,
-                                borderRadius: 3,
-                                border: "1px solid",
-                                borderColor: "divider",
-                                background: "linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.8))",
-                                transition: "all 0.3s ease",
-                                "&:hover": {
-                                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-                                },
-                            }}
-                        >
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={values.cancellationPolicy?.refundable || false}
-                                        onChange={(e) =>
-                                            setFieldValue("cancellationPolicy.refundable", e.target.checked)
-                                        }
-                                        color="primary"
-                                        sx={{
-                                            "& .MuiSvgIcon-root": {
-                                                fontSize: 28,
-                                            },
-                                        }}
-                                    />
-                                }
-                                label={
-                                    <Box>
-                                        <Typography variant="body1" fontWeight={600}>
-                                            Refundable
-                                        </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            Allow customers to cancel and receive refunds
-                                        </Typography>
-                                    </Box>
-                                }
-                                sx={{ mb: 3 }}
-                            />
-
-                            <AnimatePresence>
-                                {values.cancellationPolicy?.refundable && (
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: "auto" }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        <Box>
-                                            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
-                                                <CheckCircle2 className="w-4 h-4 text-primary" />
-                                                <Typography variant="subtitle2" fontWeight={600}>
-                                                    Refund Rules (Based on days before departure)
-                                                </Typography>
-                                            </Box>
-                                            <FieldArray name="cancellationPolicy.rules">
-                                                {({ push, remove }) => (
-                                                    <Box>
-                                                        <TableContainer
-                                                            component={Paper}
-                                                            elevation={0}
-                                                            sx={{
-                                                                mb: 2,
-                                                                borderRadius: 2,
-                                                                border: "1px solid",
-                                                                borderColor: "divider",
-                                                                overflow: "hidden",
-                                                            }}
-                                                        >
-                                                            <Table size="small">
-                                                                <TableHead>
-                                                                    <TableRow sx={{ backgroundColor: "action.hover" }}>
-                                                                        <TableCell sx={{ fontWeight: 600 }}>Days Before</TableCell>
-                                                                        <TableCell sx={{ fontWeight: 600 }}>Refund Percentage</TableCell>
-                                                                        <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
-                                                                    </TableRow>
-                                                                </TableHead>
-                                                                <TableBody>
-                                                                    <AnimatePresence mode="popLayout">
-                                                                        {values.cancellationPolicy?.rules?.map(
-                                                                            (rule, index) => (
-                                                                                <TableRow
-                                                                                    key={index}
-                                                                                    component={motion.tr}
-                                                                                    variants={cardVariants}
-                                                                                    initial="hidden"
-                                                                                    animate="visible"
-                                                                                    exit="exit"
-                                                                                    layout
-                                                                                >
-                                                                                    <TableCell>
-                                                                                        <TextField
-                                                                                            size="small"
-                                                                                            type="number"
-                                                                                            value={rule.daysBefore}
-                                                                                            onChange={(e) =>
-                                                                                                setFieldValue(
-                                                                                                    `cancellationPolicy.rules[${index}].daysBefore`,
-                                                                                                    parseInt(e.target.value)
-                                                                                                )
-                                                                                            }
-                                                                                            InputProps={{
-                                                                                                inputProps: { min: 0 },
-                                                                                            }}
-                                                                                            fullWidth
-                                                                                            sx={{
-                                                                                                "& .MuiOutlinedInput-root": {
-                                                                                                    borderRadius: 1.5,
-                                                                                                },
-                                                                                            }}
-                                                                                        />
-                                                                                    </TableCell>
-                                                                                    <TableCell>
-                                                                                        <TextField
-                                                                                            size="small"
-                                                                                            type="number"
-                                                                                            value={rule.refundPercent}
-                                                                                            onChange={(e) =>
-                                                                                                setFieldValue(
-                                                                                                    `cancellationPolicy.rules[${index}].refundPercent`,
-                                                                                                    parseInt(e.target.value)
-                                                                                                )
-                                                                                            }
-                                                                                            InputProps={{
-                                                                                                inputProps: { min: 0, max: 100 },
-                                                                                                endAdornment: (
-                                                                                                    <Typography variant="caption" sx={{ mr: 1 }}>
-                                                                                                        %
-                                                                                                    </Typography>
-                                                                                                ),
-                                                                                            }}
-                                                                                            fullWidth
-                                                                                            sx={{
-                                                                                                "& .MuiOutlinedInput-root": {
-                                                                                                    borderRadius: 1.5,
-                                                                                                },
-                                                                                            }}
-                                                                                        />
-                                                                                    </TableCell>
-                                                                                    <TableCell align="right">
-                                                                                        <IconButton
-                                                                                            size="small"
-                                                                                            onClick={() => remove(index)}
-                                                                                            color="error"
-                                                                                            sx={{
-                                                                                                borderRadius: 1.5,
-                                                                                                "&:hover": {
-                                                                                                    backgroundColor: "error.light",
-                                                                                                    color: "error.dark",
-                                                                                                },
-                                                                                            }}
-                                                                                        >
-                                                                                            <Trash2 className="w-4 h-4" />
-                                                                                        </IconButton>
-                                                                                    </TableCell>
-                                                                                </TableRow>
-                                                                            )
-                                                                        )}
-                                                                    </AnimatePresence>
-                                                                </TableBody>
-                                                            </Table>
-                                                        </TableContainer>
-                                                        <Button
-                                                            startIcon={<Plus className="w-4 h-4" />}
-                                                            variant="outlined"
-                                                            onClick={() =>
-                                                                push({ daysBefore: 0, refundPercent: 0 })
-                                                            }
-                                                            sx={{
-                                                                borderRadius: 2,
-                                                                textTransform: "none",
-                                                            }}
-                                                        >
-                                                            Add Refund Rule
-                                                        </Button>
-                                                    </Box>
-                                                )}
-                                            </FieldArray>
-                                        </Box>
-                                    </motion.div>
+                                {isRefundable && (
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                                 )}
-                            </AnimatePresence>
+                            </button>
+                            <div className="pt-0.5">
+                                <span className={`${NEU_HEADING} text-sm block`}>Refundable</span>
+                                <span className={NEU_MUTED}>
+                                    Allow customers to cancel and receive refunds
+                                </span>
+                            </div>
+                        </label>
 
-                            <AnimatePresence>
-                                {!values.cancellationPolicy?.refundable && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        <Alert
-                                            severity="warning"
-                                            icon={<AlertTriangle className="w-5 h-5" />}
-                                            sx={{
-                                                borderRadius: 2,
-                                                border: "1px solid",
-                                                borderColor: "warning.light",
-                                                "& .MuiAlert-icon": {
-                                                    color: "warning.main",
-                                                },
-                                            }}
-                                        >
-                                            <Typography variant="body2">
+                        {/* Refund Rules (shown when refundable) */}
+                        <AnimatePresence>
+                            {isRefundable && (
+                                <motion.div
+                                    key="rules"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className={`mt-6 pt-5 border-t ${NEU_DIVIDER}`}>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className={NEU_ICON_WELL_SM}>
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-[#006666]" />
+                                            </div>
+                                            <span className={`${NEU_LABEL} text-[#006666]`}>
+                                                Refund Rules — days before departure
+                                            </span>
+                                        </div>
+
+                                        <FieldArray name="cancellationPolicy.rules">
+                                            {({ push, remove }) => (
+                                                <div className="space-y-3">
+                                                    {/* Column headers (desktop) */}
+                                                    {(values.cancellationPolicy?.rules?.length ?? 0) > 0 && (
+                                                        <div className="hidden sm:grid sm:grid-cols-[1fr_1fr_40px] gap-3 px-1">
+                                                            <span className={NEU_LABEL}>Days Before</span>
+                                                            <span className={NEU_LABEL}>Refund %</span>
+                                                            <span />
+                                                        </div>
+                                                    )}
+
+                                                    <AnimatePresence mode="popLayout">
+                                                        {values.cancellationPolicy?.rules?.map((rule, idx) => (
+                                                            <motion.div
+                                                                key={idx}
+                                                                variants={cardVariants}
+                                                                initial="hidden"
+                                                                animate="visible"
+                                                                exit="exit"
+                                                                layout
+                                                                className={`${NEU_CARD_SM} p-3`}
+                                                            >
+                                                                <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_40px] gap-3 items-center">
+                                                                    <div>
+                                                                        <span className={`${NEU_LABEL} sm:hidden`}>Days Before</span>
+                                                                        <input
+                                                                            type="number"
+                                                                            min={0}
+                                                                            value={rule.daysBefore}
+                                                                            onChange={(e) =>
+                                                                                setFieldValue(
+                                                                                    `cancellationPolicy.rules[${idx}].daysBefore`,
+                                                                                    parseInt(e.target.value)
+                                                                                )
+                                                                            }
+                                                                            placeholder="e.g. 7"
+                                                                            className={NEU_INPUT}
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className={`${NEU_LABEL} sm:hidden`}>Refund %</span>
+                                                                        <div className="relative">
+                                                                            <input
+                                                                                type="number"
+                                                                                min={0}
+                                                                                max={100}
+                                                                                value={rule.refundPercent}
+                                                                                onChange={(e) =>
+                                                                                    setFieldValue(
+                                                                                        `cancellationPolicy.rules[${idx}].refundPercent`,
+                                                                                        parseInt(e.target.value)
+                                                                                    )
+                                                                                }
+                                                                                placeholder="e.g. 80"
+                                                                                className={`${NEU_INPUT} pr-10`}
+                                                                            />
+                                                                            <span className={`absolute right-3 top-1/2 -translate-y-1/2 ${NEU_MUTED} pointer-events-none`}>
+                                                                                %
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => remove(idx)}
+                                                                        className={`${NEU_BTN_DANGER} w-9 h-9 flex items-center justify-center mx-auto`}
+                                                                        aria-label="Remove rule"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </motion.div>
+                                                        ))}
+                                                    </AnimatePresence>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => push({ daysBefore: 0, refundPercent: 0 })}
+                                                        className={`${NEU_BTN_GHOST} flex items-center gap-2 px-4 py-2 text-sm mt-1`}
+                                                    >
+                                                        <Plus className="w-4 h-4 text-[#006666]" />
+                                                        Add Refund Rule
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </FieldArray>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Non-refundable warning */}
+                        <AnimatePresence>
+                            {!isRefundable && (
+                                <motion.div
+                                    key="warning"
+                                    initial={{ opacity: 0, y: -8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.25 }}
+                                    className={`mt-5`}
+                                >
+                                    <div className={`${NEU_CARD_SM} p-4 flex items-start gap-3 border-[#FE9900]/30`}>
+                                        <div className="w-8 h-8 rounded-xl bg-[#FE9900]/10 flex items-center justify-center flex-shrink-0">
+                                            <AlertTriangle className="w-4 h-4 text-[#FE9900]" />
+                                        </div>
+                                        <div>
+                                            <p className="font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#FE9900] mb-0.5">
+                                                Non-Refundable
+                                            </p>
+                                            <p className={NEU_MUTED}>
                                                 Non-refundable tours cannot be cancelled for a refund under any circumstances.
                                                 Consider this carefully as it affects customer satisfaction.
-                                            </Typography>
-                                        </Alert>
-                                    </motion.div>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </motion.section>
+
+                {/* ── Refund Policy ─────────────────────────────────────────────────── */}
+                <motion.section variants={itemVariants}>
+                    <SectionTitle
+                        icon={<CreditCard className="w-4 h-4" />}
+                        color="linear-gradient(135deg,#11998e,#38ef7d)"
+                        title="Refund Policy"
+                        required
+                    />
+
+                    <div className={`${NEU_CARD} p-5 sm:p-6 space-y-6`}>
+
+                        {/* Refund Methods */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className={NEU_ICON_WELL_SM}>
+                                    <CreditCard className="w-3.5 h-3.5 text-[#006666]" />
+                                </div>
+                                <span className={`${NEU_LABEL} text-[#006666]`}>
+                                    Refund Methods <span className="text-[#FF2157]">*</span>
+                                </span>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                {allMethods.map((method) => {
+                                    const selected = values.refundPolicy?.method?.includes(method);
+                                    return (
+                                        <button
+                                            key={method}
+                                            type="button"
+                                            onClick={() => {
+                                                const current = values.refundPolicy?.method || [];
+                                                setFieldValue(
+                                                    "refundPolicy.method",
+                                                    selected
+                                                        ? current.filter((m) => m !== method)
+                                                        : [...current, method]
+                                                );
+                                            }}
+                                            className={selected ? NEU_PILL_ON : NEU_PILL_OFF}
+                                        >
+                                            {method}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {isFieldTouched("refundPolicy.method") &&
+                                getFieldError("refundPolicy.method") && (
+                                    <FieldError message={getFieldError("refundPolicy.method")} />
                                 )}
-                            </AnimatePresence>
-                        </Paper>
-                    </motion.div>
-                </Grid>
+                        </div>
 
-                {/* Refund Policy */}
-                <Grid size={12}>
-                    <motion.div variants={itemVariants}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
-                            <Box
-                                sx={{
-                                    p: 1,
-                                    borderRadius: 2,
-                                    background: "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <CreditCard className="w-4 h-4 text-white" />
-                            </Box>
-                            <Typography variant="h6" fontWeight="bold">
-                                Refund Policy *
-                            </Typography>
-                        </Box>
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                p: 3,
-                                borderRadius: 3,
-                                border: "1px solid",
-                                borderColor: "divider",
-                                background: "linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.8))",
-                                transition: "all 0.3s ease",
-                                "&:hover": {
-                                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-                                },
-                            }}
-                        >
-                            <Grid container spacing={2.5}>
-                                <Grid size={12}>
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
-                                        <CreditCard className="w-4 h-4 text-primary" />
-                                        <Typography variant="subtitle2" fontWeight={600}>
-                                            Refund Methods *
-                                        </Typography>
-                                    </Box>
-                                    <FormGroup row sx={{ gap: 1 }}>
-                                        {Object.values([PAYMENT_METHOD.CARD]).map((method) => (
-                                            <Chip
-                                                key={method}
-                                                label={method}
-                                                onClick={() => {
-                                                    const currentMethods = values.refundPolicy?.method || [];
-                                                    const newMethods = !currentMethods.includes(method)
-                                                        ? [...currentMethods, method]
-                                                        : currentMethods.filter((m) => m !== method);
-                                                    setFieldValue("refundPolicy.method", newMethods);
-                                                }}
-                                                color={values.refundPolicy?.method?.includes(method) ? "primary" : "default"}
-                                                sx={{
-                                                    cursor: "pointer",
-                                                    borderRadius: 2,
-                                                    fontWeight: 500,
-                                                    ...(values.refundPolicy?.method?.includes(method) && {
-                                                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                                        color: "white",
-                                                    }),
-                                                }}
-                                            />
-                                        ))}
-                                    </FormGroup>
-                                    {isFieldTouched("refundPolicy.method") && getFieldError("refundPolicy.method") && (
-                                        <FormHelperText error sx={{ mt: 1 }}>
-                                            {getFieldError("refundPolicy.method")}
-                                        </FormHelperText>
-                                    )}
-                                </Grid>
+                        <div className={`border-t ${NEU_DIVIDER}`} />
 
-                                <Grid size={12}>
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
-                                        <Clock className="w-4 h-4 text-primary" />
-                                        <Typography variant="subtitle2" fontWeight={600}>
-                                            Processing Days *
-                                        </Typography>
-                                    </Box>
-                                    <TextField
-                                        fullWidth
-                                        type="number"
-                                        name="refundPolicy.processingDays"
-                                        value={values.refundPolicy?.processingDays || 0}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        label="Processing Days *"
-                                        variant="outlined"
-                                        InputProps={{ inputProps: { min: 0, max: 60 } }}
-                                        helperText="Number of business days to process refunds (max 60)"
-                                        error={
-                                            isFieldTouched("refundPolicy.processingDays") &&
-                                            !!getFieldError("refundPolicy.processingDays")
-                                        }
-                                        sx={{
-                                            "& .MuiOutlinedInput-root": {
-                                                borderRadius: 1.5,
-                                            },
-                                        }}
-                                    />
-                                </Grid>
-                            </Grid>
-                        </Paper>
-                    </motion.div>
-                </Grid>
+                        {/* Processing Days */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className={NEU_ICON_WELL_SM}>
+                                    <Clock className="w-3.5 h-3.5 text-[#006666]" />
+                                </div>
+                                <span className={`${NEU_LABEL} text-[#006666]`}>
+                                    Processing Days <span className="text-[#FF2157]">*</span>
+                                </span>
+                            </div>
 
-                {/* Terms & Conditions */}
-                <Grid size={{ xs: 12 }}>
-                    <motion.div variants={itemVariants}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
-                            <Box
-                                sx={{
-                                    p: 1,
-                                    borderRadius: 2,
-                                    background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <FileText className="w-4 h-4 text-white" />
-                            </Box>
-                            <Typography variant="h6" fontWeight="bold">
-                                Terms & Conditions
-                            </Typography>
-                        </Box>
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
-                        <Paper
-                            elevation={0}
-                            sx={{
-                                p: 3,
-                                borderRadius: 3,
-                                border: "1px solid",
-                                borderColor: "divider",
-                                background: "linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.8))",
-                                transition: "all 0.3s ease",
-                                "&:hover": {
-                                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-                                },
-                            }}
-                        >
-                            <Field
-                                as={TextField}
-                                fullWidth
-                                name="terms"
-                                label="Terms & Conditions"
-                                variant="outlined"
-                                multiline
-                                rows={8}
-                                placeholder={`Enter terms and conditions for this tour...
+                            <div className="max-w-xs">
+                                <input
+                                    type="number"
+                                    name="refundPolicy.processingDays"
+                                    min={0}
+                                    max={60}
+                                    value={values.refundPolicy?.processingDays || 0}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    placeholder="e.g. 7"
+                                    className={`${NEU_INPUT} ${isFieldTouched("refundPolicy.processingDays") &&
+                                            getFieldError("refundPolicy.processingDays")
+                                            ? "ring-2 ring-[#FF2157]/50"
+                                            : ""
+                                        }`}
+                                />
+                            </div>
+                            <p className={`${NEU_MUTED} mt-1.5`}>
+                                Number of business days to process refunds (max 60)
+                            </p>
+                            {isFieldTouched("refundPolicy.processingDays") &&
+                                getFieldError("refundPolicy.processingDays") && (
+                                    <FieldError message={getFieldError("refundPolicy.processingDays")} />
+                                )}
+                        </div>
+                    </div>
+                </motion.section>
+
+                {/* ── Terms & Conditions ────────────────────────────────────────────── */}
+                <motion.section variants={itemVariants}>
+                    <SectionTitle
+                        icon={<FileText className="w-4 h-4" />}
+                        color="linear-gradient(135deg,#4facfe,#00f2fe)"
+                        title="Terms & Conditions"
+                    />
+
+                    <div className={`${NEU_CARD} p-5 sm:p-6`}>
+                        <NeuLabel>Terms &amp; Conditions</NeuLabel>
+                        <Field name="terms">
+                            {({ field }: { field: React.InputHTMLAttributes<HTMLTextAreaElement> }) => (
+                                <textarea
+                                    {...field}
+                                    rows={10}
+                                    placeholder={`Enter terms and conditions for this tour…
 
 Example:
 1. All participants must have valid travel insurance.
@@ -528,56 +465,45 @@ Example:
 6. Health requirements: Participants must disclose any medical conditions before the tour.
 
 You can use markdown formatting for better readability.`}
-                                helperText="Use clear and comprehensive terms to avoid misunderstandings"
-                                sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                        borderRadius: 1.5,
-                                    },
-                                }}
-                            />
-                        </Paper>
-                    </motion.div>
-                </Grid>
+                                    className={NEU_TEXTAREA}
+                                />
+                            )}
+                        </Field>
+                        <p className={`${NEU_MUTED} mt-2`}>
+                            Use clear and comprehensive terms to avoid misunderstandings
+                        </p>
+                    </div>
+                </motion.section>
 
-                {/* Policy Information */}
-                <Grid size={{ xs: 12 }}>
-                    <motion.div variants={itemVariants}>
-                        <Alert
-                            severity="info"
-                            icon={<Info className="w-5 h-5" />}
-                            sx={{
-                                borderRadius: 2,
-                                border: "1px solid",
-                                borderColor: "info.light",
-                                "& .MuiAlert-icon": {
-                                    color: "info.main",
-                                },
-                            }}
-                        >
-                            <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                                Policy Guidelines
-                            </Typography>
-                            <Box component="ul" sx={{ m: 0, pl: 2 }}>
-                                <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                    Cancellation policies must comply with local consumer protection laws
-                                </Typography>
-                                <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                    Refund processing days should be realistic and achievable
-                                </Typography>
-                                <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                    Clearly state all terms to avoid disputes
-                                </Typography>
-                                <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                    Consider offering flexible cancellation options to attract more bookings
-                                </Typography>
-                                <Typography component="li" variant="body2">
-                                    Policies will be displayed prominently on the tour booking page
-                                </Typography>
-                            </Box>
-                        </Alert>
-                    </motion.div>
-                </Grid>
-            </Grid>
+                {/* ── Policy Guidelines Info ────────────────────────────────────────── */}
+                <motion.section variants={itemVariants}>
+                    <div className={`${NEU_CARD} p-5 sm:p-6`}>
+                        <div className="flex items-start gap-4">
+                            <div className={`${NEU_ICON_WELL} flex-shrink-0`}>
+                                <Info className="w-5 h-5 text-[#006666]" />
+                            </div>
+                            <div className="flex-1">
+                                <h4 className={`${NEU_HEADING} text-sm mb-3`}>Policy Guidelines</h4>
+                                <ul className="space-y-2">
+                                    {[
+                                        "Cancellation policies must comply with local consumer protection laws",
+                                        "Refund processing days should be realistic and achievable",
+                                        "Clearly state all terms to avoid disputes",
+                                        "Consider offering flexible cancellation options to attract more bookings",
+                                        "Policies will be displayed prominently on the tour booking page",
+                                    ].map((guideline, i) => (
+                                        <li key={i} className="flex items-start gap-2.5">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-[#006666]/40 flex-shrink-0 mt-2" />
+                                            <span className={NEU_MUTED}>{guideline}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </motion.section>
+
+            </div>
         </motion.div>
     );
 }
