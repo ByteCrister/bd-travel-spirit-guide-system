@@ -15,8 +15,11 @@ function createTraveler(): TravelerInfo {
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { faqId: string } }
+    { params }: { params: Promise<{ faqId: string }> }
 ) {
+    // Await the params Promise to get the actual object
+    const { faqId } = await params;
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') ?? '1', 10);
     const limit = Math.min(parseInt(searchParams.get('limit') ?? '10', 10), 100);
@@ -26,7 +29,7 @@ export async function GET(
     const totalVotes = 85;
     let allVotes: FAQVoteRecord[] = Array.from({ length: totalVotes }, () => ({
         _id: faker.database.mongodbObjectId(),
-        faqId: params.faqId,
+        faqId: faqId, // Now using the awaited faqId
         userId: createTraveler(),
         type: faker.helpers.arrayElement(['like', 'dislike']),
         createdAt: faker.date.past().toISOString(),

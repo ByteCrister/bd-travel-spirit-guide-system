@@ -1,3 +1,5 @@
+import TourFaqsPage from "@/components/support/faqs/TourFaqsPage";
+
 export default function Page() {
-    return <>FAQs Page</>
+    return <TourFaqsPage />
 }

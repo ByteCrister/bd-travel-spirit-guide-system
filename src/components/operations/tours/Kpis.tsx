@@ -1,95 +1,126 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
 import { useTourDetailStore } from "@/store/tour-detail.store";
 import { FiFileText, FiStar, FiUsers } from "react-icons/fi";
 import { KpisSkeleton } from "./skeletons/KpisSkeleton";
 import { motion, Variants } from "framer-motion";
+import {
+  NEU_CARD,
+  NEU_CARD_HOVER,
+  NEU_HEADING,
+  NEU_LABEL,
+  NEU_MUTED,
+  NEU_ICON_WELL,
+} from "@/styles/neu.styles";
 
+// ─── Animation variants ───────────────────────────────────────
 const cardVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: {
-        opacity: 1,
-        scale: 1,
-        transition: { duration: 0.4, ease: "easeOut" }
-    }
+  hidden: { opacity: 0, y: 16, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
+// ─── KPI config ───────────────────────────────────────────────
+const KPI_CONFIG = [
+  {
+    icon: FiUsers,
+    title: "Total Tours",
+    subtitle: "Active list (cached)",
+    accentColor: "text-[#006666]",
+    accentBg: "bg-[#006666]/10",
+    accentShadow:
+      "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
+    dot: "bg-[#006666]",
+  },
+  {
+    icon: FiFileText,
+    title: "Published Tours",
+    subtitle: "From active filter",
+    accentColor: "text-[#00A63D]",
+    accentBg: "bg-[#00A63D]/10",
+    accentShadow:
+      "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
+    dot: "bg-[#00A63D]",
+  },
+  {
+    icon: FiStar,
+    title: "Avg Rating",
+    subtitle: "Published tours only",
+    accentColor: "text-[#FE9900]",
+    accentBg: "bg-[#FE9900]/10",
+    accentShadow:
+      "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
+    dot: "bg-[#FE9900]",
+  },
+] as const;
+
+// ─── Component ────────────────────────────────────────────────
 export const Kpis: React.FC = () => {
-    const { selectCompanyKpisFromActiveTours, loading } = useTourDetailStore()
-    const kpis = selectCompanyKpisFromActiveTours();
+  const { selectCompanyKpisFromActiveTours, loading } = useTourDetailStore();
+  const kpis = selectCompanyKpisFromActiveTours();
 
-    if (loading["tours"])
-        return <KpisSkeleton />
+  if (loading["tours"]) return <KpisSkeleton />;
 
-    const kpiData = [
-        {
-            icon: FiUsers,
-            title: "Total Tours",
-            value: kpis.totalTours,
-            subtitle: "Active list (cached)",
-            gradient: "from-blue-500/10 to-cyan-500/10",
-            iconColor: "text-blue-500"
-        },
-        {
-            icon: FiFileText,
-            title: "Published Tours",
-            value: kpis.publishedTours,
-            subtitle: "From active filter",
-            gradient: "from-green-500/10 to-emerald-500/10",
-            iconColor: "text-green-500"
-        },
-        {
-            icon: FiStar,
-            title: "Avg Rating",
-            value: kpis.avgTourRating.toFixed(1),
-            subtitle: "Published tours only",
-            gradient: "from-amber-500/10 to-orange-500/10",
-            iconColor: "text-amber-500"
-        }
-    ];
+  const values = [
+    kpis.totalTours,
+    kpis.publishedTours,
+    kpis.avgTourRating.toFixed(1),
+  ];
 
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {kpiData.map((kpi, index) => (
-                <motion.div
-                    key={kpi.title}
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                >
-                    <Card className={`relative overflow-hidden border-border/50 bg-gradient-to-br ${kpi.gradient} backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300`}>
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-full -mr-16 -mt-16" />
-                        
-                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                {kpi.title}
-                            </CardTitle>
-                            <div className={`p-2 rounded-lg bg-background/50 ${kpi.iconColor}`}>
-                                <kpi.icon className="h-5 w-5" />
-                            </div>
-                        </CardHeader>
-                        
-                        <CardContent>
-                            <div className="flex flex-col gap-1">
-                                <motion.div 
-                                    className="text-3xl font-bold tracking-tight"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.2 + index * 0.1 }}
-                                >
-                                    {kpi.value}
-                                </motion.div>
-                                <p className="text-xs text-muted-foreground">
-                                    {kpi.subtitle}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </motion.div>
-            ))}
-        </div>
-    );
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      {KPI_CONFIG.map((kpi, index) => (
+        <motion.div
+          key={kpi.title}
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: index * 0.08 }}
+          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+          className={`${NEU_CARD} ${NEU_CARD_HOVER} p-5 flex flex-col gap-4`}
+        >
+          {/* Top row: icon well + live indicator */}
+          <div className="flex items-start justify-between">
+            <div
+              className={`${NEU_ICON_WELL} ${kpi.accentBg} ${kpi.accentShadow}`}
+            >
+              <kpi.icon className={`h-5 w-5 ${kpi.accentColor}`} />
+            </div>
+            <span className="flex items-center gap-1.5">
+              <span
+                className={`w-2 h-2 rounded-full ${kpi.dot} animate-pulse`}
+              />
+              <span className={`${NEU_LABEL} text-[10px]`}>live</span>
+            </span>
+          </div>
+
+          {/* Value */}
+          <div className="flex flex-col gap-0.5">
+            <motion.span
+              className={`${NEU_HEADING} text-4xl`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + index * 0.08 }}
+            >
+              {values[index]}
+            </motion.span>
+            <span className={`${NEU_LABEL}`}>{kpi.title}</span>
+          </div>
+
+          {/* Subtitle */}
+          <span className={`${NEU_MUTED} text-xs`}>{kpi.subtitle}</span>
+
+          {/* Bottom accent bar */}
+          <div
+            className={`h-1 w-12 rounded-full ${kpi.accentBg} shadow-[inset_1px_1px_3px_#c8c6c5,inset_-1px_-1px_3px_#ffffff]`}
+          />
+        </motion.div>
+      ))}
+    </div>
+  );
 };

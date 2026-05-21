@@ -105,7 +105,7 @@ export default function ProfilePage() {
   if (baseMeta.error || !baseUser) {
     return (
       <div
-        className="container mx-auto px-4 py-8 max-w-2xl"
+        className="container mx-auto p-2 sm:p-3 lg:p-5 max-w-2xl"
         style={{ fontFamily: "'Space Mono', monospace", background: neu.surface, minHeight: "100vh" }}
       >
         <motion.div

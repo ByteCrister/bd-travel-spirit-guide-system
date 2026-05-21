@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { RefreshCw, Shield, AlertCircle } from "lucide-react";
 import { useResetRequestsStore } from "@/store/reset-requests.store";
 import RequestList from "./RequestList";
+import { Breadcrumbs } from "@/components/global/Breadcrumbs";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -80,11 +81,20 @@ export default function EmployeeResetRequestsPage() {
 
   return (
     <motion.div
-      className={`min-h-screen p-4 md:p-6 font-['Space_Mono'] bg-[${surfaceLight}] dark:bg-[${surfaceDark}]`}
+      className={`min-h-screen p-2 sm:p-3 lg:p-5 font-['Space_Mono'] bg-[${surfaceLight}] dark:bg-[${surfaceDark}]`}
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
+      {/* Breadcrumbs */}
+            <Breadcrumbs
+                items={[
+                    { label: 'Home', href: '/' },
+                    { label: 'Reset Password', href: '/reset-password-requests' },
+                ]}
+                className="mb-4"
+            />
+
       <div className="mx-auto max-w-7xl">
         {/* ---------- Header ---------- */}
         <motion.header className="mb-8" variants={itemVariants}>

@@ -1,11 +1,36 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { useTourDetailStore } from "@/store/tour-detail.store";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileText } from "lucide-react";
+import {
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+    FileText,
+} from "lucide-react";
 import { motion } from "framer-motion";
 
+// ─── Neumorphism Design Tokens ──────────────────────────────────────────────
+const NEU_SURFACE = "bg-[#E7E5E4]";
+const NEU_BTN_ICON =
+    "rounded-xl w-9 h-9 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/60 " +
+    "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
+    "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
+    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
+const NEU_BTN_ICON_ACTIVE =
+    "rounded-xl w-9 h-9 flex items-center justify-center bg-[#006666] text-white " +
+    "shadow-[inset_2px_2px_5px_#004d4d,inset_-2px_-2px_5px_#008080]";
+const NEU_SURFACE_INSET_SM =
+    "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+const NEU_MONO = "font-[family-name:var(--font-jetbrains-mono)] text-[#1E2938]";
+const NEU_MUTED =
+    "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
+const NEU_LABEL =
+    "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
+
+// ─── Types ──────────────────────────────────────────────────────────────────
 type Props = {
     pagination?: {
         page: number;
@@ -16,35 +41,24 @@ type Props = {
 };
 
 const TourListPagination: React.FC<Props> = ({ pagination }) => {
-    const {
-        fetchTours,
-        listCache,
-        activeCacheKey
-    } = useTourDetailStore();
+    const { fetchTours, listCache, activeCacheKey } = useTourDetailStore();
     const activeKey = activeCacheKey.tours;
-
-    const current = activeKey
-        ? listCache.tours[activeKey]
-        : undefined;
+    const current = activeKey ? listCache.tours[activeKey] : undefined;
 
     const page = pagination?.page ?? 1;
     const limit = pagination?.limit ?? 10;
     const pages = current?.pages ?? 1;
     const total = current?.total ?? 0;
 
-    const goto = (p: number) => {
-        fetchTours({ page: p, limit }).catch(() => { });
-    };
+    const goto = (p: number) => fetchTours({ page: p, limit }).catch(() => { });
 
-    // Calculate range of items being displayed
     const startItem = (page - 1) * limit + 1;
     const endItem = Math.min(page * limit, total);
 
-    // Generate page numbers to display (max 7 buttons including first and last)
     const getPageNumbers = () => {
         const delta = 2;
-        const range = [];
-        const rangeWithDots = [];
+        const range: number[] = [];
+        const rangeWithDots: (number | string)[] = [];
 
         for (
             let i = Math.max(2, page - delta);
@@ -54,19 +68,13 @@ const TourListPagination: React.FC<Props> = ({ pagination }) => {
             range.push(i);
         }
 
-        if (page - delta > 2) {
-            rangeWithDots.push(1, '...');
-        } else {
-            rangeWithDots.push(1);
-        }
+        if (page - delta > 2) rangeWithDots.push(1, "...");
+        else rangeWithDots.push(1);
 
         rangeWithDots.push(...range);
 
-        if (page + delta < pages - 1) {
-            rangeWithDots.push('...', pages);
-        } else if (pages > 1) {
-            rangeWithDots.push(pages);
-        }
+        if (page + delta < pages - 1) rangeWithDots.push("...", pages);
+        else if (pages > 1) rangeWithDots.push(pages);
 
         return rangeWithDots;
     };
@@ -74,124 +82,133 @@ const TourListPagination: React.FC<Props> = ({ pagination }) => {
     const pageNumbers = pages > 1 ? getPageNumbers() : [1];
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-between gap-4"
+            className={`${NEU_SURFACE} rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4`}
         >
-            {/* Info Section */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 border border-border/50">
-                    <FileText className="h-4 w-4" />
-                    <span className="font-medium">
+            {/* ── Info ── */}
+            <div className="flex items-center gap-2.5">
+                <div
+                    className={`${NEU_SURFACE_INSET_SM} rounded-xl flex items-center gap-2 px-3 py-2`}
+                >
+                    <FileText className="h-4 w-4 text-[#006666]" />
+                    <span className={`${NEU_MONO} text-sm font-medium`}>
                         {total === 0 ? (
-                            "No items"
+                            <span className={NEU_MUTED}>No items</span>
                         ) : (
                             <>
-                                <span className="text-foreground">{startItem}</span>
-                                {" - "}
-                                <span className="text-foreground">{endItem}</span>
-                                {" of "}
-                                <span className="text-foreground">{total}</span>
+                                <span className="text-[#006666] font-bold">{startItem}</span>
+                                <span className="text-[#1E2938]/40 mx-1">–</span>
+                                <span className="text-[#006666] font-bold">{endItem}</span>
+                                <span className="text-[#1E2938]/40 mx-1"> of </span>
+                                <span className="text-[#1E2938] font-bold">{total}</span>
                             </>
                         )}
                     </span>
                 </div>
-                <span className="hidden sm:inline">•</span>
-                <span className="hidden sm:inline">
-                    Page <span className="font-medium text-foreground">{page}</span> of{" "}
-                    <span className="font-medium text-foreground">{pages}</span>
+                <span className={`${NEU_MUTED} hidden sm:block`}>
+                    Page <span className="text-[#1E2938] font-bold">{page}</span>
+                    <span className="mx-1 text-[#1E2938]/30">/</span>
+                    <span className="text-[#1E2938] font-bold">{pages}</span>
                 </span>
             </div>
 
-            {/* Pagination Controls */}
-            <div className="flex items-center gap-1">
-                {/* First Page Button */}
-                <Button
-                    variant="outline"
-                    size="icon"
+            {/* ── Pagination Controls ── */}
+            <div className="flex items-center gap-1.5">
+                {/* First */}
+                <button
+                    type="button"
                     disabled={page <= 1}
                     onClick={() => goto(1)}
-                    className="h-9 w-9 disabled:opacity-50 hover:bg-primary/10 hover:text-primary transition-all"
+                    className={NEU_BTN_ICON}
                     title="First page"
+                    aria-label="Go to first page"
                 >
                     <ChevronsLeft className="h-4 w-4" />
-                </Button>
+                </button>
 
-                {/* Previous Page Button */}
-                <Button
-                    variant="outline"
-                    size="icon"
+                {/* Prev */}
+                <button
+                    type="button"
                     disabled={page <= 1}
                     onClick={() => goto(page - 1)}
-                    className="h-9 w-9 disabled:opacity-50 hover:bg-primary/10 hover:text-primary transition-all"
+                    className={NEU_BTN_ICON}
                     title="Previous page"
+                    aria-label="Go to previous page"
                 >
                     <ChevronLeft className="h-4 w-4" />
-                </Button>
+                </button>
 
-                {/* Page Number Buttons */}
-                <div className="hidden sm:flex items-center gap-1 mx-1">
+                {/* Page Numbers */}
+                <div className="hidden sm:flex items-center gap-1">
                     {pageNumbers.map((pageNum, index) => {
-                        if (pageNum === '...') {
+                        if (pageNum === "...") {
                             return (
                                 <span
                                     key={`ellipsis-${index}`}
-                                    className="px-2 text-muted-foreground"
+                                    className={`${NEU_MUTED} w-7 text-center`}
                                 >
-                                    ...
+                                    …
                                 </span>
                             );
                         }
 
                         const isActive = pageNum === page;
                         return (
-                            <motion.div
+                            <motion.button
                                 key={pageNum}
-                                whileHover={{ scale: 1.05 }}
+                                type="button"
+                                whileHover={{ scale: isActive ? 1 : 1.05 }}
                                 whileTap={{ scale: 0.95 }}
+                                onClick={() => goto(pageNum as number)}
+                                className={isActive ? NEU_BTN_ICON_ACTIVE : NEU_BTN_ICON}
+                                aria-label={`Go to page ${pageNum}`}
+                                aria-current={isActive ? "page" : undefined}
                             >
-                                <Button
-                                    variant={isActive ? "default" : "outline"}
-                                    size="icon"
-                                    onClick={() => goto(pageNum as number)}
-                                    className={`h-9 w-9 transition-all ${
-                                        isActive
-                                            ? "bg-primary text-primary-foreground shadow-md"
-                                            : "hover:bg-primary/10 hover:text-primary"
-                                    }`}
+                                <span
+                                    className={`text-sm font-[family-name:var(--font-space-mono)] font-bold`}
                                 >
                                     {pageNum}
-                                </Button>
-                            </motion.div>
+                                </span>
+                            </motion.button>
                         );
                     })}
                 </div>
 
-                {/* Next Page Button */}
-                <Button
-                    variant="outline"
-                    size="icon"
+                {/* Mobile: current page indicator */}
+                <div className="sm:hidden">
+                    <div className={`${NEU_SURFACE_INSET_SM} rounded-xl px-3 py-2`}>
+                        <span className={`${NEU_LABEL} text-[10px]`}>
+                            {page} / {pages}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Next */}
+                <button
+                    type="button"
                     disabled={page >= pages}
                     onClick={() => goto(page + 1)}
-                    className="h-9 w-9 disabled:opacity-50 hover:bg-primary/10 hover:text-primary transition-all"
+                    className={NEU_BTN_ICON}
                     title="Next page"
+                    aria-label="Go to next page"
                 >
                     <ChevronRight className="h-4 w-4" />
-                </Button>
+                </button>
 
-                {/* Last Page Button */}
-                <Button
-                    variant="outline"
-                    size="icon"
+                {/* Last */}
+                <button
+                    type="button"
                     disabled={page >= pages}
                     onClick={() => goto(pages)}
-                    className="h-9 w-9 disabled:opacity-50 hover:bg-primary/10 hover:text-primary transition-all"
+                    className={NEU_BTN_ICON}
                     title="Last page"
+                    aria-label="Go to last page"
                 >
                     <ChevronsRight className="h-4 w-4" />
-                </Button>
+                </button>
             </div>
         </motion.div>
     );

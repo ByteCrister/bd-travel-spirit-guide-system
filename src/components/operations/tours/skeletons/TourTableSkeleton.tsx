@@ -1,94 +1,108 @@
 "use client";
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
 import { motion } from "framer-motion";
+import { NEU_SURFACE_INSET, NEU_SKELETON, NEU_LABEL } from "@/styles/neu.styles";
+
+const COL_HEADERS = [
+  "", "Title", "Type", "Division", "Difficulty",
+  "Price", "Ratings", "Wishlist", "Views", "Published",
+];
 
 const TourTableSkeleton: React.FC = () => {
-    return (
-        <div className="overflow-auto rounded-lg">
-            <Table>
-                <TableHeader>
-                    <TableRow className="hover:bg-transparent border-border/50">
-                        <TableHead className="w-12" />
-                        <TableHead className="font-semibold">Title</TableHead>
-                        <TableHead className="font-semibold">Type</TableHead>
-                        <TableHead className="font-semibold">Division</TableHead>
-                        <TableHead className="font-semibold">Difficulty</TableHead>
-                        <TableHead className="font-semibold">Price</TableHead>
-                        <TableHead className="font-semibold">Ratings</TableHead>
-                        <TableHead className="font-semibold">Wishlist</TableHead>
-                        <TableHead className="font-semibold">Views</TableHead>
-                        <TableHead className="font-semibold">Published</TableHead>
-                    </TableRow>
-                </TableHeader>
+  return (
+    <div className="overflow-auto rounded-2xl">
+      <table className="w-full border-collapse">
+        {/* Header */}
+        <thead>
+          <tr
+            className={`${NEU_SURFACE_INSET} rounded-xl`}
+          >
+            {COL_HEADERS.map((h, i) => (
+              <th
+                key={i}
+                className={`
+                  px-4 py-3 text-left
+                  ${NEU_LABEL}
+                  first:rounded-tl-xl last:rounded-tr-xl
+                `}
+              >
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
 
-                <TableBody>
-                    {[...Array(5)].map((_, rowIndex) => (
-                        <motion.tr
-                            key={rowIndex}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: rowIndex * 0.1, duration: 0.3 }}
-                            className="border-border/50"
-                        >
-                            <TableCell className="w-12">
-                                <div className="h-8 w-8 bg-muted-foreground/20 rounded animate-pulse" />
-                            </TableCell>
+        {/* Body */}
+        <tbody>
+          {[...Array(5)].map((_, rowIndex) => (
+            <motion.tr
+              key={rowIndex}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: rowIndex * 0.07, duration: 0.3 }}
+              className="border-b border-[#1E2938]/5 last:border-0"
+            >
+              {/* Expand toggle */}
+              <td className="px-4 py-3 w-12">
+                <div className={`h-8 w-8 rounded-xl ${NEU_SKELETON}`} />
+              </td>
 
-                            <TableCell>
-                                <div className="flex flex-col gap-2">
-                                    <div className="h-5 w-48 bg-muted-foreground/20 rounded animate-pulse" />
-                                    <div className="h-3 w-32 bg-muted-foreground/20 rounded animate-pulse" />
-                                </div>
-                            </TableCell>
+              {/* Title */}
+              <td className="px-4 py-3">
+                <div className="flex flex-col gap-2">
+                  <div className={`h-4 w-44 rounded ${NEU_SKELETON}`} />
+                  <div className={`h-3 w-28 rounded ${NEU_SKELETON}`} />
+                </div>
+              </td>
 
-                            <TableCell>
-                                <div className="h-6 w-20 bg-muted-foreground/20 rounded-full animate-pulse" />
-                            </TableCell>
+              {/* Type */}
+              <td className="px-4 py-3">
+                <div className={`h-6 w-20 rounded-lg ${NEU_SKELETON}`} />
+              </td>
 
-                            <TableCell>
-                                <div className="h-4 w-24 bg-muted-foreground/20 rounded animate-pulse" />
-                            </TableCell>
+              {/* Division */}
+              <td className="px-4 py-3">
+                <div className={`h-4 w-24 rounded ${NEU_SKELETON}`} />
+              </td>
 
-                            <TableCell>
-                                <div className="h-6 w-16 bg-muted-foreground/20 rounded-full animate-pulse" />
-                            </TableCell>
+              {/* Difficulty */}
+              <td className="px-4 py-3">
+                <div className={`h-6 w-16 rounded-lg ${NEU_SKELETON}`} />
+              </td>
 
-                            <TableCell>
-                                <div className="h-4 w-16 bg-muted-foreground/20 rounded animate-pulse" />
-                            </TableCell>
+              {/* Price */}
+              <td className="px-4 py-3">
+                <div className={`h-4 w-16 rounded ${NEU_SKELETON}`} />
+              </td>
 
-                            <TableCell>
-                                <div className="flex items-center gap-2">
-                                    <div className="h-4 w-12 bg-muted-foreground/20 rounded animate-pulse" />
-                                    <div className="h-3 w-8 bg-muted-foreground/20 rounded animate-pulse" />
-                                </div>
-                            </TableCell>
+              {/* Ratings */}
+              <td className="px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <div className={`h-4 w-10 rounded ${NEU_SKELETON}`} />
+                  <div className={`h-3 w-8 rounded ${NEU_SKELETON}`} />
+                </div>
+              </td>
 
-                            <TableCell>
-                                <div className="h-4 w-8 bg-muted-foreground/20 rounded animate-pulse" />
-                            </TableCell>
+              {/* Wishlist */}
+              <td className="px-4 py-3">
+                <div className={`h-4 w-8 rounded ${NEU_SKELETON}`} />
+              </td>
 
-                            <TableCell>
-                                <div className="h-4 w-8 bg-muted-foreground/20 rounded animate-pulse" />
-                            </TableCell>
+              {/* Views */}
+              <td className="px-4 py-3">
+                <div className={`h-4 w-8 rounded ${NEU_SKELETON}`} />
+              </td>
 
-                            <TableCell>
-                                <div className="h-4 w-24 bg-muted-foreground/20 rounded animate-pulse" />
-                            </TableCell>
-                        </motion.tr>
-                    ))}
-                </TableBody>
-            </Table>
-        </div>
-    );
+              {/* Published */}
+              <td className="px-4 py-3">
+                <div className={`h-4 w-24 rounded ${NEU_SKELETON}`} />
+              </td>
+            </motion.tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
 export default TourTableSkeleton;

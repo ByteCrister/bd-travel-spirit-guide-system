@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { FiSearch, FiFilter, FiX } from "react-icons/fi";
 import { useTourDetailStore } from "@/store/tour-detail.store";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -14,31 +12,49 @@ import { CalendarIcon, ChevronDown, ChevronUp, DollarSign, Clock, MapPin, Tag, S
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
-    TOUR_STATUS,
-    TRAVEL_TYPE,
-    DIFFICULTY_LEVEL,
-    DIVISION,
-    DISTRICT,
-    AUDIENCE_TYPE,
-    TOUR_CATEGORIES,
-    MODERATION_STATUS,
-    CURRENCY,
-    Division,
-    District,
-    TravelType,
-    DifficultyLevel,
-    AudienceType,
-    TourCategories,
-    Currency,
-    TourStatus,
-    ModerationStatus,
+    TOUR_STATUS, TRAVEL_TYPE, DIFFICULTY_LEVEL, DIVISION, DISTRICT,
+    AUDIENCE_TYPE, TOUR_CATEGORIES, MODERATION_STATUS, CURRENCY,
+    Division, District, TravelType, DifficultyLevel, AudienceType,
+    TourCategories, Currency, TourStatus, ModerationStatus,
 } from "@/constants/tour/tour.const";
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 import { TourFilterOptions } from "@/types/tour/tour.types";
-import { Badge } from "@/components/ui/badge";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import { motion, AnimatePresence } from "framer-motion";
 
+// ─── Neumorphism Design Tokens ──────────────────────────────────────────────
+const NEU_SURFACE = "bg-[#E7E5E4]";
+const NEU_SURFACE_INSET = "bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]";
+const NEU_BTN_PRIMARY =
+    "rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide " +
+    "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
+    "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
+    "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
+const NEU_BTN_GHOST =
+    "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] " +
+    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
+const NEU_INPUT =
+    "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
+    "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
+    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
+const NEU_BADGE_PRIMARY =
+    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
+    "bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+const NEU_BADGE =
+    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
+    "bg-[#E7E5E4] text-[#1E2938] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+const NEU_HEADING = "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
+const NEU_LABEL = "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
+const NEU_MUTED = "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
+const NEU_ICON_WELL_PRIMARY = "p-2 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+const NEU_DIVIDER = "border-[#1E2938]/10";
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
 const safeGetArray = <T,>(arr: T[] | undefined): T[] => arr || [];
 
 type ItemPerPage = 10 | 20 | 50 | 100;
@@ -47,7 +63,6 @@ const ITEMS_PER_PAGE_OPTIONS: ItemPerPage[] = [10, 20, 50, 100];
 export const Filters: React.FC = () => {
     const { fetchTours, tourFilters: initialFilters } = useTourDetailStore();
 
-    // Initialize all filter states with proper types
     const [search, setSearch] = useState<string>(initialFilters?.search || "");
     const [division, setDivision] = useState<Division[]>(safeGetArray(initialFilters?.division));
     const [district, setDistrict] = useState<District[]>(safeGetArray(initialFilters?.district));
@@ -73,30 +88,19 @@ export const Filters: React.FC = () => {
     const [moderationStatus, setModerationStatus] = useState<ModerationStatus[]>(safeGetArray(initialFilters?.moderationStatus));
     const [tags, setTags] = useState<string[]>(safeGetArray(initialFilters?.tags));
     const [newTag, setNewTag] = useState<string>("");
-
     const [itemsPerPage, setItemsPerPage] = useState<string>("20");
     const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false);
 
-    // Initialize numeric values from initial filters
     useEffect(() => {
-        if (initialFilters?.minPrice !== undefined) {
-            setMinPrice(initialFilters.minPrice.toString());
-        }
-        if (initialFilters?.maxPrice !== undefined) {
-            setMaxPrice(initialFilters.maxPrice.toString());
-        }
-        if (initialFilters?.durationMin !== undefined) {
-            setDurationMin(initialFilters.durationMin.toString());
-        }
-        if (initialFilters?.durationMax !== undefined) {
-            setDurationMax(initialFilters.durationMax.toString());
-        }
+        if (initialFilters?.minPrice !== undefined) setMinPrice(initialFilters.minPrice.toString());
+        if (initialFilters?.maxPrice !== undefined) setMaxPrice(initialFilters.maxPrice.toString());
+        if (initialFilters?.durationMin !== undefined) setDurationMin(initialFilters.durationMin.toString());
+        if (initialFilters?.durationMax !== undefined) setDurationMax(initialFilters.durationMax.toString());
     }, [initialFilters]);
 
     const debouncedApply = useDebouncedCallback(
         (filters: TourFilterOptions) => {
-            const itemsPerPageNum = itemsPerPage ?? 20;
-            fetchTours({ page: 1, limit: Number(itemsPerPageNum) }, filters).catch(() => { });
+            fetchTours({ page: 1, limit: Number(itemsPerPage ?? 20) }, filters).catch(() => { });
         },
         500
     );
@@ -124,9 +128,10 @@ export const Filters: React.FC = () => {
             moderationStatus: moderationStatus.length > 0 ? moderationStatus : undefined,
             tags: tags.length > 0 ? tags : undefined,
         };
-
         debouncedApply(filters);
-    }, [search, division, district, tourType, difficulty, audience, categories, minPrice, maxPrice, currency, startDate, endDate, durationMin, durationMax, guideIncluded, transportIncluded, featured, status, moderationStatus, tags, debouncedApply]);
+    }, [search, division, district, tourType, difficulty, audience, categories, minPrice, maxPrice, currency,
+        startDate, endDate, durationMin, durationMax, guideIncluded, transportIncluded, featured,
+        status, moderationStatus, tags, debouncedApply]);
 
     const addTag = () => {
         const trimmedTag = newTag.trim();
@@ -136,165 +141,97 @@ export const Filters: React.FC = () => {
         }
     };
 
-    const removeTag = (tagToRemove: string) => {
-        setTags(tags.filter(tag => tag !== tagToRemove));
-    };
+    const removeTag = (tagToRemove: string) => setTags(tags.filter(t => t !== tagToRemove));
 
     const resetFilters = () => {
-        setSearch("");
-        setDivision([]);
-        setDistrict([]);
-        setTourType([]);
-        setDifficulty([]);
-        setAudience([]);
-        setCategories([]);
-        setMinPrice("");
-        setMaxPrice("");
-        setCurrency("");
-        setStartDate(undefined);
-        setEndDate(undefined);
-        setDurationMin("");
-        setDurationMax("");
-        setGuideIncluded(undefined);
-        setTransportIncluded(undefined);
-        setFeatured(undefined);
-        setStatus([]);
-        setModerationStatus([]);
-        setTags([]);
+        setSearch(""); setDivision([]); setDistrict([]); setTourType([]);
+        setDifficulty([]); setAudience([]); setCategories([]);
+        setMinPrice(""); setMaxPrice(""); setCurrency("");
+        setStartDate(undefined); setEndDate(undefined);
+        setDurationMin(""); setDurationMax("");
+        setGuideIncluded(undefined); setTransportIncluded(undefined);
+        setFeatured(undefined); setStatus([]); setModerationStatus([]); setTags([]);
     };
 
-    // Apply filters when any filter changes
     useEffect(() => {
         applyFilters();
-    }, [
-        division, district, tourType, difficulty, audience, categories,
-        status, moderationStatus, tags, itemsPerPage, applyFilters
-    ]);
+    }, [division, district, tourType, difficulty, audience, categories, status, moderationStatus, tags, itemsPerPage, applyFilters]);
 
-    // Convert enums to MultiSelectOption format
-    const tourTypeOptions: MultiSelectOption<TravelType>[] = Object.values(TRAVEL_TYPE).map(value => ({
-        value,
-        label: value,
-    }));
+    // Options
+    const tourTypeOptions: MultiSelectOption<TravelType>[] = Object.values(TRAVEL_TYPE).map(v => ({ value: v, label: v }));
+    const statusOptions: MultiSelectOption<TourStatus>[] = Object.values(TOUR_STATUS).map(v => ({ value: v, label: v }));
+    const difficultyOptions: MultiSelectOption<DifficultyLevel>[] = Object.values(DIFFICULTY_LEVEL).map(v => ({ value: v, label: v }));
+    const divisionOptions: MultiSelectOption<Division>[] = Object.values(DIVISION).map(v => ({ value: v, label: v }));
+    const districtOptions: MultiSelectOption<District>[] = Object.values(DISTRICT).map(v => ({ value: v, label: v }));
+    const audienceOptions: MultiSelectOption<AudienceType>[] = Object.values(AUDIENCE_TYPE).map(v => ({ value: v, label: v }));
+    const categoryOptions: MultiSelectOption<TourCategories>[] = Object.values(TOUR_CATEGORIES).map(v => ({ value: v, label: v }));
+    const moderationStatusOptions: MultiSelectOption<ModerationStatus>[] = Object.values(MODERATION_STATUS).map(v => ({ value: v, label: v }));
+    const currencyOptions: MultiSelectOption<Currency>[] = Object.values(CURRENCY).map(v => ({ value: v, label: v }));
 
-    const statusOptions: MultiSelectOption<TourStatus>[] = Object.values(TOUR_STATUS).map(value => ({
-        value,
-        label: value,
-    }));
-
-    const difficultyOptions: MultiSelectOption<DifficultyLevel>[] = Object.values(DIFFICULTY_LEVEL).map(value => ({
-        value,
-        label: value,
-    }));
-
-    const divisionOptions: MultiSelectOption<Division>[] = Object.values(DIVISION).map(value => ({
-        value,
-        label: value,
-    }));
-
-    const districtOptions: MultiSelectOption<District>[] = Object.values(DISTRICT).map(value => ({
-        value,
-        label: value,
-    }));
-
-    const audienceOptions: MultiSelectOption<AudienceType>[] = Object.values(AUDIENCE_TYPE).map(value => ({
-        value,
-        label: value,
-    }));
-
-    const categoryOptions: MultiSelectOption<TourCategories>[] = Object.values(TOUR_CATEGORIES).map(value => ({
-        value,
-        label: value,
-    }));
-
-    const moderationStatusOptions: MultiSelectOption<ModerationStatus>[] = Object.values(MODERATION_STATUS).map(value => ({
-        value,
-        label: value,
-    }));
-
-    const currencyOptions: MultiSelectOption<Currency>[] = Object.values(CURRENCY).map(value => ({
-        value,
-        label: value,
-    }));
-
-    // Count active filters
     const activeFilterCount = [
-        division.length > 0,
-        district.length > 0,
-        tourType.length > 0,
-        difficulty.length > 0,
-        audience.length > 0,
-        categories.length > 0,
-        status.length > 0,
-        moderationStatus.length > 0,
-        tags.length > 0,
-        minPrice,
-        maxPrice,
-        startDate,
-        endDate,
-        durationMin,
-        durationMax,
-        guideIncluded !== undefined,
-        transportIncluded !== undefined,
-        featured !== undefined,
+        division.length > 0, district.length > 0, tourType.length > 0, difficulty.length > 0,
+        audience.length > 0, categories.length > 0, status.length > 0, moderationStatus.length > 0,
+        tags.length > 0, minPrice, maxPrice, startDate, endDate, durationMin, durationMax,
+        guideIncluded !== undefined, transportIncluded !== undefined, featured !== undefined,
     ].filter(Boolean).length;
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
+            className={`${NEU_SURFACE} rounded-2xl p-5 space-y-5`}
         >
-            {/* Header with Stats */}
+            {/* ── Header ── */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                        <FiFilter className="h-5 w-5 text-primary" />
+                    <div className={NEU_ICON_WELL_PRIMARY}>
+                        <FiFilter className="h-4 w-4 text-[#006666]" />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-lg">Filter Tours</h3>
-                        <p className="text-xs text-muted-foreground">
-                            {activeFilterCount > 0 
-                                ? `${activeFilterCount} filter${activeFilterCount !== 1 ? 's' : ''} applied`
-                                : 'No filters applied'}
+                        <h3 className={`${NEU_HEADING} text-base`}>Filter Tours</h3>
+                        <p className={NEU_MUTED}>
+                            {activeFilterCount > 0
+                                ? `${activeFilterCount} filter${activeFilterCount !== 1 ? "s" : ""} applied`
+                                : "No filters applied"}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    {activeFilterCount > 0 && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={resetFilters}
-                            className="text-muted-foreground hover:text-destructive"
-                        >
-                            <FiX className="h-4 w-4 mr-1" />
-                            Clear All
-                        </Button>
-                    )}
-                </div>
+                {activeFilterCount > 0 && (
+                    <button
+                        type="button"
+                        onClick={resetFilters}
+                        className={`${NEU_BTN_GHOST} flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#FF2157]`}
+                    >
+                        <FiX className="h-3.5 w-3.5" />
+                        Clear All
+                    </button>
+                )}
             </div>
 
-            {/* Search and Primary Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            {/* ── Primary Filters ── */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4">
                 {/* Search */}
-                <div className="md:col-span-5">
-                    <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                        <FiSearch className="h-3 w-3" />
-                        Search Tours
+                <div className="sm:col-span-2 md:col-span-5 space-y-1.5">
+                    <Label className={NEU_LABEL}>
+                        <span className="flex items-center gap-1.5">
+                            <FiSearch className="h-3 w-3" />
+                            Search Tours
+                        </span>
                     </Label>
                     <div className="relative">
-                        <Input
+                        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#1E2938]/40 pointer-events-none" />
+                        <input
                             placeholder="Search by title, slug, or description..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="pr-10"
+                            className={`${NEU_INPUT} w-full pl-9 pr-9 py-2.5`}
                         />
                         {search && (
                             <button
+                                type="button"
                                 onClick={() => setSearch("")}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1E2938]/40 hover:text-[#FF2157] transition-colors"
                             >
                                 <FiX className="h-4 w-4" />
                             </button>
@@ -303,10 +240,12 @@ export const Filters: React.FC = () => {
                 </div>
 
                 {/* Tour Type */}
-                <div className="md:col-span-2">
-                    <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                        <MapPin className="h-3 w-3" />
-                        Tour Type
+                <div className="md:col-span-2 space-y-1.5">
+                    <Label className={NEU_LABEL}>
+                        <span className="flex items-center gap-1.5">
+                            <MapPin className="h-3 w-3" />
+                            Tour Type
+                        </span>
                     </Label>
                     <MultiSelect
                         options={tourTypeOptions}
@@ -317,10 +256,12 @@ export const Filters: React.FC = () => {
                 </div>
 
                 {/* Status */}
-                <div className="md:col-span-2">
-                    <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                        <Sparkles className="h-3 w-3" />
-                        Status
+                <div className="md:col-span-2 space-y-1.5">
+                    <Label className={NEU_LABEL}>
+                        <span className="flex items-center gap-1.5">
+                            <Sparkles className="h-3 w-3" />
+                            Status
+                        </span>
                     </Label>
                     <MultiSelect
                         options={statusOptions}
@@ -331,8 +272,8 @@ export const Filters: React.FC = () => {
                 </div>
 
                 {/* Difficulty */}
-                <div className="md:col-span-2">
-                    <Label className="text-sm font-medium mb-2 block">Difficulty</Label>
+                <div className="md:col-span-2 space-y-1.5">
+                    <Label className={NEU_LABEL}>Difficulty</Label>
                     <MultiSelect
                         options={difficultyOptions}
                         selected={difficulty}
@@ -342,42 +283,45 @@ export const Filters: React.FC = () => {
                 </div>
 
                 {/* Items Per Page */}
-                <div className="md:col-span-1">
-                    <Label className="text-sm font-medium mb-2 block">Per Page</Label>
-                    <Select
-                        value={itemsPerPage}
-                        onValueChange={(value) => setItemsPerPage(value)}
-                    >
-                        <SelectTrigger>
+                <div className="md:col-span-1 space-y-1.5">
+                    <Label className={NEU_LABEL}>Per Page</Label>
+                    <Select value={itemsPerPage} onValueChange={setItemsPerPage}>
+                        <SelectTrigger className={`${NEU_INPUT} px-3 py-2.5 h-auto`}>
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                             {ITEMS_PER_PAGE_OPTIONS.map((num) => (
-                                <SelectItem key={num} value={String(num)}>
-                                    {num}
-                                </SelectItem>
+                                <SelectItem key={num} value={String(num)}>{num}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                 </div>
             </div>
 
-            {/* Advanced Filters Toggle */}
-            <Button
-                variant="outline"
+            {/* ── Advanced Filters Toggle ── */}
+            <button
+                type="button"
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="w-full group hover:bg-primary/5 transition-colors"
+                className={`${NEU_BTN_GHOST} w-full flex items-center justify-between px-4 py-3 text-sm`}
             >
-                <FiFilter className="h-4 w-4 mr-2" />
-                <span className="font-medium">Advanced Filters</span>
-                {showAdvancedFilters ? (
-                    <ChevronUp className="h-4 w-4 ml-auto group-hover:text-primary transition-colors" />
-                ) : (
-                    <ChevronDown className="h-4 w-4 ml-auto group-hover:text-primary transition-colors" />
-                )}
-            </Button>
+                <span className="flex items-center gap-2 text-[#1E2938]/70">
+                    <FiFilter className="h-4 w-4" />
+                    <span className={`${NEU_HEADING} text-sm`}>Advanced Filters</span>
+                </span>
+                <span className="flex items-center gap-2">
+                    {activeFilterCount > 0 && (
+                        <span className={`${NEU_BADGE_PRIMARY} text-[10px] px-2 py-0.5`}>
+                            {activeFilterCount}
+                        </span>
+                    )}
+                    {showAdvancedFilters
+                        ? <ChevronUp className="h-4 w-4 text-[#006666]" />
+                        : <ChevronDown className="h-4 w-4 text-[#1E2938]/50" />
+                    }
+                </span>
+            </button>
 
-            {/* Advanced Filters */}
+            {/* ── Advanced Filters Panel ── */}
             <AnimatePresence>
                 {showAdvancedFilters && (
                     <motion.div
@@ -387,95 +331,74 @@ export const Filters: React.FC = () => {
                         transition={{ duration: 0.3 }}
                         className="overflow-hidden"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 border border-border/50 rounded-xl bg-gradient-to-br from-muted/30 to-muted/10">
+                        <div className={`${NEU_SURFACE_INSET} rounded-2xl p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5`}>
                             {/* Division */}
-                            <div>
-                                <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                                    <MapPin className="h-3 w-3" />
-                                    Division
+                            <div className="space-y-1.5">
+                                <Label className={NEU_LABEL}>
+                                    <span className="flex items-center gap-1.5">
+                                        <MapPin className="h-3 w-3" />Division
+                                    </span>
                                 </Label>
-                                <MultiSelect
-                                    options={divisionOptions}
-                                    selected={division}
-                                    onChange={setDivision}
-                                    placeholder="Select division"
-                                />
+                                <MultiSelect options={divisionOptions} selected={division} onChange={setDivision} placeholder="Select division" />
                             </div>
 
                             {/* District */}
-                            <div>
-                                <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                                    <MapPin className="h-3 w-3" />
-                                    District
+                            <div className="space-y-1.5">
+                                <Label className={NEU_LABEL}>
+                                    <span className="flex items-center gap-1.5">
+                                        <MapPin className="h-3 w-3" />District
+                                    </span>
                                 </Label>
-                                <MultiSelect
-                                    options={districtOptions}
-                                    selected={district}
-                                    onChange={setDistrict}
-                                    placeholder="Select district"
-                                />
+                                <MultiSelect options={districtOptions} selected={district} onChange={setDistrict} placeholder="Select district" />
                             </div>
 
                             {/* Audience */}
-                            <div>
-                                <Label className="text-sm font-medium mb-2 block">Audience</Label>
-                                <MultiSelect
-                                    options={audienceOptions}
-                                    selected={audience}
-                                    onChange={setAudience}
-                                    placeholder="Select audience"
-                                />
+                            <div className="space-y-1.5">
+                                <Label className={NEU_LABEL}>Audience</Label>
+                                <MultiSelect options={audienceOptions} selected={audience} onChange={setAudience} placeholder="Select audience" />
                             </div>
 
                             {/* Categories */}
-                            <div>
-                                <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                                    <Tag className="h-3 w-3" />
-                                    Categories
+                            <div className="space-y-1.5">
+                                <Label className={NEU_LABEL}>
+                                    <span className="flex items-center gap-1.5">
+                                        <Tag className="h-3 w-3" />Categories
+                                    </span>
                                 </Label>
-                                <MultiSelect
-                                    options={categoryOptions}
-                                    selected={categories}
-                                    onChange={setCategories}
-                                    placeholder="Select categories"
-                                />
+                                <MultiSelect options={categoryOptions} selected={categories} onChange={setCategories} placeholder="Select categories" />
                             </div>
 
                             {/* Price Range */}
-                            <div>
-                                <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                                    <DollarSign className="h-3 w-3" />
-                                    Price Range
+                            <div className="space-y-1.5">
+                                <Label className={NEU_LABEL}>
+                                    <span className="flex items-center gap-1.5">
+                                        <DollarSign className="h-3 w-3" />Price Range
+                                    </span>
                                 </Label>
                                 <div className="space-y-2">
                                     <div className="flex gap-2">
-                                        <Input
+                                        <input
                                             type="number"
                                             placeholder="Min"
                                             value={minPrice}
                                             onChange={(e) => setMinPrice(e.target.value)}
-                                            className="w-full"
+                                            className={`${NEU_INPUT} w-full px-3 py-2`}
                                         />
-                                        <Input
+                                        <input
                                             type="number"
                                             placeholder="Max"
                                             value={maxPrice}
                                             onChange={(e) => setMaxPrice(e.target.value)}
-                                            className="w-full"
+                                            className={`${NEU_INPUT} w-full px-3 py-2`}
                                         />
                                     </div>
-                                    <Select
-                                        value={currency}
-                                        onValueChange={(value) => setCurrency(value as Currency)}
-                                    >
-                                        <SelectTrigger>
+                                    <Select value={currency} onValueChange={(v) => setCurrency(v as Currency)}>
+                                        <SelectTrigger className={`${NEU_INPUT} px-3 py-2.5 h-auto`}>
                                             <SelectValue placeholder="Currency" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {currencyOptions.map((curr) => (
-                                                <SelectItem key={curr.value} value={curr.value}>
-                                                    {curr.label}
-                                                </SelectItem>
+                                            {currencyOptions.map((c) => (
+                                                <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -483,115 +406,102 @@ export const Filters: React.FC = () => {
                             </div>
 
                             {/* Date Range */}
-                            <div>
-                                <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                                    <CalendarIcon className="h-3 w-3" />
-                                    Date Range
+                            <div className="space-y-1.5">
+                                <Label className={NEU_LABEL}>
+                                    <span className="flex items-center gap-1.5">
+                                        <CalendarIcon className="h-3 w-3" />Date Range
+                                    </span>
                                 </Label>
                                 <div className="space-y-2">
                                     <Popover>
                                         <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
+                                            <button
+                                                type="button"
                                                 className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !startDate && "text-muted-foreground"
+                                                    `${NEU_BTN_GHOST} w-full flex items-center gap-2 px-3 py-2.5 text-sm`,
+                                                    !startDate && "text-[#1E2938]/40"
                                                 )}
                                             >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                <CalendarIcon className="h-4 w-4 shrink-0" />
                                                 {startDate ? format(startDate, "PPP") : "Start date"}
-                                            </Button>
+                                            </button>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={startDate}
-                                                onSelect={setStartDate}
-                                                initialFocus
-                                            />
+                                            <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
                                         </PopoverContent>
                                     </Popover>
                                     <Popover>
                                         <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
+                                            <button
+                                                type="button"
                                                 className={cn(
-                                                    "w-full justify-start text-left font-normal",
-                                                    !endDate && "text-muted-foreground"
+                                                    `${NEU_BTN_GHOST} w-full flex items-center gap-2 px-3 py-2.5 text-sm`,
+                                                    !endDate && "text-[#1E2938]/40"
                                                 )}
                                             >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                <CalendarIcon className="h-4 w-4 shrink-0" />
                                                 {endDate ? format(endDate, "PPP") : "End date"}
-                                            </Button>
+                                            </button>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={endDate}
-                                                onSelect={setEndDate}
-                                                initialFocus
-                                            />
+                                            <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
                                         </PopoverContent>
                                     </Popover>
                                 </div>
                             </div>
 
                             {/* Duration Range */}
-                            <div>
-                                <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                                    <Clock className="h-3 w-3" />
-                                    Duration (days)
+                            <div className="space-y-1.5">
+                                <Label className={NEU_LABEL}>
+                                    <span className="flex items-center gap-1.5">
+                                        <Clock className="h-3 w-3" />Duration (days)
+                                    </span>
                                 </Label>
                                 <div className="flex gap-2">
-                                    <Input
+                                    <input
                                         type="number"
                                         placeholder="Min"
                                         value={durationMin}
                                         onChange={(e) => setDurationMin(e.target.value)}
-                                        className="w-full"
+                                        className={`${NEU_INPUT} w-full px-3 py-2`}
                                     />
-                                    <Input
+                                    <input
                                         type="number"
                                         placeholder="Max"
                                         value={durationMax}
                                         onChange={(e) => setDurationMax(e.target.value)}
-                                        className="w-full"
+                                        className={`${NEU_INPUT} w-full px-3 py-2`}
                                     />
                                 </div>
                             </div>
 
                             {/* Boolean Filters */}
-                            <div className="space-y-3">
-                                <Label className="text-sm font-medium block mb-3">Features</Label>
-                                <div className="space-y-3 bg-background/50 rounded-lg p-3 border border-border/50">
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id="guideIncluded"
-                                            checked={guideIncluded === true}
-                                            onCheckedChange={(checked) => setGuideIncluded(checked === true ? true : undefined)}
-                                        />
-                                        <Label htmlFor="guideIncluded" className="cursor-pointer">
-                                            Guide Included
-                                        </Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id="transportIncluded"
-                                            checked={transportIncluded === true}
-                                            onCheckedChange={(checked) => setTransportIncluded(checked === true ? true : undefined)}
-                                        />
-                                        <Label htmlFor="transportIncluded" className="cursor-pointer">
-                                            Transport Included
-                                        </Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
+                            <div className="space-y-1.5">
+                                <Label className={NEU_LABEL}>Features</Label>
+                                <div className={`${NEU_SURFACE_INSET} rounded-xl p-3 space-y-3`}>
+                                    {[
+                                        { id: "guideIncluded", label: "Guide Included", value: guideIncluded, setter: setGuideIncluded },
+                                        { id: "transportIncluded", label: "Transport Included", value: transportIncluded, setter: setTransportIncluded },
+                                    ].map(({ id, label, value, setter }) => (
+                                        <div key={id} className="flex items-center gap-2.5">
+                                            <Checkbox
+                                                id={id}
+                                                checked={value === true}
+                                                onCheckedChange={(c) => setter(c === true ? true : undefined)}
+                                                className="border-[#006666]/40 data-[state=checked]:bg-[#006666] data-[state=checked]:border-[#006666]"
+                                            />
+                                            <Label htmlFor={id} className={`${NEU_MUTED} cursor-pointer`}>{label}</Label>
+                                        </div>
+                                    ))}
+                                    <div className="flex items-center gap-2.5">
                                         <Checkbox
                                             id="featured"
                                             checked={featured === true}
-                                            onCheckedChange={(checked) => setFeatured(checked === true ? true : undefined)}
+                                            onCheckedChange={(c) => setFeatured(c === true ? true : undefined)}
+                                            className="border-[#006666]/40 data-[state=checked]:bg-[#006666] data-[state=checked]:border-[#006666]"
                                         />
-                                        <Label htmlFor="featured" className="cursor-pointer flex items-center gap-1">
-                                            <Sparkles className="h-3 w-3" />
+                                        <Label htmlFor="featured" className={`${NEU_MUTED} cursor-pointer flex items-center gap-1.5`}>
+                                            <Sparkles className="h-3 w-3 text-[#FE9900]" />
                                             Featured Tours
                                         </Label>
                                     </div>
@@ -599,8 +509,8 @@ export const Filters: React.FC = () => {
                             </div>
 
                             {/* Moderation Status */}
-                            <div>
-                                <Label className="text-sm font-medium mb-2 block">Moderation Status</Label>
+                            <div className="space-y-1.5">
+                                <Label className={NEU_LABEL}>Moderation Status</Label>
                                 <MultiSelect
                                     options={moderationStatusOptions}
                                     selected={moderationStatus}
@@ -610,57 +520,52 @@ export const Filters: React.FC = () => {
                             </div>
 
                             {/* Tags */}
-                            <div className="md:col-span-2 lg:col-span-3">
-                                <Label className="text-sm font-medium mb-2 flex items-center gap-2">
-                                    <Tag className="h-3 w-3" />
-                                    Tags
+                            <div className="md:col-span-2 lg:col-span-3 space-y-1.5">
+                                <Label className={NEU_LABEL}>
+                                    <span className="flex items-center gap-1.5">
+                                        <Tag className="h-3 w-3" />Tags
+                                    </span>
                                 </Label>
-                                <div className="flex gap-2 mb-3">
-                                    <Input
+                                <div className="flex gap-2">
+                                    <input
                                         placeholder="Add a tag and press Enter"
                                         value={newTag}
                                         onChange={(e) => setNewTag(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                                addTag();
-                                            }
-                                        }}
-                                        className="flex-1"
+                                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
+                                        className={`${NEU_INPUT} flex-1 px-3 py-2.5`}
                                     />
-                                    <Button 
+                                    <button
+                                        type="button"
                                         onClick={addTag}
                                         disabled={!newTag.trim()}
-                                        className="px-6"
+                                        className={`${NEU_BTN_PRIMARY} px-5 py-2.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none`}
                                     >
                                         Add
-                                    </Button>
+                                    </button>
                                 </div>
                                 {tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-2">
-                                        {tags.map((tag) => (
-                                            <motion.div
-                                                key={tag}
-                                                initial={{ opacity: 0, scale: 0.8 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0.8 }}
-                                            >
-                                                <Badge 
-                                                    variant="secondary" 
-                                                    className="flex items-center gap-2 px-3 py-1 hover:bg-primary/10 transition-colors"
+                                    <div className="flex flex-wrap gap-2 pt-1">
+                                        <AnimatePresence>
+                                            {tags.map((tag) => (
+                                                <motion.span
+                                                    key={tag}
+                                                    initial={{ opacity: 0, scale: 0.8 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    exit={{ opacity: 0, scale: 0.8 }}
+                                                    className={`${NEU_BADGE_PRIMARY} group`}
                                                 >
                                                     <Tag className="h-3 w-3" />
                                                     {tag}
                                                     <button
                                                         type="button"
                                                         onClick={() => removeTag(tag)}
-                                                        className="ml-1 hover:text-destructive transition-colors"
+                                                        className="ml-0.5 hover:text-[#FF2157] transition-colors"
                                                     >
-                                                        <FiX size={14} />
+                                                        <FiX size={12} />
                                                     </button>
-                                                </Badge>
-                                            </motion.div>
-                                        ))}
+                                                </motion.span>
+                                            ))}
+                                        </AnimatePresence>
                                     </div>
                                 )}
                             </div>
@@ -669,222 +574,127 @@ export const Filters: React.FC = () => {
                 )}
             </AnimatePresence>
 
-            {/* Active Filters Summary */}
-            {activeFilterCount > 0 && (
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="border-t pt-4"
-                >
-                    <div className="flex items-center justify-between mb-3">
-                        <Label className="text-sm font-medium flex items-center gap-2">
-                            <Sparkles className="h-4 w-4 text-primary" />
-                            Active Filters ({activeFilterCount})
-                        </Label>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={resetFilters}
-                            className="text-xs h-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                            <FiX className="h-3 w-3 mr-1" />
-                            Clear All
-                        </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {search && (
-                            <Badge variant="secondary" className="flex items-center gap-2 px-3 py-1">
-                                <FiSearch className="h-3 w-3" />
-                                {search}
-                                <button
-                                    type="button"
-                                    onClick={() => setSearch("")}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
+            {/* ── Active Filters Summary ── */}
+            <AnimatePresence>
+                {activeFilterCount > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className={`border-t ${NEU_DIVIDER} pt-4 space-y-3`}
+                    >
+                        <div className="flex items-center justify-between">
+                            <span className={`${NEU_LABEL} flex items-center gap-1.5`}>
+                                <Sparkles className="h-3.5 w-3.5 text-[#006666]" />
+                                Active Filters ({activeFilterCount})
+                            </span>
+                            <button
+                                type="button"
+                                onClick={resetFilters}
+                                className="text-xs text-[#FF2157] hover:text-[#FF2157]/80 font-[family-name:var(--font-space-mono)] flex items-center gap-1 transition-colors"
+                            >
+                                <FiX className="h-3 w-3" />Clear All
+                            </button>
+                        </div>
 
-                        {tourType.map((type) => (
-                            <Badge key={type} variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                Type: {type}
-                                <button
-                                    type="button"
-                                    onClick={() => setTourType(tourType.filter(t => t !== type))}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        ))}
+                        <div className="flex flex-wrap gap-2">
+                            {search && (
+                                <span className={NEU_BADGE_PRIMARY}>
+                                    <FiSearch className="h-3 w-3" />
+                                    {search}
+                                    <button type="button" onClick={() => setSearch("")} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
 
-                        {division.map((div) => (
-                            <Badge key={div} variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                <MapPin className="h-3 w-3" />
-                                {div}
-                                <button
-                                    type="button"
-                                    onClick={() => setDivision(division.filter(d => d !== div))}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        ))}
+                            {tourType.map((type) => (
+                                <span key={type} className={NEU_BADGE}>
+                                    Type: {type}
+                                    <button type="button" onClick={() => setTourType(tourType.filter(t => t !== type))} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            ))}
 
-                        {minPrice && (
-                            <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                <DollarSign className="h-3 w-3" />
-                                Min: {minPrice}
-                                <button
-                                    type="button"
-                                    onClick={() => setMinPrice("")}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
+                            {division.map((div) => (
+                                <span key={div} className={NEU_BADGE}>
+                                    <MapPin className="h-3 w-3" />
+                                    {div}
+                                    <button type="button" onClick={() => setDivision(division.filter(d => d !== div))} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            ))}
 
-                        {maxPrice && (
-                            <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                <DollarSign className="h-3 w-3" />
-                                Max: {maxPrice}
-                                <button
-                                    type="button"
-                                    onClick={() => setMaxPrice("")}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
+                            {minPrice && (
+                                <span className={NEU_BADGE}>
+                                    <DollarSign className="h-3 w-3" />Min: {minPrice}
+                                    <button type="button" onClick={() => setMinPrice("")} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
+                            {maxPrice && (
+                                <span className={NEU_BADGE}>
+                                    <DollarSign className="h-3 w-3" />Max: {maxPrice}
+                                    <button type="button" onClick={() => setMaxPrice("")} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
 
-                        {startDate && (
-                            <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                <CalendarIcon className="h-3 w-3" />
-                                From: {format(startDate, "PP")}
-                                <button
-                                    type="button"
-                                    onClick={() => setStartDate(undefined)}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
+                            {startDate && (
+                                <span className={NEU_BADGE}>
+                                    <CalendarIcon className="h-3 w-3" />From: {format(startDate, "PP")}
+                                    <button type="button" onClick={() => setStartDate(undefined)} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
+                            {endDate && (
+                                <span className={NEU_BADGE}>
+                                    <CalendarIcon className="h-3 w-3" />To: {format(endDate, "PP")}
+                                    <button type="button" onClick={() => setEndDate(undefined)} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
 
-                        {endDate && (
-                            <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                <CalendarIcon className="h-3 w-3" />
-                                To: {format(endDate, "PP")}
-                                <button
-                                    type="button"
-                                    onClick={() => setEndDate(undefined)}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
+                            {durationMin && (
+                                <span className={NEU_BADGE}>
+                                    <Clock className="h-3 w-3" />Min: {durationMin}d
+                                    <button type="button" onClick={() => setDurationMin("")} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
+                            {durationMax && (
+                                <span className={NEU_BADGE}>
+                                    <Clock className="h-3 w-3" />Max: {durationMax}d
+                                    <button type="button" onClick={() => setDurationMax("")} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
 
-                        {durationMin && (
-                            <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                <Clock className="h-3 w-3" />
-                                Min: {durationMin}d
-                                <button
-                                    type="button"
-                                    onClick={() => setDurationMin("")}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
+                            {guideIncluded !== undefined && (
+                                <span className={NEU_BADGE}>
+                                    Guide Included
+                                    <button type="button" onClick={() => setGuideIncluded(undefined)} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
+                            {transportIncluded !== undefined && (
+                                <span className={NEU_BADGE}>
+                                    Transport Included
+                                    <button type="button" onClick={() => setTransportIncluded(undefined)} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
+                            {featured !== undefined && (
+                                <span className={NEU_BADGE}>
+                                    <Sparkles className="h-3 w-3 text-[#FE9900]" />Featured
+                                    <button type="button" onClick={() => setFeatured(undefined)} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            )}
 
-                        {durationMax && (
-                            <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                <Clock className="h-3 w-3" />
-                                Max: {durationMax}d
-                                <button
-                                    type="button"
-                                    onClick={() => setDurationMax("")}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
-
-                        {guideIncluded !== undefined && (
-                            <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                Guide Included
-                                <button
-                                    type="button"
-                                    onClick={() => setGuideIncluded(undefined)}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
-
-                        {transportIncluded !== undefined && (
-                            <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                Transport Included
-                                <button
-                                    type="button"
-                                    onClick={() => setTransportIncluded(undefined)}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
-
-                        {featured !== undefined && (
-                            <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                <Sparkles className="h-3 w-3" />
-                                Featured
-                                <button
-                                    type="button"
-                                    onClick={() => setFeatured(undefined)}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        )}
-
-                        {difficulty.map((diff) => (
-                            <Badge key={diff} variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                Difficulty: {diff}
-                                <button
-                                    type="button"
-                                    onClick={() => setDifficulty(difficulty.filter(d => d !== diff))}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        ))}
-
-                        {status.map((stat) => (
-                            <Badge key={stat} variant="outline" className="flex items-center gap-1 px-3 py-1">
-                                Status: {stat}
-                                <button
-                                    type="button"
-                                    onClick={() => setStatus(status.filter(s => s !== stat))}
-                                    className="ml-1 hover:text-destructive transition-colors"
-                                >
-                                    <FiX size={12} />
-                                </button>
-                            </Badge>
-                        ))}
-                    </div>
-                </motion.div>
-            )}
+                            {difficulty.map((diff) => (
+                                <span key={diff} className={NEU_BADGE}>
+                                    Difficulty: {diff}
+                                    <button type="button" onClick={() => setDifficulty(difficulty.filter(d => d !== diff))} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            ))}
+                            {status.map((stat) => (
+                                <span key={stat} className={NEU_BADGE}>
+                                    Status: {stat}
+                                    <button type="button" onClick={() => setStatus(status.filter(s => s !== stat))} className="ml-0.5 hover:text-[#FF2157] transition-colors"><FiX size={12} /></button>
+                                </span>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </motion.div>
     );
 };

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { HiDocumentReport } from "react-icons/hi";
 import { spaceMono, jetbrainsMono } from "@/styles/fonts";
+import { Breadcrumbs } from "@/components/global/Breadcrumbs";
 
 export const ReportsPage: FC = () => {
     const { fetchListPage, params, loading } = useReportsStore();
@@ -27,6 +28,15 @@ export const ReportsPage: FC = () => {
             className={cn("min-h-screen", spaceMono.variable, jetbrainsMono.variable)}
             style={{ backgroundColor: "#E7E5E4", fontFamily: "var(--font-space-mono)" }}
         >
+            {/* Breadcrumbs */}
+            <Breadcrumbs
+                items={[
+                    { label: 'Home', href: '/' },
+                    { label: 'Operations', href: '/operations/reports' },
+                ]}
+                className="mb-4"
+            />
+
             {/* Page Header */}
             <motion.header
                 initial={{ opacity: 0, y: -16 }}

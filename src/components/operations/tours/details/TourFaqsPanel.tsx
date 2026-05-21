@@ -40,7 +40,7 @@ const makeCacheKey = (params: {
 
 const EMPTY_OBJ = {};
 
-export default function TourFaqs({ tourId, active = true }: Props) {
+export default function TourFaqsPanel({ tourId, active = true }: Props) {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [forceReloadToken, setForceReloadToken] = useState(0);

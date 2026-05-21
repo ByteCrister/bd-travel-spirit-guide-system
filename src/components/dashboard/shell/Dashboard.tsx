@@ -27,6 +27,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { CalendarIcon, ChevronDown } from 'lucide-react';
+import { Breadcrumbs } from "@/components/global/Breadcrumbs";
 
 const brand = {
     primary: '#006666',
@@ -169,7 +170,16 @@ export default function Dashboard() {
     const showProfileSkeleton = isLoadingProfile && !companyInfo;
 
     return (
-        <div className="space-y-8 pb-16">
+        <div className="space-y-8 p-2 sm:p-3 lg:p-5">
+            {/* Breadcrumbs */}
+            <Breadcrumbs
+                items={[
+                    { label: 'Home', href: '/' },
+                    { label: 'Dashboard', href: '/dashboard' },
+                ]}
+                className="mb-4"
+            />
+
             <DashboardPageHeader
                 exportWindow={filters.globalDateRange}
                 onExportWindowChange={(range) => setSectionDateRange('globalDateRange', range)}

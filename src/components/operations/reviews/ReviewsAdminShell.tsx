@@ -10,6 +10,7 @@ import { TableSkeleton } from "./Skeletons";
 import { clampPages, isApiError } from "@/utils/helpers/reviews.uiHelpers";
 import type { ApiError, ReviewToolbarState } from "@/types/tour/reviews.types";
 import { toast } from "sonner";
+import { Breadcrumbs } from "@/components/global/Breadcrumbs";
 
 export default function ReviewsAdminShell(): JSX.Element {
     const {
@@ -150,7 +151,16 @@ export default function ReviewsAdminShell(): JSX.Element {
             style={{ background: "#E7E5E4", fontFamily: "var(--font-space-mono), monospace" }}
             aria-label="Reviews management"
         >
-            <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
+            {/* Breadcrumbs */}
+            <Breadcrumbs
+                items={[
+                    { label: 'Home', href: '/' },
+                    { label: 'Reviews', href: '/operations/reviews' },
+                ]}
+                className="mb-4"
+            />
+
+            <div className="mx-auto max-w-[1600px] p-2 sm:p-3 lg:p-5">
                 <section
                     className="space-y-5"
                     data-testid="reviews-admin-shell"

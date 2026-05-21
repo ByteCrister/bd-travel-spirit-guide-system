@@ -11,7 +11,7 @@ import {
 
 import ReviewsPanel from "./ReviewsPanel";
 import ReportsPanel from "./ReportsPanel";
-import TourFaqs from "./TourFaqs";
+import TourFaqsPanel from "./TourFaqsPanel";
 import TourCoreDetails from "./TourCoreDetails";
 import { useTourDetailStore } from "@/store/tour-detail.store";
 import { encodeId } from "@/utils/helpers/mongodb-id-conversions";
@@ -235,7 +235,7 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                             {activeTab === "details" && <TourCoreDetails tourId={tourId} />}
                             {activeTab === "reviews" && <ReviewsPanel tourId={tourId} />}
                             {activeTab === "reports" && <ReportsPanel tourId={tourId} />}
-                            {activeTab === "faqs" && <TourFaqs tourId={tourId} />}
+                            {activeTab === "faqs" && <TourFaqsPanel tourId={tourId} />}
                             {activeTab === "bookings" && <TourBookingsPanel tourId={tourId} />}
                         </div>
                     </div>

@@ -57,7 +57,7 @@ export function BookingsPage() {
     return (
         // Neumorphic page background — the monochromatic stone surface
         <div
-            className="min-h-screen bg-[#E7E5E4] px-6 py-8 space-y-6"
+            className="min-h-screen bg-[#E7E5E4] p-2 sm:p-3 lg:p-5 space-y-6"
             style={spaceMono.style}
         >
             {/* ── Breadcrumbs ─────────────────────────────────────────────── */}
