@@ -7,8 +7,6 @@ import {
   Users,
   Headphones,
   FileText,
-  Image,
-  Gift,
   Menu,
   X,
   ChevronRight,
@@ -17,6 +15,8 @@ import {
   User,
   MessageSquare,
   Compass,
+  Settings,
+  CreditCard,
 } from "lucide-react";
 import { NavLink } from "./NavLink";
 import { cn } from "@/lib/utils";
@@ -68,7 +68,11 @@ const navigationGroups: NavGroup[] = [
     title: "Support",
     icon: Headphones,
     items: [
-      { href: "/support/travelers", label: "Customer Support", icon: Headphones },
+      {
+        href: "/support/travelers",
+        label: "Customer Support",
+        icon: Headphones,
+      },
       { href: "/support/faqs", label: "FAQs", icon: FileText },
       {
         href: "/support/reset-password-requests",
@@ -82,15 +86,24 @@ const navigationGroups: NavGroup[] = [
     title: "Users",
     icon: Users,
     items: [
-      { href: "/users/employees", label: "Employees", icon: Users, adminOnly: true },
+      {
+        href: "/users/employees",
+        label: "Employees",
+        icon: Users,
+        adminOnly: true,
+      },
     ],
   },
   {
-    title: "Social",
-    icon: Gift,
+    title: "Settings",
+    icon: Settings,
     items: [
-      { href: "/social/advertising", label: "Advertising", icon: Image },
-      { href: "/social/notifications", label: "Notifications", icon: Gift },
+      {
+        href: "/settings/payment-accounts",
+        label: "Payment Accounts",
+        icon: CreditCard,
+        adminOnly: true,
+      },
     ],
   },
 ];
@@ -104,7 +117,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
-    navigationGroups.map(g => g.title)
+    navigationGroups.map((g) => g.title),
   );
   const [hasAutoCollapsed, setHasAutoCollapsed] = useState(false);
 
@@ -113,12 +126,12 @@ export function Sidebar({
 
   useEffect(() => {
     const activeGroup = navigationGroups.find((group) =>
-      group.items.some((item) => pathname.startsWith(item.href))
+      group.items.some((item) => pathname.startsWith(item.href)),
     );
     // if (activeGroup) setExpandedGroups([activeGroup.title]);
     if (activeGroup) {
-      setExpandedGroups(prev =>
-        prev.includes(activeGroup.title) ? prev : [...prev, activeGroup.title]
+      setExpandedGroups((prev) =>
+        prev.includes(activeGroup.title) ? prev : [...prev, activeGroup.title],
       );
     }
 
@@ -129,13 +142,21 @@ export function Sidebar({
     } else if (!pathname.startsWith("/customer-support")) {
       setHasAutoCollapsed(false);
     }
-  }, [hasAutoCollapsed, isCollapsed, isMobile, isOpen, onClose, pathname, setIsCollapsed]);
+  }, [
+    hasAutoCollapsed,
+    isCollapsed,
+    isMobile,
+    isOpen,
+    onClose,
+    pathname,
+    setIsCollapsed,
+  ]);
 
   const toggleGroup = (groupTitle: string) => {
     setExpandedGroups((prev) =>
       prev.includes(groupTitle)
         ? prev.filter((t) => t !== groupTitle)
-        : [...prev, groupTitle]
+        : [...prev, groupTitle],
     );
   };
 
@@ -171,7 +192,7 @@ export function Sidebar({
         "border-r border-[#d0cecc]",
         // Outer shadow to create raised effect
         "shadow-[4px_0_16px_rgba(0,0,0,0.08),-2px_0_6px_rgba(255,255,255,0.8)]",
-        isMobile ? "w-80" : "w-80 lg:relative lg:z-auto"
+        isMobile ? "w-80" : "w-80 lg:relative lg:z-auto",
       )}
       role="navigation"
       aria-label="Main navigation"
@@ -182,7 +203,7 @@ export function Sidebar({
           "border-b border-[#d0cecc] p-4",
           isCollapsed
             ? "flex flex-col items-center gap-3"
-            : "flex items-center justify-between"
+            : "flex items-center justify-between",
         )}
       >
         <AnimatePresence mode="wait">
@@ -200,16 +221,14 @@ export function Sidebar({
                 className={cn(
                   "flex h-10 w-10 items-center justify-center rounded-xl",
                   "bg-[#E7E5E4]",
-                  "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]"
+                  "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]",
                 )}
               >
                 <Compass className="h-5 w-5 text-[#006666]" strokeWidth={2} />
               </div>
 
               <div>
-                <h1
-                  className="font-[family-name:var(--font-space-mono)] text-base font-bold tracking-tight text-[#1E2938]"
-                >
+                <h1 className="font-[family-name:var(--font-space-mono)] text-base font-bold tracking-tight text-[#1E2938]">
                   BD Travel Spirit
                 </h1>
                 <p className="text-[10px] tracking-widest uppercase text-[#006666] font-semibold">
@@ -227,7 +246,7 @@ export function Sidebar({
               className={cn(
                 "flex h-12 w-12 items-center justify-center rounded-xl",
                 "bg-[#E7E5E4]",
-                "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]"
+                "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]",
               )}
             >
               <Compass className="h-6 w-6 text-[#006666]" strokeWidth={2} />
@@ -245,7 +264,7 @@ export function Sidebar({
               "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]",
               "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
               "transition-all duration-200 focus:outline-none",
-              isCollapsed && "mt-2"
+              isCollapsed && "mt-2",
             )}
             whileTap={{ scale: 0.95 }}
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -266,7 +285,7 @@ export function Sidebar({
               "bg-[#E7E5E4] text-[#1E2938]",
               "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]",
               "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
-              "transition-all duration-200 focus:outline-none"
+              "transition-all duration-200 focus:outline-none",
             )}
             whileTap={{ scale: 0.95 }}
             aria-label="Close sidebar"
@@ -298,18 +317,18 @@ export function Sidebar({
                     "font-[family-name:var(--font-space-mono)]",
                     isExpanded
                       ? [
-                        "text-[#006666]",
-                        "shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.75)]",
-                        "bg-[#E7E5E4]",
-                      ]
+                          "text-[#006666]",
+                          "shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.75)]",
+                          "bg-[#E7E5E4]",
+                        ]
                       : [
-                        "text-[#1E2938]/60",
-                        "bg-[#E7E5E4]",
-                        "shadow-[2px_2px_6px_rgba(0,0,0,0.1),-2px_-2px_6px_rgba(255,255,255,0.85)]",
-                        "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.7)]",
-                        "hover:text-[#1E2938]",
-                      ],
-                    isCollapsed && "justify-center px-2 py-3"
+                          "text-[#1E2938]/60",
+                          "bg-[#E7E5E4]",
+                          "shadow-[2px_2px_6px_rgba(0,0,0,0.1),-2px_-2px_6px_rgba(255,255,255,0.85)]",
+                          "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.7)]",
+                          "hover:text-[#1E2938]",
+                        ],
+                    isCollapsed && "justify-center px-2 py-3",
                   )}
                   whileTap={{ scale: 0.97 }}
                   aria-expanded={isExpanded}
@@ -319,7 +338,7 @@ export function Sidebar({
                     className={cn(
                       "flex-shrink-0 transition-colors duration-200",
                       isCollapsed ? "h-5 w-5" : "h-4 w-4",
-                      isExpanded ? "text-[#006666]" : "text-[#1E2938]/50"
+                      isExpanded ? "text-[#006666]" : "text-[#1E2938]/50",
                     )}
                   />
                   <AnimatePresence>
@@ -403,7 +422,7 @@ export function Sidebar({
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-lg",
                   "bg-[#E7E5E4]",
-                  "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]"
+                  "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]",
                 )}
               >
                 <span className="font-[family-name:var(--font-space-mono)] text-[10px] font-bold text-[#006666]">

@@ -51,7 +51,7 @@ export async function GET() {
     const summaryData = generateMockSummary();
 
     const response: BookingsSummaryApiResponse = {
-        data: { data: summaryData },
+        data: summaryData,
     };
 
     return NextResponse.json(response);

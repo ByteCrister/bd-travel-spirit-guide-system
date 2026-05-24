@@ -53,7 +53,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function GET(
     request: NextRequest,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { params }: { params: { tourId: string } }
+    { params }: { params: Promise<{ tourId: string }> }
 ) {
     // Simulate network latency (300-800ms)
     await delay(faker.number.int({ min: 300, max: 800 }));

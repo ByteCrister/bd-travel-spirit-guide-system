@@ -9,133 +9,147 @@ import { Eye, Clock, CheckCircle2, XCircle } from "lucide-react";
 import RequestDetailsDrawer from "./RequestDetailsDrawer";
 import { REQUEST_STATUS } from "@/constants/employee/reset-password-request.const";
 
+/* ─── Neumorphic style tokens ────────────────────────────────────────────── */
+const N = {
+  surface: "bg-[#E7E5E4] dark:bg-[#2A2A2A]",
+  text: "text-[#1E2938] dark:text-white",
+  textMuted: "text-[#1E2938]/60 dark:text-white/50",
+  raisedSm:
+    "shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#3a3a3a]",
+  raisedXs:
+    "shadow-[2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#1a1a1a,-2px_-2px_4px_#3a3a3a]",
+  pressedSm:
+    "[box-shadow:inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff] dark:[box-shadow:inset_2px_2px_5px_#1a1a1a,inset_-2px_-2px_5px_#3a3a3a]",
+} as const;
+
+/* ─── Props ──────────────────────────────────────────────────────────────── */
 interface RequestRowProps {
   entity: ResetRequestEntity;
 }
 
+/* ─── Animation ──────────────────────────────────────────────────────────── */
 const rowVariants: Variants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.3 },
+  hidden: { opacity: 0, x: -16 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.25 } },
+};
+
+/* ─── Status config ──────────────────────────────────────────────────────── */
+const STATUS_CONFIG: Record<
+  string,
+  { badge: React.ReactNode }
+> = {
+  [REQUEST_STATUS.PENDING]: {
+    badge: (
+      <Badge
+        variant="outline"
+        className={`inline-flex items-center gap-1.5 rounded-lg border-none px-3 py-1 text-xs font-semibold text-[#FE9900] ${N.surface} ${N.raisedSm}`}
+      >
+        <Clock className="h-3 w-3" />
+        Pending
+      </Badge>
+    ),
+  },
+  [REQUEST_STATUS.DENIED]: {
+    badge: (
+      <Badge
+        variant="outline"
+        className={`inline-flex items-center gap-1.5 rounded-lg border-none px-3 py-1 text-xs font-semibold text-[#FF2157] ${N.surface} ${N.raisedSm}`}
+      >
+        <XCircle className="h-3 w-3" />
+        Denied
+      </Badge>
+    ),
+  },
+  fulfilled: {
+    badge: (
+      <Badge
+        variant="outline"
+        className={`inline-flex items-center gap-1.5 rounded-lg border-none px-3 py-1 text-xs font-semibold text-[#00A63D] ${N.surface} ${N.raisedSm}`}
+      >
+        <CheckCircle2 className="h-3 w-3" />
+        Fulfilled
+      </Badge>
+    ),
   },
 };
 
+/* ─── Component ──────────────────────────────────────────────────────────── */
 export default function RequestRow({ entity }: RequestRowProps) {
   const { id, attributes } = entity;
   const [open, setOpen] = useState(false);
 
-  const getStatusConfig = () => {
-    switch (attributes.status) {
-      case REQUEST_STATUS.PENDING:
-        return {
-          badge: (
-            <Badge
-              variant="outline"
-              className="inline-flex items-center gap-1.5 rounded-lg border-none bg-[#E7E5E4] px-3 py-1 text-xs font-semibold shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] text-[#FE9900]"
-            >
-              <Clock className="h-3 w-3" />
-              Pending
-            </Badge>
-          ),
-          rowHoverClass:
-            "hover:shadow-[inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff]",
-        };
-      case REQUEST_STATUS.DENIED:
-        return {
-          badge: (
-            <Badge
-              variant="outline"
-              className="inline-flex items-center gap-1.5 rounded-lg border-none bg-[#E7E5E4] px-3 py-1 text-xs font-semibold shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] text-[#FF2157]"
-            >
-              <XCircle className="h-3 w-3" />
-              Denied
-            </Badge>
-          ),
-          rowHoverClass:
-            "hover:shadow-[inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff]",
-        };
-      default:
-        return {
-          badge: (
-            <Badge
-              variant="outline"
-              className="inline-flex items-center gap-1.5 rounded-lg border-none bg-[#E7E5E4] px-3 py-1 text-xs font-semibold shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] text-[#00A63D]"
-            >
-              <CheckCircle2 className="h-3 w-3" />
-              Fulfilled
-            </Badge>
-          ),
-          rowHoverClass:
-            "hover:shadow-[inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff]",
-        };
-    }
-  };
-
-  const statusConfig = getStatusConfig();
+  const statusCfg =
+    STATUS_CONFIG[attributes.status] ?? STATUS_CONFIG.fulfilled;
 
   return (
     <>
       <motion.tr
         variants={rowVariants}
-        className={`group border-b border-[#D6D3D1] bg-[#E7E5E4] transition-shadow duration-200 ${statusConfig.rowHoverClass}`}
+        className={`
+          group border-b border-[#D6D3D1] dark:border-[#3a3a3a]
+          ${N.surface} transition-shadow duration-200
+          hover:${N.pressedSm}
+        `}
       >
-        {/* Requester email & mobile */}
-        <td className="px-3 py-2.5">
-          <div className="flex flex-col">
-            <span className="truncate text-sm font-medium text-[#1E2938]">
+        {/* Email + mobile */}
+        <td className="px-4 py-3">
+          <div className="flex flex-col gap-0.5">
+            <span className={`truncate text-sm font-semibold ${N.text}`}>
               {attributes.requesterEmail}
             </span>
             {attributes.requesterMobile && (
-              <span className="truncate text-xs text-[#1E2938]/60">
+              <span className={`truncate text-xs ${N.textMuted}`}>
                 {attributes.requesterMobile}
               </span>
             )}
           </div>
         </td>
 
-        {/* Requester name */}
-        <td className="px-3 py-2.5">
+        {/* Name */}
+        <td className="px-4 py-3">
           {attributes.requesterName ? (
-            <span className="text-sm text-[#1E2938]">
-              {attributes.requesterName}
-            </span>
+            <span className={`text-sm ${N.text}`}>{attributes.requesterName}</span>
           ) : (
-            <span className="text-sm italic text-[#1E2938]/40">N/A</span>
+            <span className={`text-sm italic ${N.textMuted}`}>N/A</span>
           )}
         </td>
 
         {/* Status badge */}
-        <td className="px-3 py-2.5">{statusConfig.badge}</td>
+        <td className="px-4 py-3">{statusCfg.badge}</td>
 
-        {/* Request date & time */}
-        <td className="px-3 py-2.5">
-          <div className="flex flex-col">
-            <span className="text-sm text-[#1E2938]">
+        {/* Date/time */}
+        <td className="px-4 py-3">
+          <div className="flex flex-col gap-0.5">
+            <span className={`text-sm ${N.text}`}>
               {new Date(attributes.requestedAt).toLocaleDateString()}
             </span>
-            <span className="text-xs text-[#1E2938]/60">
+            <span className={`text-xs ${N.textMuted}`}>
               {new Date(attributes.requestedAt).toLocaleTimeString()}
             </span>
           </div>
         </td>
 
         {/* View button */}
-        <td className="px-3 py-2.5 text-right">
+        <td className="px-4 py-3 text-right">
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
             className="inline-block"
           >
             <Button
               size="sm"
               variant="outline"
               onClick={() => setOpen(true)}
-              className="h-9 gap-2 rounded-lg border-none bg-[#E7E5E4] px-3 text-sm font-semibold text-[#006666] shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] transition-shadow duration-200 hover:shadow-[2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2 active:shadow-[inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff]"
+              className={`
+                h-9 gap-1.5 rounded-lg border-none text-sm font-semibold text-[#006666]
+                ${N.surface} ${N.raisedSm}
+                hover:${N.raisedXs} active:${N.pressedSm}
+                transition-all duration-150
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2
+              `}
             >
               <Eye className="h-4 w-4" />
-              View
+              <span className="hidden sm:inline">View</span>
             </Button>
           </motion.div>
         </td>

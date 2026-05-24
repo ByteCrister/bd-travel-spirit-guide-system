@@ -108,7 +108,7 @@ export default function ModerationAlert({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="bg-[#E7E5E4] shadow-[12px_12px_24px_#c8c6c5,-12px_-12px_24px_#ffffff] border border-white/60 rounded-2xl p-0 overflow-hidden max-w-md w-full">
+            <AlertDialogContent className="bg-[#E7E5E4] shadow-[0_4px_12px_rgba(0,0,0,0.06)] border border-white/60 rounded-2xl p-0 overflow-hidden max-w-md w-full">
                 {/* Content wrapper */}
                 <div className="p-6 space-y-5">
                     <AlertDialogHeader className="space-y-2">

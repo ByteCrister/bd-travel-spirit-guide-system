@@ -18,8 +18,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { IBookingPopulated } from '@/types/tour/booking.types';
@@ -142,7 +140,7 @@ function CancelDialog({ bookingId, disabled }: { bookingId: string; disabled: bo
             <AlertDialogContent className={cn(
                 'rounded-2xl border-0 max-w-md p-6',
                 'bg-[#E7E5E4]',
-                'shadow-[12px_12px_24px_#c8c6c4,-8px_-8px_16px_#ffffff]',
+                'shadow-[0_4px_12px_rgba(0,0,0,0.06)]',
             )}>
                 <AlertDialogHeader>
                     <AlertDialogTitle className="text-[#1E2938] text-base font-bold flex items-center gap-2" style={spaceMono.style}>
@@ -245,7 +243,7 @@ function RefundDialog({
             <AlertDialogContent className={cn(
                 'rounded-2xl border-0 max-w-md p-6',
                 'bg-[#E7E5E4]',
-                'shadow-[12px_12px_24px_#c8c6c4,-8px_-8px_16px_#ffffff]',
+                'shadow-[0_4px_12px_rgba(0,0,0,0.06)]',
             )}>
                 <AlertDialogHeader>
                     <AlertDialogTitle className="text-[#1E2938] text-base font-bold flex items-center gap-2" style={spaceMono.style}>

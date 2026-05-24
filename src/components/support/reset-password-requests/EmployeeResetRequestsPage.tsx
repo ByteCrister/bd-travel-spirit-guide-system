@@ -10,51 +10,39 @@ import { useResetRequestsStore } from "@/store/reset-requests.store";
 import RequestList from "./RequestList";
 import { Breadcrumbs } from "@/components/global/Breadcrumbs";
 
+/* ─── Animation variants ─────────────────────────────────────────────────── */
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.05,
-    },
+    transition: { staggerChildren: 0.08, delayChildren: 0.04 },
   },
 };
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 10 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.3, ease: "easeOut" },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
-/* ------------------------------------------------------------------ */
-/*  Neumorphic design tokens (light / dark)                           */
-/* ------------------------------------------------------------------ */
-const surfaceLight = "#E7E5E4";
-const surfaceDark = "#2a2a2a";
-const textLight = "#1E2938";
-const textDark = "#ffffff";
-const primary = "#006666";
+/* ─── Neumorphic style tokens ────────────────────────────────────────────── */
+const N = {
+  surface: "bg-[#E7E5E4] dark:bg-[#2A2A2A]",
+  text: "text-[#1E2938] dark:text-white",
+  textMuted: "text-[#1E2938]/60 dark:text-white/50",
+  raisedLg:
+    "shadow-[12px_12px_24px_#cac8c7,-12px_-12px_24px_#ffffff] dark:shadow-[12px_12px_24px_#1a1a1a,-12px_-12px_24px_#3a3a3a]",
+  raisedMd:
+    "shadow-[8px_8px_16px_#cac8c7,-8px_-8px_16px_#ffffff] dark:shadow-[8px_8px_16px_#1a1a1a,-8px_-8px_16px_#3a3a3a]",
+  raisedSm:
+    "shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#3a3a3a]",
+  raisedXs:
+    "shadow-[2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#1a1a1a,-2px_-2px_4px_#3a3a3a]",
+  pressedSm:
+    "[box-shadow:inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff] dark:[box-shadow:inset_2px_2px_5px_#1a1a1a,inset_-2px_-2px_5px_#3a3a3a]",
+  font: "font-['Space_Mono']",
+} as const;
 
-/* ------------------------------------------------------------------ */
-/*  Reusable neumorphic shadow strings                                */
-/* ------------------------------------------------------------------ */
-const softRaised =
-  "shadow-[4px_4px_8px_#c5c3c2,-4px_-4px_8px_#ffffff]";
-const softRaisedDark =
-  "dark:shadow-[4px_4px_8px_#1f1f1f,-4px_-4px_8px_#3a3a3a]";
-const pressed =
-  "shadow-[inset_2px_2px_4px_#c5c3c2,inset_-2px_-2px_4px_#ffffff]";
-const pressedDark =
-  "dark:shadow-[inset_2px_2px_4px_#1f1f1f,inset_-2px_-2px_4px_#3a3a3a]";
-const elevatedCard =
-  "shadow-[8px_8px_16px_#c5c3c2,-8px_-8px_16px_#ffffff]";
-const elevatedCardDark =
-  "dark:shadow-[8px_8px_16px_#1f1f1f,-8px_-8px_16px_#3a3a3a]";
-
+/* ─── Component ──────────────────────────────────────────────────────────── */
 export default function EmployeeResetRequestsPage() {
   const { fetchList, currentQuery, loading, error } = useResetRequestsStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -81,66 +69,67 @@ export default function EmployeeResetRequestsPage() {
 
   return (
     <motion.div
-      className={`min-h-screen p-2 sm:p-3 lg:p-5 font-['Space_Mono'] bg-[${surfaceLight}] dark:bg-[${surfaceDark}]`}
+      className={`min-h-screen p-1 sm:p-2 lg:p-3 ${N.surface} ${N.font} transition-colors`}
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
-      {/* Breadcrumbs */}
-            <Breadcrumbs
-                items={[
-                    { label: 'Home', href: '/' },
-                    { label: 'Reset Password', href: '/reset-password-requests' },
-                ]}
-                className="mb-4"
-            />
+      <div className="mx-auto max-w-7xl space-y-6">
 
-      <div className="mx-auto max-w-7xl">
-        {/* ---------- Header ---------- */}
-        <motion.header className="mb-8" variants={itemVariants}>
+        {/* ── Breadcrumbs ── */}
+        <motion.div variants={itemVariants}>
+          <Breadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Reset Password", href: "/reset-password-requests" },
+            ]}
+          />
+        </motion.div>
+
+        {/* ── Header ── */}
+        <motion.header variants={itemVariants}>
           <div className="flex flex-wrap items-start justify-between gap-4">
+            {/* Title group */}
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                {/* Neumorphic icon container (concave) */}
+                {/* Icon — concave pressed */}
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-full bg-[${surfaceLight}] p-2.5 ${pressed} ${pressedDark} dark:bg-[${surfaceDark}]`}
+                  className={`
+                    flex h-12 w-12 items-center justify-center rounded-full
+                    ${N.surface} ${N.pressedSm}
+                  `}
                 >
-                  <Shield className="h-6 w-6 text-[#006666] dark:text-[#4db8b8]" />
+                  <Shield className="h-6 w-6 text-[#006666]" aria-hidden />
                 </div>
-                <h1
-                  className={`text-3xl font-bold text-[${textLight}] dark:text-[${textDark}]`}
-                >
+
+                <h1 className={`text-2xl sm:text-3xl font-bold ${N.text}`}>
                   Password Reset Requests
                 </h1>
               </div>
-              <p className="ml-14 text-sm text-[#64748b] dark:text-[#94a3b8]">
+
+              <p className={`ml-[3.75rem] text-sm ${N.textMuted}`}>
                 Manage employee password reset requests
               </p>
             </div>
 
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            {/* Refresh button */}
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="outline"
                 size="lg"
                 onClick={handleRefresh}
                 disabled={loading || isRefreshing}
                 className={`
-                  border-0 bg-[${surfaceLight}] text-[${textLight}] rounded-xl px-5 py-2.5 font-medium
-                  ${softRaised} ${softRaisedDark}
-                  hover:${pressed} hover:${pressedDark}
-                  active:${pressed} active:${pressedDark}
-                  focus-visible:ring-2 focus-visible:ring-[${primary}]
-                  disabled:opacity-50 disabled:hover:shadow-none
-                  dark:bg-[${surfaceDark}] dark:text-[${textDark}]
-                  transition-shadow duration-200
+                  border-0 rounded-xl px-5 font-medium gap-2
+                  ${N.surface} ${N.text} ${N.raisedSm}
+                  hover:${N.raisedXs} active:${N.pressedSm}
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2
+                  disabled:opacity-50 disabled:pointer-events-none
+                  transition-all duration-200
                 `}
               >
                 <RefreshCw
-                  className={`mr-2 h-4 w-4 text-[${primary}] dark:text-[#4db8b8] ${isRefreshing ? "animate-spin" : ""
-                    }`}
+                  className={`h-4 w-4 text-[#006666] ${isRefreshing ? "animate-spin" : ""}`}
                 />
                 Refresh
               </Button>
@@ -153,20 +142,19 @@ export default function EmployeeResetRequestsPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="mt-4"
+              className="mt-4 overflow-hidden"
             >
               <Card
-                className={`border-l-4 border-[#FF2157] bg-[${surfaceLight}] ${softRaised} ${softRaisedDark} dark:bg-[${surfaceDark}]`}
+                className={`
+                  border-l-4 border-[#FF2157] border-t-0 border-r-0 border-b-0
+                  ${N.surface} ${N.raisedSm}
+                `}
               >
-                <div className="flex items-center gap-3 p-4">
-                  <AlertCircle className="h-5 w-5 flex-shrink-0 text-[#FF2157]" />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-[#1E2938] dark:text-white">
-                      Error loading requests
-                    </p>
-                    <p className="mt-0.5 text-xs text-[#475569] dark:text-[#94a3b8]">
-                      {error.message}
-                    </p>
+                <div className="flex items-start gap-3 p-4">
+                  <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-[#FF2157]" />
+                  <div className="flex-1 space-y-0.5">
+                    <p className={`text-sm font-semibold ${N.text}`}>Error loading requests</p>
+                    <p className={`text-xs ${N.textMuted}`}>{error.message}</p>
                   </div>
                 </div>
               </Card>
@@ -174,19 +162,23 @@ export default function EmployeeResetRequestsPage() {
           )}
         </motion.header>
 
-        {/* ---------- Separator ---------- */}
+        {/* ── Divider ── */}
         <motion.div variants={itemVariants}>
-          <Separator className="mb-8 border-t border-[#d1cfce] dark:border-[#3a3a3a]" />
+          <Separator className="border-0 h-px bg-transparent shadow-[0_1px_2px_#cac8c7] dark:shadow-[0_1px_2px_#1a1a1a]" />
         </motion.div>
 
-        {/* ---------- Main content ---------- */}
+        {/* ── Main content ── */}
         <motion.main variants={itemVariants}>
           <Card
-            className={`overflow-hidden rounded-2xl border-0 bg-[${surfaceLight}] ${elevatedCard} ${elevatedCardDark} dark:bg-[${surfaceDark}]`}
+            className={`
+              overflow-hidden rounded-2xl border-0
+              ${N.surface} ${N.raisedMd}
+            `}
           >
             <RequestList />
           </Card>
         </motion.main>
+
       </div>
     </motion.div>
   );

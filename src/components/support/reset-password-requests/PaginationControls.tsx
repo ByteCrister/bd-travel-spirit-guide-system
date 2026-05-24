@@ -2,7 +2,6 @@
 
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import {
     ChevronLeft,
     ChevronRight,
@@ -11,16 +10,65 @@ import {
 } from "lucide-react";
 import { useResetRequestsStore } from "@/store/reset-requests.store";
 
+/* ─── Neumorphic style tokens ────────────────────────────────────────────── */
+const N = {
+    surface: "bg-[#E7E5E4] dark:bg-[#2A2A2A]",
+    text: "text-[#1E2938] dark:text-white",
+    textMuted: "text-[#1E2938]/60 dark:text-white/50",
+    raisedMd:
+        "shadow-[6px_6px_12px_#cac8c7,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#1a1a1a,-6px_-6px_12px_#3a3a3a]",
+    raisedSm:
+        "shadow-[3px_3px_6px_#cac8c7,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#1a1a1a,-3px_-3px_6px_#3a3a3a]",
+    raisedXs:
+        "shadow-[2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#1a1a1a,-2px_-2px_4px_#3a3a3a]",
+    pressedSm:
+        "[box-shadow:inset_3px_3px_6px_#cac8c7,inset_-3px_-3px_6px_#ffffff] dark:[box-shadow:inset_3px_3px_6px_#1a1a1a,inset_-3px_-3px_6px_#3a3a3a]",
+    font: "font-['Space_Mono']",
+} as const;
+
+/* ─── Nav Button ─────────────────────────────────────────────────────────── */
+function NavButton({
+    onClick,
+    disabled,
+    label,
+    children,
+}: {
+    onClick: () => void;
+    disabled: boolean;
+    label: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <motion.button
+            onClick={onClick}
+            disabled={disabled}
+            aria-label={label}
+            whileHover={!disabled ? { scale: 1.04 } : undefined}
+            whileTap={!disabled ? { scale: 0.96 } : undefined}
+            className={`
+        h-9 w-9 flex items-center justify-center rounded-xl border-none
+        ${N.surface} ${N.text} ${N.raisedSm}
+        hover:${N.raisedXs} active:${N.pressedSm}
+        transition-all duration-150
+        disabled:opacity-40 disabled:pointer-events-none
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-1
+      `}
+        >
+            {children}
+        </motion.button>
+    );
+}
+
+/* ─── Component ──────────────────────────────────────────────────────────── */
 export default function PaginationControls() {
     const { currentQuery, fetchList, queryCache } = useResetRequestsStore();
 
     const page = currentQuery.page ?? 1;
     const limit = currentQuery.limit ?? 20;
 
-    // Calculate total pages from cache
     const totalPages = useMemo(() => {
         const cacheKeys = Object.keys(queryCache);
-        const relevantCache = cacheKeys.find((key) => {
+        const relevantKey = cacheKeys.find((key) => {
             try {
                 const cached = queryCache[key];
                 return (
@@ -32,11 +80,11 @@ export default function PaginationControls() {
             }
         });
 
-        if (relevantCache && queryCache[relevantCache]) {
-            const total = queryCache[relevantCache].total;
+        if (relevantKey && queryCache[relevantKey]) {
+            const total = queryCache[relevantKey].total;
             return Math.ceil(total / limit);
         }
-        return page; // Fallback to current page
+        return page;
     }, [queryCache, currentQuery, page, limit]);
 
     const goToPage = async (newPage: number) => {
@@ -44,115 +92,63 @@ export default function PaginationControls() {
         await fetchList({ ...currentQuery, page: newPage });
     };
 
-    const prev = () => goToPage(page - 1);
-    const next = () => goToPage(page + 1);
-    const first = () => goToPage(1);
-    const last = () => goToPage(totalPages);
-
-    const hasNext = page < totalPages;
     const hasPrev = page > 1;
+    const hasNext = page < totalPages;
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 5 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2.5 sm:py-3 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm"
+            className={`
+        flex items-center justify-between gap-3 px-4 py-3 rounded-2xl
+        ${N.surface} ${N.raisedMd} ${N.font}
+      `}
         >
-            {/* Page Info */}
-            <div className="flex items-center text-sm font-medium">
-                {/* Mobile: compact display */}
-                <span className="sm:hidden text-gray-900 dark:text-gray-100">
-                    {page} / {totalPages}
+            {/* Page info */}
+            <div className={`flex items-center gap-2 text-sm font-medium select-none ${N.textMuted}`}>
+                {/* Mobile: compact */}
+                <span className="sm:hidden">
+                    <span className={N.text}>{page}</span>
+                    {" / "}
+                    {totalPages}
                 </span>
-                {/* Desktop: full label with highlighted page number */}
-                <span className="hidden sm:flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+
+                {/* Desktop: verbose */}
+                <span className="hidden sm:flex items-center gap-2">
                     Page
-                    <span className="font-semibold text-gray-900 dark:text-gray-100 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-md">
+                    <span
+                        className={`
+              inline-flex items-center justify-center h-7 min-w-[1.75rem] px-2 rounded-lg text-sm
+              ${N.text} font-semibold
+              ${N.surface} ${N.pressedSm}
+            `}
+                    >
                         {page}
                     </span>
-                    of {totalPages}
+                    of
+                    <span className={`font-semibold ${N.text}`}>{totalPages}</span>
                 </span>
             </div>
 
-            {/* Navigation Buttons */}
-            <div className="flex items-center gap-1 sm:gap-1.5">
-                {/* First Page */}
-                <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasPrev}
-                    className="shadow-sm"
-                >
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={first}
-                        aria-label="First page"
-                        type="button"
-                    >
-                        <ChevronsLeft className="w-4 h-4" />
-                    </motion.button>
-                </Button>
+            {/* Navigation buttons */}
+            <div className="flex items-center gap-1.5">
+                <NavButton onClick={() => goToPage(1)} disabled={!hasPrev} label="First page">
+                    <ChevronsLeft className="w-4 h-4" />
+                </NavButton>
 
-                {/* Previous Page */}
-                <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasPrev}
-                    className="shadow-sm gap-1"
-                >
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={prev}
-                        aria-label="Previous page"
-                        type="button"
-                    >
-                        <ChevronLeft className="w-4 h-4" />
-                        <span className="hidden sm:inline">Previous</span>
-                    </motion.button>
-                </Button>
+                <NavButton onClick={() => goToPage(page - 1)} disabled={!hasPrev} label="Previous page">
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="hidden sm:inline text-xs font-medium ml-0.5">Prev</span>
+                </NavButton>
 
-                {/* Next Page */}
-                <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasNext}
-                    className="shadow-sm gap-1"
-                >
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={next}
-                        aria-label="Next page"
-                        type="button"
-                    >
-                        <span className="hidden sm:inline">Next</span>
-                        <ChevronRight className="w-4 h-4" />
-                    </motion.button>
-                </Button>
+                <NavButton onClick={() => goToPage(page + 1)} disabled={!hasNext} label="Next page">
+                    <span className="hidden sm:inline text-xs font-medium mr-0.5">Next</span>
+                    <ChevronRight className="w-4 h-4" />
+                </NavButton>
 
-                {/* Last Page */}
-                <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasNext}
-                    className="shadow-sm"
-                >
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={last}
-                        aria-label="Last page"
-                        type="button"
-                    >
-                        <ChevronsRight className="w-4 h-4" />
-                    </motion.button>
-                </Button>
+                <NavButton onClick={() => goToPage(totalPages)} disabled={!hasNext} label="Last page">
+                    <ChevronsRight className="w-4 h-4" />
+                </NavButton>
             </div>
         </motion.div>
     );

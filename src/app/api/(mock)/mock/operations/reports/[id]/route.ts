@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { faker } from "@faker-js/faker";
-import type { ReportFull, ReportDetailResponse, ReportActionResponse } from "@/types/tour/reports.types";
-import { REPORT_PRIORITY, REPORT_REASON, REPORT_STATUS } from "@/constants/tour/report.const";
+import type {
+  ReportFull,
+  ReportDetailResponse,
+  ReportActionResponse,
+} from "@/types/tour/reports.types";
+import {
+  REPORT_PRIORITY,
+  REPORT_REASON,
+  REPORT_STATUS,
+} from "@/constants/tour/report.const";
 
 type DBMap = Map<string, ReportFull>;
 const DB_KEY = "__mock_reports_db_v1";
@@ -12,7 +20,9 @@ function getSharedDB(): DBMap {
     const map: DBMap = new Map();
     const makeReportFull = (overrides?: Partial<ReportFull>): ReportFull => {
       const createdAt = faker.date.past({ years: 1 }).toISOString();
-      const updatedAt = faker.date.between({ from: new Date(createdAt), to: new Date() }).toISOString();
+      const updatedAt = faker.date
+        .between({ from: new Date(createdAt), to: new Date() })
+        .toISOString();
       return {
         _id: faker.string.uuid(),
         reporter: {
@@ -30,14 +40,19 @@ function getSharedDB(): DBMap {
         },
         reason: faker.helpers.arrayElement(Object.values(REPORT_REASON)),
         message: faker.lorem.paragraph(),
-        evidenceImages: faker.helpers.maybe(() => [faker.image.urlLoremFlickr()]),
+        evidenceImages: faker.helpers.maybe(() => [
+          faker.image.urlLoremFlickr(),
+        ]),
         evidenceLinks: faker.helpers.maybe(() => [faker.internet.url()]),
         status: faker.helpers.arrayElement(Object.values(REPORT_STATUS)),
         priority: faker.helpers.arrayElement(Object.values(REPORT_PRIORITY)),
         resolutionNotes: null,
         resolvedAt: null,
         reopenedCount: faker.number.int({ min: 0, max: 2 }),
-        tags: faker.helpers.arrayElements(["safety", "billing", "quality"], { min: 0, max: 2 }),
+        tags: faker.helpers.arrayElements(["safety", "billing", "quality"], {
+          min: 0,
+          max: 2,
+        }),
         createdAt,
         updatedAt,
         deletedAt: null,
@@ -62,7 +77,10 @@ function getSharedDB(): DBMap {
 const DB = getSharedDB();
 
 /** GET /api/operations/reports/:id */
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   let report = DB.get((await params).id);
   if (!report) {
     // create a new report on the fly if not found
@@ -101,16 +119,22 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
   const payload: ReportDetailResponse = { report };
   return NextResponse.json({ data: payload });
-};
+}
 
 /** POST actions: assign, resolve, reopen */
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const id = (await params).id;
   const url = new URL(request.url);
   const path = url.pathname;
   const report = DB.get(id);
   if (!report) {
-    return NextResponse.json({ success: false, message: "Report not found" }, { status: 404 });
+    return NextResponse.json(
+      { success: false, message: "Report not found" },
+      { status: 404 },
+    );
   }
 
   if (path.endsWith("/assign")) {
@@ -143,11 +167,17 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json(resp);
   }
 
-  return NextResponse.json({ success: false, message: "Unknown action" }, { status: 400 });
+  return NextResponse.json(
+    { success: false, message: "Unknown action" },
+    { status: 400 },
+  );
 }
 
 /** DELETE /api/operations/reports/:id -> soft delete */
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const id = (await params).id;
   let report = DB.get(id);
   if (!report) {
@@ -190,4 +220,4 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 
   return NextResponse.json({ data: { success: true, reportId: id } });
-};
+}

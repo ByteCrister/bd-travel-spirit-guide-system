@@ -16,17 +16,17 @@ import { motion } from 'framer-motion';
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const NEU = {
     surface: '#E7E5E4',
-    card: 'bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_20px_#c8c6c4,-8px_-8px_20px_#ffffff] border-0',
-    iconBox: 'rounded-xl shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] flex items-center justify-center bg-[#E7E5E4]',
+    card: 'bg-[#E7E5E4] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.06)] border-0',
+    iconBox: 'rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.06)] flex items-center justify-center bg-[#E7E5E4]',
     primaryText: 'text-[#1E2938]',
     mutedText: 'text-[#718096]',
     labelFont: 'font-[Space_Mono,monospace] tracking-wide',
     bodyFont: 'font-[JetBrains_Mono,monospace]',
     btnCancel: [
         'bg-[#E7E5E4]',
-        'shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff]',
-        'hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff]',
-        'active:shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
+        'shadow-[0_4px_10px_rgba(0,0,0,0.06)]',
+        'hover:shadow-[0_2px_6px_rgba(0,0,0,0.06)]',
+        'active:shadow-[inset_3px_3px_8px_rgba(0,0,0,0.06),inset_-3px_-3px_8px_rgba(0,0,0,0.06)]',
         'border-0 rounded-xl transition-all duration-200',
         'text-[#4a5568] font-semibold',
     ].join(' '),

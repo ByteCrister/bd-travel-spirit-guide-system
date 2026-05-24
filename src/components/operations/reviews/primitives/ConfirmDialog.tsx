@@ -69,7 +69,7 @@ export default function ConfirmDialog({
                             // Responsive width & neumorphic surface
                             "w-[calc(100vw-1.5rem)] max-w-[480px] sm:max-w-[480px]",
                             "rounded-[2rem] border-0 p-0",
-                            "bg-[#E7E5E4] shadow-[8px_8px_16px_#cfcdcb,-8px_-8px_16px_#f9f8f7]",
+                            "bg-[#E7E5E4] shadow-[0_4px_12px_rgba(0,0,0,0.06)]",
                             // Override shadcn’s default overflow
                             "[&>button]:hidden",
                             className

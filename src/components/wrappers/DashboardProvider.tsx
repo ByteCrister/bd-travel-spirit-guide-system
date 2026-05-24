@@ -21,8 +21,7 @@ const ADMIN_ROUTES = [
   "/support/travelers",
   "/support/reset-password-requests", // for "assistant" employees
 
-  "/social/advertising",
-  "/social/notifications",
+  "/settings/payment-accounts",
 ];
 
 interface DashboardProviderProps {
