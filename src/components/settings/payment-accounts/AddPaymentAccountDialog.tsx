@@ -251,7 +251,7 @@ export function AddPaymentAccountDialog({ children }: Props) {
                                         >
                                             {({ value }) => (
                                                 <Select
-                                                    value={value ?? ""}
+                                                    value={value ?? PAYMENT_OWNER_TYPE.GUIDE}
                                                     onValueChange={(val) => {
                                                         if (val !== value) setFieldValue("ownerType", val);
                                                     }}
@@ -260,7 +260,7 @@ export function AddPaymentAccountDialog({ children }: Props) {
                                                         <SelectValue placeholder="Select owner type" />
                                                     </SelectTrigger>
                                                     <SelectContent className={`${NEU_SURFACE_RAISED} border-0 rounded-xl`}>
-                                                        <SelectItem value={PAYMENT_OWNER_TYPE.ADMIN}>Admin</SelectItem>
+                                                        <SelectItem value={PAYMENT_OWNER_TYPE.GUIDE}>Guide</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             )}
