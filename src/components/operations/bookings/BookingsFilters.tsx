@@ -24,6 +24,7 @@ import {
   BookingStatus,
   BookingPaymentStatus,
 } from "@/constants/tour/tour-booking.const";
+import {BookingDateRangePreset} from "@/types/tour/booking.types";
 import { cn } from "@/lib/utils";
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 import { spaceMono, jetbrainsMono } from "@/styles/fonts";
@@ -282,7 +283,7 @@ export function BookingsFilters({
                 </label>
                 <Select
                   value={filters.dateRangePreset ?? ""}
-                  onValueChange={(val) =>
+                  onValueChange={(val: BookingDateRangePreset ) =>
                     onFilterChange({ dateRangePreset: val })
                   }
                 >

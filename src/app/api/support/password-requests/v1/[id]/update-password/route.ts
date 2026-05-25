@@ -12,7 +12,7 @@ import EmployeeModel from "@/models/employees/employees.model";
 import ResetPasswordRequestModel from "@/models/employees/reset-password-request.model";
 
 import { validatePassword } from "@/lib/helpers/validatePassword";
-import { employeePasswordUpdateEmail } from "@/lib/html/employee-password-update.html";
+import { employeePasswordUpdateEmail } from "@/lib/html/employee-password-update-html";
 import { mailer } from "@/config/node-mailer";
 import { USER_ROLE } from "@/constants/current-user/user.const";
 import { ResetPasswordRequestPopulated } from "@/types/employee/employee-password-request.types.server";

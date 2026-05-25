@@ -10,7 +10,7 @@ import {
 import { ApiError } from '@/lib/helpers/withErrorHandler';
 import { withTransaction } from '@/lib/helpers/withTransaction';
 import { EmailVerificationToken } from '@/models/email-verification-token.model';
-import ApplicationTokenHtml from '@/lib/html/application-token.html';
+import ApplicationTokenHtml from '@/lib/html/application-token-html';
 import ConnectDB from '@/config/db';
 import GuideModel from '@/models/guide/guide.model';
 import { GUIDE_STATUS } from '@/constants/guide/guide.const';

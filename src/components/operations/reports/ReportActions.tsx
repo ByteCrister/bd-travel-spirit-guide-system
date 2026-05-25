@@ -163,7 +163,7 @@ export const ReportActions: FC<{ item: ReportListItem }> = ({ item }) => {
     const [rejectNotes, setRejectNotes] = useState("");
 
     const wrap =
-        (fn: () => Promise<void>, close: () => void) => async () => {
+        <T,>(fn: () => Promise<T>, close: () => void) => async () => {
             setActionLoading(true);
             try {
                 await fn();
@@ -192,8 +192,8 @@ export const ReportActions: FC<{ item: ReportListItem }> = ({ item }) => {
     const onReopen = wrap(() => reopenReport(item._id), () => setReopenConfirmOpen(false));
     const onDelete = wrap(() => softDeleteReport(item._id), () => setDeleteConfirmOpen(false));
 
-    const isOpenOrInReview = [REPORT_STATUS.OPEN, REPORT_STATUS.IN_REVIEW].includes(item.status);
-    const isResolvedOrRejected = [REPORT_STATUS.RESOLVED, REPORT_STATUS.REJECTED].includes(item.status);
+    const isOpenOrInReview = [REPORT_STATUS.OPEN, REPORT_STATUS.IN_REVIEW].includes(item.status as REPORT_STATUS);
+    const isResolvedOrRejected = [REPORT_STATUS.RESOLVED, REPORT_STATUS.REJECTED].includes(item.status as REPORT_STATUS);
 
     return (
         <Popover>

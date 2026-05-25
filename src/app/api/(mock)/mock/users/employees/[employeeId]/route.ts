@@ -18,7 +18,7 @@ import { calculateCurrentMonthPayment, getActualPaymentStatus } from "@/lib/help
 
 export async function GET(
     _req: NextRequest,
-    { params }: { params: { employeeId: string } }
+    { params }: { params: Promise<{ employeeId: string }> }
 ) {
     const { employeeId } = await params;
     const encodedId = decodeId(decodeURIComponent(employeeId));

@@ -3,22 +3,13 @@ import { NextRequest } from "next/server";
 import mongoose, { FilterQuery } from "mongoose";
 import { z } from "zod";
 
-import { getUserIdFromSession } from "@/lib/auth/session";
 import {
   withErrorHandler,
   ApiError,
   HandlerResult,
 } from "@/lib/helpers/withErrorHandler";
 import UserModel, { IUser } from "@/models/user.model";
-import GuideModel, { IGuide } from "@/models/guide.model";
-import EmployeeModel, { IEmployee } from "@/models/employees.model";
-import TourModel, { ITour } from "@/models/tour.model";
-import BookingModel, { IBooking } from "@/models/booking.model";
 
-import ReportModel from "@/models/report.model";
-import ReviewModel from "@/models/review.model";
-import type { IReport } from "@/models/report.model";
-import type { IReview } from "@/models/review.model";
 
 import { Types } from "mongoose";
 import { USER_ROLE } from "@/constants/current-user/user.const";
@@ -29,18 +20,22 @@ import {
 } from "@/constants/tour/tour-booking.const";
 import { CURRENCY } from "@/constants/tour/tour.const";
 import ConnectDB from "@/config/db";
+import TourModel, { ITour } from "@/models/tours/tour.model";
+import EmployeeModel, { IEmployee } from "@/models/employees/employees.model";
+import { IReport, ReportModel } from "@/models/tours/report.model";
+import { getUserIdFromSession } from "@/lib/auth/session.auth";
+import BookingModel, { IBooking } from "@/models/tours/booking.model";
+import { IReview, ReviewModel } from "@/models/tours/review.model";
+import GuideModel, { IGuide } from "@/models/guide/guide.model";
 
 // ─── CSV Helper (generic, no `any`) ──────────────────────────────
-function arrayToCSV<T extends Record<string, unknown>>(
-  data: T[],
-  headers?: string[],
-): string {
+function arrayToCSV(data: object[], headers?: string[]): string {
   if (!data.length) return "";
-  const cols = headers ?? (Object.keys(data[0]) as string[]);
+  const cols = headers ?? Object.keys(data[0]);
   const rows = data.map((row) =>
     cols
       .map((field) => {
-        const value = row[field];
+        const value = (row as Record<string, string>)[field];
         return JSON.stringify(value ?? "");
       })
       .join(","),
@@ -268,7 +263,7 @@ async function fetchTransactions(
   const employees = await EmployeeModel.find({
     companyId,
     deletedAt: null,
-  }).lean<IEmployeeLean[]>();
+  }).lean<(IEmployeeLean & { _id: Types.ObjectId })[]>();
 
   const payrollTx: IPayrollPaymentTx[] = [];
   for (const emp of employees) {
@@ -288,7 +283,7 @@ async function fetchTransactions(
           status: payroll.status,
           date: payroll.paidAt,
           transactionId: payroll.transactionRef,
-          employeeId: emp._id,
+          employeeId: emp._id as Types.ObjectId,
         });
       }
     }
@@ -300,7 +295,7 @@ async function fetchTransactions(
 // ─── Inner handler (returns HandlerResult<string>) ────────────────
 async function exportHandler(
   request: NextRequest,
-): Promise<HandlerResult<string>> {
+): Promise<HandlerResult<{ csvContent: string }>> {
   await ConnectDB();
 
   // 1. Validate query parameters
@@ -320,7 +315,7 @@ async function exportHandler(
     throw new ApiError("Unauthorized", 401);
   }
 
-  // 3. Authorisation + company resolution
+  // 3. Authorization + company resolution
   const companyId = await resolveCompanyId(userId);
 
   // 4. Date range conversion (Zod already ensures valid ISO strings)

@@ -255,6 +255,7 @@ export const useBookingStore = create<BookingsStoreState>()(
             const summary = response.data.data;
             set(
               (state) => ({
+                ...state,
                 summary,
                 isSummaryLoading: false,
                 cache: new Map(state.cache).set(cacheKey, {

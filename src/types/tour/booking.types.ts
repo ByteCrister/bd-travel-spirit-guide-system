@@ -137,7 +137,7 @@ export interface BookingStatusCount {
     total: number;
 }
 
-export type BookingsSummaryApiResponse = ApiResponse<{ data: BookingStatusCount }>
+export type BookingsSummaryApiResponse = ApiResponse<BookingStatusCount>
 
 // ============================================
 // ACTION REQUEST / RESPONSE TYPES
@@ -161,6 +161,8 @@ export type BookingActionApiResponse = ApiResponse<{ message: string }>
 // STORE STATE TYPES
 // ============================================
 
+export type BookingDateRangePreset = "custom" | "last30days" | "last7days" | "lastmonth" | "thismonth" | "today" | "yesterday";
+
 export interface BookingsFilterState extends BookingsQueryParams {
     // UI-specific filter states (not sent to API)
 
@@ -174,7 +176,7 @@ export interface BookingsFilterState extends BookingsQueryParams {
     selectedPaymentStatuses?: BookingPaymentStatus[];
 
     /** Quick date range preset (e.g., 'today', 'yesterday', 'last7days', 'last30days', 'thismonth', 'lastmonth', 'custom') */
-    dateRangePreset?: 'today' | 'yesterday' | 'last7days' | 'last30days' | 'thismonth' | 'lastmonth' | 'custom';
+    dateRangePreset?: BookingDateRangePreset;
 
     /** Whether the advanced filters panel is expanded */
     advancedFiltersExpanded?: boolean;

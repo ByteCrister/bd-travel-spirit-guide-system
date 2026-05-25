@@ -563,7 +563,7 @@ ReportSchema.methods.reopen = async function (
     } = {}
 ): Promise<HydratedReportDocument> {
     // Only allow reopening from RESOLVED or REJECTED status
-    if (![REPORT_STATUS.RESOLVED, REPORT_STATUS.REJECTED].includes(this.status)) {
+    if (![REPORT_STATUS.RESOLVED, REPORT_STATUS.REJECTED].includes(this.status as REPORT_STATUS)) {
         throw new Error(`Cannot reopen a report with status: ${this.status}`);
     }
 
@@ -846,7 +846,7 @@ ReportSchema.pre('save', function (next) {
             this.resolvedAt = now;
         } else if (this.status === REPORT_STATUS.REJECTED && !this.rejectedAt) {
             this.rejectedAt = now;
-        } else if ([REPORT_STATUS.OPEN, REPORT_STATUS.IN_REVIEW].includes(this.status)) {
+        } else if ([REPORT_STATUS.OPEN, REPORT_STATUS.IN_REVIEW].includes(this.status as REPORT_STATUS)) {
             // Clear timestamps when reopening
             this.resolvedAt = undefined;
             this.rejectedAt = undefined;

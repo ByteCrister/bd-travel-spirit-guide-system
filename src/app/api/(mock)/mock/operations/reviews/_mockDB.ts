@@ -231,21 +231,12 @@ function applyFilters(list: StoredReview[], filters: Partial<ReviewFilters> | nu
     if (!filters || Object.keys(filters).length === 0) return list;
 
     return list.filter((r) => {
-        // Filter by tourId
-        if (filters.tourId && r.tourId !== filters.tourId) return false;
-
         // Filter by approval status
         if (typeof filters.isApproved === 'boolean' && r.isApproved !== filters.isApproved) return false;
 
         // Filter by rating range
         if (filters.ratingMin !== undefined && r.rating < Number(filters.ratingMin)) return false;
         if (filters.ratingMax !== undefined && r.rating > Number(filters.ratingMax)) return false;
-
-        // Filter by images
-        if (filters.hasImages != null) {
-            const has = (r.imageUrls?.length ?? 0) > 0;
-            if (filters.hasImages !== has) return false;
-        }
 
         // Filter by trip type
         if (filters.tripType && r.tripType !== filters.tripType) return false;

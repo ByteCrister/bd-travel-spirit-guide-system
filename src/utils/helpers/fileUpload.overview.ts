@@ -1,7 +1,4 @@
 // src/lib/fileUpload.ts
-import { GUIDE_DOCUMENT_TYPE, GuideDocumentCategory, GuideDocumentType } from "@/constants/guide/guide.const";
-import type { GuideDocument } from "@/types/overview.types";
-
 /**
  * Config
  */
@@ -116,70 +113,4 @@ export async function compressImage(
     }
 
     throw new Error("Unable to compress image below size limit");
-}
-
-/**
- * High-level file processing helper
- * - validates extension
- * - if image: compresses if necessary (attempt)
- * - if non-image: rejects if larger than limit (recommend server-side compress)
- *
- * Returns a GuideDocument where fileUrl is a data URL (base64) suitable for client-side preview/download.
- */
-export async function processUploadFile(params: {
-    file: File;
-    category: GuideDocumentCategory;
-    preferFileType?: GuideDocumentType | undefined;
-    maxBytes?: number;
-}): Promise<{ ok: true; doc: GuideDocument } | { ok: false; error: string }> {
-    const { file, category, preferFileType, maxBytes = MAX_UPLOAD_BYTES } = params;
-
-    if (!isAllowedExtension(file)) {
-        return { ok: false, error: "Unsupported file type. Allowed: jpg, jpeg, png, webp, pdf, docx" };
-    }
-
-    // Quick pass if already small
-    if (isUnderMaxSize(file.size, maxBytes)) {
-        const dataUrl = await fileToBase64(file);
-        const inferredType = file.type.startsWith("image/") ? "image" : file.type === "application/pdf" ? "pdf" : "docx";
-        const doc: GuideDocument = {
-            id: undefined,
-            category,
-            fileType: (preferFileType ?? (inferredType as GuideDocumentType)) as GuideDocumentType,
-            fileName: file.name,
-            fileUrl: dataUrl,
-            uploadedAt: new Date().toISOString(),
-        };
-        return { ok: true, doc };
-    }
-
-    // If it's an image, attempt compression
-    if (file.type.startsWith("image/")) {
-        try {
-            const compressed = await compressImage(file, { maxBytes, maxWidth: 1600, maxHeight: 1600 });
-            const dataUrl = await fileToBase64(compressed);
-            const doc: GuideDocument = {
-                id: undefined,
-                category,
-                fileType: (preferFileType ?? "image") as GuideDocumentType,
-                fileName: file.name,
-                fileUrl: dataUrl,
-                uploadedAt: new Date().toISOString(),
-            };
-            return { ok: true, doc };
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                return { ok: false, error: err.message };
-            }
-            return { ok: false, error: String(err) };
-        }
-
-    }
-
-    // Non-image (PDF/DOCX) larger than allowed — reject and provide guidance
-    return {
-        ok: false,
-        error:
-            "File is too large and automatic compression for PDFs/DOCX is not available in-browser. Please upload a file under 2 MB or use server-side compression.",
-    };
 }

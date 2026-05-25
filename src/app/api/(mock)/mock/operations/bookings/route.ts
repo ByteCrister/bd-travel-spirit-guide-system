@@ -71,10 +71,12 @@ const generateTour = (id: string): PopulatedTour => {
 const TRAVELERS_COUNT = 20;
 const TOURS_COUNT = 15;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const travelersPool: PopulatedTraveler[] = Array.from({ length: TRAVELERS_COUNT }, (_, i) =>
     generateTraveler(faker.string.uuid())
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const toursPool: PopulatedTour[] = Array.from({ length: TOURS_COUNT }, (_, i) =>
     generateTour(faker.string.uuid())
 );

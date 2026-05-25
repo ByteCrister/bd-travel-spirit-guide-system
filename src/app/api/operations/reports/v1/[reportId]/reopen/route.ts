@@ -75,14 +75,14 @@ export const PUT = withErrorHandler(
                 );
             }
 
-            if ([REPORT_STATUS.OPEN, REPORT_STATUS.IN_REVIEW].includes(report.status)) {
+            if ([REPORT_STATUS.OPEN, REPORT_STATUS.IN_REVIEW].includes(report.status as REPORT_STATUS)) {
                 throw new ApiError(
                     `Report is already in ${report.status.toLowerCase()} status and cannot be reopened.`,
                     400
                 );
             }
 
-            if (![REPORT_STATUS.RESOLVED, REPORT_STATUS.REJECTED].includes(report.status)) {
+            if (![REPORT_STATUS.RESOLVED, REPORT_STATUS.REJECTED].includes(report.status as REPORT_STATUS)) {
                 throw new ApiError(
                     `Report cannot be reopened from ${report.status.toLowerCase()} status.`,
                     400

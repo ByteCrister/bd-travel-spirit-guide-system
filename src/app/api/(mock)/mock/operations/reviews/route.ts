@@ -35,16 +35,13 @@ export async function GET(req: NextRequest) {
   const filters: ReviewFilters = {
     query: params.q,
     queryField: params.qField as ReviewFilters["queryField"],
-    tourId: params.tourId,
     ratingMin: params.ratingMin ? Number(params.ratingMin) : undefined,
     ratingMax: params.ratingMax ? Number(params.ratingMax) : undefined,
     isApproved: params.isApproved ? params.isApproved === "true" : undefined,
-    hasImages: params.hasImages ? params.hasImages === "true" : undefined,
     tripType: params.tripType as ReviewFilters["tripType"],
     dateFrom: params.dateFrom ?? undefined,
     dateTo: params.dateTo ?? undefined,
     includeDeleted: params.includeDeleted ? params.includeDeleted === "true" : undefined,
-    companyId: params.companyId,
   };
 
   // Base list clone
