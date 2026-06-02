@@ -7,6 +7,7 @@ import ConnectDB from "@/config/db";
 import { withTransaction } from "@/lib/helpers/withTransaction";
 import EmployeeModel from "@/models/employees/employees.model";
 import { Types } from "mongoose";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 interface Params {
     params: Promise<{ employeeId: string }>
@@ -44,6 +45,12 @@ export const PATCH = withErrorHandler(async (request: NextRequest, { params }: P
         return deleted;
     });
 
-    // 6. Return success
+    await logAuditForActor(adminId, {
+        targetModel: "Employee",
+        target: employeeId,
+        action: AUDIT_ACTION.DELETE,
+        note: reason ? `Soft-deleted employee: ${reason}` : "Soft-deleted employee",
+    });
+
     return { data: deletedEmployee, status: 200 };
 });

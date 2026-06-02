@@ -9,6 +9,7 @@ import { Guide } from "@/types/guide.types";
 import { buildGuideDto } from "@/lib/build-responses/buildGuideOwner-dt";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { GUIDE_STATUS } from "@/constants/guide/guide.const";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 interface CompanyNameUpdatePayload {
     companyName: string;
@@ -146,6 +147,18 @@ async function handlePatchRequest(
             session
         );
     });
+
+    const guideDoc = await GuideModel.findOne({ "owner.user": userId })
+        .select("_id")
+        .lean();
+    if (guideDoc?._id) {
+        await logAuditForActor(userId, {
+            targetModel: "Guide",
+            target: guideDoc._id.toString(),
+            action: AUDIT_ACTION.UPDATE,
+            note: "Updated company name",
+        });
+    }
 
     return {
         data: updatedGuide,

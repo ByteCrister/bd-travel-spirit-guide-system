@@ -12,6 +12,7 @@ import TourModel from '@/models/tours/tour.model';
 import { buildTourDetailDTO } from '@/lib/build-responses/build-tour-details';
 import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour/tour.const';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
+import { auditTourMutation, requireSessionUserId } from '@/lib/audit/tour-audit';
 
 
 // Export the PATCH handler with error handling
@@ -22,6 +23,7 @@ export const PATCH = withErrorHandler(async (
     await ConnectDB();
 
     const tourId = resolveMongoId((await params).tourId);
+    const userId = await requireSessionUserId();
 
     if (!tourId) {
         throw new ApiError("Invalid tour ID", 400)
@@ -99,6 +101,8 @@ export const PATCH = withErrorHandler(async (
 
         return detailDto;
     });
+
+    await auditTourMutation(userId, tourId, "Updated tour gallery");
 
     return {
         data: tourDetailsDTO.gallery,

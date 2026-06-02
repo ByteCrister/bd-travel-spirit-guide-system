@@ -9,6 +9,7 @@ import { UpdateTourBangladeshFieldsDTO } from '@/types/tour/tour.types';
 import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour/tour.const';
 import { Types } from 'mongoose';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
+import { auditTourMutation, requireSessionUserId } from '@/lib/audit/tour-audit';
 /**
  * Update Step-1 bangladesh fields
  */
@@ -18,6 +19,7 @@ export const PATCH = withErrorHandler(async (
 ) => {
     // Get tourId from params
     const tourId = resolveMongoId((await params).tourId);
+    const userId = await requireSessionUserId();
 
     if (!tourId || !Types.ObjectId.isValid(tourId)) {
         throw new ApiError('Valid Tour ID is required', 400);
@@ -124,7 +126,8 @@ export const PATCH = withErrorHandler(async (
         };
     });
 
-    // Return successful response
+    await auditTourMutation(userId, tourId, "Updated tour Bangladesh fields");
+
     return {
         data: result,
         status: 200

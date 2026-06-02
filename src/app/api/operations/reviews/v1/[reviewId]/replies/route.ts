@@ -10,6 +10,7 @@ import { ReviewModel } from "@/models/tours/review.model";
 import { buildTourReviewDTO } from "@/lib/build-responses/build-tour-review-dto";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { EMPLOYEE_ROLE } from "@/constants/employee/employee.const";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 // Validation schema for request body
 const ReplySchema = z.object({
@@ -124,6 +125,13 @@ export const POST = withErrorHandler(
             }
 
             return updatedReview;
+        });
+
+        await logAuditForActor(userId, {
+            targetModel: "Review",
+            target: reviewId,
+            action: AUDIT_ACTION.UPDATE,
+            note: "Added review reply",
         });
 
         return {

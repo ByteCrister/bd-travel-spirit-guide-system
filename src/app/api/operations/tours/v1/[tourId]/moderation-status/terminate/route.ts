@@ -9,6 +9,7 @@ import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
 import ConnectDB from "@/config/db";
+import { auditTourMutation } from "@/lib/audit/tour-audit";
 
 type Params = Promise<{ tourId: string }>;
 
@@ -68,6 +69,8 @@ const terminateTourHandler = async (
         // Build the detailed DTO for response
         return await buildTourDetailDTO(tour._id as Types.ObjectId, session);
     });
+
+    await auditTourMutation(currentUserId, tourId, "Terminated tour");
 
     return {
         data: tourDetailDTO,

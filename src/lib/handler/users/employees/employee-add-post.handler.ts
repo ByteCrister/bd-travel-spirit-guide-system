@@ -22,6 +22,7 @@ import { createEmployeeValidationSchema } from "@/utils/validators/employee/empl
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import GuideModel from "@/models/guide/guide.model";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 type ObjectId = Types.ObjectId;
 
@@ -205,6 +206,29 @@ export const EmployeeAddPostHandler = async (req: NextRequest) => {
         subject,
         html
     )
+
+    const employeeTargetId =
+        newCreatedEmployeeDetail &&
+        typeof newCreatedEmployeeDetail === "object" &&
+        "id" in newCreatedEmployeeDetail &&
+        typeof newCreatedEmployeeDetail.id === "string"
+            ? newCreatedEmployeeDetail.id
+            : newCreatedEmployeeDetail &&
+                typeof newCreatedEmployeeDetail === "object" &&
+                "employeeId" in newCreatedEmployeeDetail
+              ? String(
+                    (newCreatedEmployeeDetail as { employeeId: Types.ObjectId }).employeeId
+                )
+              : undefined;
+
+    if (employeeTargetId) {
+        await logAuditForActor(userId, {
+            targetModel: "Employee",
+            target: employeeTargetId,
+            action: AUDIT_ACTION.CREATE,
+            note: "Created or restored employee",
+        });
+    }
 
     return {
         data: newCreatedEmployeeDetail,

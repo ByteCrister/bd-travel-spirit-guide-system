@@ -12,6 +12,7 @@ import mappedEmployeeUser from "@/lib/build-responses/build-mappedEmployeeUser";
 import { buildGuideDto } from "@/lib/build-responses/buildGuideOwner-dt";
 import GuideModel from "@/models/guide/guide.model";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 // Request body type for name update
 interface UpdateNameRequest {
@@ -118,6 +119,13 @@ async function handler(request: NextRequest): Promise<HandlerResult<UpdateNameRe
         } else {
             throw new ApiError("Invalid user role", 400);
         }
+    });
+
+    await logAuditForActor(currentUserId, {
+        targetModel: "User",
+        target: currentUserId,
+        action: AUDIT_ACTION.UPDATE,
+        note: "Updated display name",
     });
 
     return {

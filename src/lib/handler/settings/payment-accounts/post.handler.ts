@@ -16,6 +16,7 @@ import { createPaymentAccountSchema } from "@/utils/validators/settings/payment-
 import StripePaymentAccountModel from "@/models/payments/payment-account.model";
 import { buildPaymentAccountResponse } from "@/lib/build-responses/build-payment-account-dt";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2026-04-22.dahlia",
@@ -126,6 +127,13 @@ export default async function PostPaymentAccountHandler(
             (newAccount._id as MongoId).toString(),
             session
         );
+    });
+
+    await logAuditForActor(userId, {
+        targetModel: "StripePaymentAccount",
+        target: paymentAccount.id,
+        action: AUDIT_ACTION.CREATE,
+        note: "Created payment account",
     });
 
     return { data: paymentAccount, status: 201 };

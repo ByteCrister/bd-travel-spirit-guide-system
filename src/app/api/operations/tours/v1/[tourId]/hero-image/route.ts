@@ -12,6 +12,7 @@ import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 import { ASSET_TYPE } from "@/constants/common/asset.const";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
+import { auditTourMutation, requireSessionUserId } from "@/lib/audit/tour-audit";
 
 // Asset helper functions
 const AssetHelper = {
@@ -31,6 +32,7 @@ export const PATCH = withErrorHandler(
         await ConnectDB();
 
         const tourId = resolveMongoId((await params).tourId);
+        const userId = await requireSessionUserId();
 
         if (!tourId) {
             throw new ApiError("Invalid tour ID", 400);
@@ -110,6 +112,8 @@ export const PATCH = withErrorHandler(
                 return detailDto;
             }
         );
+
+        await auditTourMutation(userId, tourId, "Updated tour hero image");
 
         return { data: tourDetailDTO.heroImage, status: 200 };
     }

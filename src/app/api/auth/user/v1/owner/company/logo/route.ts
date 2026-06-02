@@ -12,6 +12,7 @@ import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { resolveDocuments } from "@/lib/cloudinary/resolve.cloudinary";
 import { buildGuideDto } from "@/lib/build-responses/buildGuideOwner-dt";
 import { GUIDE_STATUS } from "@/constants/guide/guide.const";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 interface CompanyLogoUpdatePayload {
     logoUrl: string;
@@ -194,6 +195,18 @@ async function handlePatchRequest(
             session
         );
     });
+
+    const guideDoc = await GuideModel.findOne({ "owner.user": userId })
+        .select("_id")
+        .lean();
+    if (guideDoc?._id) {
+        await logAuditForActor(userId, {
+            targetModel: "Guide",
+            target: guideDoc._id.toString(),
+            action: AUDIT_ACTION.UPDATE,
+            note: "Updated company logo",
+        });
+    }
 
     return {
         data: updatedGuide,

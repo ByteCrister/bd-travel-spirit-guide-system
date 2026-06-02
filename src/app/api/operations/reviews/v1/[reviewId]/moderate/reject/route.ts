@@ -9,6 +9,7 @@ import { withTransaction } from "@/lib/helpers/withTransaction";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import EmployeeModel from "@/models/employees/employees.model";
 import { EMPLOYEE_ROLE } from "@/constants/employee/employee.const";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 // Export the wrapped handler
 export const POST = withErrorHandler(async (request: NextRequest, { params }: { params: Promise<{ reviewId: string }> }) => {
@@ -94,6 +95,13 @@ export const POST = withErrorHandler(async (request: NextRequest, { params }: { 
         }
 
         return reviewDTO;
+    });
+
+    await logAuditForActor(userId, {
+        targetModel: "Review",
+        target: reviewId,
+        action: AUDIT_ACTION.UPDATE,
+        note: "Rejected review moderation",
     });
 
     return {

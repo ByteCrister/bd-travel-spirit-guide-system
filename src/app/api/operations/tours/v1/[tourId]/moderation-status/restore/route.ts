@@ -9,6 +9,7 @@ import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
 import ConnectDB from "@/config/db";
+import { auditTourMutation } from "@/lib/audit/tour-audit";
 
 type Params = Promise<{ tourId: string }>;
 
@@ -38,8 +39,7 @@ async function restoreTourHandler(
 
     await VERIFY_USER_ROLE.ASSISTANT(currentUserId);
 
-    return withTransaction(async (session) => {
-        // 1. Restore the tour
+    const response = await withTransaction(async (session) => {
         const restoredTour = await TourModel.restoreById(objectId, {
             session,
             restoredBy: new Types.ObjectId(currentUserId)
@@ -49,7 +49,6 @@ async function restoreTourHandler(
             throw new ApiError("Tour not found or cannot be restored", 404);
         }
 
-        // 2. Build the detailed DTO
         const tourDTO = await buildTourDetailDTO(restoredTour._id as Types.ObjectId, session);
 
         return {
@@ -57,6 +56,10 @@ async function restoreTourHandler(
             status: 200
         };
     });
+
+    await auditTourMutation(currentUserId, tourId, "Restored tour");
+
+    return response;
 }
 
 // Export the wrapped handler

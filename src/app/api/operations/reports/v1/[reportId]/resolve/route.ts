@@ -10,6 +10,7 @@ import { getUserIdFromSession } from '@/lib/auth/session.auth';
 import { buildTourReportResponse } from '@/lib/build-responses/build-tour-report-dt';
 import { ReportModel } from '@/models/tours/report.model';
 import { REPORT_STATUS } from '@/constants/tour/report.const';
+import { AUDIT_ACTION, logAuditForActor } from '@/lib/audit/audit-logger';
 
 /**
  * PUT /api/operations/reports/v1/[reportId]/resolve
@@ -117,9 +118,13 @@ export const PUT = withErrorHandler(
             return fullReportDTO;
         });
 
-        /**
-         * Success response
-         */
+        await logAuditForActor(currentUserId, {
+            targetModel: "Report",
+            target: reportId,
+            action: AUDIT_ACTION.UPDATE,
+            note: "Resolved report",
+        });
+
         return {
             status: 200,
             data: {

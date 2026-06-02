@@ -7,6 +7,7 @@ import ConnectDB from "@/config/db";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import EmployeeModel from "@/models/employees/employees.model";
 import { EMPLOYEE_ROLE } from "@/constants/employee/employee.const";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 import { ReviewModel } from "@/models/tours/review.model";
 import { Types } from "mongoose";
 
@@ -126,6 +127,13 @@ export const DELETE = withErrorHandler(
 
             // Soft delete the review using instance method
             await review.deleteReview(reason, session);
+        });
+
+        await logAuditForActor(userId, {
+            targetModel: "Review",
+            target: reviewId,
+            action: AUDIT_ACTION.DELETE,
+            note: "Soft-deleted review",
         });
 
         return {

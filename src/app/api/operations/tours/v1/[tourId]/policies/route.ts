@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import { withTransaction } from '@/lib/helpers/withTransaction';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
+import { auditTourMutation, requireSessionUserId } from '@/lib/audit/tour-audit';
 
 /**
  * Update Step-6 policy
@@ -18,6 +19,7 @@ export const PATCH = withErrorHandler(async (
 ) => {
     // Get tourId from params
     const tourId = resolveMongoId((await params).tourId);
+    const userId = await requireSessionUserId();
 
     // Validate tourId format
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -122,7 +124,8 @@ export const PATCH = withErrorHandler(async (
         return updatedTour;
     });
 
-    // Return successful response
+    await auditTourMutation(userId, tourId, "Updated tour policies");
+
     return {
         data: {
             cancellationPolicy: updatedTour.cancellationPolicy,

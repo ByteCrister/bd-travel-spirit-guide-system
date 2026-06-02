@@ -19,6 +19,7 @@ import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import { buildPaymentAccountResponse } from "@/lib/build-responses/build-payment-account-dt";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 /**
  * GET /api/site-settings/payment-accounts/v1/[id]
@@ -138,6 +139,13 @@ export const PATCH = withErrorHandler(
             return await buildPaymentAccountResponse(id.toString(), session);
         });
 
+        await logAuditForActor(userId, {
+            targetModel: "StripePaymentAccount",
+            target: id.toString(),
+            action: AUDIT_ACTION.UPDATE,
+            note: "Updated payment account",
+        });
+
         return { data: updated };
     },
 );
@@ -205,6 +213,13 @@ export const DELETE = withErrorHandler(
             await account.save({ session });
 
             return account;
+        });
+
+        await logAuditForActor(userId, {
+            targetModel: "StripePaymentAccount",
+            target: id.toString(),
+            action: AUDIT_ACTION.DELETE,
+            note: "Soft-deleted payment account",
         });
 
         return { data: { success: true } };

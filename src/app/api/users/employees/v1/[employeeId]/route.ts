@@ -19,6 +19,8 @@ import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import AssetModel from "@/models/assets/asset.model";
 import AssetFileModel from "@/models/assets/asset-file.model";
 import { PopulatedAssetLean } from "@/types/common/populated-asset.types";
+import { getUserIdFromSession } from "@/lib/auth/session.auth";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 interface Params {
     params: Promise<{ employeeId: string }>
@@ -78,6 +80,8 @@ export const GET = withErrorHandler(async (req: NextRequest, { params }: Params)
 export const PUT = withErrorHandler(async (req: NextRequest, { params }: Params) => {
 
     const employeeId = resolveMongoId((await params).employeeId);
+    const actorId = await getUserIdFromSession();
+    if (!actorId) throw new ApiError("Unauthorized", 401);
 
     const body: UpdateEmployeePayload = await req.json();
 
@@ -205,6 +209,13 @@ export const PUT = withErrorHandler(async (req: NextRequest, { params }: Params)
     });
 
     const dto = await buildEmployeeDTO(updatedEmployeeId as Types.ObjectId);
+
+    await logAuditForActor(actorId, {
+        targetModel: "Employee",
+        target: employeeId,
+        action: AUDIT_ACTION.UPDATE,
+        note: "Updated employee profile",
+    });
 
     return {
         data: dto,

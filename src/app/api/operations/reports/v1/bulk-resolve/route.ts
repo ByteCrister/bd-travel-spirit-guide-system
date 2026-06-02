@@ -9,6 +9,7 @@ import { withTransaction } from '@/lib/helpers/withTransaction';
 import { getUserIdFromSession } from '@/lib/auth/session.auth';
 import { ReportModel } from '@/models/tours/report.model';
 import { REPORT_STATUS } from '@/constants/tour/report.const';
+import { AUDIT_ACTION, logAuditForActor } from '@/lib/audit/audit-logger';
 
 /**
  * PATCH /api/operations/reports/v1/bulk-resolve
@@ -183,8 +184,28 @@ export const PATCH = withErrorHandler(
             };
         });
 
+        if (result.resolvedCount > 0) {
+            const failedIds = new Set(
+                ("errors" in result && Array.isArray(result.errors)
+                    ? result.errors
+                    : []
+                ).map((e) => e.reportId)
+            );
+            const resolvedIds = reportIds.filter((id) => !failedIds.has(id));
+            await Promise.all(
+                resolvedIds.map((id) =>
+                    logAuditForActor(currentUserId, {
+                        targetModel: "Report",
+                        target: id,
+                        action: AUDIT_ACTION.UPDATE,
+                        note: "Bulk resolved report",
+                    })
+                )
+            );
+        }
+
         return {
-            status: result.success ? 200 : 207, // Multi-Status for partial success
+            status: result.success ? 200 : 207,
             data: result,
         };
     }

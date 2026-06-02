@@ -13,6 +13,7 @@ import {
 } from '@/constants/tour/tour.const';
 import mongoose from 'mongoose';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
+import { auditTourMutation, requireSessionUserId } from '@/lib/audit/tour-audit';
 
 /**
  * Update Step-5 compliance
@@ -23,6 +24,7 @@ export const PATCH = withErrorHandler(async (
 ) => {
     // Get tourId from params
     const tourId = resolveMongoId((await params).tourId);
+    const userId = await requireSessionUserId();
 
     // Validate tourId format
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -128,7 +130,8 @@ export const PATCH = withErrorHandler(async (
         accessibility: updatedTour.accessibility,
     };
 
-    // Return successful response
+    await auditTourMutation(userId, tourId, "Updated tour compliance");
+
     return {
         data: responseData,
         status: 200

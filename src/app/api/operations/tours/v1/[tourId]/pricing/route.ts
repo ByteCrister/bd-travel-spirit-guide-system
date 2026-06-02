@@ -9,6 +9,7 @@ import { Step4PricingSchema } from "@/utils/validators/tour/add-tour.validator";
 import TourModel from "@/models/tours/tour.model";
 import { MODERATION_STATUS, TOUR_DISCOUNT, TOUR_DISCOUNT_TYPE, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
+import { auditTourMutation, requireSessionUserId } from "@/lib/audit/tour-audit";
 
 /**
  * Update Step-4 pricing
@@ -18,6 +19,7 @@ export const PATCH = withErrorHandler(async (
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
     const tourId = resolveMongoId((await params).tourId);
+    const userId = await requireSessionUserId();
 
     // Validate tour ID
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -154,6 +156,8 @@ export const PATCH = withErrorHandler(async (
         })) || [],
         paymentMethods: updatedTour.paymentMethods,
     };
+
+    await auditTourMutation(userId, tourId, "Updated tour pricing");
 
     return {
         data: responseData,

@@ -12,6 +12,7 @@ import { ASSET_TYPE } from "@/constants/common/asset.const";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
+import { auditTourMutation, requireSessionUserId } from "@/lib/audit/tour-audit";
 
 /**
  * PATCH api/operations/tours/v1/[tourId]/destinations/images-bulk/route.ts
@@ -22,6 +23,7 @@ export const PATCH = withErrorHandler(async (
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
     const tourId = resolveMongoId((await params).tourId);
+    const userId = await requireSessionUserId();
 
     // Validate tour ID
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -147,6 +149,8 @@ export const PATCH = withErrorHandler(async (
     const updatedDestination = tourDetailDto?.destinations?.find(
         dest => dest.id === body?.destinationId
     );
+
+    await auditTourMutation(userId, tourId, "Updated destination images");
 
     return {
         data: updatedDestination?.imageIds,

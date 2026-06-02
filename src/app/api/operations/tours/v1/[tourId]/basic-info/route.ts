@@ -9,6 +9,7 @@ import { validateUpdatedYupSchema } from "@/utils/validators/common/update-updat
 import TourModel from "@/models/tours/tour.model";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
+import { auditTourMutation, requireSessionUserId } from "@/lib/audit/tour-audit";
 
 /**
  * Update Step-0 basic info
@@ -18,6 +19,7 @@ export const PATCH = withErrorHandler(async (
     { params }: { params: Promise<{ tourId: string }> }
 ) => {
     const tourId = resolveMongoId((await params).tourId);
+    const userId = await requireSessionUserId();
 
     // Validate tour ID
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -90,6 +92,8 @@ export const PATCH = withErrorHandler(async (
             tags: updatedTour.tags || [],
         };
     });
+
+    await auditTourMutation(userId, tourId, "Updated tour basic info");
 
     return {
         data: result,

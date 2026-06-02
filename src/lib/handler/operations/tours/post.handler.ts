@@ -14,6 +14,7 @@ import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import EmployeeModel from "@/models/employees/employees.model";
 import { ApiError } from "@/lib/helpers/withErrorHandler";
 import { slugify } from "@/lib/helpers/slugify";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 // POST Helper function to map destinations & attractions
 function mapDestinations(
@@ -142,6 +143,13 @@ const TourPostHandler = async (request: NextRequest) => {
             );
 
         return detailDto;
+    });
+
+    await logAuditForActor(authorIdStr, {
+        targetModel: "Tour",
+        target: tourDetailDTO.id,
+        action: AUDIT_ACTION.CREATE,
+        note: "Created tour draft",
     });
 
     return { data: tourDetailDTO, status: 201 };

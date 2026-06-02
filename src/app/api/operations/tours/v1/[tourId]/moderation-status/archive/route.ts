@@ -10,6 +10,8 @@ import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
 import ConnectDB from "@/config/db";
+import { AUDIT_ACTION } from "@/lib/audit/audit-logger";
+import { auditTourMutation } from "@/lib/audit/tour-audit";
 
 type Params = Promise<{ tourId: string }>;
 
@@ -83,6 +85,8 @@ const archiveTourHandler = async (
             status: 200,
         };
     });
+
+    await auditTourMutation(userId, tourId, "Archived tour", AUDIT_ACTION.DELETE);
 
     return result;
 }

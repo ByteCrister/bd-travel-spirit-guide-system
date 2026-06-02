@@ -18,6 +18,7 @@ import { USER_ROLE } from "@/constants/current-user/user.const";
 import { ResetPasswordRequestPopulated } from "@/types/employee/employee-password-request.types.server";
 import { REQUEST_STATUS } from "@/constants/employee/reset-password-request.const";
 import { ResetPasswordRequestDTO } from "@/types/employee/password-reset.types";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 /**
  * Update password that has been requested by an employee with "support" role
  */
@@ -155,6 +156,13 @@ export const POST = withErrorHandler(async (
         createdAt: updatedRequest.createdAt.toISOString(),
         updatedAt: updatedRequest.updatedAt.toISOString(),
     };
+
+    await logAuditForActor(adminId, {
+        targetModel: "ResetPasswordRequest",
+        target: requestId,
+        action: AUDIT_ACTION.UPDATE,
+        note: "Fulfilled password reset request",
+    });
 
     return {
         data: responseDTO,

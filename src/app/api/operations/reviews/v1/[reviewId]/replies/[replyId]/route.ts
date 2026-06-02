@@ -10,6 +10,7 @@ import { ReviewModel } from "@/models/tours/review.model";
 import { Types } from "mongoose";
 import { NextRequest } from "next/server";
 import z from "zod";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 // Validation schema for request body
 const UpdateReplySchema = z.object({
@@ -158,6 +159,13 @@ export const PATCH = withErrorHandler(
             return replyDTO;
         });
 
+        await logAuditForActor(userId, {
+            targetModel: "Review",
+            target: reviewId,
+            action: AUDIT_ACTION.UPDATE,
+            note: `Updated review reply ${replyId}`,
+        });
+
         return {
             data: result,
             status: 200,
@@ -259,6 +267,13 @@ export const DELETE = withErrorHandler(
 
             // Soft delete the reply using existing instance method
             await review.deleteReply(replyObjectId, reason, session);
+        });
+
+        await logAuditForActor(userId, {
+            targetModel: "Review",
+            target: reviewId,
+            action: AUDIT_ACTION.UPDATE,
+            note: `Deleted review reply ${replyId}`,
         });
 
         return {

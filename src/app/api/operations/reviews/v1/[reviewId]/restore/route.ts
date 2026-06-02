@@ -10,6 +10,7 @@ import EmployeeModel from "@/models/employees/employees.model";
 import { EMPLOYEE_ROLE } from "@/constants/employee/employee.const";
 import { ReviewModel } from "@/models/tours/review.model";
 import { buildTourReviewDTO } from "@/lib/build-responses/build-tour-review-dto";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 // Define route context type
 interface Params {
@@ -108,6 +109,13 @@ export const POST = withErrorHandler(
             }
 
             return restoredReview;
+        });
+
+        await logAuditForActor(userId, {
+            targetModel: "Review",
+            target: reviewId,
+            action: AUDIT_ACTION.UPDATE,
+            note: "Restored review",
         });
 
         return {

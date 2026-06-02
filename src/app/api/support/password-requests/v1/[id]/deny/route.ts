@@ -13,6 +13,7 @@ import { USER_ROLE } from "@/constants/current-user/user.const";
 import { DenyResetRequestPayload, ResetPasswordRequestDTO } from "@/types/employee/password-reset.types";
 import { ResetPasswordRequestPopulated } from "@/types/employee/employee-password-request.types.server";
 import { REQUEST_STATUS } from "@/constants/employee/reset-password-request.const";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 /**
  * Post deny action for employee's password update request
@@ -137,6 +138,13 @@ export const POST = withErrorHandler(async (
         createdAt: updatedRequest.createdAt.toISOString(),
         updatedAt: updatedRequest.updatedAt.toISOString(),
     };
+
+    await logAuditForActor(adminId, {
+        targetModel: "ResetPasswordRequest",
+        target: requestId,
+        action: AUDIT_ACTION.UPDATE,
+        note: "Denied password reset request",
+    });
 
     return {
         data: responseDTO,

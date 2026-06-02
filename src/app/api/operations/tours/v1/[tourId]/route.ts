@@ -8,6 +8,7 @@ import { withTransaction } from '@/lib/helpers/withTransaction';
 import TourModel, { ITour } from '@/models/tours/tour.model';
 import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour/tour.const';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
+import { auditTourMutation, requireSessionUserId } from '@/lib/audit/tour-audit';
 
 /**
  * GET Full Tour details 
@@ -49,6 +50,7 @@ export const POST = withErrorHandler(async (
 ) => {
 
     const tourId = resolveMongoId((await params).tourId);
+    const userId = await requireSessionUserId();
 
     if (!tourId || !Types.ObjectId.isValid(tourId)) {
         throw new ApiError("Invalid tour ID", 400);
@@ -120,6 +122,8 @@ export const POST = withErrorHandler(async (
 
         return detailDto
     });
+
+    await auditTourMutation(userId, tourId, "Submitted tour for moderation");
 
     return { data: detailDto, status: 200 };
 })

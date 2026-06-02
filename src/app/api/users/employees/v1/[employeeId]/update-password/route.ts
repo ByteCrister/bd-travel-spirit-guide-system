@@ -12,6 +12,8 @@ import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { notifyEmployeeNewPassword } from "@/lib/html/notify-new-password-html";
 import { mailer } from "@/config/node-mailer";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
+import { getUserIdFromSession } from "@/lib/auth/session.auth";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 type ObjectId = Types.ObjectId;
 
@@ -26,6 +28,8 @@ export type EmployeeLeanPopulated =
 export const PUT = withErrorHandler(async (request: NextRequest, { params }: { params: Promise<{ employeeId: string }> }) => {
 
     const employeeId = resolveMongoId((await params).employeeId);
+    const actorId = await getUserIdFromSession();
+    if (!actorId) throw new ApiError("Unauthorized", 401);
 
     // validate id
     if (!employeeId || !mongoose.Types.ObjectId.isValid(employeeId)) {
@@ -92,6 +96,13 @@ export const PUT = withErrorHandler(async (request: NextRequest, { params }: { p
         const html = notifyEmployeeNewPassword(employee.user.name, employee.user.email, password)
         await mailer(employee.user.email, "Password has been updated!!", html)
     }
+
+    await logAuditForActor(actorId, {
+        targetModel: "Employee",
+        target: employeeId,
+        action: AUDIT_ACTION.UPDATE,
+        note: "Updated employee password",
+    });
 
     return { data: { message: "Password updated successfully" }, status: 200 }
 

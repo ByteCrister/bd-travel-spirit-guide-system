@@ -6,6 +6,7 @@ import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { USER_ROLE } from "@/constants/current-user/user.const";
 import UserModel from "@/models/user.model";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 // Request body type for password update
 interface UpdatePasswordRequest {
@@ -90,6 +91,12 @@ async function handler(request: NextRequest): Promise<HandlerResult<UpdatePasswo
         await user.save({ session });
     });
 
+    await logAuditForActor(currentUserId, {
+        targetModel: "User",
+        target: currentUserId,
+        action: AUDIT_ACTION.UPDATE,
+        note: "Updated password",
+    });
 
     return {
         data: {

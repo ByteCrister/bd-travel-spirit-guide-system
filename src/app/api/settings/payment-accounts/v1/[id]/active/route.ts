@@ -9,6 +9,7 @@ import { buildPaymentAccountResponse } from "@/lib/build-responses/build-payment
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 /**
  * PATCH /api/site-settings/payment-accounts/v1/[id]/active
@@ -84,6 +85,13 @@ export const PATCH = withErrorHandler(
             await account.save({ session });
 
             return await buildPaymentAccountResponse(id.toString(), session);
+        });
+
+        await logAuditForActor(userId, {
+            targetModel: "StripePaymentAccount",
+            target: id.toString(),
+            action: AUDIT_ACTION.UPDATE,
+            note: `Set payment account active=${body.isActive}`,
         });
 
         return { data: updated };

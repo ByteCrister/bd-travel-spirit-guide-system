@@ -13,6 +13,7 @@ import { withTransaction } from "@/lib/helpers/withTransaction";
 import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
+import { auditTourMutation, requireSessionUserId } from "@/lib/audit/tour-audit";
 
 // helper that preserves key-value coupling
 function setIfDefined<K extends keyof ITour>(
@@ -31,6 +32,7 @@ export const PATCH = withErrorHandler(
         { params }: { params: Promise<{ tourId: string }> }
     ) => {
         const tourId = resolveMongoId((await params).tourId);
+        const userId = await requireSessionUserId();
 
         if (!tourId || !Types.ObjectId.isValid(tourId)) {
             throw new ApiError("Invalid tour ID", 400);
@@ -189,6 +191,8 @@ export const PATCH = withErrorHandler(
                 translations: detailDto.translations,
             };
         });
+
+        await auditTourMutation(userId, tourId, "Updated tour content and itinerary");
 
         return {
             data: result,

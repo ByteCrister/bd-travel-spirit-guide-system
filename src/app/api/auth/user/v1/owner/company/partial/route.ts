@@ -9,6 +9,7 @@ import { Guide } from "@/types/guide.types";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { buildGuideDto } from "@/lib/build-responses/buildGuideOwner-dt";
 import { Types } from "mongoose";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 type GuideUpdateSet = Partial<
     Pick<Guide, "bio" | "address" | "social">
@@ -108,6 +109,9 @@ async function handlePatchRequest(
     validateUpdateData(body);
 
     const userId = await getUserIdFromSession();
+    if (!userId) {
+        throw new ApiError("Unauthorized", 401);
+    }
     const updateData = prepareUpdateData(body);
 
     const updatedGuide = await withTransaction(async (session) => {
@@ -142,6 +146,18 @@ async function handlePatchRequest(
             session
         );
     });
+
+    const guideDoc = await GuideModel.findOne({ "owner.user": userId })
+        .select("_id")
+        .lean();
+    if (guideDoc?._id) {
+        await logAuditForActor(userId, {
+            targetModel: "Guide",
+            target: guideDoc._id.toString(),
+            action: AUDIT_ACTION.UPDATE,
+            note: "Updated company profile",
+        });
+    }
 
     return {
         data: updatedGuide,

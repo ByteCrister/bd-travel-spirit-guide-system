@@ -7,6 +7,7 @@ import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import { withTransaction } from '@/lib/helpers/withTransaction';
 import { getUserIdFromSession } from '@/lib/auth/session.auth';
 import { ReportModel } from '@/models/tours/report.model';
+import { AUDIT_ACTION, logAuditForActor } from '@/lib/audit/audit-logger';
 
 
 /**
@@ -117,6 +118,13 @@ export const DELETE = withErrorHandler(
             }
 
             return report;
+        });
+
+        await logAuditForActor(currentUserId, {
+            targetModel: "Report",
+            target: reportId,
+            action: AUDIT_ACTION.DELETE,
+            note: "Soft-deleted report",
         });
 
         return {

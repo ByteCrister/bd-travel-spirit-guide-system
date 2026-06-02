@@ -11,6 +11,7 @@ import { withErrorHandler, ApiError } from "@/lib/helpers/withErrorHandler";
 import { Types } from "mongoose";
 import { USER_ROLE } from "@/constants/current-user/user.const";
 import ConnectDB from "@/config/db";
+import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
 
 export const PATCH = withErrorHandler(async (req: NextRequest) => {
     // 1. Authenticate
@@ -77,7 +78,13 @@ export const PATCH = withErrorHandler(async (req: NextRequest) => {
         return asset.file.publicUrl;
     });
 
-    // 7. Return success response
+    await logAuditForActor(userId, {
+        targetModel: "User",
+        target: userId,
+        action: AUDIT_ACTION.UPDATE,
+        note: "Updated avatar",
+    });
+
     return {
         data: { avatarUrl },
         status: 200,
