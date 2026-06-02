@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { toBooleanChecked } from '@/components/operations/tours/shared/NeuCheckboxIndicator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Select,
@@ -163,7 +164,7 @@ export default function Step5Compliance({ tourId, initialData }: Step5Compliance
       animate="visible"
       className={`${NEU.surface} min-h-screen p-4 sm:p-6`}
     >
-      <div className={`${NEU.card} p-6 sm:p-8 max-w-3xl mx-auto`}>
+      <div className={`${NEU.card} p-6 sm:p-8 mx-auto w-full`}>
 
         {/* ── Header ───────────────────────────────────────────────────── */}
         <motion.div variants={itemVariants} className="flex items-center gap-4 mb-8">
@@ -204,8 +205,10 @@ export default function Step5Compliance({ tourId, initialData }: Step5Compliance
                     </div>
                     <Checkbox
                       id="licenseRequired"
-                      checked={formik.values.licenseRequired}
-                      onCheckedChange={(checked) => formik.setFieldValue('licenseRequired', checked)}
+                      checked={!!formik.values.licenseRequired}
+                      onCheckedChange={(checked) =>
+                        formik.setFieldValue('licenseRequired', toBooleanChecked(checked))
+                      }
                       className="mt-0.5 h-5 w-5 rounded-md border-[#006666]/40 data-[state=checked]:bg-[#006666] data-[state=checked]:border-[#006666]"
                     />
                   </div>

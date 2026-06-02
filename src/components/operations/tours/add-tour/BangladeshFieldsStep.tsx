@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Check, ChevronDown } from "lucide-react";
+import { NeuCheckboxIndicator } from "@/components/operations/tours/shared/NeuCheckboxIndicator";
 import {
     MdLocationOn,
     MdMap,
@@ -108,7 +108,11 @@ export default function BangladeshFieldsStep() {
     }, [values.division]);
 
     useEffect(() => {
-        if (values.district && !filteredDistricts.includes(values.district)) {
+        if (
+            values.district &&
+            filteredDistricts.length > 0 &&
+            !filteredDistricts.includes(values.district)
+        ) {
             setFieldValue("district", "");
         }
     }, [filteredDistricts, values.district, setFieldValue]);
@@ -372,17 +376,7 @@ export default function BangladeshFieldsStep() {
                                         }}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <Checkbox
-                                                checked={isActive}
-                                                onCheckedChange={(checked) => {
-                                                    const current = values.accommodationType || [];
-                                                    const next = checked
-                                                        ? [...current, type]
-                                                        : current.filter((t) => t !== type);
-                                                    setFieldValue("accommodationType", next);
-                                                }}
-                                                className="data-[state=checked]:bg-[#006666] data-[state=checked]:border-[#006666]"
-                                            />
+                                            <NeuCheckboxIndicator checked={!!isActive} />
                                             <Label className={`text-sm cursor-pointer font-[family-name:var(--font-space-mono)] ${isActive ? "text-[#006666] font-bold" : "text-[#1E2938]"}`}>
                                                 {type}
                                             </Label>
@@ -420,11 +414,7 @@ export default function BangladeshFieldsStep() {
                                 onClick={() => setFieldValue("guideIncluded", !values.guideIncluded)}
                             >
                                 <div className="flex items-center gap-3">
-                                    <Checkbox
-                                        checked={values.guideIncluded || false}
-                                        onCheckedChange={(checked) => setFieldValue("guideIncluded", checked)}
-                                        className="data-[state=checked]:bg-[#006666] data-[state=checked]:border-[#006666]"
-                                    />
+                                    <NeuCheckboxIndicator checked={!!values.guideIncluded} />
                                     <MdSupportAgent className={`w-5 h-5 ${values.guideIncluded ? "text-[#006666]" : "text-[#1E2938]/50"}`} />
                                     <Label className={`font-[family-name:var(--font-space-mono)] font-medium cursor-pointer ${values.guideIncluded ? "text-[#006666]" : "text-[#1E2938]"}`}>
                                         Professional Guide
@@ -440,11 +430,7 @@ export default function BangladeshFieldsStep() {
                                 onClick={() => setFieldValue("transportIncluded", !values.transportIncluded)}
                             >
                                 <div className="flex items-center gap-3">
-                                    <Checkbox
-                                        checked={values.transportIncluded || false}
-                                        onCheckedChange={(checked) => setFieldValue("transportIncluded", checked)}
-                                        className="data-[state=checked]:bg-[#006666] data-[state=checked]:border-[#006666]"
-                                    />
+                                    <NeuCheckboxIndicator checked={!!values.transportIncluded} />
                                     <MdDirectionsBus className={`w-5 h-5 ${values.transportIncluded ? "text-[#006666]" : "text-[#1E2938]/50"}`} />
                                     <Label className={`font-[family-name:var(--font-space-mono)] font-medium cursor-pointer ${values.transportIncluded ? "text-[#006666]" : "text-[#1E2938]"}`}>
                                         Transportation

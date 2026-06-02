@@ -3,7 +3,7 @@
 import { useFormikContext } from "formik";
 import { motion } from "framer-motion";
 import { CreateTourDTO } from "@/types/tour/tour.types";
-import { DIFFICULTY_LEVEL } from "@/constants/tour/tour.const";
+import { DIFFICULTY_LEVEL, type DifficultyLevel } from "@/constants/tour/tour.const";
 import { Mountain, TrendingUp, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -24,28 +24,33 @@ const NEU_BADGE_PRIMARY =
   "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-700 " +
   "bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
 
-const DIFFICULTY_META: Record<string, { color: string; bar: string; description: string }> = {
-  easy: {
+const DIFFICULTY_META: Record<
+  DifficultyLevel,
+  { color: string; bar: string; description: string }
+> = {
+  [DIFFICULTY_LEVEL.EASY]: {
     color: "text-[#00A63D]",
     bar: "bg-[#00A63D]",
     description: "Suitable for beginners & families",
   },
-  moderate: {
+  [DIFFICULTY_LEVEL.MODERATE]: {
     color: "text-[#FE9900]",
     bar: "bg-[#FE9900]",
     description: "Requires basic fitness level",
   },
-  hard: {
+  [DIFFICULTY_LEVEL.CHALLENGING]: {
     color: "text-[#FF2157]",
     bar: "bg-[#FF2157]",
     description: "For experienced adventurers",
   },
-  extreme: {
-    color: "text-[#006666]",
-    bar: "bg-[#006666]",
-    description: "Elite physical challenge",
-  },
 };
+
+function getDifficultyMeta(level: string) {
+  return (
+    DIFFICULTY_META[level as DifficultyLevel] ??
+    DIFFICULTY_META[DIFFICULTY_LEVEL.MODERATE]
+  );
+}
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -71,9 +76,7 @@ export default function DifficultySection() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const current = values.difficulty
-    ? DIFFICULTY_META[values.difficulty.toLowerCase()]
-    : null;
+  const current = values.difficulty ? getDifficultyMeta(values.difficulty) : null;
 
   return (
     <div className="col-span-12 md:col-span-6">
@@ -141,7 +144,7 @@ export default function DifficultySection() {
                 className={`absolute z-20 left-0 right-0 mt-2 rounded-xl ${NEU_CARD} p-1.5 overflow-hidden`}
               >
                 {Object.values(DIFFICULTY_LEVEL).map((level) => {
-                  const meta = DIFFICULTY_META[level.toLowerCase()];
+                  const meta = getDifficultyMeta(level);
                   const isSelected = values.difficulty === level;
                   return (
                     <button

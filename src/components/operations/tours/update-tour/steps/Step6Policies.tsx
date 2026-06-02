@@ -29,6 +29,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { toBooleanChecked } from '@/components/operations/tours/shared/NeuCheckboxIndicator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Collapsible,
@@ -167,7 +168,7 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
       animate="visible"
       className={`${NEU.surface} min-h-screen p-4 sm:p-6`}
     >
-      <div className={`${NEU.card} p-6 sm:p-8 max-w-3xl mx-auto`}>
+      <div className={`${NEU.card} p-6 sm:p-8 mx-auto w-full`}>
 
         {/* ── Header ───────────────────────────────────────────────────── */}
         <motion.div variants={itemVariants} className="flex items-center gap-4 mb-8">
@@ -243,7 +244,10 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
                     <Switch
                       checked={formik.values.cancellationPolicy?.refundable ?? true}
                       onCheckedChange={(checked) =>
-                        formik.setFieldValue('cancellationPolicy.refundable', checked)
+                        formik.setFieldValue(
+                          'cancellationPolicy.refundable',
+                          toBooleanChecked(checked)
+                        )
                       }
                       className="data-[state=checked]:bg-[#006666]"
                     />
