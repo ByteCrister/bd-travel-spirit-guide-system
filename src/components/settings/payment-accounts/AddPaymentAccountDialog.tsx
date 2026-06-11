@@ -1,7 +1,7 @@
 // components/payment-accounts/AddPaymentAccountDialog.tsx
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useCallback } from "react";
 import { Formik, Form, useField, FieldInputProps } from "formik";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -91,7 +91,7 @@ type FormValues = CreateStripePaymentMethodDTO;
 
 const initialValues: FormValues = {
     ownerType: PAYMENT_OWNER_TYPE.ADMIN,
-    purpose: PAYMENT_PURPOSE.ALL,
+    purpose: PAYMENT_PURPOSE.TRANSACTION_ACCOUNT,
     isBackup: false,
     email: "",
     name: "",
@@ -107,6 +107,84 @@ const initialValues: FormValues = {
     },
 };
 
+// ── Custom FormSelectField to prevent infinite loops ────────────────────────
+interface FormSelectFieldProps {
+    name: string;
+    label: string;
+    placeholder?: string;
+    options: { value: string; label: string }[];
+    icon?: ReactNode;
+    required?: boolean;
+}
+
+function FormSelectField({
+    name,
+    label,
+    placeholder,
+    options,
+    icon,
+    required = false,
+}: FormSelectFieldProps) {
+    const [field, meta, helpers] = useField(name);
+    const { setValue } = helpers;
+
+    const handleValueChange = useCallback((value: string) => {
+        if (value !== field.value) {
+            setValue(value);
+        }
+    }, [field.value, setValue]);
+
+    const currentValue = field.value ?? "";
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-2"
+        >
+            <Label
+                htmlFor={name}
+                className={`${NEU_LABEL} flex items-center gap-1.5`}
+                style={{ fontFamily: "var(--font-space-mono)" }}
+            >
+                {icon && <span className="text-[#006666]/70">{icon}</span>}
+                {label}
+                {required && <span className="text-[#FF2157] ml-0.5">*</span>}
+            </Label>
+
+            <Select value={currentValue} onValueChange={handleValueChange}>
+                <SelectTrigger id={name} className={NEU_SELECT_TRIGGER}>
+                    <SelectValue placeholder={placeholder || `Select ${label.toLowerCase()}`} />
+                </SelectTrigger>
+                <SelectContent className={`${NEU_SURFACE_RAISED} border-0 rounded-xl`}>
+                    {options.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+
+            <AnimatePresence>
+                {meta.touched && meta.error && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="flex items-center gap-1.5 text-xs text-[#FF2157] font-medium"
+                        style={{ fontFamily: "var(--font-jetbrains-mono)" }}
+                    >
+                        <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                        {meta.error}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
+    );
+}
+
+// ── Generic FormField for text inputs (safe, no loop) ───────────────────────
 type FormFieldProps<Name extends keyof FormValues | string> = {
     label: string;
     name: Name;
@@ -115,7 +193,6 @@ type FormFieldProps<Name extends keyof FormValues | string> = {
     required?: boolean;
 };
 
-// Custom Field wrapper to show errors
 const FormField = <Name extends keyof FormValues | string>({
     label,
     name,
@@ -242,53 +319,27 @@ export function AddPaymentAccountDialog({ children }: Props) {
                                             <div className={NEU_SECTION_DIVIDER_LINE} />
                                         </div>
 
-                                        {/* Owner Type */}
-                                        <FormField
-                                            label="Owner Type"
+                                        {/* Owner Type - using FormSelectField */}
+                                        <FormSelectField
                                             name="ownerType"
+                                            label="Owner Type"
+                                            options={[
+                                                { value: PAYMENT_OWNER_TYPE.GUIDE, label: "Guide" }
+                                            ]}
                                             icon={<Building2 className="h-3 w-3" />}
                                             required
-                                        >
-                                            {({ value }) => (
-                                                <Select
-                                                    value={value ?? PAYMENT_OWNER_TYPE.GUIDE}
-                                                    onValueChange={(val) => {
-                                                        if (val !== value) setFieldValue("ownerType", val);
-                                                    }}
-                                                >
-                                                    <SelectTrigger className={NEU_SELECT_TRIGGER}>
-                                                        <SelectValue placeholder="Select owner type" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className={`${NEU_SURFACE_RAISED} border-0 rounded-xl`}>
-                                                        <SelectItem value={PAYMENT_OWNER_TYPE.GUIDE}>Guide</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            )}
-                                        </FormField>
+                                        />
 
-                                        {/* Purpose */}
-                                        <FormField
-                                            label="Purpose"
+                                        {/* Purpose - using FormSelectField */}
+                                        <FormSelectField
                                             name="purpose"
+                                            label="Purpose"
+                                            options={[
+                                                { value: PAYMENT_PURPOSE.TRANSACTION_ACCOUNT, label: "Transaction Account" }
+                                            ]}
                                             icon={<Target className="h-3 w-3" />}
                                             required
-                                        >
-                                            {({ value }) => (
-                                                <Select
-                                                    value={value}
-                                                    onValueChange={(val) => setFieldValue("purpose", val)}
-                                                >
-                                                    <SelectTrigger className={NEU_SELECT_TRIGGER}>
-                                                        <SelectValue placeholder="Select purpose" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className={`${NEU_SURFACE_RAISED} border-0 rounded-xl`}>
-                                                        <SelectItem value={PAYMENT_PURPOSE.ALL}>All Purposes</SelectItem>
-                                                        <SelectItem value={PAYMENT_PURPOSE.EMPLOYEE_WAGES}>Employee Wages</SelectItem>
-                                                        <SelectItem value={PAYMENT_PURPOSE.REFUND}>Refund</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            )}
-                                        </FormField>
+                                        />
 
                                         {/* Label */}
                                         <FormField
@@ -477,30 +528,22 @@ export function AddPaymentAccountDialog({ children }: Props) {
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4">
-                                            {/* Brand */}
-                                            <FormField
-                                                label="Brand"
+                                            {/* Brand - using FormSelectField */}
+                                            <FormSelectField
                                                 name="card.brand"
+                                                label="Brand"
+                                                options={[
+                                                    { value: CARD_BRAND.VISA, label: "Visa" },
+                                                    { value: CARD_BRAND.MASTERCARD, label: "Mastercard" },
+                                                    { value: CARD_BRAND.AMEX, label: "Amex" },
+                                                    { value: CARD_BRAND.DISCOVER, label: "Discover" },
+                                                    { value: CARD_BRAND.DINERS, label: "Diners Club" },
+                                                    { value: CARD_BRAND.JCB, label: "JCB" },
+                                                    { value: CARD_BRAND.UNIONPAY, label: "UnionPay" },
+                                                    { value: CARD_BRAND.UNKNOWN, label: "Unknown" }
+                                                ]}
                                                 required
-                                            >
-                                                {({ value }) => (
-                                                    <Select
-                                                        value={value ?? ""}
-                                                        onValueChange={(val) => setFieldValue("card.brand", val)}
-                                                    >
-                                                        <SelectTrigger className={NEU_SELECT_TRIGGER}>
-                                                            <SelectValue placeholder="Select brand" />
-                                                        </SelectTrigger>
-                                                        <SelectContent className={`${NEU_SURFACE_RAISED} border-0 rounded-xl`}>
-                                                            <SelectItem value={CARD_BRAND.VISA}>Visa</SelectItem>
-                                                            <SelectItem value={CARD_BRAND.MASTERCARD}>Mastercard</SelectItem>
-                                                            <SelectItem value={CARD_BRAND.AMEX}>Amex</SelectItem>
-                                                            <SelectItem value={CARD_BRAND.UNIONPAY}>UnionPay</SelectItem>
-                                                            <SelectItem value={CARD_BRAND.UNKNOWN}>Unknown</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                )}
-                                            </FormField>
+                                            />
 
                                             {/* Last 4 */}
                                             <FormField

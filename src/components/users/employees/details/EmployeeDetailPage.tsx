@@ -20,6 +20,7 @@ import {
   SALARY_PAYMENT_MODE,
   SalaryPaymentMode,
 } from "@/constants/employee/employee.const";
+
 import { Breadcrumbs } from "../../../global/Breadcrumbs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -59,7 +60,7 @@ import {
   getFileExtension,
 } from "@/utils/helpers/file-conversion";
 import { CURRENCY } from "@/constants/tour/tour.const";
-import { CARD_BRAND } from "@/constants/payment/payment.const";
+import { CARD_BRAND, CardBrand } from "@/constants/payment/payment.const";
 import Image from "next/image";
 import ConfirmationDialog from "./ConfirmationDialog";
 import EmployeeDetailSkeleton from "./EmployeeDetailSkeleton";
@@ -106,7 +107,6 @@ type UpdateEmployeeForm = Partial<
     | "salary"
     | "currency"
     | "paymentMode"
-    | "paymentCard"
   >
 >;
 
@@ -154,6 +154,10 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
   const [generatedPassword, setGeneratedPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
 
+  // NEW: Separate state for payment card updates
+  const [cardForm, setCardForm] = useState<PaymentCardDTO | null>(null);
+  const [updatingCard, setUpdatingCard] = useState(false);
+
   const breadcrumbItems = useMemo(
     () => [
       { label: "Home", href: "/" },
@@ -175,27 +179,27 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
         if (!mounted) return;
         setDetail(d);
         setForm({
-          id: d.id,
-          name: d.user.name,
-          status: d.status,
-          employmentType: d.employmentType,
-          salary: d.salary,
-          currency: d.currency,
-          paymentMode: d.paymentMode,
-          paymentCard: d.paymentCard,
+          id: d.id, name: d.user.name, status: d.status, employmentType: d.employmentType,
+          avatar: d.avatar, salary: d.salary, paymentMode: d.paymentMode,
+          // Removed paymentCard
           dateOfJoining: d.dateOfJoining,
-          dateOfLeaving: d.dateOfLeaving,
-          contactInfo: d.contactInfo,
-          shifts: d.shifts,
-          notes: d.notes,
-          avatar: d.avatar,
-          documents: d.documents,
+          dateOfLeaving: d.dateOfLeaving, contactInfo: d.contactInfo,
+          shifts: d.shifts, documents: d.documents, notes: d.notes,
         });
-        if (d.avatar && typeof d.avatar === "string") {
-          setAvatarPreview(d.avatar);
+        // Initialize cardForm from existing paymentCard
+        if (d.paymentCard) {
+          setCardForm({ ...d.paymentCard });
         } else {
-          setAvatarPreview(null);
+          // Empty card form with defaults for adding new card
+          setCardForm({
+            brand: CARD_BRAND.UNKNOWN,
+            last4: "",
+            expMonth: 1,
+            expYear: new Date().getFullYear(),
+            cardholderName: "",
+          });
         }
+        setAvatarPreview(typeof d.avatar === "string" ? d.avatar : null);
       } catch (e) {
         showToast.error(`Failed to load employee details: ${String(e)}`);
       } finally {
@@ -203,9 +207,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
       }
     };
     hydrate();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [employeeId]);
 
@@ -232,18 +234,6 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
   };
 
   const setShifts = (value: ShiftDTO[] | undefined) => setField("shifts", value);
-
-  const getPaymentCardDraft = (): PaymentCardDTO => ({
-    brand: form?.paymentCard?.brand ?? detail?.paymentCard?.brand ?? CARD_BRAND.UNKNOWN,
-    last4: form?.paymentCard?.last4 ?? detail?.paymentCard?.last4 ?? "",
-    expMonth: form?.paymentCard?.expMonth ?? detail?.paymentCard?.expMonth ?? 1,
-    expYear:
-      form?.paymentCard?.expYear ?? detail?.paymentCard?.expYear ?? new Date().getFullYear(),
-    cardholderName:
-      form?.paymentCard?.cardholderName ??
-      detail?.paymentCard?.cardholderName ??
-      "",
-  });
 
   /* ------------------------- File helpers ------------------------- */
 
@@ -323,7 +313,6 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
         employmentType: (form.employmentType ??
           detail.employmentType) as UpdateEmployeePayload["employmentType"],
         paymentMode: form.paymentMode,
-        paymentCard: form.paymentCard ?? detail.paymentCard,
         contactInfo: form.contactInfo ?? detail.contactInfo,
         shifts: form.shifts ?? detail.shifts,
         notes: form.notes ?? detail.notes ?? "",
@@ -345,7 +334,6 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
         salary: updated.salary,
         currency: updated.currency,
         paymentMode: updated.paymentMode,
-        paymentCard: updated.paymentCard,
         contactInfo: updated.contactInfo,
         shifts: updated.shifts,
         notes: updated.notes,
@@ -361,6 +349,58 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
     } finally {
       setSaving(false);
     }
+  };
+
+  // NEW: Separate handler for updating payment card
+  const handleUpdateCard = async () => {
+    if (!detail?.id || !cardForm) return;
+
+    // Validation
+    if (!cardForm.last4 || cardForm.last4.length !== 4) {
+      showToast.warning("Last 4 digits must be exactly 4 digits");
+      return;
+    }
+    if (cardForm.expMonth < 1 || cardForm.expMonth > 12) {
+      showToast.warning("Expiration month must be between 1 and 12");
+      return;
+    }
+    const currentYear = new Date().getFullYear();
+    if (cardForm.expYear < currentYear || cardForm.expYear > currentYear + 20) {
+      showToast.warning(`Expiration year must be between ${currentYear} and ${currentYear + 20}`);
+      return;
+    }
+
+    setUpdatingCard(true);
+    try {
+      const response = await fetch(`/api/users/employees/v1/${detail.id}/payment-card`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cardForm),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to update payment card (${response.status})`);
+      }
+
+      const updatedEmployee = await response.json();
+      setDetail(updatedEmployee);
+      // Update cardForm with the saved card data
+      if (updatedEmployee.paymentCard) {
+        setCardForm({ ...updatedEmployee.paymentCard });
+      }
+      showToast.success("Payment card updated successfully");
+    } catch (err) {
+      showToast.error(String(extractErrorMessage(err) ?? "Failed to update payment card"));
+    } finally {
+      setUpdatingCard(false);
+    }
+  };
+
+  // Helper to update specific card field
+  const setCardField = <K extends keyof PaymentCardDTO>(key: K, value: PaymentCardDTO[K]) => {
+    if (!cardForm) return;
+    setCardForm({ ...cardForm, [key]: value });
   };
 
   /* ------------------------- Password ----------------------------- */
@@ -438,7 +478,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
             <div className="px-8 py-6 flex items-start justify-between flex-wrap gap-4">
               <div className="flex items-center gap-6">
                 {/* Avatar */}
-               <div className={`relative w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#C6C4C3] ${neumorphRaised}`}>
+                <div className={`relative w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#C6C4C3] ${neumorphRaised}`}>
                   {avatarPreview ? (
                     <Image
                       src={avatarPreview}
@@ -464,13 +504,12 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                   </h1>
                   <div className="mt-2">
                     <span
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${neumorphRaised} ${
-                        detail.status === EMPLOYEE_STATUS.ACTIVE
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${neumorphRaised} ${detail.status === EMPLOYEE_STATUS.ACTIVE
                           ? "text-[#00A63D]"
                           : detail.status === EMPLOYEE_STATUS.ON_LEAVE
                             ? "text-[#FE9900]"
                             : "text-[#FF2157]"
-                      }`}
+                        }`}
                       style={{ fontFamily: "var(--font-space-mono)" }}
                     >
                       {detail.status}
@@ -891,7 +930,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                             emergencyContact: {
                               ...(form?.contactInfo?.emergencyContact ??
                                 detail?.contactInfo?.emergencyContact ??
-                                { name: "", phone: "", relation: "" }),
+                              { name: "", phone: "", relation: "" }),
                               name: e.target.value,
                             },
                           })
@@ -912,7 +951,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                             emergencyContact: {
                               ...(form?.contactInfo?.emergencyContact ??
                                 detail?.contactInfo?.emergencyContact ??
-                                { name: "", phone: "", relation: "" }),
+                              { name: "", phone: "", relation: "" }),
                               phone: e.target.value,
                             },
                           })
@@ -933,7 +972,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                             emergencyContact: {
                               ...(form?.contactInfo?.emergencyContact ??
                                 detail?.contactInfo?.emergencyContact ??
-                                { name: "", phone: "", relation: "" }),
+                              { name: "", phone: "", relation: "" }),
                               relation: e.target.value,
                             },
                           })
@@ -1014,113 +1053,6 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                     </select>
                   </FormRow>
 
-                  <FormRow label="Card Brand" icon={CreditCard}>
-                    <select
-                      value={
-                        form?.paymentCard?.brand ??
-                        detail.paymentCard?.brand ??
-                        CARD_BRAND.UNKNOWN
-                      }
-                      onChange={(e) =>
-                        setField("paymentCard", {
-                          ...getPaymentCardDraft(),
-                          brand: e.target.value as PaymentCardDTO["brand"],
-                        })
-                      }
-                      className={`${neumorphInput} w-full appearance-none`}
-                      style={{ fontFamily: "var(--font-space-mono)" }}
-                    >
-                      {Object.values(CARD_BRAND).map((brand) => (
-                        <option key={brand} value={brand}>
-                          {brand}
-                        </option>
-                      ))}
-                    </select>
-                  </FormRow>
-
-                  <FormRow label="Card Last 4" icon={CreditCard}>
-                    <input
-                      maxLength={4}
-                      value={
-                        form?.paymentCard?.last4 ??
-                        detail.paymentCard?.last4 ??
-                        ""
-                      }
-                      onChange={(e) => {
-                        const nextLast4 = e.target.value
-                          .replace(/\D/g, "")
-                          .slice(0, 4);
-                        setField("paymentCard", {
-                          ...getPaymentCardDraft(),
-                          last4: nextLast4,
-                        });
-                      }}
-                      className={`${neumorphInput} w-full`}
-                      style={{ fontFamily: "var(--font-jetbrains-mono)" }}
-                    />
-                  </FormRow>
-
-                  <FormRow label="Exp. Month" icon={Calendar}>
-                    <input
-                      type="number"
-                      min={1}
-                      max={12}
-                      value={
-                        form?.paymentCard?.expMonth ??
-                        detail.paymentCard?.expMonth ??
-                        ""
-                      }
-                      onChange={(e) =>
-                        setField("paymentCard", {
-                          ...getPaymentCardDraft(),
-                          expMonth: Number(e.target.value || 1),
-                        })
-                      }
-                      className={`${neumorphInput} w-full`}
-                      style={{ fontFamily: "var(--font-jetbrains-mono)" }}
-                    />
-                  </FormRow>
-
-                  <FormRow label="Exp. Year" icon={Calendar}>
-                    <input
-                      type="number"
-                      min={new Date().getFullYear()}
-                      value={
-                        form?.paymentCard?.expYear ??
-                        detail.paymentCard?.expYear ??
-                        ""
-                      }
-                      onChange={(e) =>
-                        setField("paymentCard", {
-                          ...getPaymentCardDraft(),
-                          expYear: Number(
-                            e.target.value || new Date().getFullYear(),
-                          ),
-                        })
-                      }
-                      className={`${neumorphInput} w-full`}
-                      style={{ fontFamily: "var(--font-jetbrains-mono)" }}
-                    />
-                  </FormRow>
-
-                  <FormRow label="Cardholder Name" icon={User}>
-                    <input
-                      value={
-                        form?.paymentCard?.cardholderName ??
-                        detail.paymentCard?.cardholderName ??
-                        ""
-                      }
-                      onChange={(e) =>
-                        setField("paymentCard", {
-                          ...getPaymentCardDraft(),
-                          cardholderName: e.target.value,
-                        })
-                      }
-                      className={`${neumorphInput} w-full`}
-                      style={{ fontFamily: "var(--font-jetbrains-mono)" }}
-                    />
-                  </FormRow>
-
                   <FormRow label="Effective From">
                     <input
                       value={latestEffectiveFrom(detail.salaryHistory) ?? "—"}
@@ -1129,6 +1061,99 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                       style={{ fontFamily: "var(--font-jetbrains-mono)" }}
                     />
                   </FormRow>
+                </div>
+              </InfoCard>
+
+              {/* UPDATED: Separate Payment Card section with its own update button */}
+              <InfoCard icon={CreditCard} title="Payment Card">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+                    {/* Card Brand */}
+                    <FormRow label="Card Brand" icon={CreditCard}>
+                      <select
+                        value={cardForm?.brand ?? CARD_BRAND.UNKNOWN}
+                        onChange={(e) => setCardField("brand", e.target.value as CardBrand)}
+                        className={`${neumorphInput} w-full appearance-none`}
+                        style={{ fontFamily: "var(--font-space-mono)" }}
+                      >
+                        {Object.values(CARD_BRAND).map((brand) => (
+                          <option key={brand} value={brand}>
+                            {brand.charAt(0).toUpperCase() + brand.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </FormRow>
+
+                    {/* Last 4 Digits */}
+                    <FormRow label="Last 4 Digits" icon={Lock}>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={4}
+                        placeholder="1234"
+                        value={cardForm?.last4 ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                          setCardField("last4", val);
+                        }}
+                        className={`${neumorphInput} w-full font-mono tracking-widest`}
+                        style={{ fontFamily: "var(--font-jetbrains-mono)" }}
+                      />
+                    </FormRow>
+
+                    {/* Expiration Month */}
+                    <FormRow label="Expiration Month">
+                      <input
+                        type="number"
+                        min={1}
+                        max={12}
+                        placeholder="MM"
+                        value={cardForm?.expMonth ?? 1}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          if (!isNaN(val) && val >= 1 && val <= 12) {
+                            setCardField("expMonth", val);
+                          }
+                        }}
+                        className={`${neumorphInput} w-full`}
+                        style={{ fontFamily: "var(--font-jetbrains-mono)" }}
+                      />
+                    </FormRow>
+
+                    {/* Expiration Year */}
+                    <FormRow label="Expiration Year">
+                      <input
+                        type="number"
+                        min={new Date().getFullYear()}
+                        max={new Date().getFullYear() + 20}
+                        placeholder="YYYY"
+                        value={cardForm?.expYear ?? new Date().getFullYear()}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          if (!isNaN(val)) setCardField("expYear", val);
+                        }}
+                        className={`${neumorphInput} w-full`}
+                        style={{ fontFamily: "var(--font-jetbrains-mono)" }}
+                      />
+                    </FormRow>
+                  </div>
+
+                  {/* Update Button */}
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleUpdateCard}
+                      disabled={updatingCard || !cardForm}
+                      className={`${btnPrimary} ${!cardForm ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      {updatingCard ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <CreditCard className="mr-2 h-4 w-4" />
+                      )}
+                      {updatingCard ? "Updating..." : "Update Card"}
+                    </button>
+                  </div>
                 </div>
               </InfoCard>
             </TabsContent>
@@ -1425,9 +1450,8 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                         <button
                           onClick={handleUpdatePassword}
                           disabled={!newPassword}
-                          className={`${btnPrimary} flex-1 justify-center ${
-                            !newPassword ? "opacity-50 cursor-not-allowed" : ""
-                          }`}
+                          className={`${btnPrimary} flex-1 justify-center ${!newPassword ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                         >
                           {isPassUpdating ? (
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />

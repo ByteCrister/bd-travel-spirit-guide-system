@@ -23,6 +23,9 @@ import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import GuideModel from "@/models/guide/guide.model";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
 import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
+import verifyAndAttachPaymentMethod from "@/lib/payments/verify-and-attatch-payment-method.service";
+import StripePaymentAccountModel from "@/models/payments/payment-account.model";
+import { CardBrand, PAYMENT_OWNER_TYPE, PAYMENT_PURPOSE } from "@/constants/payment/payment.const";
 
 type ObjectId = Types.ObjectId;
 
@@ -194,6 +197,53 @@ export const EmployeeAddPostHandler = async (req: NextRequest) => {
         const newEmployee = new EmployeeModel(employeeData);
         await newEmployee.save({ session });
 
+        const paymentCard = body.paymentCard;
+
+        if (!paymentCard || !paymentCard.stripeCustomerId || !paymentCard.stripePaymentMethodId) {
+            throw new ApiError("Payment card details are required", 400);
+        }
+
+        const { stripeCustomerId, stripePaymentMethodId } = paymentCard;
+
+        // Verify and attach payment method, retrieve fresh card details
+        const verifiedCard = await verifyAndAttachPaymentMethod(
+            stripeCustomerId,
+            stripePaymentMethodId,
+        );
+
+        // Create or update StripePaymentAccount
+        let paymentAccount = await StripePaymentAccountModel.findOne({
+            ownerId: userId,
+            purpose: PAYMENT_PURPOSE.TRANSACTION_ACCOUNT,
+        }).session(session);
+
+        if (paymentAccount) {
+            // Update existing account
+            paymentAccount.stripePaymentMethodId = stripePaymentMethodId;
+            paymentAccount.card = {
+                brand: verifiedCard.brand as CardBrand,
+                last4: verifiedCard.last4,
+                expMonth: verifiedCard.expMonth,
+                expYear: verifiedCard.expYear,
+            };
+            paymentAccount.isActive = true;
+            await paymentAccount.save({ session });
+        } else {
+            paymentAccount = new StripePaymentAccountModel({
+                ownerType: PAYMENT_OWNER_TYPE.SUPPORT,
+                ownerId: userId,
+                purpose: PAYMENT_PURPOSE.TRANSACTION_ACCOUNT,
+                stripeCustomerId,
+                stripePaymentMethodId,
+                card: verifiedCard,
+                isActive: true,
+            });
+            await paymentAccount.save({ session });
+        }
+
+        newEmployee.paymentAccount = paymentAccount._id as Types.ObjectId;
+        await newEmployee.save({ session });
+
         return await buildEmployeeDTO(newEmployee._id as ObjectId, session);
 
     });
@@ -209,17 +259,17 @@ export const EmployeeAddPostHandler = async (req: NextRequest) => {
 
     const employeeTargetId =
         newCreatedEmployeeDetail &&
-        typeof newCreatedEmployeeDetail === "object" &&
-        "id" in newCreatedEmployeeDetail &&
-        typeof newCreatedEmployeeDetail.id === "string"
+            typeof newCreatedEmployeeDetail === "object" &&
+            "id" in newCreatedEmployeeDetail &&
+            typeof newCreatedEmployeeDetail.id === "string"
             ? newCreatedEmployeeDetail.id
             : newCreatedEmployeeDetail &&
                 typeof newCreatedEmployeeDetail === "object" &&
                 "employeeId" in newCreatedEmployeeDetail
-              ? String(
+                ? String(
                     (newCreatedEmployeeDetail as { employeeId: Types.ObjectId }).employeeId
                 )
-              : undefined;
+                : undefined;
 
     if (employeeTargetId) {
         await logAuditForActor(userId, {

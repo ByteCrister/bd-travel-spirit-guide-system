@@ -88,6 +88,16 @@ export interface CurrentMonthPaymentStatusDTO {
   failureReason?: string;
 }
 
+export interface PaymentCardDTO {
+  brand: CardBrand;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+  cardholderName?: string;
+  stripePaymentMethodId?: string;
+  stripeCustomerId?: string;
+}
+
 /* ---------------------------------------------------------------------
   3. CORE EMPLOYEE DTOs
 --------------------------------------------------------------------- */
@@ -201,7 +211,7 @@ export interface CreateEmployeePayload {
   notes?: string;
 }
 
-export type UpdateEmployeePayload = Omit<CreateEmployeePayload, "password" | "id" | "salary"> & {
+export type UpdateEmployeePayload = Omit<CreateEmployeePayload, "password" | "id" | "salary" | "paymentCard"> & {
   id: ObjectIdString;
   status: EmployeeStatus;
   salary: number;
@@ -354,12 +364,4 @@ export interface SalaryPaymentRetryResponse {
   message: string;
   payment: CurrentMonthPaymentStatusDTO;
   employee?: EmployeeDetailDTO; // Optional full employee data
-}
-
-export interface PaymentCardDTO {
-  brand: CardBrand;
-  last4: string;
-  expMonth: number;
-  expYear: number;
-  cardholderName?: string;
 }
