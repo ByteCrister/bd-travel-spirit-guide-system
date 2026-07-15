@@ -1,4 +1,4 @@
-// models/user-notification.model.ts
+// models/traveler-notification.model.ts
 import {
   NOTIFICATION_PRIORITY,
   NOTIFICATION_RELATED_MODAL,
@@ -6,7 +6,7 @@ import {
   NotificationRelatedModal,
   USER_NOTIFICATION_TYPE,
   UserNotificationType,
-} from "@/constants/customer-notification.const";
+} from "@/constants/notifications/traveler-notification.const";
 import { defineModel } from "@/lib/helpers/defineModel";
 import { Schema, Document, Types } from "mongoose";
 

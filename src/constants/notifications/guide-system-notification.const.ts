@@ -1,13 +1,13 @@
 /**
  * Enum representing the different system or business events
- * that can trigger an admin notification.
+ * that can trigger a guide system notification.
  *
  * Using an enum ensures:
  * - Type safety in TypeScript (no accidental typos in string values)
  * - Centralized management of allowed event types
  * - Easy reuse across services, controllers, and tests
  */
-export enum ADMIN_NOTIFICATION_TYPE {
+export enum GUIDE_SYSTEM_NOTIFICATION_TYPE {
   // --- Password Resets ---
   GUIDE_EMP_FORGOT_PASSWORD = "guide_emp_forgot_password", // A guide’s employee (sub‑account) forgot password
 
@@ -27,7 +27,7 @@ export enum ADMIN_NOTIFICATION_TYPE {
   LOW_INVENTORY = "low_inventory", // Tour spots / availability running low
 }
 
-export type AdminNotificationType = `${ADMIN_NOTIFICATION_TYPE}`;
+export type GuideSystemNotificationType = `${GUIDE_SYSTEM_NOTIFICATION_TYPE}`;
 
 /**
  * Enum representing the urgency/priority level of a notification.
@@ -35,11 +35,11 @@ export type AdminNotificationType = `${ADMIN_NOTIFICATION_TYPE}`;
  * This helps admins quickly identify which notifications
  * require immediate attention vs. those that can be handled later.
  */
-export enum ADMIN_NOTIFICATION_PRIORITY {
+export enum GUIDE_SYSTEM_NOTIFICATION_PRIORITY {
   LOW = "low", // Informational, no immediate action needed
   MEDIUM = "medium", // Normal priority, should be addressed in due course
   HIGH = "high", // Important, requires timely attention
   CRITICAL = "critical", // Urgent, immediate action required
 }
 
-export type AdminNotificationPriority = `${ADMIN_NOTIFICATION_PRIORITY}`;
+export type GuideSystemNotificationPriority = `${GUIDE_SYSTEM_NOTIFICATION_PRIORITY}`;

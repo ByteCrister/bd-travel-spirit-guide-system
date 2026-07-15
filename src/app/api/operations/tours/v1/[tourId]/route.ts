@@ -9,7 +9,10 @@ import TourModel, { ITour } from '@/models/tours/tour.model';
 import { MODERATION_STATUS, TOUR_STATUS } from '@/constants/tour/tour.const';
 import { resolveMongoId } from '@/lib/helpers/resolveMongoId';
 import { auditTourMutation, requireSessionUserId } from '@/lib/audit/tour-audit';
-
+import { SupportSystemNotificationModel } from "@/models/notifications/support-system-notification.model";
+import { SUPPORT_SYSTEM_NOTIFICATION_TYPE, SUPPORT_SYSTEM_NOTIFICATION_PRIORITY } from "@/constants/notifications/support-system-notification.const";
+import { triggerSocketEvent } from "@/socket/triggerSocketEvent";
+import { SocketTTriggerTypes } from "@/constants/socket/socket.const";
 /**
  * GET Full Tour details 
  */
@@ -119,6 +122,25 @@ export const POST = withErrorHandler(async (
         }
 
         const detailDto = await buildTourDetailDTO(updatedTour._id as Types.ObjectId, session);
+
+        const notification = await SupportSystemNotificationModel.create(
+            [{
+                type: SUPPORT_SYSTEM_NOTIFICATION_TYPE.NEW_TOUR_REQUESTED,
+                title: "New Tour Submission",
+                message: `Tour "${updatedTour.title}" has been submitted for moderation.`,
+                priority: SUPPORT_SYSTEM_NOTIFICATION_PRIORITY.MEDIUM,
+                relatedModel: "Tour",
+                relatedId: updatedTour._id,
+            }],
+            { session }
+        );
+        const notifDoc = Array.isArray(notification) ? notification[0] : notification;
+
+        triggerSocketEvent({
+            userId: userId,
+            type: SUPPORT_SYSTEM_NOTIFICATION_TYPE.NEW_TOUR_REQUESTED as unknown as SocketTTriggerTypes,
+            data: notifDoc,
+        }).catch(console.error);
 
         return detailDto
     });

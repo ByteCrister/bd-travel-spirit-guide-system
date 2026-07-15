@@ -15,7 +15,12 @@ import { REQUEST_STATUS, RequestStatus } from "@/constants/employee/reset-passwo
 import GuideModel from "@/models/guide/guide.model";
 import GuideForgotPasswordModel from "@/models/guide/guide-forgot-password.model";
 import { FORGOT_PASSWORD_STATUS } from "@/constants/guide/guide-forgot-password.const";
-
+import { GuideSystemNotificationModel } from "@/models/notifications/guide-system-notification.model";
+import { GUIDE_SYSTEM_NOTIFICATION_TYPE, GUIDE_SYSTEM_NOTIFICATION_PRIORITY } from "@/constants/notifications/guide-system-notification.const";
+import { SupportSystemNotificationModel } from "@/models/notifications/support-system-notification.model";
+import { SUPPORT_SYSTEM_NOTIFICATION_TYPE, SUPPORT_SYSTEM_NOTIFICATION_PRIORITY } from "@/constants/notifications/support-system-notification.const";
+import { triggerSocketEvent } from "@/socket/triggerSocketEvent";
+import { SocketTTriggerTypes } from "@/constants/socket/socket.const";
 /* -----------------------------------------
    Query params
 ------------------------------------------ */
@@ -336,6 +341,25 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
                 ? resetRequest[0]
                 : resetRequest;
 
+            const notification = await GuideSystemNotificationModel.create(
+                [{
+                    type: GUIDE_SYSTEM_NOTIFICATION_TYPE.GUIDE_EMP_FORGOT_PASSWORD,
+                    title: "Employee Password Reset Request",
+                    message: `An employee associated with your guide account has requested a password reset. Email: ${email}`,
+                    priority: GUIDE_SYSTEM_NOTIFICATION_PRIORITY.HIGH,
+                    relatedModel: "ResetPasswordRequest",
+                    relatedId: doc._id,
+                }],
+                { session }
+            );
+            const notifDoc = Array.isArray(notification) ? notification[0] : notification;
+
+            triggerSocketEvent({
+                userId: (user._id as Types.ObjectId).toString(),
+                type: GUIDE_SYSTEM_NOTIFICATION_TYPE.GUIDE_EMP_FORGOT_PASSWORD as unknown as SocketTTriggerTypes,
+                data: notifDoc,
+            }).catch(console.error);
+
             return {
                 message: "Your password reset request has been submitted.",
                 requestId: (doc._id as Types.ObjectId).toString(),
@@ -394,6 +418,25 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
             const doc = Array.isArray(guideRequest)
                 ? guideRequest[0]
                 : guideRequest;
+
+            const notification = await SupportSystemNotificationModel.create(
+                [{
+                    type: SUPPORT_SYSTEM_NOTIFICATION_TYPE.GUIDE_FORGOT_PASSWORD,
+                    title: "Guide Password Reset Request",
+                    message: `You have requested a password reset for your guide account. Email: ${email}`,
+                    priority: SUPPORT_SYSTEM_NOTIFICATION_PRIORITY.HIGH,
+                    relatedModel: "GuideForgotPassword",
+                    relatedId: doc._id,
+                }],
+                { session }
+            );
+            const notifDoc = Array.isArray(notification) ? notification[0] : notification;
+
+            triggerSocketEvent({
+                userId: (user._id as Types.ObjectId).toString(),
+                type: SUPPORT_SYSTEM_NOTIFICATION_TYPE.GUIDE_FORGOT_PASSWORD as unknown as SocketTTriggerTypes,
+                data: notifDoc,
+            }).catch(console.error);
 
             return {
                 message: "Your guide password reset request has been submitted.",

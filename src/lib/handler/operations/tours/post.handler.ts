@@ -15,7 +15,10 @@ import EmployeeModel from "@/models/employees/employees.model";
 import { ApiError } from "@/lib/helpers/withErrorHandler";
 import { slugify } from "@/lib/helpers/slugify";
 import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
-
+import { SupportSystemNotificationModel } from "@/models/notifications/support-system-notification.model";
+import { SUPPORT_SYSTEM_NOTIFICATION_TYPE, SUPPORT_SYSTEM_NOTIFICATION_PRIORITY } from "@/constants/notifications/support-system-notification.const";
+import { triggerSocketEvent } from "@/socket/triggerSocketEvent";
+import { SocketTTriggerTypes } from "@/constants/socket/socket.const";
 // POST Helper function to map destinations & attractions
 function mapDestinations(
     destinations: CreateTourDTO["destinations"],
@@ -141,6 +144,25 @@ const TourPostHandler = async (request: NextRequest) => {
                 "Tour was created but failed to build tour details.",
                 500
             );
+
+        const notification = await SupportSystemNotificationModel.create(
+            [{
+                type: SUPPORT_SYSTEM_NOTIFICATION_TYPE.NEW_TOUR_REQUESTED,
+                title: "New Tour as Draft",
+                message: `Tour "${tour.title}" has been added as draft.`,
+                priority: SUPPORT_SYSTEM_NOTIFICATION_PRIORITY.LOW,
+                relatedModel: "Tour",
+                relatedId: tour._id,
+            }],
+            { session }
+        );
+        const notifDoc = Array.isArray(notification) ? notification[0] : notification;
+
+        triggerSocketEvent({
+            userId: authorIdStr,
+            type: SUPPORT_SYSTEM_NOTIFICATION_TYPE.NEW_TOUR_REQUESTED as unknown as SocketTTriggerTypes,
+            data: notifDoc,
+        }).catch(console.error);
 
         return detailDto;
     });
