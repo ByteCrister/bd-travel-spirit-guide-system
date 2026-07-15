@@ -139,11 +139,7 @@ export const createEmployeeValidationSchema = yup.object({
     paymentCard: yup
         .mixed<PaymentCardDTO>()
         .test("valid-payment-card", "Invalid payment card", async function (value) {
-            if (!value) return true;
-            const hasAnyValue = Boolean(
-                value.last4 || value.expMonth || value.expYear || value.cardholderName
-            );
-            if (!hasAnyValue) return true;
+            if (!value) return this.createError({ message: "Stripe payment account is required" });
             try {
                 await paymentCardValidationSchema.validate(value, { abortEarly: false });
                 return true;
@@ -152,7 +148,7 @@ export const createEmployeeValidationSchema = yup.object({
                 return this.createError({ message: err.errors[0] ?? "Invalid payment card" });
             }
         })
-        .optional(),
+        .required("Stripe payment account is required"),
     dateOfJoining: yup
         .date()
         .min(new Date(), "Date cannot be in the past")

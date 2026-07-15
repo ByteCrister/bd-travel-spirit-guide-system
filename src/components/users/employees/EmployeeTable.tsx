@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpDown, ChevronDown } from "lucide-react";
+import { ArrowUpDown, ChevronDown, Banknote } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
     FaUser,
     FaEnvelope,
@@ -28,7 +29,6 @@ import {
     TableCell,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { spaceMono, jetbrainsMono } from "@/styles/fonts";
 
@@ -60,14 +60,19 @@ interface EmployeeTableProps {
     sortOrder: SortOrder;
     onRetryPayment?: (employeeId: string) => void;
     retryLoading?: string;
+    selectedIds?: Set<string>;
+    onToggleSelect?: (id: string) => void;
+    onToggleSelectAll?: (ids: string[]) => void;
+    onManualPay?: (employee: EmployeeListItemDTO) => void;
+    manualPayLoading?: string;
 }
 
 const primaryFields = [
-    { key: "user.name",       label: "Name",    icon: <FaUser className="h-3 w-3" />,        width: "w-48" },
-    { key: "user.email",      label: "Email",   icon: <FaEnvelope className="h-3 w-3" />,     width: "w-56" },
-    { key: "status",          label: "Status",  icon: <FaUsers className="h-3 w-3" />,         width: "w-28" },
-    { key: "dateOfJoining",   label: "Joined",  icon: <FaCalendarAlt className="h-3 w-3" />,  width: "w-28" },
-    { key: "paymentStatus",   label: "Payment", icon: <FaCreditCard className="h-3 w-3" />,   width: "w-40" },
+    { key: "user.name", label: "Name", icon: <FaUser className="h-3 w-3" />, width: "w-48" },
+    { key: "user.email", label: "Email", icon: <FaEnvelope className="h-3 w-3" />, width: "w-56" },
+    { key: "status", label: "Status", icon: <FaUsers className="h-3 w-3" />, width: "w-28" },
+    { key: "dateOfJoining", label: "Joined", icon: <FaCalendarAlt className="h-3 w-3" />, width: "w-28" },
+    { key: "paymentStatus", label: "Payment", icon: <FaCreditCard className="h-3 w-3" />, width: "w-40" },
 ] as const;
 
 export function EmployeeTable({
@@ -79,12 +84,25 @@ export function EmployeeTable({
     sortOrder,
     onRetryPayment,
     retryLoading,
+    selectedIds,
+    onToggleSelect,
+    onToggleSelectAll,
+    onManualPay,
+    manualPayLoading,
 }: EmployeeTableProps) {
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+    const showSelection = !!onToggleSelect;
+
+    const payableIds = (list?.docs ?? [])
+        .filter((d) => d.paymentMode === "manual" && !d.isDeleted && d.currentMonthPayment?.status !== "paid")
+        .map((d) => d.id);
 
     const headers = [
+        ...(showSelection
+            ? [{ key: "select", label: "", icon: null, width: "w-10", sortable: false }]
+            : []),
         { key: "accordion", label: "", icon: null, width: "w-10", sortable: false },
-        { key: "avatar",    label: "", icon: null, width: "w-14", sortable: false },
+        { key: "avatar", label: "", icon: null, width: "w-14", sortable: false },
         ...primaryFields.map((field) => ({
             ...field,
             sortable: ["user.name", "user.email", "status", "dateOfJoining", "paymentStatus"].includes(field.key),
@@ -105,7 +123,11 @@ export function EmployeeTable({
 
     const toggleRow = (id: string) => {
         const next = new Set(expandedRows);
-        next.has(id) ? next.delete(id) : next.add(id);
+        if (next.has(id)) {
+            next.delete(id);
+        } else {
+            next.add(id);
+        }
         setExpandedRows(next);
     };
 
@@ -175,6 +197,15 @@ export function EmployeeTable({
                                                 />
                                             </motion.span>
                                         </button>
+                                    ) : h.key === "select" ? (
+                                        <Checkbox
+                                            checked={
+                                                payableIds.length > 0 &&
+                                                payableIds.every((id) => selectedIds?.has(id))
+                                            }
+                                            onCheckedChange={() => onToggleSelectAll?.(payableIds)}
+                                            aria-label="Select all payable"
+                                        />
                                     ) : h.key !== "accordion" && h.key !== "avatar" ? (
                                         <span
                                             style={{
@@ -212,6 +243,14 @@ export function EmployeeTable({
                                             borderBottom: `1px solid rgba(0,0,0,0.06)`,
                                         }}
                                     >
+                                        {showSelection && (
+                                            <TableCell className="w-10 px-3 py-3">
+                                                <Skeleton
+                                                    className="h-4 w-4 rounded"
+                                                    style={{ background: "rgba(0,0,0,0.07)" }}
+                                                />
+                                            </TableCell>
+                                        )}
                                         <TableCell className="w-10 px-3 py-3">
                                             <Skeleton
                                                 className="h-4 w-4 rounded"
@@ -224,7 +263,7 @@ export function EmployeeTable({
                                                 style={{ background: "rgba(0,0,0,0.07)" }}
                                             />
                                         </TableCell>
-                                        {headers.slice(2).map((h, j) => (
+                                        {headers.slice(showSelection ? 3 : 2).map((h, j) => (
                                             <TableCell key={j} className={cn("px-3 py-3", h.width)}>
                                                 <Skeleton
                                                     className="h-4 w-full rounded-md"
@@ -244,6 +283,11 @@ export function EmployeeTable({
                                         onToggle={() => toggleRow(row.id)}
                                         onRetryPayment={onRetryPayment}
                                         retryLoading={retryLoading === row.id}
+                                        showSelection={showSelection}
+                                        selected={!!selectedIds?.has(row.id)}
+                                        onToggleSelect={onToggleSelect ? () => onToggleSelect(row.id) : undefined}
+                                        onManualPay={onManualPay}
+                                        manualPayLoading={manualPayLoading === row.id}
                                     />
                                 ))
                             ) : (
@@ -295,6 +339,11 @@ interface EmployeeAccordionRowProps {
     onToggle: () => void;
     onRetryPayment?: (employeeId: string) => void;
     retryLoading?: boolean;
+    showSelection?: boolean;
+    selected?: boolean;
+    onToggleSelect?: () => void;
+    onManualPay?: (employee: EmployeeListItemDTO) => void;
+    manualPayLoading?: boolean;
 }
 
 function EmployeeAccordionRow({
@@ -304,29 +353,36 @@ function EmployeeAccordionRow({
     onToggle,
     onRetryPayment,
     retryLoading = false,
+    showSelection = false,
+    selected = false,
+    onToggleSelect,
+    onManualPay,
+    manualPayLoading = false,
 }: EmployeeAccordionRowProps) {
+    const isPayable =
+        row.paymentMode === "manual" && !row.isDeleted && row.currentMonthPayment?.status !== "paid";
 
     /* ── Status configs ── */
     const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
-        active:     { label: "Active",     color: TOKEN.success, bg: "rgba(0,166,61,0.12)"  },
-        onLeave:    { label: "On Leave",   color: TOKEN.warning, bg: "rgba(254,153,0,0.12)" },
-        suspended:  { label: "Suspended",  color: TOKEN.danger,  bg: "rgba(255,33,87,0.10)" },
-        terminated: { label: "Terminated", color: TOKEN.muted,   bg: "rgba(0,0,0,0.07)"     },
+        active: { label: "Active", color: TOKEN.success, bg: "rgba(0,166,61,0.12)" },
+        onLeave: { label: "On Leave", color: TOKEN.warning, bg: "rgba(254,153,0,0.12)" },
+        suspended: { label: "Suspended", color: TOKEN.danger, bg: "rgba(255,33,87,0.10)" },
+        terminated: { label: "Terminated", color: TOKEN.muted, bg: "rgba(0,0,0,0.07)" },
     };
     const employmentTypeConfig: Record<string, { label: string; color: string; bg: string }> = {
-        full_time: { label: "Full Time", color: TOKEN.primary, bg: "rgba(0,102,102,0.1)"  },
-        part_time: { label: "Part Time", color: "#7C3AED",     bg: "rgba(124,58,237,0.1)" },
-        contract:  { label: "Contract",  color: TOKEN.warning, bg: "rgba(254,153,0,0.1)"  },
-        intern:    { label: "Intern",    color: TOKEN.success, bg: "rgba(0,166,61,0.1)"   },
+        full_time: { label: "Full Time", color: TOKEN.primary, bg: "rgba(0,102,102,0.1)" },
+        part_time: { label: "Part Time", color: "#7C3AED", bg: "rgba(124,58,237,0.1)" },
+        contract: { label: "Contract", color: TOKEN.warning, bg: "rgba(254,153,0,0.1)" },
+        intern: { label: "Intern", color: TOKEN.success, bg: "rgba(0,166,61,0.1)" },
     };
     const paymentModeConfig: Record<string, { label: string; color: string; bg: string }> = {
-        auto:   { label: "Auto",   color: TOKEN.success, bg: "rgba(0,166,61,0.1)"    },
-        manual: { label: "Manual", color: TOKEN.primary, bg: "rgba(0,102,102,0.1)"   },
+        auto: { label: "Auto", color: TOKEN.success, bg: "rgba(0,166,61,0.1)" },
+        manual: { label: "Manual", color: TOKEN.primary, bg: "rgba(0,102,102,0.1)" },
     };
 
-    const statusData   = statusConfig[row.status] ?? { label: row.status ?? "Unknown", color: TOKEN.muted, bg: "rgba(0,0,0,0.07)" };
-    const empData      = employmentTypeConfig[row.employmentType || "full_time"] ?? { label: row.employmentType || "Unknown", color: TOKEN.muted, bg: "rgba(0,0,0,0.07)" };
-    const payModeData  = paymentModeConfig[row.paymentMode || "manual"] ?? { label: row.paymentMode || "Unknown", color: TOKEN.muted, bg: "rgba(0,0,0,0.07)" };
+    const statusData = statusConfig[row.status] ?? { label: row.status ?? "Unknown", color: TOKEN.muted, bg: "rgba(0,0,0,0.07)" };
+    const empData = employmentTypeConfig[row.employmentType || "full_time"] ?? { label: row.employmentType || "Unknown", color: TOKEN.muted, bg: "rgba(0,0,0,0.07)" };
+    const payModeData = paymentModeConfig[row.paymentMode || "manual"] ?? { label: row.paymentMode || "Unknown", color: TOKEN.muted, bg: "rgba(0,0,0,0.07)" };
 
     const handleRetry = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -358,6 +414,21 @@ function EmployeeAccordionRow({
                         : TOKEN.surface;
                 }}
             >
+                {/* Select checkbox */}
+                {showSelection && (
+                    <TableCell
+                        className="w-10 px-2 py-3"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <Checkbox
+                            checked={selected}
+                            disabled={!isPayable}
+                            onCheckedChange={() => onToggleSelect?.()}
+                            aria-label={`Select ${row.user.name}`}
+                        />
+                    </TableCell>
+                )}
+
                 {/* Accordion toggle */}
                 <TableCell className="w-10 px-2 py-3">
                     <button
@@ -492,14 +563,42 @@ function EmployeeAccordionRow({
                     onClick={(e) => e.stopPropagation()}
                 >
                     {row.currentMonthPayment ? (
-                        <PaymentStatusBadge
-                            status={row.currentMonthPayment.status}
-                            amount={row.currentMonthPayment.amount}
-                            currency={row.currency}
-                            isRetryable={row.currentMonthPayment.status === "failed"}
-                            onRetry={handleRetry}
-                            isLoading={retryLoading}
-                        />
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <PaymentStatusBadge
+                                status={row.currentMonthPayment.status}
+                                amount={row.currentMonthPayment.amount}
+                                currency={row.currency}
+                                isRetryable={row.currentMonthPayment.status === "failed"}
+                                onRetry={handleRetry}
+                                isLoading={retryLoading}
+                            />
+                            {isPayable && onManualPay && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (!manualPayLoading) onManualPay(row);
+                                    }}
+                                    disabled={manualPayLoading}
+                                    aria-label="Mark as paid"
+                                    style={{
+                                        width: 26,
+                                        height: 26,
+                                        borderRadius: 8,
+                                        border: "none",
+                                        background: TOKEN.surface,
+                                        boxShadow: TOKEN.neu_subtle,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        cursor: manualPayLoading ? "not-allowed" : "pointer",
+                                        opacity: manualPayLoading ? 0.5 : 1,
+                                    }}
+                                >
+                                    <Banknote style={{ width: 13, height: 13, color: TOKEN.primary }} />
+                                </button>
+                            )}
+                        </div>
                     ) : (
                         <span
                             style={{
@@ -524,7 +623,7 @@ function EmployeeAccordionRow({
                             borderBottom: "1px solid rgba(0,0,0,0.06)",
                         }}
                     >
-                        <TableCell colSpan={7} style={{ padding: 0 }}>
+                        <TableCell colSpan={showSelection ? 8 : 7} style={{ padding: 0 }}>
                             <motion.div
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}

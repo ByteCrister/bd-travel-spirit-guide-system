@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Loader2, Key, RefreshCw, Shield, CheckCircle2, XCircle, AlertTriangle, Lock, Zap } from "lucide-react";
 import generateStrongPassword from "@/utils/helpers/generate-strong-password";
 import { useCurrentUserStore } from "@/store/current-user.store";
+import OtpVerificationDialog from "./OtpVerificationDialog";
 
 // Reusable neumorphic input with toggle
 function PasswordInput({
@@ -54,10 +55,11 @@ function PasswordInput({
 }
 
 export default function PasswordUpdateForm() {
-  const { updateUserPassword, updatePasswordMeta } = useCurrentUserStore();
+  const { baseUser, updateUserPassword, updatePasswordMeta } = useCurrentUserStore();
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showOtpDialog, setShowOtpDialog] = useState(false);
   const [formData, setFormData] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [error, setError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -101,6 +103,15 @@ export default function PasswordUpdateForm() {
     setError("");
     setShowSuccess(false);
     if (!validateForm()) return;
+    if (!baseUser?.email) {
+      setError("Cannot verify identity, email is missing.");
+      return;
+    }
+    setShowOtpDialog(true);
+  };
+
+  const handleVerified = async () => {
+    setShowOtpDialog(false);
     await updateUserPassword({ currentPassword: formData.currentPassword, newPassword: formData.newPassword });
     if (!updatePasswordMeta?.error) {
       setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
@@ -282,6 +293,13 @@ export default function PasswordUpdateForm() {
               )}
             </AnimatePresence>
           </div>
+
+          <OtpVerificationDialog
+            open={showOtpDialog}
+            email={baseUser?.email || ""}
+            onVerified={handleVerified}
+            onClose={() => setShowOtpDialog(false)}
+          />
 
           {/* Alerts */}
           <AnimatePresence>

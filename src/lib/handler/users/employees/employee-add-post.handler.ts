@@ -7,7 +7,7 @@ import { EMPLOYEE_STATUS, EMPLOYMENT_TYPE } from "@/constants/employee/employee.
 
 // Import models
 import UserModel, { IUserDoc } from "@/models/user.model";
-import { CreateEmployeePayload } from "@/types/employee/employee.types";
+import { CreateEmployeePayload, PaymentCardDTO } from "@/types/employee/employee.types";
 import { Types } from "mongoose";
 import EmployeeModel, { IEmployee } from "@/models/employees/employees.model";
 import ConnectDB from "@/config/db";
@@ -55,6 +55,56 @@ async function createUser(
 
     await user.save({ session });
     return user;
+}
+
+async function attachEmployeeStripeAccount(
+    employee: IEmployee,
+    userId: ObjectId,
+    paymentCard: PaymentCardDTO,
+    session: ClientSession
+): Promise<void> {
+    if (!paymentCard.stripeCustomerId || !paymentCard.stripePaymentMethodId) {
+        throw new ApiError("Payment card details are required", 400);
+    }
+
+    const { stripeCustomerId, stripePaymentMethodId } = paymentCard;
+
+    const verifiedCard = await verifyAndAttachPaymentMethod(
+        stripeCustomerId,
+        stripePaymentMethodId,
+    );
+
+    let paymentAccount = await StripePaymentAccountModel.findOne({
+        ownerId: userId,
+        purpose: PAYMENT_PURPOSE.TRANSACTION_ACCOUNT,
+    }).session(session);
+
+    if (paymentAccount) {
+        paymentAccount.stripeCustomerId = stripeCustomerId;
+        paymentAccount.stripePaymentMethodId = stripePaymentMethodId;
+        paymentAccount.card = {
+            brand: verifiedCard.brand as CardBrand,
+            last4: verifiedCard.last4,
+            expMonth: verifiedCard.expMonth,
+            expYear: verifiedCard.expYear,
+        };
+        paymentAccount.isActive = true;
+        await paymentAccount.save({ session });
+    } else {
+        paymentAccount = new StripePaymentAccountModel({
+            ownerType: PAYMENT_OWNER_TYPE.SUPPORT,
+            ownerId: userId,
+            purpose: PAYMENT_PURPOSE.TRANSACTION_ACCOUNT,
+            stripeCustomerId,
+            stripePaymentMethodId,
+            card: verifiedCard,
+            isActive: true,
+        });
+        await paymentAccount.save({ session });
+    }
+
+    employee.paymentAccount = paymentAccount._id as Types.ObjectId;
+    await employee.save({ session });
 }
 
 // Main POST handler
@@ -167,6 +217,10 @@ export const EmployeeAddPostHandler = async (req: NextRequest) => {
             documents: documentAssets.map((d) => ({ type: d.type, asset: d.asset, uploadedAt: new Date() })),
             notes: body.notes,
         };
+
+        if (!body.paymentCard?.stripeCustomerId || !body.paymentCard?.stripePaymentMethodId) {
+            throw new ApiError("Stripe payment account is required for all employees", 400);
+        }
 
         // 5 Restore & update terminated employee
         if (existingEmployee) {

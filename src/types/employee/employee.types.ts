@@ -67,7 +67,9 @@ export interface PayrollRecordDTO {
   paidAt?: ISODateString;
   failureReason?: string;
   transactionRef?: string;
-  paidBy?: ObjectIdString; // admin/user who paid manually
+  paymentMode?: SalaryPaymentMode;
+  paidBy?: ObjectIdString;
+  manualReference?: string;
 }
 
 export interface UserSummaryDTO {
@@ -126,6 +128,7 @@ export interface EmployeeListItemDTO {
   currency: string;
   paymentMode: SalaryPaymentMode; // auto | manual
   paymentCard?: PaymentCardDTO;
+  hasPaymentAccount?: boolean;
   currentMonthPayment?: CurrentMonthPaymentStatusDTO; // current month payment status
 
   // Dates
@@ -224,6 +227,30 @@ export interface RestoreEmployeePayload {
 
 export interface RetrySalaryPaymentPayload {
   id: ObjectIdString;
+}
+
+export interface MarkManualPayrollPayload {
+  year?: number;
+  month?: number;
+  manualReference?: string;
+}
+
+export interface BulkMarkManualPayrollPayload {
+  employeeIds: ObjectIdString[];
+  manualReference?: string;
+}
+
+export interface BulkManualPayrollResult {
+  succeeded: number;
+  failed: number;
+  total: number;
+  results: Array<{
+    employeeId: ObjectIdString;
+    success: boolean;
+    error?: string;
+    year?: number;
+    month?: number;
+  }>;
 }
 
 /* ---------------------------------------------------------------------

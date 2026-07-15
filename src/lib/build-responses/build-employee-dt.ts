@@ -158,7 +158,7 @@ export async function buildEmployeeDTO(
             ...({ match: { deletedAt: null } }),
             options: { session }
         })
-         .populate({
+        .populate({
             path: "paymentAccount",
             select: "card stripeCustomerId stripePaymentMethodId",
             options: { session },
@@ -217,6 +217,9 @@ export async function buildEmployeeDTO(
         paidAt: p.paidAt?.toISOString(),
         failureReason: p.failureReason,
         transactionRef: p.transactionRef,
+        paymentMode: p.paymentMode,
+        paidBy: p.paidBy?.toString(),
+        manualReference: p.manualReference,
     }));
 
     /* ---------------------------------- */
@@ -229,7 +232,7 @@ export async function buildEmployeeDTO(
         employee.payroll || []
     );
 
-    
+
     /* ---------------------------------- */
     /* Payment Card from paymentAccount   */
     /* ---------------------------------- */
