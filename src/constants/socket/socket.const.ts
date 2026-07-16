@@ -13,7 +13,9 @@ export enum SOCKET_TRIGGERS {
     INCREASE_UNSEEN_MESSAGE_COUNT = 'INCREASE_UNSEEN_MESSAGE_COUNT',
     MARK_AS_SEEN = 'MARK_AS_SEEN',
 }
-export type SocketTTriggerTypes = `${SOCKET_TRIGGERS}`;
+export type SocketTTriggerTypes =
+    | `${SOCKET_TRIGGERS}`
+    | `${LISTEN_SOCKET_NOTIFICATION_EVENT}`;
 
 /**
  * Events the client LISTENS for (incoming from Express socket server).
@@ -39,8 +41,20 @@ export enum LISTEN_SOCKET_ADMIN_NOTIFICATION_EVENT {
 }
 export type ListenSocketAdminNotificationEventTypes = `${LISTEN_SOCKET_ADMIN_NOTIFICATION_EVENT}`;
 
+/**
+ * Real-time notification events pushed from Express to the frontend.
+ * - GUIDE_EMP_FORGOT_PASSWORD: An employee of a guide company forgot their password.
+ *   The event is sent to the guide owner's company room (ownerId).
+ * - GUIDE_FORGOT_PASSWORD: A guide forgot their password.
+ *   The event is sent to the main admin's room (ownerId = admin userId).
+ */
+export enum LISTEN_SOCKET_NOTIFICATION_EVENT {
+    GUIDE_EMP_FORGOT_PASSWORD = 'guide_emp_forgot_password',
+    GUIDE_FORGOT_PASSWORD = 'guide_forgot_password',
+}
+export type ListenSocketNotificationEventTypes = `${LISTEN_SOCKET_NOTIFICATION_EVENT}`;
 
 export enum SOCKET_NAMESPACES {
     USER_ONLINE = 'user-online',
 }
-export type SocketNamespacesTypes = `${SOCKET_NAMESPACES}`;
+export type SocketNamespacesTypes = `${SOCKET_NAMESPACES}`;

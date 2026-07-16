@@ -1,5 +1,7 @@
 // app/api/operations/tours/[tourId]/route.ts
 import { NextRequest } from 'next/server';
+import UserModel from '@/models/user.model';
+import { USER_ROLE } from '@/constants/current-user/user.const';
 import mongoose, { Types } from 'mongoose';
 import { buildTourDetailDTO } from '@/lib/build-responses/build-tour-details';
 import ConnectDB from '@/config/db';
@@ -136,8 +138,12 @@ export const POST = withErrorHandler(async (
         );
         const notifDoc = Array.isArray(notification) ? notification[0] : notification;
 
+        const adminUser = await UserModel.findOne({ role: USER_ROLE.ADMIN }).select("_id").lean();
+        const ownerId = adminUser?._id?.toString() || "";
+
         triggerSocketEvent({
             userId: userId,
+            ownerId: ownerId,
             type: SUPPORT_SYSTEM_NOTIFICATION_TYPE.NEW_TOUR_REQUESTED as unknown as SocketTTriggerTypes,
             data: notifDoc,
         }).catch(console.error);

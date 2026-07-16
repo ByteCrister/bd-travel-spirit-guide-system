@@ -294,7 +294,7 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
         if (user.role === USER_ROLE.ASSISTANT) {
 
             const employee = await EmployeeModel.findOne({ user: user._id })
-                .select("_id")
+                .select("_id companyId")
                 .session(session)
                 .lean();
 
@@ -354,8 +354,20 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
             );
             const notifDoc = Array.isArray(notification) ? notification[0] : notification;
 
+            // Find the guide that owns this employee (via companyId) to get the owner's userId
+            let ownerIdForSocket: string | undefined;
+            if (employee.companyId) {
+                const ownerGuide = await GuideModel.findById(employee.companyId)
+                    .select("owner.user")
+                    .session(session)
+                    .lean();
+                if (ownerGuide?.owner?.user) {
+                    ownerIdForSocket = (ownerGuide.owner.user as Types.ObjectId).toString();
+                }
+            }
+
             triggerSocketEvent({
-                userId: (user._id as Types.ObjectId).toString(),
+                ownerId: ownerIdForSocket,
                 type: GUIDE_SYSTEM_NOTIFICATION_TYPE.GUIDE_EMP_FORGOT_PASSWORD as unknown as SocketTTriggerTypes,
                 data: notifDoc,
             }).catch(console.error);
@@ -432,8 +444,14 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
             );
             const notifDoc = Array.isArray(notification) ? notification[0] : notification;
 
+            // Guide forgot password → notify the main admin (first user with role=admin)
+            const adminUser = await UserModel.findOne({ role: USER_ROLE.ADMIN })
+                .select("_id")
+                .session(session)
+                .lean();
+
             triggerSocketEvent({
-                userId: (user._id as Types.ObjectId).toString(),
+                ownerId: adminUser ? (adminUser._id as Types.ObjectId).toString() : undefined,
                 type: SUPPORT_SYSTEM_NOTIFICATION_TYPE.GUIDE_FORGOT_PASSWORD as unknown as SocketTTriggerTypes,
                 data: notifDoc,
             }).catch(console.error);

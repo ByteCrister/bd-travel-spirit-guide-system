@@ -245,13 +245,15 @@ export function generateEmployeeWelcomeEmail(
         }
         
         .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 20px;
             margin: 30px 0;
         }
         
         .detail-card {
+            flex: 1 1 calc(50% - 10px);
+            min-width: 200px;
             background: white;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
@@ -455,9 +457,43 @@ export function generateEmployeeWelcomeEmail(
                 margin-bottom: 5px;
             }
             
-            .shifts-table {
+            .shifts-table thead {
+                display: none;
+            }
+            
+            .shifts-table, .shifts-table tbody, .shifts-table tr, .shifts-table td {
                 display: block;
-                overflow-x: auto;
+                width: 100%;
+            }
+            
+            .shifts-table tr {
+                margin-bottom: 15px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+            }
+            
+            .shifts-table td {
+                text-align: right;
+                padding-left: 45%;
+                position: relative;
+                border-top: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            
+            .shifts-table td:last-child {
+                border-bottom: none;
+            }
+            
+            .shifts-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                width: 40%;
+                text-align: left;
+                font-weight: 600;
+                color: #718096;
+                font-size: 13px;
+                text-transform: uppercase;
             }
             
             .logo-container {
@@ -618,10 +654,10 @@ function generateShiftsTable(shifts: ShiftDTO[]): string {
 
         return `
           <tr>
-            <td>${daysBadges}</td>
-            <td><strong>${formatTime(shift.startTime)}</strong></td>
-            <td><strong>${formatTime(shift.endTime)}</strong></td>
-            <td>${duration}</td>
+            <td data-label="Shift Days">${daysBadges}</td>
+            <td data-label="Start Time"><strong>${formatTime(shift.startTime)}</strong></td>
+            <td data-label="End Time"><strong>${formatTime(shift.endTime)}</strong></td>
+            <td data-label="Duration">${duration}</td>
           </tr>
           `;
     }).join('')}

@@ -8,82 +8,82 @@ import {
   AlertCircle,
   Flag,
   Settings,
+  KeyRound,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useNotificationStore } from "@/store/notification.store";
+import { IGuideSystemNotificationData } from "@/models/notifications/guide-system-notification.model";
+import { LISTEN_SOCKET_NOTIFICATION_EVENT } from "@/constants/socket/socket.const";
+import { formatDistanceToNow } from "date-fns";
 
-interface Notification {
-  id: string;
-  type: "message" | "update" | "system" | "flag";
-  title: string;
-  message: string;
-  timestamp: string;
-  isRead: boolean;
+/* ------------------------------------------------------------------
+   Type mapping: guide notification type → display category
+------------------------------------------------------------------ */
+
+type DisplayCategory = "message" | "update" | "system" | "flag" | "password";
+
+function getDisplayCategory(type: string): DisplayCategory {
+  switch (type) {
+    case LISTEN_SOCKET_NOTIFICATION_EVENT.GUIDE_EMP_FORGOT_PASSWORD:
+    case LISTEN_SOCKET_NOTIFICATION_EVENT.GUIDE_FORGOT_PASSWORD:
+      return "password";
+    case "new_booking":
+    case "booking_cancelled":
+      return "message";
+    case "content_flagged":
+    case "refund_requested":
+      return "flag";
+    case "system_error":
+    case "high_traffic_alert":
+    case "low_inventory":
+      return "system";
+    default:
+      return "update";
+  }
 }
 
-const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "message",
-    title: "New Support Ticket",
-    message: "User John Doe has submitted a new support request",
-    timestamp: "2 min ago",
-    isRead: false,
-  },
-  {
-    id: "2",
-    type: "update",
-    title: "System Update",
-    message: "Dashboard has been updated with new features",
-    timestamp: "1 hour ago",
-    isRead: false,
-  },
-  {
-    id: "3",
-    type: "flag",
-    title: "Content Flagged",
-    message: "A tour listing has been flagged for review",
-    timestamp: "3 hours ago",
-    isRead: true,
-  },
-  {
-    id: "4",
-    type: "system",
-    title: "Backup Complete",
-    message: "Daily backup has been completed successfully",
-    timestamp: "1 day ago",
-    isRead: true,
-  },
-];
-
-const notificationIcons = {
+const notificationIcons: Record<DisplayCategory, React.ElementType> = {
   message: MessageCircle,
   update: Settings,
   system: AlertCircle,
   flag: Flag,
+  password: KeyRound,
 };
 
-const notificationAccents: Record<string, string> = {
-  message: "text-[#006666] bg-[#006666]/10",
-  update:  "text-[#00A63D] bg-[#00A63D]/10",
-  system:  "text-[#FE9900] bg-[#FE9900]/10",
-  flag:    "text-[#FF2157] bg-[#FF2157]/10",
+const notificationAccents: Record<DisplayCategory, string> = {
+  message:  "text-[#006666] bg-[#006666]/10",
+  update:   "text-[#00A63D] bg-[#00A63D]/10",
+  system:   "text-[#FE9900] bg-[#FE9900]/10",
+  flag:     "text-[#FF2157] bg-[#FF2157]/10",
+  password: "text-[#7C3AED] bg-[#7C3AED]/10",
 };
+
+/* ------------------------------------------------------------------
+   Helpers
+------------------------------------------------------------------ */
+
+function formatTimestamp(dateStr: string): string {
+  try {
+    return formatDistanceToNow(new Date(dateStr), { addSuffix: true });
+  } catch {
+    return dateStr;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Component
+------------------------------------------------------------------ */
 
 export function NotificationMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const { notifications, unreadCount, markAsRead, markAllAsRead } =
+    useNotificationStore();
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
-
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+  const handleNotificationClick = (notification: IGuideSystemNotificationData) => {
+    if (!notification.isRead) {
+      markAsRead(notification._id);
+    }
   };
 
   return (
@@ -169,56 +169,66 @@ export function NotificationMenu() {
 
               <ScrollArea className="max-h-96">
                 <div className="p-2 space-y-1">
-                  {notifications.map((notification, index) => {
-                    const Icon = notificationIcons[notification.type];
-                    return (
-                      <motion.div
-                        key={notification.id}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.04 }}
-                        onClick={() => markAsRead(notification.id)}
-                        className={cn(
-                          "flex items-start gap-3 rounded-xl p-3 cursor-pointer transition-all duration-150",
-                          "font-[family-name:var(--font-jetbrains-mono)]",
-                          notification.isRead
-                            ? [
-                                "shadow-[1px_1px_4px_rgba(0,0,0,0.08),-1px_-1px_4px_rgba(255,255,255,0.7)]",
-                                "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
-                              ]
-                            : [
-                                "shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
-                                "border border-[#006666]/20",
-                              ]
-                        )}
-                      >
-                        <div
+                  {notifications.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 gap-2 text-[#1E2938]/40">
+                      <Bell className="h-8 w-8 opacity-30" />
+                      <p className="text-xs font-[family-name:var(--font-jetbrains-mono)]">
+                        No notifications yet
+                      </p>
+                    </div>
+                  ) : (
+                    notifications.map((notification, index) => {
+                      const category = getDisplayCategory(notification.type);
+                      const Icon = notificationIcons[category];
+                      return (
+                        <motion.div
+                          key={notification._id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.04 }}
+                          onClick={() => handleNotificationClick(notification)}
                           className={cn(
-                            "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg",
-                            notificationAccents[notification.type]
+                            "flex items-start gap-3 rounded-xl p-3 cursor-pointer transition-all duration-150",
+                            "font-[family-name:var(--font-jetbrains-mono)]",
+                            notification.isRead
+                              ? [
+                                  "shadow-[1px_1px_4px_rgba(0,0,0,0.08),-1px_-1px_4px_rgba(255,255,255,0.7)]",
+                                  "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
+                                ]
+                              : [
+                                  "shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
+                                  "border border-[#006666]/20",
+                                ]
                           )}
                         >
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="text-xs font-semibold text-[#1E2938] truncate">
-                              {notification.title}
-                            </p>
-                            {!notification.isRead && (
-                              <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#006666]" />
+                          <div
+                            className={cn(
+                              "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg",
+                              notificationAccents[category]
                             )}
+                          >
+                            <Icon className="h-4 w-4" />
                           </div>
-                          <p className="text-[11px] text-[#1E2938]/50 line-clamp-2 mt-0.5">
-                            {notification.message}
-                          </p>
-                          <p className="text-[10px] text-[#1E2938]/35 mt-1 tracking-wide">
-                            {notification.timestamp}
-                          </p>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs font-semibold text-[#1E2938] truncate">
+                                {notification.title}
+                              </p>
+                              {!notification.isRead && (
+                                <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#006666]" />
+                              )}
+                            </div>
+                            <p className="text-[11px] text-[#1E2938]/50 line-clamp-2 mt-0.5">
+                              {notification.message}
+                            </p>
+                            <p className="text-[10px] text-[#1E2938]/35 mt-1 tracking-wide">
+                              {formatTimestamp(notification.createdAt)}
+                            </p>
+                          </div>
+                        </motion.div>
+                      );
+                    })
+                  )}
                 </div>
               </ScrollArea>
             </motion.div>
@@ -227,4 +237,4 @@ export function NotificationMenu() {
       </AnimatePresence>
     </div>
   );
-}
+}
