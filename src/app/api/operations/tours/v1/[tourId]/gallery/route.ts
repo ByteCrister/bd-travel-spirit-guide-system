@@ -1,7 +1,9 @@
-// app/api/operations/tours/v1/[tourId]/gallery/route.ts
+export const maxDuration = 300; // 5 minutes
+
 import { NextRequest } from 'next/server';
 import mongoose, { Types } from 'mongoose';
 import { resolveDocuments } from '@/lib/cloudinary/resolve.cloudinary';
+import { cleanupAssets } from '@/lib/cloudinary/delete.cloudinary';
 import { withTransaction } from '@/lib/helpers/withTransaction';
 import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import { ASSET_TYPE } from '@/constants/common/asset.const';
@@ -54,35 +56,27 @@ export const PATCH = withErrorHandler(async (
         }
     });
 
+    const oldTour = await TourModel.findOne({ _id: tourId, deletedAt: null });
+    if (!oldTour) throw new ApiError("Tour not found", 404);
+
+    // Get existing gallery asset IDs
+    const existingDocs = (oldTour.gallery ?? []).map((gId) => ({ type: ASSET_TYPE.IMAGE, asset: gId }));
+    const incoming = (gallery ?? []).map((gId) => ({ url: gId, type: ASSET_TYPE.IMAGE }));
+
+    // Resolve documents OUTSIDE transaction so slow Cloudinary uploads don't cause MongoDB NoSuchTransaction aborts
+    const { resolvedDocs: newGalleryIds, assetsToDelete } = await resolveDocuments(incoming, existingDocs, ASSET_TYPE.IMAGE, undefined as unknown as mongoose.ClientSession);
+
     const tourDetailsDTO = await withTransaction<TourDetailDTO>(async (session) => {
-        // Find the tour
+        // Find the tour inside transaction for atomicity
         const tour = await TourModel.findOne({
             _id: tourId,
             deletedAt: null,
         }).session(session);
 
-        if (!tour) {
-            throw new ApiError("Tour not found", 404);
-        }
-
-        if (tour.status === TOUR_STATUS.TERMINATED) {
-            throw new ApiError("Tour is terminated and cannot be modified", 409);
-        }
-
-        if (tour.status === TOUR_STATUS.ARCHIVED) {
-            throw new ApiError("Tour is archived and cannot be modified", 409);
-        }
-
-        if (tour.status === TOUR_STATUS.ACTIVE) {
-            throw new ApiError("Completed tours cannot be modified", 409);
-        }
-
-        // Get existing gallery asset IDs
-        const existingDocs = (tour.gallery ?? []).map((gId) => ({ type: ASSET_TYPE.IMAGE, asset: gId }))
-        const incoming = (gallery ?? []).map((gId) => ({ url: gId, type: ASSET_TYPE.IMAGE }))
-
-        const newGalleryIds = await resolveDocuments(incoming, existingDocs, ASSET_TYPE.IMAGE, session)
-
+        if (!tour) throw new ApiError("Tour not found", 404);
+        if (tour.status === TOUR_STATUS.TERMINATED) throw new ApiError("Tour is terminated and cannot be modified", 409);
+        if (tour.status === TOUR_STATUS.ARCHIVED) throw new ApiError("Tour is archived and cannot be modified", 409);
+        if (tour.status === TOUR_STATUS.ACTIVE) throw new ApiError("Completed tours cannot be modified", 409);
 
         // Update tour
         tour.gallery = newGalleryIds.map((g) => g.asset);
@@ -91,9 +85,15 @@ export const PATCH = withErrorHandler(async (
         tour.moderationStatus = MODERATION_STATUS.PENDING;
         tour.status = TOUR_STATUS.DRAFT;
 
+        // Cleanup orphaned assets BEFORE save — if save fails, the transaction
+        // rolls back both the soft-deletes and the gallery update atomically.
+        if (assetsToDelete.length > 0) {
+            await cleanupAssets(assetsToDelete, session);
+        }
+
         await tour.save({ session });
 
-        const detailDto = await buildTourDetailDTO(tour._id as Types.ObjectId, session)
+        const detailDto = await buildTourDetailDTO(tour._id as Types.ObjectId, session);
 
         if (!detailDto || !detailDto.gallery) {
             throw new ApiError('Failed to fetch updated gallery', 500);

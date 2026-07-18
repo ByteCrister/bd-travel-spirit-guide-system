@@ -45,12 +45,12 @@ async function batchResolveAssetUrls(
     if (validIds.length === 0) return {};
 
     const assets = await AssetModel.find({ _id: { $in: validIds } })
-        .populate<{ assetfile: { publicUrl: string } }>("assetfile")
+        .populate<{ file: { publicUrl: string } }>("file")
         .lean();
 
     const map: Record<string, string | undefined> = {};
     assets.forEach((asset) => {
-        map[asset._id.toString()] = asset.assetfile?.publicUrl;
+        map[asset._id.toString()] = asset.file?.publicUrl;
     });
     validIds.forEach((id) => {
         if (!(id.toString() in map)) map[id.toString()] = undefined;

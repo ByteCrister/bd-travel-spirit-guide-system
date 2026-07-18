@@ -57,9 +57,8 @@ interface TourDetailLoadingProps {
 
 export default function TourDetailLoading({ showFullLayout = true }: TourDetailLoadingProps) {
     return (
-        <div className={`${NEU_PAGE_BG} p-4 sm:p-6`}>
-            <div className="container mx-auto max-w-7xl">
-                <motion.div
+        <div className="w-full">
+            <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
@@ -434,7 +433,6 @@ export default function TourDetailLoading({ showFullLayout = true }: TourDetailL
                         </>
                     )}
                 </motion.div>
-            </div>
         </div>
     );
 }

@@ -1,0 +1,407 @@
+{
+  "title": "Moulvibazar Tea Country (6D/5N)",
+  "summary": "A 6-day journey through Moulvibazar, Sylhet Division, covering Lawachara National Park, Madhabkunda Waterfall.",
+  "heroImage": "",
+  "gallery": [],
+  "seo": {
+    "metaTitle": "Moulvibazar Tea Country | Book Now",
+    "metaDescription": "Explore Moulvibazar with our curated 6-day tour."
+  },
+  "tags": [
+    "moulvibazar",
+    "sylhet",
+    "bangladesh"
+  ],
+  "status": "archived",
+  "tourType": "culture_history",
+  "division": "sylhet",
+  "district": "moulvibazar",
+  "accommodationType": [
+    "cottage",
+    "hotel"
+  ],
+  "guideIncluded": true,
+  "transportIncluded": false,
+  "emergencyContacts": {
+    "policeNumber": "999",
+    "ambulanceNumber": "16263",
+    "fireServiceNumber": "102",
+    "localEmergency": "01724407119"
+  },
+  "destinations": [
+    {
+      "description": "Core exploration zone around Moulvibazar.",
+      "highlights": [
+        "Lawachara National Park",
+        "Madhabkunda Waterfall"
+      ],
+      "attractions": [
+        {
+          "title": "Lawachara National Park",
+          "description": "Popular spot: Lawachara National Park",
+          "bestFor": "Couples",
+          "insiderTip": "Visit early morning to avoid crowds.",
+          "address": "Lawachara National Park, Moulvibazar, Sylhet",
+          "openingHours": "06:00 - 18:00",
+          "coordinates": {
+            "lat": 24.40678,
+            "lng": 91.604707
+          }
+        },
+        {
+          "title": "Madhabkunda Waterfall",
+          "description": "Popular spot: Madhabkunda Waterfall",
+          "bestFor": "Adventure seekers",
+          "insiderTip": "Visit early morning to avoid crowds.",
+          "address": "Madhabkunda Waterfall, Moulvibazar, Sylhet",
+          "openingHours": "06:00 - 18:00",
+          "coordinates": {
+            "lat": 24.208651,
+            "lng": 88.142344
+          }
+        }
+      ],
+      "activities": [
+        {
+          "title": "Guided visit to Lawachara National Park",
+          "provider": "GreenHill Travels BD",
+          "duration": "3h",
+          "price": {
+            "amount": 500,
+            "currency": "BDT"
+          },
+          "rating": 4.4
+        },
+        {
+          "title": "Guided visit to Madhabkunda Waterfall",
+          "provider": "GreenHill Travels BD",
+          "duration": "4h",
+          "price": {
+            "amount": 500,
+            "currency": "BDT"
+          },
+          "rating": 4.3
+        }
+      ],
+      "coordinates": {
+        "lat": 24.631681,
+        "lng": 88.742978
+      }
+    }
+  ],
+  "itinerary": [
+    {
+      "day": 1,
+      "title": "Day 1: Moulvibazar Tea Country",
+      "description": "Visit Madhabkunda Waterfall and nearby sites.",
+      "mealsProvided": [
+        "Lunch",
+        "Breakfast"
+      ],
+      "accommodation": "homestay",
+      "activities": [
+        "Lawachara National Park",
+        "Madhabkunda Waterfall"
+      ],
+      "travelDistance": "45 km",
+      "travelMode": "ride_share",
+      "estimatedTime": "3h",
+      "importantNotes": [
+        "Local guide accompanies group."
+      ]
+    },
+    {
+      "day": 2,
+      "title": "Day 2: Explore Moulvibazar",
+      "description": "Visit Lawachara National Park and nearby sites.",
+      "mealsProvided": [
+        "Dinner",
+        "Breakfast"
+      ],
+      "accommodation": "homestay",
+      "activities": [
+        "Lawachara National Park",
+        "Madhabkunda Waterfall"
+      ],
+      "travelDistance": "20 km",
+      "travelMode": "domestic_flight",
+      "estimatedTime": "4h",
+      "importantNotes": [
+        "Stay hydrated, humid climate."
+      ]
+    },
+    {
+      "day": 3,
+      "title": "Day 3: Explore Moulvibazar",
+      "description": "Visit Lawachara National Park and nearby sites.",
+      "mealsProvided": [
+        "Breakfast"
+      ],
+      "accommodation": "homestay",
+      "activities": [
+        "Madhabkunda Waterfall",
+        "Lawachara National Park"
+      ],
+      "travelDistance": "36 km",
+      "travelMode": "train",
+      "estimatedTime": "3h",
+      "importantNotes": [
+        "Respect local customs at religious sites."
+      ]
+    },
+    {
+      "day": 4,
+      "title": "Day 4: Explore Moulvibazar",
+      "description": "Visit Madhabkunda Waterfall and nearby sites.",
+      "mealsProvided": [
+        "Breakfast"
+      ],
+      "accommodation": "guest_house",
+      "activities": [
+        "Madhabkunda Waterfall",
+        "Lawachara National Park"
+      ],
+      "travelDistance": "44 km",
+      "travelMode": "boat",
+      "estimatedTime": "1h",
+      "importantNotes": [
+        "Carry light woolens for evening."
+      ]
+    },
+    {
+      "day": 5,
+      "title": "Day 5: Explore Moulvibazar",
+      "description": "Visit Madhabkunda Waterfall and nearby sites.",
+      "mealsProvided": [
+        "Lunch",
+        "Breakfast",
+        "Dinner"
+      ],
+      "accommodation": "cottage",
+      "activities": [
+        "Madhabkunda Waterfall",
+        "Lawachara National Park"
+      ],
+      "travelDistance": "11 km",
+      "travelMode": "domestic_flight",
+      "estimatedTime": "4h",
+      "importantNotes": [
+        "Respect local customs at religious sites."
+      ]
+    },
+    {
+      "day": 6,
+      "title": "Day 6: Explore Moulvibazar",
+      "description": "Visit Madhabkunda Waterfall and nearby sites.",
+      "mealsProvided": [
+        "Dinner",
+        "Breakfast"
+      ],
+      "accommodation": "hotel",
+      "activities": [
+        "Madhabkunda Waterfall",
+        "Lawachara National Park"
+      ],
+      "travelDistance": "38 km",
+      "travelMode": "ride_share",
+      "estimatedTime": "3h",
+      "importantNotes": [
+        "Local guide accompanies group."
+      ]
+    }
+  ],
+  "inclusions": [
+    {
+      "label": "Accommodation",
+      "description": "Homestay stay for 5 night(s)"
+    },
+    {
+      "label": "Meals as per itinerary",
+      "description": "Breakfast, lunch, and/or dinner as listed in daily plan"
+    },
+    {
+      "label": "Local transport",
+      "description": "Bus between destinations"
+    },
+    {
+      "label": "Guide services",
+      "description": "English/Bangla speaking local guide"
+    }
+  ],
+  "exclusions": [
+    {
+      "label": "Personal expenses",
+      "description": "Shopping, tips, and other personal costs"
+    },
+    {
+      "label": "Travel insurance",
+      "description": "Not included, recommended for adventure activities"
+    },
+    {
+      "label": "International/domestic airfare to meeting point",
+      "description": "Excludes fare to reach starting location"
+    }
+  ],
+  "difficulty": "easy",
+  "bestSeason": [
+    "winter",
+    "autumn"
+  ],
+  "audience": [
+    "seniors"
+  ],
+  "categories": [
+    "nature",
+    "culture_history"
+  ],
+  "translations": {
+    "en": {
+      "title": "Moulvibazar Tea Country",
+      "summary": "Discover Moulvibazar.",
+      "description": "Join this 6-day tour through Moulvibazar, Sylhet Division, featuring Lawachara National Park, Madhabkunda Waterfall."
+    },
+    "bn": {
+      "title": "Moulvibazar Tea Country (বাংলা)",
+      "summary": "বাংলাদেশের সৌন্দর্য উপভোগ করুন।",
+      "description": "Sylhet বিভাগের Moulvibazar অঞ্চলে 6 দিনের ভ্রমণ।"
+    }
+  },
+  "mainLocation": {
+    "address": {
+      "line1": "Moulvibazar Tea Country Base Camp",
+      "line2": "Madhabkunda Waterfall",
+      "city": "Moulvibazar",
+      "district": "moulvibazar",
+      "region": "sylhet",
+      "postalCode": "5582"
+    },
+    "coordinates": {
+      "lat": 25.451868,
+      "lng": 90.929235
+    }
+  },
+  "transportModes": [
+    "bus",
+    "train",
+    "ride_share"
+  ],
+  "pickupOptions": [
+    {
+      "city": "Dhaka",
+      "price": 300,
+      "currency": "BDT"
+    }
+  ],
+  "meetingPoint": "Central Bus Terminal",
+  "packingList": [
+    {
+      "item": "Comfortable shoes",
+      "required": true,
+      "notes": "Trekking-grade for hilly terrain."
+    },
+    {
+      "item": "Rain jacket",
+      "required": true,
+      "notes": "Monsoon season risk in this region."
+    },
+    {
+      "item": "Sunscreen",
+      "required": true,
+      "notes": "SPF 30+ recommended."
+    }
+  ],
+  "basePrice": {
+    "amount": 3500,
+    "currency": "BDT"
+  },
+  "discounts": [],
+  "duration": {
+    "days": 6,
+    "nights": 5
+  },
+  "operatingWindows": [
+    {
+      "startDate": "2026-08-15T00:00:00.000Z",
+      "endDate": "2027-04-30T00:00:00.000Z",
+      "seatsTotal": 55,
+      "seatsBooked": 11
+    }
+  ],
+  "departures": [
+    {
+      "date": "2026-11-06T00:00:00.000Z",
+      "seatsTotal": 34,
+      "meetingPoint": "Company Office, Dhaka",
+      "meetingCoordinates": {
+        "lat": 23.500467,
+        "lng": 88.212926
+      }
+    },
+    {
+      "date": "2026-10-06T00:00:00.000Z",
+      "seatsTotal": 37,
+      "meetingPoint": "Local Bus Terminal",
+      "meetingCoordinates": {
+        "lat": 23.342465,
+        "lng": 90.147846
+      }
+    }
+  ],
+  "paymentMethods": [
+    "cash",
+    "nagad",
+    "card",
+    "stripe"
+  ],
+  "licenseRequired": false,
+  "ageSuitability": "adults",
+  "accessibility": {
+    "wheelchair": false,
+    "familyFriendly": true,
+    "petFriendly": false,
+    "notes": "Terrain varies; contact operator for accessibility details."
+  },
+  "cancellationPolicy": {
+    "refundable": true,
+    "rules": [
+      {
+        "daysBefore": 7,
+        "refundPercent": 80
+      },
+      {
+        "daysBefore": 3,
+        "refundPercent": 40
+      }
+    ]
+  },
+  "refundPolicy": {
+    "method": [
+      "card",
+      "cash"
+    ],
+    "processingDays": 8
+  },
+  "terms": "Standard booking terms and conditions apply.",
+  "id": "7767acb7-cecd-49d5-ac74-18147c070ed3",
+  "slug": "moulvibazar-tea-country-14",
+  "tourCode": "BDT-0014",
+  "moderationStatus": "suspended",
+  "companyInfo": {
+    "id": "b181544d-9fb6-4073-9feb-3b94fce43b9e",
+    "name": "GreenHill Travels BD",
+    "createdAt": "2023-01-05T00:00:00.000Z"
+  },
+  "authorInfo": {
+    "id": "887b1c7a-64c9-44d6-85cc-6b4b367bb582",
+    "name": "Kamal Hossain",
+    "email": "kamal.hossain@bengaltours.bd",
+    "avatarUrl": null
+  },
+  "wishlistCount": 362,
+  "featured": false,
+  "viewCount": 3940,
+  "likeCount": 17,
+  "shareCount": 94,
+  "createdAt": "2026-03-24T00:00:00.000Z",
+  "updatedAt": "2026-07-14T00:00:00.000Z"
+}

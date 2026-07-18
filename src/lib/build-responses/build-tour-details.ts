@@ -153,8 +153,8 @@ export async function buildTourDetailDTO(
             tourCode: tour.uniqueTourCode,
             status: tour.status,
             summary: tour.summary,
-            heroImage: tour.heroImage?.file?.publicUrl.toString() ?? undefined,
-            gallery: tour.gallery?.map((asset) => asset?.file?.publicUrl ?? "") || [],
+            heroImage: tour.heroImage?.file?.publicUrl?.toString() ?? undefined,
+            gallery: tour.gallery?.map((asset) => asset?.file?.publicUrl?.toString()).filter((url): url is string => !!url) || [],
             seo: tour.seo,
 
             // =============== BANGLADESH-SPECIFIC FIELDS ===============
@@ -223,7 +223,7 @@ export async function buildTourDetailDTO(
                 id: tour.authorId._id.toString(),
                 name: tour.authorId.name,
                 email: tour.authorId.email,
-                avatarUrl: tour.authorId.avatar?.file?.publicUrl ?? "",
+                avatarUrl: tour.authorId.avatar?.file?.publicUrl?.toString() ?? "",
             },
 
             // =============== SYSTEM FIELDS ===============

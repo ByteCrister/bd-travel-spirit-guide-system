@@ -22,6 +22,7 @@ import PoliciesStep from './PoliciesStep';
 import ReviewStep from './ReviewStep';
 import { Breadcrumbs } from '@/components/global/Breadcrumbs';
 import { GUIDE_DEFAULT_1 } from '@/data/tour-defaults';
+import toursData from '@/data/tours.json';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
 import { encodeId } from '@/utils/helpers/mongodb-id-conversions';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
@@ -77,7 +78,8 @@ const STEPS = [
   { label: 'Review & Submit', icon: '/images/tour-review/code-review.png' },
 ];
 
-const INITIAL_VALUES: CreateTourDTO = GUIDE_DEFAULT_1;
+// const INITIAL_VALUES: CreateTourDTO = GUIDE_DEFAULT_1;
+const INITIAL_VALUES: CreateTourDTO = toursData as unknown as CreateTourDTO;
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function getFirstErrorMessage<T>(errors: FormikErrors<T>): string | null {
@@ -182,7 +184,7 @@ export default function AddTourPage() {
   };
 
   return (
-    <div className={`${NEU_PAGE_BG} py-6 px-4 sm:px-6`}>
+    <div className={`${NEU_PAGE_BG} py-2 px-4 sm:px-2`}>
       <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 16 }}

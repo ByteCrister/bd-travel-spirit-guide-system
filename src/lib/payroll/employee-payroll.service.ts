@@ -3,9 +3,9 @@ import {
     EMPLOYEE_STATUS,
     PAYROLL_STATUS,
     SALARY_PAYMENT_MODE,
-} from "@/constants/employee.const";
-import { USER_ROLE } from "@/constants/user.const";
-import { CURRENCY } from "@/constants/tour.const";
+} from "@/constants/employee/employee.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
+import { CURRENCY } from "@/constants/tour/tour.const";
 import {
     convertBdtToUsd,
     usdToStripeCents,

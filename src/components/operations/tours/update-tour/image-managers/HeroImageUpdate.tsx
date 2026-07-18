@@ -108,8 +108,8 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      if (file.size > 5 * 1024 * 1024) {
-        showToast.warning('File size exceeds 5MB limit. Please choose a smaller image.');
+      if (file.size > 2 * 1024 * 1024) {
+        showToast.warning('File size exceeds 2MB limit. Please choose a smaller image.');
         event.target.value = '';
         return;
       }
@@ -134,7 +134,7 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
         compressImages: true,
         maxWidth: 1920,
         quality: 0.85,
-        maxFileBytes: 5 * 1024 * 1024,
+        maxFileBytes: 2 * 1024 * 1024,
       });
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
@@ -450,7 +450,7 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
                 <div className="mt-2 space-y-1.5">
                   {[
                     'Recommended: 1920×1080 px (16:9)',
-                    'Maximum size: 5 MB',
+                    'Maximum size: 2 MB',
                     'Supported: JPG, PNG, GIF, WebP, BMP',
                   ].map((text) => (
                     <p key={text} className={NEU_GUIDELINE_ITEM}>

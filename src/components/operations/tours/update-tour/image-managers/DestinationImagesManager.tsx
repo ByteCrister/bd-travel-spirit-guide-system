@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
@@ -77,6 +77,9 @@ const getDestinationUrl = (tourId: string) =>
 const getAttractionUrl = (tourId: string) =>
   `/operations/tours/v1/${tourId}/destinations/attractions/images-bulk`;
 
+const MAX_FILE_SIZE_MB    = 2;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 type SelectedFile = { file: File; preview: string };
 type ImageDraft = {
   existing: Array<{ id: string; url: string }>;
@@ -112,6 +115,50 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
     )
   );
 
+  useEffect(() => {
+    setDestDrafts(prev => {
+      const next = new Map(prev);
+      destinations.filter(d => d.id).forEach(d => {
+        if (!next.has(d.id!)) {
+          next.set(d.id!, { existing: d.imageIds ?? [], toDelete: new Set(), toAdd: [] });
+        } else {
+          // Sync existing images in case they were updated externally
+          const draft = next.get(d.id!);
+          next.set(d.id!, { ...draft!, existing: d.imageIds ?? [] });
+        }
+      });
+      // Remove stale drafts (destinations that were deleted)
+      const currentIds = new Set(destinations.map(d => d.id).filter(Boolean));
+      for (const id of Array.from(next.keys())) {
+        if (!currentIds.has(id)) next.delete(id);
+      }
+      return next;
+    });
+
+    setAttrDrafts(prev => {
+      const next = new Map(prev);
+      destinations.forEach(d => {
+        d.attractions?.filter(a => a.id).forEach(a => {
+          if (!next.has(a.id!)) {
+            next.set(a.id!, { existing: a.imageIds ?? [], toDelete: new Set(), toAdd: [] });
+          } else {
+            // Sync existing images
+            const draft = next.get(a.id!);
+            next.set(a.id!, { ...draft!, existing: a.imageIds ?? [] });
+          }
+        });
+      });
+      // Remove stale drafts
+      const currentAttrIds = new Set(
+        destinations.flatMap(d => d.attractions?.map(a => a.id).filter(Boolean))
+      );
+      for (const id of Array.from(next.keys())) {
+        if (!currentAttrIds.has(id)) next.delete(id);
+      }
+      return next;
+    });
+  }, [destinations]);
+
   const visibleDestImages = (destId: string) => {
     const draft = destDrafts.get(destId);
     return draft?.existing.filter(img => !draft.toDelete.has(img.id)) ?? [];
@@ -134,9 +181,29 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
 
   const onSelectDestFiles = (destId: string, files: FileList | null) => {
     if (!files) return;
-    const valid = Array.from(files).filter(f => isAllowedExtension(f.name, IMAGE_EXTENSIONS));
-    if (!valid.length) return showToast.warning('Invalid files', 'Only image files are allowed');
-    const mapped = valid.map(f => ({ file: f, preview: URL.createObjectURL(f) }));
+
+    const all = Array.from(files);
+
+    // Filter invalid extension
+    const extValid = all.filter(f => isAllowedExtension(f.name, IMAGE_EXTENSIONS));
+    if (!extValid.length) return showToast.warning('Invalid files', 'Only image files are allowed');
+
+    // Filter oversized files — show a toast for each one skipped
+    const sizeValid: File[] = [];
+    for (const f of extValid) {
+      if (f.size > MAX_FILE_SIZE_BYTES) {
+        showToast.warning(
+          `"${f.name}" skipped`,
+          `File is ${(f.size / (1024 * 1024)).toFixed(1)} MB — max allowed is ${MAX_FILE_SIZE_MB} MB`
+        );
+      } else {
+        sizeValid.push(f);
+      }
+    }
+
+    if (!sizeValid.length) return;
+
+    const mapped = sizeValid.map(f => ({ file: f, preview: URL.createObjectURL(f) }));
     setDestDrafts(prev => {
       const next = new Map(prev);
       const draft = next.get(destId);
@@ -147,9 +214,29 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
 
   const onSelectAttrFiles = (attrId: string, files: FileList | null) => {
     if (!files) return;
-    const valid = Array.from(files).filter(f => isAllowedExtension(f.name, IMAGE_EXTENSIONS));
-    if (!valid.length) return showToast.warning('Invalid files', 'Only image files are allowed');
-    const mapped = valid.map(f => ({ file: f, preview: URL.createObjectURL(f) }));
+
+    const all = Array.from(files);
+
+    // Filter invalid extension
+    const extValid = all.filter(f => isAllowedExtension(f.name, IMAGE_EXTENSIONS));
+    if (!extValid.length) return showToast.warning('Invalid files', 'Only image files are allowed');
+
+    // Filter oversized files — show a toast for each one skipped
+    const sizeValid: File[] = [];
+    for (const f of extValid) {
+      if (f.size > MAX_FILE_SIZE_BYTES) {
+        showToast.warning(
+          `"${f.name}" skipped`,
+          `File is ${(f.size / (1024 * 1024)).toFixed(1)} MB — max allowed is ${MAX_FILE_SIZE_MB} MB`
+        );
+      } else {
+        sizeValid.push(f);
+      }
+    }
+
+    if (!sizeValid.length) return;
+
+    const mapped = sizeValid.map(f => ({ file: f, preview: URL.createObjectURL(f) }));
     setAttrDrafts(prev => {
       const next = new Map(prev);
       const draft = next.get(attrId);
@@ -231,7 +318,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
             compressImages: true,
             maxWidth: 1600,
             quality: 0.8,
-            maxFileBytes: 5 * 1024 * 1024,
+            maxFileBytes: 2 * 1024 * 1024,
             allowedExtensions: IMAGE_EXTENSIONS,
           })
         )
@@ -273,7 +360,7 @@ export default function DestinationImagesManager({ tourId, destinations, updateD
             compressImages: true,
             maxWidth: 1600,
             quality: 0.8,
-            maxFileBytes: 5 * 1024 * 1024,
+            maxFileBytes: 2 * 1024 * 1024,
             allowedExtensions: IMAGE_EXTENSIONS,
           })
         )

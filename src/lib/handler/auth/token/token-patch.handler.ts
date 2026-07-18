@@ -61,6 +61,8 @@ export default async function GuideAppTokenPatchHandler(
     const token = body.token?.trim();
     const purpose =  body.purpose?.trim() as EmailVerificationPurpose;
 
+    console.log(`Purpose : ${purpose}`)
+
     /* =======================
        Validation
     ======================= */

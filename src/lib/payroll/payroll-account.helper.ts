@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { PAYMENT_OWNER_TYPE, PAYMENT_PURPOSE } from "@/constants/payment.const";
-import { USER_ROLE } from "@/constants/user.const";
+import { PAYMENT_OWNER_TYPE, PAYMENT_PURPOSE } from "@/constants/payment/payment.const";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import GuideModel from "@/models/guide/guide.model";
 import StripePaymentAccountModel from "@/models/payments/payment-account.model";
 import UserModel from "@/models/user.model";

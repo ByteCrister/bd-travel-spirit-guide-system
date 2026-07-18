@@ -28,8 +28,8 @@ import {
   TourBookingsResponseDTO,
 } from "@/types/tour/tour-detail-booking.types";
 
-const URL_AFTER_API = "/mock/operations/tours";
-// const URL_AFTER_API = "/operations/tours/v1";
+// const URL_AFTER_API = "/mock/operations/tours";
+const URL_AFTER_API = "/operations/tours/v1";
 
 // --------------------
 // Types

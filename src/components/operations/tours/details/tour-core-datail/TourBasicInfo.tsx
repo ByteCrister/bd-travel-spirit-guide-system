@@ -236,6 +236,7 @@ const TourBasicInfo = ({ tour }: TourBasicInfoProps) => {
                                                 src={tour.authorInfo.avatarUrl}
                                                 alt={tour.authorInfo.name}
                                                 fill
+                                                sizes="32px"
                                                 className="object-cover"
                                             />
                                         </div>

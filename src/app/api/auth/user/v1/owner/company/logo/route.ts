@@ -10,6 +10,7 @@ import { ASSET_TYPE } from "@/constants/common/asset.const";
 import { isBase64DataUrl, isCloudinaryUrl } from "@/lib/helpers/document-conversions";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { resolveDocuments } from "@/lib/cloudinary/resolve.cloudinary";
+import { cleanupAssets } from "@/lib/cloudinary/delete.cloudinary";
 import { buildGuideDto } from "@/lib/build-responses/buildGuideOwner-dt";
 import { GUIDE_STATUS } from "@/constants/guide/guide.const";
 import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
@@ -152,7 +153,7 @@ async function handlePatchRequest(
 
         const existingLogoAsset = getExistingLogoAsset(guide);
 
-        const resolvedDocs = await resolveDocuments(
+        const { resolvedDocs, assetsToDelete } = await resolveDocuments(
             [
                 {
                     type: "company_logo",
@@ -188,6 +189,10 @@ async function handlePatchRequest(
                 "Failed to update company logo",
                 500
             );
+        }
+
+        if (assetsToDelete && assetsToDelete.length > 0) {
+            await cleanupAssets(assetsToDelete, session);
         }
 
         return buildGuideDto(

@@ -62,6 +62,14 @@ export default function EmployeeVerificationDialog({
     }
   }, [open]);
 
+  // Clear inputs when a new error arrives so user can re-enter
+  useEffect(() => {
+    if (error) {
+      setDigits(["", "", "", "", "", ""]);
+      setTimeout(() => inputRefs.current[0]?.focus(), 50);
+    }
+  }, [error]);
+
   const handleDigitChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
     const newDigits = [...digits];
@@ -242,12 +250,21 @@ export default function EmployeeVerificationDialog({
                     style={{
                       background: DANGER_SOFT_BG,
                       boxShadow: RAISED_SHADOW,
-                      color: DANGER,
                       border: `1px solid ${DANGER}30`,
                     }}
                   >
                     <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" style={{ color: DANGER }} />
-                    <span>{error}</span>
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                      <span className="font-semibold text-xs uppercase tracking-wide" style={{ color: DANGER }}>
+                        Error
+                      </span>
+                      <span
+                        className="text-xs break-words"
+                        style={{ color: DANGER, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}
+                      >
+                        {error}
+                      </span>
+                    </div>
                   </div>
                 </motion.div>
               )}

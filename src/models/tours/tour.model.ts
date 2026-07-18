@@ -1070,8 +1070,8 @@ TourSchema.statics.findOneWithDeleted = function (
 
 // =============== SCHEMA HOOKS ===============
 
-// Pre-save hook to ensure unique slug
-TourSchema.pre("save", async function (this: HydratedDocument<ITour>) {
+// Pre-validate hook to ensure unique slug and uniqueTourCode
+TourSchema.pre("validate", async function (this: HydratedDocument<ITour>) {
   // Only generate if it's a new document or the code is missing
   if (this.isNew || !this.uniqueTourCode) {
     let code: string;

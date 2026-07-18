@@ -13,6 +13,7 @@ import { MODERATION_STATUS, TOUR_STATUS } from "@/constants/tour/tour.const";
 import { buildTourDetailDTO } from "@/lib/build-responses/build-tour-details";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import { auditTourMutation, requireSessionUserId } from "@/lib/audit/tour-audit";
+import ConnectDB from "@/config/db";
 
 /**
  * PATCH /api/tours/[tourId]/attraction-images
@@ -25,6 +26,8 @@ export const PATCH = withErrorHandler(async (
 ) => {
     const tourId = resolveMongoId((await params).tourId);
     const userId = await requireSessionUserId();
+
+    await ConnectDB();
 
     // Validate tour ID
     if (!tourId || !mongoose.Types.ObjectId.isValid(tourId)) {
@@ -73,40 +76,41 @@ export const PATCH = withErrorHandler(async (
         }
     }
 
-    // Run in transaction
-    const detailsDto = await withTransaction(async (session) => {
+    // Run uploads OUTSIDE transaction to avoid Mongo 60s transaction timeout
+    let newAssetIds: Types.ObjectId[] = [];
+    if (body.newImages && body.newImages.length > 0) {
+        const newAssets: Base64Asset[] = body.newImages.map((base64, index) => ({
+            base64,
+            name: `attraction-${body.attractionId}-image-${Date.now()}-${index}`,
+            assetType: ASSET_TYPE.IMAGE,
+        }));
+        newAssetIds = await uploadAssets(newAssets, undefined as unknown as mongoose.ClientSession);
+    }
+
+    // Run DB updates inside transaction — returns tourId only so the DTO query
+    // runs AFTER the transaction commits and can see freshly written AssetFile.publicUrl
+    // records (MongoDB snapshot isolation would hide them if queried inside the same session).
+    const committedTourId = await withTransaction(async (session) => {
         const tour = await TourModel.findOne({
             _id: tourId,
             deletedAt: null,
         }).session(session);
 
         if (!tour) {
+            console.error("[images-bulk] Tour not found", { tourId });
             throw new ApiError("Tour not found", 404);
         }
-
-        if (tour.status === TOUR_STATUS.TERMINATED) {
-            throw new ApiError("Tour is terminated and cannot be modified", 409);
-        }
-
-        if (tour.status === TOUR_STATUS.ARCHIVED) {
-            throw new ApiError("Tour is archived and cannot be modified", 409);
-        }
-
-        if (tour.status === TOUR_STATUS.ACTIVE) {
-            throw new ApiError("Completed tours cannot be modified", 409);
-        }
-
-        // Check if tour is deleted
-        if (tour.deletedAt) {
-            throw new ApiError("Tour is deleted", 410);
-        }
+        if (tour.status === TOUR_STATUS.TERMINATED) throw new ApiError("Tour is terminated and cannot be modified", 409);
+        if (tour.status === TOUR_STATUS.ARCHIVED) throw new ApiError("Tour is archived and cannot be modified", 409);
+        if (tour.status === TOUR_STATUS.ACTIVE) throw new ApiError("Completed tours cannot be modified", 409);
+        if (tour.deletedAt) throw new ApiError("Tour is deleted", 410);
 
         // Find destination by ID
         const destination = tour?.destinations?.find(
             (dest) => dest?._id?.toString() === body.destinationId
         );
-
         if (!destination) {
+            console.error("[images-bulk] Destination not found", { destId: body.destinationId, availableDests: tour?.destinations?.map(d => d._id?.toString()) });
             throw new ApiError("Destination not found", 404);
         }
 
@@ -114,8 +118,8 @@ export const PATCH = withErrorHandler(async (
         const attraction = destination?.attractions?.find(
             (attr) => attr?._id?.toString() === body.attractionId
         );
-
         if (!attraction) {
+            console.error("[images-bulk] Attraction not found", { attrId: body.attractionId, destId: body.destinationId, availableAttrs: destination?.attractions?.map(a => a._id?.toString()) });
             throw new ApiError("Attraction not found", 404);
         }
 
@@ -135,37 +139,19 @@ export const PATCH = withErrorHandler(async (
                 );
             }
 
-            // Convert string IDs to ObjectId
-            const deleteObjectIds = body.deleteImageIds.map(
-                (id) => new mongoose.Types.ObjectId(id)
-            );
-
-            // Soft delete assets from Cloudinary and database
-            await cleanupAssets(deleteObjectIds, session);
-
             // Remove deleted IDs from attraction images
             attraction.images = currentImageIds.filter(
                 (imgId) => !body.deleteImageIds.includes(imgId.toString())
             );
+            
+            // Soft delete assets from Cloudinary and database
+            const deleteObjectIds = body.deleteImageIds.map((id) => new mongoose.Types.ObjectId(id));
+            await cleanupAssets(deleteObjectIds, session);
         }
 
-        // Step 2: Upload new images
-        if (body.newImages && body.newImages.length > 0) {
-            // Convert base64 strings to Base64Asset format
-            const newAssets: Base64Asset[] = body.newImages.map((base64, index) => ({
-                base64,
-                name: `attraction-${attraction._id}-image-${Date.now()}-${index}`,
-                assetType: ASSET_TYPE.IMAGE,
-            }));
-
-            // Upload to Cloudinary and get new asset IDs
-            const newAssetIds = await uploadAssets(newAssets, session);
-
-            // Add new image IDs to attraction
-            if (!attraction.images) {
-                attraction.images = [];
-            }
-
+        // Step 2: Add new images
+        if (newAssetIds.length > 0) {
+            if (!attraction.images) attraction.images = [];
             attraction.images.push(...newAssetIds);
         }
 
@@ -179,8 +165,12 @@ export const PATCH = withErrorHandler(async (
         // Save the tour
         await tour.save({ session });
 
-        return await buildTourDetailDTO(tour._id as Types.ObjectId, session);
+        return tour._id as Types.ObjectId;
     });
+
+    // Build DTO AFTER the transaction has committed so the session-less query reads
+    // the fully-committed AssetFile.publicUrl values written by uploadAssets().
+    const detailsDto = await buildTourDetailDTO(committedTourId);
 
     // Find the updated attraction in the DTO to return
     const updatedDestination = detailsDto?.destinations?.find(

@@ -135,4 +135,18 @@ export interface AssetStorageProvider {
    * - Return `false` when the asset does not exist (idempotent delete).
    */
   delete(providerId: string): Promise<boolean>;
+
+  /**
+   * Delete multiple assets in bulk from the storage backend.
+   *
+   * @param providerIds - Array of provider-specific identifiers to delete.
+   * @returns A promise resolving to an object with two arrays:
+   *   - `success`: IDs that were successfully deleted.
+   *   - `failed`: IDs that could not be deleted (not found or error).
+   *
+   * Implementations should:
+   * - Process deletions in batches to respect provider rate limits.
+   * - Not throw on partial failures; failed IDs are returned instead.
+   */
+  deleteMany(providerIds: string[]): Promise<{ success: string[]; failed: string[] }>;
 }

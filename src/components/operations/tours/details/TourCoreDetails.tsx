@@ -257,8 +257,7 @@ export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
     // ── Error state ───────────────────────────────────────
     if (error[errorKey] || !tour) {
         return (
-            <div className={`${NEU_PAGE_BG} p-4 sm:p-6`}>
-                <div className="container mx-auto max-w-7xl">
+            <div className="w-full">
                     <FadeUp>
                         <div className={`${NEU_CARD} p-6 border-l-4 border-l-[#FF2157]`}>
                             <div className="flex items-start gap-3 mb-4">
@@ -284,14 +283,12 @@ export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
                         </div>
                     </FadeUp>
                 </div>
-            </div>
         );
     }
 
     // ── Main render ───────────────────────────────────────
     return (
-        <div className={`${NEU_PAGE_BG} p-4 sm:p-6`}>
-            <div className="container mx-auto max-w-7xl space-y-8">
+        <div className="w-full space-y-8">
 
                 {/* ── Page Header ──────────────────────────────── */}
                 <motion.div
@@ -564,8 +561,8 @@ export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
                                     <span className={NEU_LABEL}>Tags</span>
                                     <div className="flex flex-wrap gap-1.5">
                                         {tour.tags && tour.tags.length > 0 ? (
-                                            tour.tags.map((tag) => (
-                                                <span key={tag} className={NEU_BADGE_NEUTRAL}>{tag}</span>
+                                            tour.tags.map((tag, index) => (
+                                                <span key={`${tag}-${index}`} className={NEU_BADGE_NEUTRAL}>{tag}</span>
                                             ))
                                         ) : (
                                             <span className={NEU_MUTED}>No tags</span>
@@ -611,6 +608,5 @@ export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
                 </FadeUp>
 
             </div>
-        </div>
     );
 }

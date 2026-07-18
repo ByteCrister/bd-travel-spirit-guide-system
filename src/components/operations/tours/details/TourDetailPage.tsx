@@ -7,7 +7,9 @@ import {
     MessageSquare,
     Flag,
     HelpCircle,
+    Plus,
 } from "lucide-react";
+import Link from "next/link";
 
 import ReviewsPanel from "./ReviewsPanel";
 import ReportsPanel from "./ReportsPanel";
@@ -101,8 +103,17 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
     };
 
     return (
-        <div className={cn("w-full space-y-6 overflow-x-hidden", NEU_SURFACE, "min-h-screen p-0")}>
-            <Breadcrumbs items={breadCrumbs} />
+        <div className={cn("w-full space-y-6 overflow-x-hidden container mx-auto max-w-7xl p-4 sm:p-6 lg:p-8", NEU_SURFACE, "min-h-screen")}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <Breadcrumbs items={breadCrumbs} />
+                <Link
+                    href="/operations/tours/add-tour"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50"
+                >
+                    <Plus className="w-5 h-5" />
+                    Create Tour
+                </Link>
+            </div>
 
             {/* ── Tab Bar ── */}
             <div className={NEU_TAB_WRAPPER}>

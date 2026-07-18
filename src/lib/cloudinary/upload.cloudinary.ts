@@ -39,7 +39,7 @@ export interface Base64Asset {
 export async function uploadAssets(
     assets: Base64Asset[],
     session: ClientSession,
-    concurrency = 1
+    concurrency = 4 // Increased from 1: upload up to 4 images in parallel
 ): Promise<Types.ObjectId[]> {
     if (!assets?.length) return [];
 
@@ -102,6 +102,11 @@ async function processSingleAsset(
     //
     // We retry on duplicate-key races because two concurrent requests with the
     // same checksum may both attempt to create the document simultaneously.
+    //
+    // ⚠️ NOTE: Do NOT use `setDefaultsOnInsert: true` here — the schema default
+    // for `refCount` is 1. Combined with `$inc: { refCount: 1 }`, Mongoose would
+    // inject `{ $setOnInsert: { refCount: 1 } }` making the initial refCount = 2,
+    // which breaks the `isNew` detection below.
     for (let i = 0; i < 5; i++) {
         try {
             assetFile = await AssetFileModel.findOneAndUpdate(
@@ -110,13 +115,15 @@ async function processSingleAsset(
                 {
                     new: true,
                     upsert: true,
-                    setDefaultsOnInsert: true,
                     session
                 }
             );
 
-            // If refCount is 1 after the upsert, this is the first time we've seen this checksum.
-            isNew = assetFile.refCount === 1;
+            // Treat as "new" if publicUrl hasn't been saved yet.
+            // This is more reliable than checking refCount === 1 because
+            // setDefaultsOnInsert was previously injecting a default refCount of 1
+            // alongside $inc, making refCount start at 2 and breaking the detection.
+            isNew = !assetFile.publicUrl;
             break;
         } catch (err) {
             // If the error is a Mongo duplicate-key race, wait a short backoff and retry.
@@ -136,7 +143,8 @@ async function processSingleAsset(
             const uploaded = await storage.create(dataUrl, {
                 checksum,
                 fileName: asset.name,
-                timeout: calculateTimeout(dataUrl),
+                // Pass buffer.length to avoid re-decoding the base64 inside calculateTimeout
+                timeout: calculateTimeout(buffer.length),
                 maxRetries: 1
             });
 
@@ -206,15 +214,15 @@ async function processSingleAsset(
  * @param dataUrl - Base64 data URL string.
  * @returns Timeout in milliseconds.
  */
-// Replace calculateTimeout function in upload.cloudinary.ts
-function calculateTimeout(dataUrl: string): number {
-    const buffer = base64ToBuffer(dataUrl);
-    const mb = buffer.length / (1024 * 1024);
-    
-    // Adjust timeouts based on file size
-    if (mb > 20) return 300_000; // 5 minutes for very large files
-    if (mb > 10) return 180_000; // 3 minutes
-    if (mb > 5) return 120_000;  // 2 minutes
-    if (mb > 2) return 60_000;   // 1 minute
-    return 30_000;               // 30 seconds for small files
+/**
+ * Calculate a sensible upload timeout based on raw byte count.
+ * Accepts buffer byte length directly to avoid redundant base64 decoding.
+ */
+function calculateTimeout(byteLength: number): number {
+    const mb = byteLength / (1024 * 1024);
+    if (mb > 20) return 300_000; // 5 min for very large files
+    if (mb > 10) return 240_000; // 4 min
+    if (mb > 5)  return 180_000; // 3 min
+    if (mb > 2)  return 120_000; // 2 min
+    return 90_000;               // 1.5 min for small files (≤2 MB) - increased from 30s to prevent 499s
 }

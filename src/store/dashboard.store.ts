@@ -31,7 +31,8 @@ import { showToast } from "@/components/global/showToast";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import { ApiResponse } from "@/types/common/api.types";
 
-const URL_AFTER_API = `/mock/dashboard/v1`;
+const URL_AFTER_API = `/dashboard/v1`;
+// const URL_AFTER_API = `/mock/dashboard/v1`;
 const API_PATHS = {
   stats: `${URL_AFTER_API}/stats`,
   profile: `${URL_AFTER_API}/profile`,

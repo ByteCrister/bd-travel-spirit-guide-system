@@ -61,7 +61,7 @@ const NEU_BADGE =
 
 // ── Constants ─────────────────────────────────────────────────
 const MAX_IMAGES = 5;
-const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_MB = 2;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 interface GalleryUpdateProps {
@@ -330,6 +330,7 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
                     className={`relative ${NEU_IMAGE_TILE}`}
                   >
                     <div className="relative h-32 rounded-xl overflow-hidden">
+                      {imageId ? (
                       <Image
                         src={imageId}
                         alt={`Gallery ${index + 1}`}
@@ -338,9 +339,12 @@ export default function GalleryUpdate({ tourId, currentGallery, updateData }: Ga
                         sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                         onError={(e) => {
                           const t = e.target as HTMLImageElement;
-                          t.src = '/placeholder-image.jpg';
+                          t.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23ccc%22/%3E%3C/svg%3E';
                         }}
                       />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs">No image</div>
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
 

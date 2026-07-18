@@ -393,7 +393,7 @@ export const Step4PricingSchema = Yup.object().shape({
                         createNestedErrorMessage("Pricing", "Operating Windows", "Start Date", "must be at least 10 days from today"),
                         function (value) {
                             if (!value) return true;
-                            return new Date(value) >= minDateFromToday(10);
+                            return new Date(value) >= minDateFromToday(1);
                         }
                     ),
                 endDate: Yup.date()
@@ -471,62 +471,6 @@ export const Step4PricingSchema = Yup.object().shape({
                             if (!value) return false;
                             return new Date(value) >= minDateFromToday(10);
                         }
-                    )
-                    .test(
-                        "within-operating-window",
-                        createNestedErrorMessage("Pricing", "Departures", "Date", "must be within an operating window"),
-                        function (value) {
-                            const operatingWindows = this.parent?.parent?.operatingWindows;
-
-                            if (!operatingWindows || operatingWindows.length === 0)
-                                return true;
-
-                            const departureDate = new Date(value);
-
-                            return operatingWindows.some((window: OperatingWindowDTO) => {
-                                const windowStart = new Date(window.startDate);
-                                const windowEnd = new Date(window.endDate);
-                                return (
-                                    departureDate >= windowStart && departureDate <= windowEnd
-                                );
-                            });
-                        }
-                    )
-                    .test(
-                        "has-enough-duration",
-                        createNestedErrorMessage("Pricing", "Departures", "Date", "must allow for full tour duration"),
-                        function (value) {
-                            const { duration, operatingWindows } = this.parent?.parent || {};
-
-                            if (
-                                !duration?.days ||
-                                !operatingWindows ||
-                                operatingWindows.length === 0
-                            )
-                                return true;
-
-                            const departureDate = new Date(value);
-                            const tourDurationDays = duration.days;
-
-                            const operatingWindow = operatingWindows.find(
-                                (window: OperatingWindowDTO) => {
-                                    const windowStart = new Date(window.startDate);
-                                    const windowEnd = new Date(window.endDate);
-                                    return (
-                                        departureDate >= windowStart && departureDate <= windowEnd
-                                    );
-                                }
-                            );
-
-                            if (!operatingWindow) return true;
-
-                            const tourEndDate = new Date(departureDate);
-                            tourEndDate.setDate(tourEndDate.getDate() + tourDurationDays - 1);
-
-                            const windowEnd = new Date(operatingWindow.endDate);
-
-                            return tourEndDate <= windowEnd;
-                        }
                     ),
                 seatsTotal: Yup.number()
                     .required(createNestedErrorMessage("Pricing", "Departures", "Seats Total", "is required"))
@@ -550,41 +494,6 @@ export const Step4PricingSchema = Yup.object().shape({
                         message: createNestedErrorMessage("Pricing", "Departures", "Dates", "duplicate departure dates are not allowed"),
                     });
                 }
-                return true;
-            }
-        )
-        .test(
-            "departures-within-windows",
-            createNestedErrorMessage("Pricing", "Departures", "Dates", "must be within operating windows"),
-            function (departures) {
-                const operatingWindows = this.parent?.operatingWindows;
-
-                if (
-                    !departures ||
-                    departures.length === 0 ||
-                    !operatingWindows ||
-                    operatingWindows.length === 0
-                ) {
-                    return true;
-                }
-
-                for (const departure of departures) {
-                    const departureDate = new Date(departure.date);
-                    const isWithinWindow = operatingWindows.some(
-                        (window: OperatingWindowDTO) => {
-                            const windowStart = new Date(window.startDate);
-                            const windowEnd = new Date(window.endDate);
-                            return departureDate >= windowStart && departureDate <= windowEnd;
-                        }
-                    );
-
-                    if (!isWithinWindow) {
-                        return this.createError({
-                            message: createNestedErrorMessage("Pricing", "Departures", `Date ${departure.date.toISOString().split("T")[0]}`, "is not within any operating window"),
-                        });
-                    }
-                }
-
                 return true;
             }
         ),

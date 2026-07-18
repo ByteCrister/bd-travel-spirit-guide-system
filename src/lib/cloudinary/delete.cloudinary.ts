@@ -1,31 +1,23 @@
 // lib/cloudinary/delete.cloudinary.ts
 import mongoose from "mongoose";
 import AssetModel from "@/models/assets/asset.model";
+import AssetFileModel from "@/models/assets/asset-file.model";
+import { getDocumentStorageProvider } from "@/lib/storage-providers";
+import { STORAGE_PROVIDER } from "@/constants/common/asset.const";
 
 /**
- * Soft-delete assets in the database and remove their files from the configured storage provider.
+ * Soft-delete assets in the database and remove their files from Cloudinary
+ * when no other Asset references them (refCount reaches 0).
  *
- * Behavior
- * - Loads assets that are not already soft-deleted.
- * - Attempts to delete each asset file from the storage provider. Storage failures are logged but do not abort the process.
- * - Performs a soft-delete of the asset documents using the provided session so the caller can include this operation in a transaction.
+ * Behavior:
+ * - Soft-deletes Asset documents using the provided session (transaction-safe).
+ * - Decrements refCount on the associated AssetFile (done inside softDeleteMany).
+ * - After the DB operations, fetches any AssetFile whose refCount is now 0
+ *   and deletes them from Cloudinary. Storage failures are logged but do not
+ *   abort the process (the DB soft-delete already committed).
  *
- * @param {mongoose.Types.ObjectId[]} assetIds - Array of Asset document IDs to clean up. If empty the function returns immediately.
- *
- * @example
- * const ids = [new mongoose.Types.ObjectId("..."), new mongoose.Types.ObjectId("...")];
- * await cleanupAssets(ids, session);
- *
- * @param {mongoose.ClientSession} session - Mongoose client session used for DB operations. Pass a valid session to include the soft-delete in a transaction.
- *
- * @returns {Promise<void>} Resolves when all storage delete attempts and the DB soft-delete operation complete.
- *
- * @throws {Error} Re-throws unexpected errors from Mongoose operations. Storage provider errors are caught and logged.
- *
- * Notes
- * - The function intentionally swallows and logs storage provider delete errors to avoid leaving the DB in an inconsistent state when storage is temporarily unavailable.
- * - If you want storage failures to abort the DB soft-delete, move the soft-delete call inside the try/catch and rethrow on storage failure.
- * - Ensure AssetModel.softDeleteMany accepts the same session signature used here.
+ * @param assetIds - Array of Asset document IDs to clean up.
+ * @param session  - Mongoose client session for transactional DB operations.
  */
 export async function cleanupAssets(
     assetIds: mongoose.Types.ObjectId[],
@@ -33,14 +25,40 @@ export async function cleanupAssets(
 ): Promise<void> {
     if (!assetIds?.length) return;
 
-    // 1️⃣ Fetch Assets to get their file IDs
+    // 1️⃣ Fetch Assets (with file IDs) before soft-deleting
     const assets = await AssetModel.find({ _id: { $in: assetIds }, deletedAt: null })
         .session(session)
-        .select("file");
+        .select("file")
+        .lean();
 
     if (!assets.length) return;
 
-    // 2️⃣ Soft-delete Assets
+    const fileIds = assets.map(a => a.file);
+
+    // 2️⃣ Soft-delete Asset documents and decrement AssetFile.refCount
+    //    (softDeleteMany handles the decrement internally)
     await AssetModel.softDeleteMany({ _id: { $in: assetIds } }, session);
 
+    // 3️⃣ After decrement, find AssetFiles whose refCount has reached 0
+    //    — these are truly orphaned and should be removed from Cloudinary.
+    //    This runs OUTSIDE the session intentionally: Cloudinary is not
+    //    transactional, and we don't want a storage failure to roll back the DB.
+    const orphanedFiles = await AssetFileModel.find({
+        _id: { $in: fileIds },
+        refCount: { $lte: 0 },
+        objectKey: { $exists: true, $ne: "" },
+    }).lean();
+
+    if (!orphanedFiles.length) return;
+
+    const storage = getDocumentStorageProvider(STORAGE_PROVIDER.CLOUDINARY);
+    const objectKeys = orphanedFiles.map(f => f.objectKey);
+
+    try {
+        await storage.deleteMany(objectKeys);
+    } catch (err) {
+        // Storage failures are logged but do not throw — the DB state is already
+        // consistent. The files can be cleaned up via a background job later.
+        console.error("[cleanupAssets] Failed to delete files from Cloudinary:", err);
+    }
 }

@@ -39,32 +39,40 @@ export const PATCH = withErrorHandler(async (req: NextRequest) => {
 
     const existingAvatarId = user.avatar ?? null;
 
-    // 4. Execute the asset upload & user update inside a transaction
+    // 4. Perform Cloudinary upload OUTSIDE the transaction
+    let newAssetId: Types.ObjectId;
+    let assetsToDelete: Types.ObjectId[] = [];
+    if (existingAvatarId) {
+        // Replace existing avatar: reuse/resolve
+        const result = await resolveDocuments(
+            [{ type: ASSET_TYPE.IMAGE, url: avatarBase64 }],
+            [{ type: ASSET_TYPE.IMAGE, asset: existingAvatarId }],
+            ASSET_TYPE.IMAGE,
+            null as any
+        );
+        newAssetId = result.resolvedDocs[0].asset;
+        assetsToDelete = result.assetsToDelete;
+    } else {
+        // First avatar upload
+        const [assetId] = await uploadAssets(
+            [{ base64: avatarBase64, name: "profile-image-avatar", assetType: ASSET_TYPE.IMAGE }],
+            null as any,
+            1
+        );
+        newAssetId = assetId;
+    }
+
+    // 5. Execute the user update inside a transaction
     const avatarUrl = await withTransaction(async (session) => {
-        let newAssetId: Types.ObjectId;
-
-        if (existingAvatarId) {
-            // Replace existing avatar: reuse/resolve + cleanup old asset
-            const resolved = await resolveDocuments(
-                [{ type: ASSET_TYPE.IMAGE, url: avatarBase64 }],
-                [{ type: ASSET_TYPE.IMAGE, asset: existingAvatarId }],
-                ASSET_TYPE.IMAGE,
-                session
-            );
-            newAssetId = resolved[0].asset;
-        } else {
-            // First avatar upload
-            const [assetId] = await uploadAssets(
-                [{ base64: avatarBase64, name: "profile-image-avatar", assetType: ASSET_TYPE.IMAGE }],
-                session,
-                1
-            );
-            newAssetId = assetId;
-        }
-
-        // 5. Update user document with the new asset id
+        // Update user document with the new asset id
         user.avatar = newAssetId;
         await user.save({ session });
+        
+        // Cleanup old avatar if it was replaced
+        if (assetsToDelete.length > 0) {
+            const { cleanupAssets } = await import('@/lib/cloudinary/delete.cloudinary');
+            await cleanupAssets(assetsToDelete, session);
+        }
 
         // 6. Fetch public URL of the new avatar
         const asset = await AssetModel.findById(newAssetId)
