@@ -1,4 +1,4 @@
-// Enhanced Profile Header – Neumorphism design system
+﻿// Enhanced Profile Header – Neumorphism design system
 import { IBaseUser, CurrentUser, IEmployeeInfo } from "@/types/current-user.types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, Mail, Crown, Headphones, User } from "lucide-react";
@@ -73,7 +73,7 @@ export default function ProfileHeader({ baseUser, fullUser }: ProfileHeaderProps
     >
       {/* Outer neumorphic card */}
       <div className="rounded-2xl p-6 bg-[#E7E5E4]
-        shadow-[10px_10px_24px_rgba(0,0,0,0.16),-8px_-8px_20px_rgba(255,255,255,0.9)]">
+        ">
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
           {/* Avatar */}
@@ -85,10 +85,10 @@ export default function ProfileHeader({ baseUser, fullUser }: ProfileHeaderProps
           >
             {/* Outer ring — raised */}
             <div className="p-1.5 rounded-full bg-[#E7E5E4]
-              shadow-[5px_5px_14px_rgba(0,0,0,0.16),-5px_-5px_12px_rgba(255,255,255,0.9)]">
+              ">
               {/* Inner ring — pressed */}
               <div className="p-1 rounded-full bg-[#E7E5E4]
-                shadow-[inset_3px_3px_8px_rgba(0,0,0,0.12),inset_-3px_-3px_7px_rgba(255,255,255,0.75)]">
+                ">
                 <Avatar className="h-24 w-24 border-0">
                   <AvatarImage src={getAvatar()} />
                   <AvatarFallback
@@ -109,7 +109,7 @@ export default function ProfileHeader({ baseUser, fullUser }: ProfileHeaderProps
               className="absolute bottom-2 right-2"
             >
               <div className="h-5 w-5 rounded-full bg-[#E7E5E4]
-                shadow-[3px_3px_6px_rgba(0,0,0,0.15),-2px_-2px_5px_rgba(255,255,255,0.8)]
+                
                 flex items-center justify-center">
                 <div className="h-3 w-3 rounded-full bg-[#00A63D]" />
               </div>
@@ -128,7 +128,7 @@ export default function ProfileHeader({ baseUser, fullUser }: ProfileHeaderProps
                 {getDisplayName()}
               </h2>
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold ${roleConfig.badgeBg}
-                shadow-[3px_3px_7px_rgba(0,0,0,0.18),-2px_-2px_5px_rgba(255,255,255,0.6)]`}>
+                `}>
                 <RoleIcon className="h-3.5 w-3.5" />
                 {roleConfig.label}
               </span>
@@ -142,7 +142,7 @@ export default function ProfileHeader({ baseUser, fullUser }: ProfileHeaderProps
             >
               {/* Email pill */}
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4]
-                shadow-[inset_3px_3px_7px_rgba(0,0,0,0.1),inset_-3px_-3px_7px_rgba(255,255,255,0.7)]">
+                ">
                 <Mail className="h-4 w-4 text-[#006666] shrink-0" />
                 <div className="min-w-0">
                   <p className="text-[10px] uppercase tracking-widest text-[#1E2938]/40
@@ -155,7 +155,7 @@ export default function ProfileHeader({ baseUser, fullUser }: ProfileHeaderProps
 
               {/* Member since pill */}
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4]
-                shadow-[inset_3px_3px_7px_rgba(0,0,0,0.1),inset_-3px_-3px_7px_rgba(255,255,255,0.7)]">
+                ">
                 <Calendar className="h-4 w-4 text-[#006666] shrink-0" />
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-[#1E2938]/40">Member Since</p>

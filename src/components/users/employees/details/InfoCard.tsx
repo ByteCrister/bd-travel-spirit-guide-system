@@ -1,4 +1,4 @@
-// components/ui/InfoCard.tsx
+﻿// components/ui/InfoCard.tsx
 export default function InfoCard({
   icon: Icon,
   title,
@@ -12,11 +12,11 @@ export default function InfoCard({
 }) {
   return (
     <div
-      className={`bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_16px_#C6C4C3,-8px_-8px_16px_#ffffff] overflow-hidden ${className}`}
+      className={`bg-[#E7E5E4] rounded-2xl  overflow-hidden ${className}`}
     >
       <div className="px-6 py-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-[#E7E5E4] rounded-lg shadow-[4px_4px_8px_#C6C4C3,-4px_-4px_8px_#ffffff]">
+          <div className="p-2 bg-[#E7E5E4] rounded-lg ">
             <Icon className="h-5 w-5 text-[#006666]" />
           </div>
           <h3

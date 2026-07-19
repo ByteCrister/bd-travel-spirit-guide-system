@@ -1,4 +1,4 @@
-// components/faqs/FaqPagination.tsx
+﻿// components/faqs/FaqPagination.tsx
 'use client';
 
 import React from 'react';
@@ -36,9 +36,9 @@ export function FaqPagination({ currentPage, totalPages, onPageChange }: FaqPagi
     const navBtn =
         'inline-flex h-9 w-9 items-center justify-center rounded-full ' +
         'bg-[#E7E5E4] text-[#1E2938] ' +
-        'shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] ' +
-        'hover:shadow-[3px_3px_6px_#cac8c7,-3px_-3px_6px_#ffffff] ' +
-        'active:shadow-[inset_3px_3px_6px_#cac8c7,inset_-3px_-3px_6px_#ffffff] ' +
+        ' ' +
+        'hover: ' +
+        'active: ' +
         'disabled:pointer-events-none disabled:opacity-35 ' +
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2 focus-visible:ring-offset-[#E7E5E4] ' +
         'transition-shadow duration-150 select-none';
@@ -47,7 +47,7 @@ export function FaqPagination({ currentPage, totalPages, onPageChange }: FaqPagi
         <nav
             aria-label="FAQ pagination"
             className="inline-flex items-center gap-2 rounded-2xl bg-[#E7E5E4] px-3 py-2
-                shadow-[8px_8px_16px_#cac8c7,-8px_-8px_16px_#ffffff]"
+                "
         >
             {/* Previous */}
             <button
@@ -134,12 +134,12 @@ function PageButton({
                 'focus-visible:ring-offset-2 focus-visible:ring-offset-[#E7E5E4]',
                 'transition-shadow duration-150 select-none',
                 isActive
-                    ? 'bg-[#006666] text-white shadow-[inset_2px_2px_5px_#004d4d,inset_-2px_-2px_5px_#009999]'
+                    ? 'bg-[#006666] text-white '
                     : [
                         'bg-[#E7E5E4] text-[#1E2938]',
-                        'shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff]',
-                        'hover:shadow-[3px_3px_6px_#cac8c7,-3px_-3px_6px_#ffffff]',
-                        'active:shadow-[inset_3px_3px_6px_#cac8c7,inset_-3px_-3px_6px_#ffffff]',
+                        '',
+                        'hover:',
+                        'active:',
                     ].join(' '),
             ].join(' ')}
         >

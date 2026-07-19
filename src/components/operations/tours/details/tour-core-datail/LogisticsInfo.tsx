@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { TRANSPORT_MODE, TransportMode } from "@/constants/tour/tour.const";
 import { TourDetailDTO } from "@/types/tour/tour.types";
@@ -22,19 +22,19 @@ import { motion, HTMLMotionProps } from "framer-motion";
 const NEU = {
     surface:   "bg-[#E7E5E4]",
     card:      "bg-[#E7E5E4] rounded-2xl",
-    raised:    "shadow-[6px_6px_12px_#c8c6c4,-6px_-6px_12px_#ffffff] rounded-2xl",
-    inset:     "shadow-[inset_4px_4px_8px_#c8c6c4,inset_-4px_-4px_8px_#ffffff] rounded-xl",
-    insetSm:   "shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] rounded-lg",
-    pill:      "shadow-[3px_3px_6px_#c8c6c4,-3px_-3px_6px_#ffffff] rounded-full",
-    iconWrap:  "flex items-center justify-center w-10 h-10 rounded-xl bg-[#E7E5E4] shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff]",
+    raised:    " rounded-2xl",
+    inset:     " rounded-xl",
+    insetSm:   " rounded-lg",
+    pill:      " rounded-full",
+    iconWrap:  "flex items-center justify-center w-10 h-10 rounded-xl bg-[#E7E5E4] ",
     label:     "text-xs font-mono font-semibold uppercase tracking-widest text-[#006666]",
     heading:   "font-bold text-[#1E2938] font-[Space_Mono,monospace]",
     muted:     "text-sm text-[#1E2938]/50 font-[Space_Mono,monospace]",
     body:      "text-sm text-[#1E2938]/80 font-[Space_Mono,monospace]",
     divider:   "border-t border-[#1E2938]/10 my-4",
     accent:    "text-[#006666]",
-    required:  "bg-[#E7E5E4] border-l-4 border-[#00A63D] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] rounded-lg",
-    optional:  "bg-[#E7E5E4] border-l-4 border-[#FE9900] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] rounded-lg",
+    required:  "bg-[#E7E5E4] border-l-4 border-[#00A63D]  rounded-lg",
+    optional:  "bg-[#E7E5E4] border-l-4 border-[#FE9900]  rounded-lg",
 } as const;
 
 // Fixed: proper easing type for Framer Motion

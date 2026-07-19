@@ -1,6 +1,6 @@
 "use client";
 
-import { Field, FieldArray, useFormikContext, getIn } from "formik";
+import { useFormikContext, getIn, Field, FieldArray } from "formik";
 import { motion, AnimatePresence } from "framer-motion";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -28,47 +28,47 @@ import { FaBangladeshiTakaSign } from "react-icons/fa6";
 
 // ── Neumorphism style tokens (from neu.styles.ts) ──────────────
 const NEU_SURFACE_INSET =
-  "bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
+  "bg-[#E7E5E4] ";
 
 const NEU_CARD =
-  "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+  "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_CARD_SM =
-  "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+  "rounded-xl bg-[#E7E5E4]  border border-white/60";
 const NEU_CARD_HOVER =
-  "hover:shadow-[10px_10px_20px_#c8c6c5,-10px_-10px_20px_#ffffff] hover:-translate-y-0.5 transition-all duration-300";
+  "hover: hover:-translate-y-0.5 transition-all duration-300";
 const NEU_BTN_PRIMARY =
   "rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide " +
-  "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
-  "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
-  "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+  " " +
+  "hover: hover:bg-[#007777] " +
+  "active: " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
 const NEU_BTN_GHOST =
   "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] " +
-  "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-  "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
-  "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " " +
+  "hover: " +
+  "active: " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 const NEU_BTN_ICON =
   "rounded-xl w-9 h-9 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/60 " +
-  "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-  "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " " +
+  "hover:text-[#006666] hover: " +
   "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 
 const NEU_INPUT =
   "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 w-full " +
   "font-[family-name:var(--font-jetbrains-mono)] text-sm px-3 py-2.5 " +
-  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+  " border-none " +
   "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 const NEU_SELECT =
   "rounded-xl bg-[#E7E5E4] text-[#1E2938] w-full " +
   "font-[family-name:var(--font-jetbrains-mono)] text-sm px-3 py-2.5 " +
-  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+  " border-none " +
   "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200 appearance-none cursor-pointer";
 
 const NEU_BADGE_PRIMARY =
   "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-  "bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+  "bg-[#006666]/10 text-[#006666] ";
 const NEU_HEADING =
   "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL =
@@ -76,9 +76,9 @@ const NEU_LABEL =
 const NEU_MUTED =
   "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_ICON_WELL =
-  "p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+  "p-2.5 rounded-xl bg-[#E7E5E4] ";
 const NEU_ICON_WELL_PRIMARY =
-  "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+  "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_PAGE_BG = "min-h-screen bg-[#E7E5E4]";
 
 // ── Section header component ────────────────────────────────────
@@ -122,9 +122,6 @@ export default function PricingCommerceStep() {
     useFormikContext<CreateTourDTO>();
 
   const [mapPickerOpen, setMapPickerOpen] = useState(false);
-  const [editingDepartureIndex, setEditingDepartureIndex] = useState<
-    number | null
-  >(null);
 
   const getError = (fieldName: string) => {
     const error = getIn(errors, fieldName);
@@ -133,27 +130,22 @@ export default function PricingCommerceStep() {
   };
 
   const handleMapSelect = (lat: number, lng: number) => {
-    if (editingDepartureIndex !== null) {
-      setFieldValue(`departures[${editingDepartureIndex}].meetingCoordinates`, {
-        lat,
-        lng,
-      });
-    }
+    setFieldValue("departure.meetingCoordinates", {
+      lat,
+      lng,
+    });
   };
 
-  const openMapPicker = (index: number) => {
-    setEditingDepartureIndex(index);
+  const openMapPicker = () => {
     setMapPickerOpen(true);
   };
 
   const closeMapPicker = () => {
     setMapPickerOpen(false);
-    setEditingDepartureIndex(null);
   };
 
   const getInitialPosition = (): [number, number] | undefined => {
-    if (editingDepartureIndex === null) return undefined;
-    const departure = values.departures?.[editingDepartureIndex];
+    const departure = values.departure;
     if (departure?.meetingCoordinates) {
       return [departure.meetingCoordinates.lat, departure.meetingCoordinates.lng];
     }
@@ -369,6 +361,20 @@ export default function PricingCommerceStep() {
                               onChange={(date) =>
                                 setFieldValue(`discounts[${index}].validFrom`, date)
                               }
+                              shouldDisableDate={(d: any) => {
+                                const current = new Date(d);
+                                current.setHours(0, 0, 0, 0);
+                                const today = new Date(); today.setHours(0, 0, 0, 0);
+                                if (current < today) return true;
+                                
+                                const opWin = values.operatingWindow;
+                                if (opWin && opWin.startDate && opWin.endDate) {
+                                  const start = new Date(opWin.startDate); start.setHours(0,0,0,0);
+                                  const end = new Date(opWin.endDate); end.setHours(0,0,0,0);
+                                  if (current < start || current > end) return true;
+                                }
+                                return false;
+                              }}
                               slotProps={{
                                 textField: {
                                   size: "small",
@@ -397,6 +403,26 @@ export default function PricingCommerceStep() {
                               onChange={(date) =>
                                 setFieldValue(`discounts[${index}].validUntil`, date)
                               }
+                              shouldDisableDate={(d: any) => {
+                                const current = new Date(d);
+                                current.setHours(0, 0, 0, 0);
+                                const today = new Date(); today.setHours(0, 0, 0, 0);
+                                if (current < today) return true;
+
+                                if (discount.validFrom) {
+                                  const validFromDate = new Date(discount.validFrom);
+                                  validFromDate.setHours(0,0,0,0);
+                                  if (current < validFromDate) return true;
+                                }
+                                
+                                const opWin = values.operatingWindow;
+                                if (opWin && opWin.startDate && opWin.endDate) {
+                                  const start = new Date(opWin.startDate); start.setHours(0,0,0,0);
+                                  const end = new Date(opWin.endDate); end.setHours(0,0,0,0);
+                                  if (current < start || current > end) return true;
+                                }
+                                return false;
+                              }}
                               slotProps={{
                                 textField: {
                                   size: "small",
@@ -488,146 +514,75 @@ export default function PricingCommerceStep() {
             </div>
           </motion.section>
 
-          {/* ── Operating Windows ────────────────────────────────── */}
+          {/* ── Operating Window ─────────────────────────────────── */}
           <motion.section variants={itemVariants}>
             <SectionHeader
               icon={<Calendar className="w-4 h-4" />}
-              title="Operating Windows"
-              subtitle="Define date ranges when this tour runs"
+              title="Operating Window"
+              subtitle="Define the date range when this tour is available"
             />
-            <FieldArray name="operatingWindows">
-              {({ push, remove }) => (
-                <div className="space-y-3">
-                  {/* Table header – desktop only */}
-                  <div className="hidden sm:grid sm:grid-cols-[1fr_1fr_120px_48px] gap-3 px-4">
-                    <span className={NEU_LABEL}>Start Date *</span>
-                    <span className={NEU_LABEL}>End Date *</span>
-                    <span className={NEU_LABEL}>Total Seats</span>
-                    <span />
-                  </div>
-
-                  <AnimatePresence mode="popLayout">
-                    {values.operatingWindows?.map((window, index) => (
-                      <motion.div
-                        key={index}
-                        variants={cardVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        layout
-                        className={`${NEU_CARD_SM} p-4`}
-                      >
-                        <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_120px_48px] gap-3 items-end">
-                          <div>
-                            <label className={NEU_LABEL + " mb-1.5 block sm:hidden"}>Start Date *</label>
-                            <DatePicker
-                              value={new Date(window.startDate)}
-                              onChange={(date) =>
-                                setFieldValue(
-                                  `operatingWindows[${index}].startDate`,
-                                  date
-                                )
-                              }
-                              slotProps={{
-                                textField: {
-                                  size: "small",
-                                  fullWidth: true,
-                                  error: Boolean(getError(`operatingWindows[${index}].startDate`)),
-                                  helperText: getError(`operatingWindows[${index}].startDate`),
-                                  sx: {
-                                    "& .MuiOutlinedInput-root": {
-                                      borderRadius: "0.75rem",
-                                      background: "#E7E5E4",
-                                      boxShadow: "inset 3px 3px 7px #c8c6c5, inset -3px -3px 7px #ffffff",
-                                      border: "none",
-                                      fontFamily: "var(--font-jetbrains-mono)",
-                                    },
-                                    "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                                  },
-                                },
-                              }}
-                            />
-                          </div>
-                          <div>
-                            <label className={NEU_LABEL + " mb-1.5 block sm:hidden"}>End Date *</label>
-                            <DatePicker
-                              value={new Date(window.endDate)}
-                              onChange={(date) =>
-                                setFieldValue(
-                                  `operatingWindows[${index}].endDate`,
-                                  date
-                                )
-                              }
-                              slotProps={{
-                                textField: {
-                                  size: "small",
-                                  fullWidth: true,
-                                  error: Boolean(getError(`operatingWindows[${index}].endDate`)),
-                                  helperText: getError(`operatingWindows[${index}].endDate`),
-                                  sx: {
-                                    "& .MuiOutlinedInput-root": {
-                                      borderRadius: "0.75rem",
-                                      background: "#E7E5E4",
-                                      boxShadow: "inset 3px 3px 7px #c8c6c5, inset -3px -3px 7px #ffffff",
-                                      border: "none",
-                                      fontFamily: "var(--font-jetbrains-mono)",
-                                    },
-                                    "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                                  },
-                                },
-                              }}
-                            />
-                          </div>
-                          <div>
-                            <label className={NEU_LABEL + " mb-1.5 block sm:hidden"}>Total Seats</label>
-                            <input
-                              type="number"
-                              value={window.seatsTotal || ""}
-                              min={0}
-                              placeholder="∞"
-                              onChange={(e) =>
-                                setFieldValue(
-                                  `operatingWindows[${index}].seatsTotal`,
-                                  e.target.value
-                                    ? parseInt(e.target.value, 10)
-                                    : undefined
-                                )
-                              }
-                              className={NEU_INPUT}
-                            />
-                          </div>
-                          <div className="flex sm:justify-center">
-                            <button
-                              type="button"
-                              onClick={() => remove(index)}
-                              className={NEU_BTN_ICON}
-                              aria-label="Remove operating window"
-                            >
-                              <Trash2 className="w-4 h-4 text-[#FF2157]" />
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      push({
-                        startDate: new Date(),
-                        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                        seatsTotal: undefined,
-                      })
+            <div className={`${NEU_CARD} p-5 ${NEU_CARD_HOVER}`}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={NEU_LABEL + " mb-1.5 block"}>
+                    Start Date <span className="text-[#FF2157]">*</span>
+                  </label>
+                  <DatePicker
+                    value={values.operatingWindow?.startDate ? new Date(values.operatingWindow.startDate) : null}
+                    onChange={(date) =>
+                      setFieldValue("operatingWindow.startDate", date)
                     }
-                    className={`${NEU_BTN_GHOST} flex items-center gap-2 px-4 py-2.5 text-sm`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Operating Window
-                  </button>
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        fullWidth: true,
+                        error: Boolean(getError("operatingWindow.startDate")),
+                        helperText: getError("operatingWindow.startDate"),
+                        sx: {
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "0.75rem",
+                            background: "#E7E5E4",
+                            boxShadow: "inset 3px 3px 7px #c8c6c5, inset -3px -3px 7px #ffffff",
+                            border: "none",
+                            fontFamily: "var(--font-jetbrains-mono)",
+                          },
+                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                        },
+                      },
+                    }}
+                  />
                 </div>
-              )}
-            </FieldArray>
+                <div>
+                  <label className={NEU_LABEL + " mb-1.5 block"}>
+                    End Date <span className="text-[#FF2157]">*</span>
+                  </label>
+                  <DatePicker
+                    value={values.operatingWindow?.endDate ? new Date(values.operatingWindow.endDate) : null}
+                    onChange={(date) =>
+                      setFieldValue("operatingWindow.endDate", date)
+                    }
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        fullWidth: true,
+                        error: Boolean(getError("operatingWindow.endDate")),
+                        helperText: getError("operatingWindow.endDate"),
+                        sx: {
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "0.75rem",
+                            background: "#E7E5E4",
+                            boxShadow: "inset 3px 3px 7px #c8c6c5, inset -3px -3px 7px #ffffff",
+                            border: "none",
+                            fontFamily: "var(--font-jetbrains-mono)",
+                          },
+                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           </motion.section>
 
           {/* ── Payment Methods ──────────────────────────────────── */}
@@ -674,185 +629,183 @@ export default function PricingCommerceStep() {
             </div>
           </motion.section>
 
-          {/* ── Departures ───────────────────────────────────────── */}
+          {/* ── Departure ───────────────────────────────────────── */}
           <motion.section variants={itemVariants}>
             <SectionHeader
               icon={<Plane className="w-4 h-4" />}
-              title="Departures Schedule"
-              subtitle="Manage individual departure dates and meeting points"
+              title="Departure Schedule"
+              subtitle="Set the departure date and meeting point for this tour"
             />
-            <FieldArray name="departures">
-              {({ push, remove }) => (
-                <div className="space-y-3">
-                  {/* Column headers – desktop */}
-                  <div className="hidden lg:grid lg:grid-cols-[160px_100px_1fr_200px_48px] gap-3 px-4">
-                    <span className={NEU_LABEL}>Date</span>
-                    <span className={NEU_LABEL}>Seats</span>
-                    <span className={NEU_LABEL}>Meeting Point</span>
-                    <span className={NEU_LABEL}>Coordinates</span>
-                    <span />
-                  </div>
-
-                  <AnimatePresence mode="popLayout">
-                    {values.departures?.map((departure, index) => (
-                      <motion.div
-                        key={index}
-                        variants={cardVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        layout
-                        className={`${NEU_CARD_SM} p-4`}
-                      >
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[160px_100px_1fr_200px_48px] gap-3 items-end">
-                          {/* Date */}
-                          <div>
-                            <label className={NEU_LABEL + " mb-1.5 block lg:hidden"}>Date</label>
-                            <DatePicker
-                              value={new Date(departure.date)}
-                              onChange={(date) =>
-                                setFieldValue(`departures[${index}].date`, date)
-                              }
-                              slotProps={{
-                                textField: {
-                                  size: "small",
-                                  fullWidth: true,
-                                  sx: {
-                                    "& .MuiOutlinedInput-root": {
-                                      borderRadius: "0.75rem",
-                                      background: "#E7E5E4",
-                                      boxShadow: "inset 3px 3px 7px #c8c6c5, inset -3px -3px 7px #ffffff",
-                                      border: "none",
-                                      fontFamily: "var(--font-jetbrains-mono)",
-                                    },
-                                    "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                                  },
-                                },
-                              }}
-                            />
-                          </div>
-
-                          {/* Seats */}
-                          <div>
-                            <label className={NEU_LABEL + " mb-1.5 block lg:hidden"}>Total Seats</label>
-                            <input
-                              type="number"
-                              value={departure.seatsTotal}
-                              min={1}
-                              onChange={(e) =>
-                                setFieldValue(
-                                  `departures[${index}].seatsTotal`,
-                                  parseInt(e.target.value, 10)
-                                )
-                              }
-                              className={NEU_INPUT}
-                            />
-                          </div>
-
-                          {/* Meeting Point */}
-                          <div>
-                            <label className={NEU_LABEL + " mb-1.5 block lg:hidden"}>Meeting Point</label>
-                            <input
-                              type="text"
-                              value={departure.meetingPoint || ""}
-                              placeholder="e.g. Dhaka Airport Gate 3"
-                              onChange={(e) =>
-                                setFieldValue(
-                                  `departures[${index}].meetingPoint`,
-                                  e.target.value
-                                )
-                              }
-                              className={NEU_INPUT}
-                            />
-                          </div>
-
-                          {/* Coordinates */}
-                          <div className="space-y-1.5">
-                            <label className={NEU_LABEL + " block lg:hidden"}>Coordinates</label>
-                            <button
-                              type="button"
-                              onClick={() => openMapPicker(index)}
-                              className={`${NEU_BTN_GHOST} flex items-center gap-1.5 px-3 py-2 text-xs w-full justify-center`}
-                            >
-                              <MapPin className="w-3.5 h-3.5 text-[#006666]" />
-                              Set Location
-                            </button>
-                            {departure.meetingCoordinates && (
-                              <div className={NEU_BADGE_PRIMARY + " w-full justify-between"}>
-                                <span className="truncate text-[10px]">
-                                  {departure.meetingCoordinates.lat.toFixed(4)},{" "}
-                                  {departure.meetingCoordinates.lng.toFixed(4)}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setFieldValue(
-                                      `departures[${index}].meetingCoordinates`,
-                                      undefined
-                                    )
-                                  }
-                                  className="ml-1 hover:text-[#FF2157] transition-colors"
-                                  aria-label="Clear coordinates"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Delete */}
-                          <div className="flex lg:justify-center">
-                            <button
-                              type="button"
-                              onClick={() => remove(index)}
-                              className={NEU_BTN_ICON}
-                              aria-label="Remove departure"
-                            >
-                              <Trash2 className="w-4 h-4 text-[#FF2157]" />
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-
-                  {values.departures?.length === 0 && (
-                    <div className={`${NEU_SURFACE_INSET} rounded-2xl p-8 flex flex-col items-center gap-3`}>
-                      <div className={NEU_ICON_WELL + " text-[#1E2938]/30"}>
-                        <Plane className="w-5 h-5" />
-                      </div>
-                      <p className={NEU_MUTED}>No departures added yet</p>
+            
+            <div className="space-y-3">
+              {!values.departure ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFieldValue("departure", {
+                      date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+                      seatsTotal: 20,
+                    })
+                  }
+                  className={`${NEU_BTN_GHOST} flex items-center gap-2 px-4 py-2.5 text-sm`}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Departure
+                </button>
+              ) : (
+                <motion.div
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  layout
+                  className={`${NEU_CARD_SM} p-4`}
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[160px_100px_1fr_200px_48px] gap-3 items-end">
+                    {/* Date */}
+                    <div>
+                      <label className={NEU_LABEL + " mb-1.5 block lg:hidden"}>Date *</label>
+                      <label className={NEU_LABEL + " mb-1.5 hidden lg:block"}>Date *</label>
+                      <DatePicker
+                        value={new Date(values.departure.date)}
+                        onChange={(date) =>
+                          setFieldValue("departure.date", date)
+                        }
+                        shouldDisableDate={(d: any) => {
+                          const today = new Date(); today.setHours(0, 0, 0, 0);
+                          const current = new Date(d);
+                          if (current < today) return true;
+                          
+                          const opWin = values.operatingWindow;
+                          if (opWin && opWin.endDate) {
+                              const endDate = new Date(opWin.endDate);
+                              endDate.setHours(0, 0, 0, 0);
+                              const maxDate = new Date(endDate);
+                              maxDate.setDate(maxDate.getDate() + 10);
+                              if (current < endDate || current > maxDate) return true;
+                          }
+                          return false;
+                        }}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                            fullWidth: true,
+                            sx: {
+                              "& .MuiOutlinedInput-root": {
+                                borderRadius: "0.75rem",
+                                background: "#E7E5E4",
+                                boxShadow: "inset 3px 3px 7px #c8c6c5, inset -3px -3px 7px #ffffff",
+                                border: "none",
+                                fontFamily: "var(--font-jetbrains-mono)",
+                              },
+                              "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                            },
+                          },
+                        }}
+                      />
                     </div>
-                  )}
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      push({
-                        date: new Date(),
-                        seatsTotal: 10,
-                        meetingPoint: "",
-                      })
-                    }
-                    className={`${NEU_BTN_GHOST} flex items-center gap-2 px-4 py-2.5 text-sm`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Departure
-                  </button>
-                </div>
+                    {/* Seats */}
+                    <div>
+                      <label className={NEU_LABEL + " mb-1.5 block lg:hidden"}>Total Seats *</label>
+                      <label className={NEU_LABEL + " mb-1.5 hidden lg:block"}>Total Seats *</label>
+                      <input
+                        type="number"
+                        value={values.departure.seatsTotal}
+                        min={1}
+                        onChange={(e) =>
+                          setFieldValue(
+                            "departure.seatsTotal",
+                            parseInt(e.target.value, 10)
+                          )
+                        }
+                        className={NEU_INPUT}
+                      />
+                    </div>
+
+                    {/* Meeting Point */}
+                    <div>
+                      <label className={NEU_LABEL + " mb-1.5 block lg:hidden"}>Meeting Point</label>
+                      <label className={NEU_LABEL + " mb-1.5 hidden lg:block"}>Meeting Point</label>
+                      <input
+                        type="text"
+                        value={values.departure.meetingPoint || ""}
+                        placeholder="e.g. Dhaka Airport Gate 3"
+                        onChange={(e) =>
+                          setFieldValue(
+                            "departure.meetingPoint",
+                            e.target.value
+                          )
+                        }
+                        className={NEU_INPUT}
+                      />
+                    </div>
+
+                    {/* Coordinates */}
+                    <div className="space-y-1.5">
+                      <label className={NEU_LABEL + " block lg:hidden"}>Coordinates</label>
+                      <label className={NEU_LABEL + " hidden lg:block"}>Coordinates</label>
+                      <button
+                        type="button"
+                        onClick={() => openMapPicker()}
+                        className={`${NEU_BTN_GHOST} flex items-center gap-1.5 px-3 py-2 text-xs w-full justify-center`}
+                      >
+                        <MapPin className="w-3.5 h-3.5 text-[#006666]" />
+                        Set Location
+                      </button>
+                      {values.departure.meetingCoordinates && (
+                        <div className={NEU_BADGE_PRIMARY + " w-full justify-between"}>
+                          <span className="truncate text-[10px]">
+                            {values.departure.meetingCoordinates.lat.toFixed(4)},{" "}
+                            {values.departure.meetingCoordinates.lng.toFixed(4)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFieldValue(
+                                "departure.meetingCoordinates",
+                                undefined
+                              )
+                            }
+                            className="ml-1 hover:text-[#FF2157] transition-colors"
+                            aria-label="Clear coordinates"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Remove button */}
+                    <div className="flex lg:justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setFieldValue("departure", undefined)}
+                        className={NEU_BTN_ICON}
+                        aria-label="Remove departure"
+                      >
+                        <Trash2 className="w-4 h-4 text-[#FF2157]" />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
               )}
-            </FieldArray>
+            </div>
           </motion.section>
         </div>
       </motion.div>
 
-      {/* Map Picker Dialog */}
-      <MapPickerDialog
-        open={mapPickerOpen}
-        onClose={closeMapPicker}
-        onSelect={handleMapSelect}
-        initialPosition={getInitialPosition()}
-      />
-    </LocalizationProvider>
+        {mapPickerOpen && (
+          <MapPickerDialog
+            open={mapPickerOpen}
+            onClose={closeMapPicker}
+            onSelect={handleMapSelect}
+            initialPosition={
+              values.departure?.meetingCoordinates
+                ? [values.departure.meetingCoordinates.lat, values.departure.meetingCoordinates.lng]
+                : undefined
+            }
+          />
+        )}</LocalizationProvider>
   );
 }

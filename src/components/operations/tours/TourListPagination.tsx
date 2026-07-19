@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { useTourDetailStore } from "@/store/tour-detail.store";
@@ -15,15 +15,15 @@ import { motion } from "framer-motion";
 const NEU_SURFACE = "bg-[#E7E5E4]";
 const NEU_BTN_ICON =
     "rounded-xl w-9 h-9 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/60 " +
-    "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-    "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover:text-[#006666] hover: " +
     "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 const NEU_BTN_ICON_ACTIVE =
     "rounded-xl w-9 h-9 flex items-center justify-center bg-[#006666] text-white " +
-    "shadow-[inset_2px_2px_5px_#004d4d,inset_-2px_-2px_5px_#008080]";
+    "";
 const NEU_SURFACE_INSET_SM =
-    "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+    "bg-[#E7E5E4] ";
 const NEU_MONO = "font-[family-name:var(--font-jetbrains-mono)] text-[#1E2938]";
 const NEU_MUTED =
     "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";

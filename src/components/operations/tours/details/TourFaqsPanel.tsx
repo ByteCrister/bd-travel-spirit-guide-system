@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import Image from "next/image";
@@ -12,49 +12,49 @@ import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 
 // ─── Neumorphism Design Tokens ─────────────────────────────────────────────────
 const NEU_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 
 const NEU_SURFACE_RAISED =
-    "bg-[#E7E5E4] shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff]";
+    "bg-[#E7E5E4] ";
 
 const NEU_SURFACE_INSET_SM =
-    "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+    "bg-[#E7E5E4] ";
 
 const NEU_BTN_GHOST =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
-    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover: " +
+    "active: " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none";
 
 const NEU_BTN_ICON =
     "rounded-xl flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/60 " +
-    "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-    "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover:text-[#006666] hover: " +
     "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 
 const NEU_BTN_DANGER =
     "rounded-xl bg-[#E7E5E4] text-[#FF2157] font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    " " +
+    "hover:bg-[#FF2157]/10 hover: " +
     "transition-all duration-200";
 
 const NEU_INPUT =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
     "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    " border-none " +
     "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 
 const NEU_BADGE =
     "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-    "bg-[#E7E5E4] text-[#1E2938] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+    "bg-[#E7E5E4] text-[#1E2938] ";
 const NEU_BADGE_SUCCESS =
     "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-    "bg-[#00A63D]/10 text-[#00A63D] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+    "bg-[#00A63D]/10 text-[#00A63D] ";
 const NEU_BADGE_WARNING =
     "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-    "bg-[#FE9900]/10 text-[#FE9900] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+    "bg-[#FE9900]/10 text-[#FE9900] ";
 
 const NEU_SKELETON = "rounded-lg bg-[#d0cecd] animate-pulse";
 
@@ -62,7 +62,7 @@ const NEU_HEADING = "font-[family-name:var(--font-space-mono)] font-bold text-[#
 const NEU_LABEL = "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
 const NEU_MONO = "font-[family-name:var(--font-jetbrains-mono)] text-[#1E2938]";
 const NEU_MUTED = "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
-const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_DIVIDER = "border-[#1E2938]/10";
 
 // ─── Types & Constants ─────────────────────────────────────────────────────────
@@ -207,7 +207,7 @@ function FaqItem({ faq, index }: { faq: TourFAQDTO; index: number }) {
             <div className="flex gap-4">
                 {/* Avatar */}
                 <div className="shrink-0">
-                    <div className="shadow-[3px_3px_7px_#c8c6c5,-3px_-3px_7px_#ffffff] rounded-full">
+                    <div className=" rounded-full">
                         <Image
                             src={faq.askedBy.avatarUrl ?? `/api/avatars/${faq.askedBy.id}`}
                             alt={`${faq.askedBy.name} avatar`}
@@ -288,7 +288,7 @@ function FaqItem({ faq, index }: { faq: TourFAQDTO; index: number }) {
                             <div className="flex items-center gap-2 flex-wrap">
                                 {faq.reports.slice(0, 3).map((r, idx) => (
                                     <div key={idx} className="flex items-center gap-1.5">
-                                        <div className="shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff] rounded-full">
+                                        <div className=" rounded-full">
                                             <Image
                                                 src={r.reportedBy.avatarUrl ?? `/api/avatars/${r.reportedBy.id}`}
                                                 alt={r.reportedBy.name}
@@ -509,7 +509,7 @@ export default function TourFaqsPanel({ tourId, active = true }: Props) {
                         transition={{ duration: 0.2 }}
                         className={cn(
                             "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border border-[#006666]/20",
-                            "bg-[#006666]/5 shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff]"
+                            "bg-[#006666]/5 "
                         )}
                     >
                         <FiSearch className="text-[#006666] shrink-0" size={13} />

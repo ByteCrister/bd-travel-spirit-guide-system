@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FC, FormEvent, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -83,8 +83,8 @@ const ActionBtn: FC<{
         className={[
             "flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-[#1E2938]",
             "tracking-wide uppercase transition-all duration-150",
-            "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.12),inset_-1px_-1px_4px_rgba(255,255,255,0.60)]",
-            "active:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.15),inset_-2px_-2px_5px_rgba(255,255,255,0.55)]",
+            "hover:",
+            "active:",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50",
         ].join(" ")}
     >

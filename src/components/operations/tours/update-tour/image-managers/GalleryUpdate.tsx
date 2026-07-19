@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -20,44 +20,44 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ApiResponse } from '@/types/common/api.types';
 
 // ── Neumorphism Style Tokens ──────────────────────────────────
-const NEU_CARD = 'rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60';
-const NEU_INSET = 'bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]';
+const NEU_CARD = 'rounded-2xl bg-[#E7E5E4]  border border-white/60';
+const NEU_INSET = 'bg-[#E7E5E4] ';
 const NEU_DIVIDER = 'border-[#1E2938]/10';
 const NEU_HEADING = 'font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight';
 const NEU_LABEL = 'font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest';
 const NEU_MUTED = 'font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50';
-const NEU_ICON_WELL = 'p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]';
+const NEU_ICON_WELL = 'p-2.5 rounded-xl bg-[#E7E5E4] ';
 
 const NEU_BTN_PRIMARY =
   'rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold ' +
-  'shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] ' +
-  'hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] ' +
-  'active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] ' +
+  ' ' +
+  'hover: hover:bg-[#007777] ' +
+  'active: ' +
   'transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none';
 
 const NEU_BTN_GHOST =
   'rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] ' +
-  'shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] border border-white/60 ' +
-  'hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] ' +
+  ' border border-white/60 ' +
+  'hover: ' +
   'transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none';
 
 const NEU_BTN_DANGER =
   'rounded-xl bg-[#E7E5E4] text-[#FF2157] font-[family-name:var(--font-space-mono)] ' +
-  'shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] border border-white/60 ' +
-  'hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] ' +
+  ' border border-white/60 ' +
+  'hover:bg-[#FF2157]/10 hover: ' +
   'transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none';
 
 const NEU_IMAGE_TILE =
   'relative group rounded-xl overflow-hidden ' +
-  'shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] border border-white/60 ' +
-  'hover:shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff] transition-all duration-300';
+  ' border border-white/60 ' +
+  'hover: transition-all duration-300';
 
-const NEU_ALERT_WARNING = 'rounded-xl bg-[#FE9900]/8 border border-[#FE9900]/25 shadow-[2px_2px_6px_#c8c6c5,-2px_-2px_6px_#ffffff]';
-const NEU_ALERT_INFO = 'rounded-xl bg-[#006666]/5 border border-[#006666]/20 shadow-[2px_2px_6px_#c8c6c5,-2px_-2px_6px_#ffffff]';
+const NEU_ALERT_WARNING = 'rounded-xl bg-[#FE9900]/8 border border-[#FE9900]/25 ';
+const NEU_ALERT_INFO = 'rounded-xl bg-[#006666]/5 border border-[#006666]/20 ';
 
 const NEU_BADGE =
   'inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold ' +
-  'bg-[#E7E5E4] text-[#1E2938]/60 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]';
+  'bg-[#E7E5E4] text-[#1E2938]/60 ';
 
 // ── Constants ─────────────────────────────────────────────────
 const MAX_IMAGES = 5;

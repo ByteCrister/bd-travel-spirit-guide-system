@@ -1,4 +1,4 @@
-// components/payment-accounts/AddPaymentAccountDialog.tsx
+﻿// components/payment-accounts/AddPaymentAccountDialog.tsx
 "use client";
 
 import { ReactNode, useState, useCallback } from "react";
@@ -44,41 +44,41 @@ import {
 
 // ── Neumorphism Style Tokens ──────────────────────────────────────────────────
 const NEU_SURFACE = "bg-[#E7E5E4]";
-const NEU_SURFACE_RAISED = "bg-[#E7E5E4] shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff]";
-const NEU_SURFACE_INSET = "bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
+const NEU_SURFACE_RAISED = "bg-[#E7E5E4] ";
+const NEU_SURFACE_INSET = "bg-[#E7E5E4] ";
 
-const NEU_CARD = "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+const NEU_CARD = "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 
 const NEU_BTN_PRIMARY =
     "rounded-xl bg-[#006666] text-white font-bold tracking-wide " +
-    "shadow-[0_4px_12px_rgba(0,0,0,0.06)] " +
-    "hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] hover:bg-[#007777] " +
-    "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+    " " +
+    "hover: hover:bg-[#007777] " +
+    "active: " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
 
 const NEU_BTN_GHOST =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] " +
-    "shadow-[0_4px_12px_rgba(0,0,0,0.06)] " +
-    "hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] " +
-    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover: " +
+    "active: " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 
 const NEU_INPUT =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
-    "text-sm shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    "text-sm  border-none " +
     "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 
 const NEU_HEADING = "font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL = "text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
 const NEU_MUTED = "text-sm text-[#1E2938]/50";
 
-const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 ";
 
 const NEU_DIVIDER = "border-[#1E2938]/10";
 
 const NEU_SELECT_TRIGGER =
     "h-11 rounded-xl bg-[#E7E5E4] text-[#1E2938] text-sm border-none " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] " +
+    " " +
     "focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 
 const NEU_SECTION_DIVIDER = "flex items-center gap-3 py-1";

@@ -80,10 +80,10 @@ export interface RunningTourInfo {
     tourId: string;
     slug: string;
     title: string;
-    totalSeats: number;           // sum of seatsTotal across active departures
-    currentBookings: number;      // sum of seatsBooked
-    windowStart: Date;             // earliest departure date
-    windowEnd: Date;               // latest departure date
+    totalSeats: number;           // seatsTotal of active departure
+    currentBookings: number;      // seatsBooked
+    windowStart: Date;             // departure date
+    windowEnd: Date;               // departure date
 }
 
 export interface EmployeeSummary {

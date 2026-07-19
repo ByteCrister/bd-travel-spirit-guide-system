@@ -23,12 +23,12 @@ import { TOUR_DISCOUNT_TYPE } from "@/constants/tour/tour.const";
 
 // ─── Neumorphic Design Tokens ──────────────────────────────────────────────────
 const NEU_PAGE_BG = "min-h-screen bg-[#E7E5E4]";
-const NEU_CARD = "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
-const NEU_CARD_SM = "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
-const NEU_CARD_INSET = "rounded-xl bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
-const NEU_ICON_WELL = "p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
-const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
-const NEU_ICON_WELL_SM = "p-2 rounded-lg bg-[#E7E5E4] shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+const NEU_CARD = "rounded-2xl bg-[#E7E5E4]  border border-white/60";
+const NEU_CARD_SM = "rounded-xl bg-[#E7E5E4]  border border-white/60";
+const NEU_CARD_INSET = "rounded-xl bg-[#E7E5E4] ";
+const NEU_ICON_WELL = "p-2.5 rounded-xl bg-[#E7E5E4] ";
+const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 ";
+const NEU_ICON_WELL_SM = "p-2 rounded-lg bg-[#E7E5E4] ";
 const NEU_HEADING = "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL = "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
 const NEU_MONO = "font-[family-name:var(--font-jetbrains-mono)] text-[#1E2938]";
@@ -36,23 +36,23 @@ const NEU_MUTED = "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#
 const NEU_DIVIDER = "border-[#1E2938]/10";
 
 // Status badge helpers
-const NEU_BADGE_SUCCESS = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#00A63D]/10 text-[#00A63D] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
-const NEU_BADGE_WARNING = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#FE9900]/10 text-[#FE9900] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
-const NEU_BADGE_DANGER = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#FF2157]/10 text-[#FF2157] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
-const NEU_BADGE_DEFAULT = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#E7E5E4] text-[#1E2938]/60 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
-const NEU_BADGE_PRIMARY = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+const NEU_BADGE_SUCCESS = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#00A63D]/10 text-[#00A63D] ";
+const NEU_BADGE_WARNING = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#FE9900]/10 text-[#FE9900] ";
+const NEU_BADGE_DANGER = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#FF2157]/10 text-[#FF2157] ";
+const NEU_BADGE_DEFAULT = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#E7E5E4] text-[#1E2938]/60 ";
+const NEU_BADGE_PRIMARY = "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#006666]/10 text-[#006666] ";
 
 // Stat card
-const NEU_STAT_CARD = "rounded-2xl bg-[#E7E5E4] shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff] border border-white/60 p-4 flex items-center justify-between";
+const NEU_STAT_CARD = "rounded-2xl bg-[#E7E5E4]  border border-white/60 p-4 flex items-center justify-between";
 
 // Progress bar track
-const NEU_PROGRESS_TRACK = "w-full rounded-full bg-[#E7E5E4] shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] h-3 overflow-hidden";
+const NEU_PROGRESS_TRACK = "w-full rounded-full bg-[#E7E5E4]  h-3 overflow-hidden";
 
 // ─── Type Definitions ──────────────────────────────────────────────────────────
 type FieldType =
     | 'text' | 'boolean' | 'array' | 'tags' | 'payment' | 'count'
     | 'destinations' | 'itinerary' | 'inclusions' | 'exclusions' | 'discounts'
-    | 'pickup' | 'packing' | 'windows' | 'departures' | 'cancellation'
+    | 'pickup' | 'packing' | 'windows' | 'departure' | 'cancellation'
     | 'refund' | 'emergency' | 'translations' | 'price' | 'address'
     | 'accessibility' | 'duration' | 'seo' | 'coordinates';
 
@@ -174,7 +174,7 @@ const renderFieldValue = (
             const bv = typeof value === "boolean" ? value : false;
             return (
                 <div className="flex items-center gap-2 mt-0.5">
-                    <div className={`${bv ? "bg-[#00A63D]" : "bg-[#E7E5E4]"} w-5 h-5 rounded-lg flex items-center justify-center ${bv ? "shadow-[inset_2px_2px_4px_#007a2d,inset_-1px_-1px_3px_#00c94d]" : "shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]"}`}>
+                    <div className={`${bv ? "bg-[#00A63D]" : "bg-[#E7E5E4]"} w-5 h-5 rounded-lg flex items-center justify-center ${bv ? "" : ""}`}>
                         {bv
                             ? <CheckCircle className="w-3 h-3 text-white" />
                             : <XCircle className="w-3 h-3 text-[#1E2938]/30" />}
@@ -388,7 +388,7 @@ const renderDetailedSection = ({
                 <div className="space-y-2">
                     {packing.map((item, idx) => (
                         <div key={idx} className={`${NEU_CARD_SM} p-3 flex items-start gap-3`}>
-                            <div className={`w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${item.required ? "bg-[#006666]/10" : "bg-[#E7E5E4] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]"}`}>
+                            <div className={`w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${item.required ? "bg-[#006666]/10" : "bg-[#E7E5E4] "}`}>
                                 {item.required
                                     ? <CheckCircle className="w-3 h-3 text-[#006666]" />
                                     : <Info className="w-3 h-3 text-[#1E2938]/40" />}
@@ -552,8 +552,8 @@ export default function ReviewStep() {
                 { label: "Base Price", value: formatCurrency(values.basePrice.amount, values.basePrice.currency), icon: FaBangladeshiTakaSign, type: "price", data: values.basePrice, status: "success", required: true },
                 { label: "Discounts", value: `${values.discounts?.length || 0} discounts`, icon: Percent, type: "discounts", count: values.discounts?.length, data: values.discounts, status: values.discounts?.length ? "success" : "default" },
                 { label: "Duration", value: formatDuration(values.duration), icon: Clock, type: "duration", data: values.duration, status: values.duration?.days ? "success" : "default" },
-                { label: "Operating Windows", value: `${values.operatingWindows?.length || 0} windows`, icon: Calendar, type: "windows", count: values.operatingWindows?.length, data: values.operatingWindows, status: values.operatingWindows?.length ? "success" : "default" },
-                { label: "Departures", value: `${values.departures?.length || 0} scheduled`, icon: CalendarDays, type: "departures", count: values.departures?.length, data: values.departures, status: values.departures?.length ? "success" : "default" },
+                { label: "Operating Window", value: values.operatingWindow ? `${new Date(values.operatingWindow.startDate).toLocaleDateString()} — ${new Date(values.operatingWindow.endDate).toLocaleDateString()}` : 'Not set', icon: Calendar, type: "text", status: values.operatingWindow ? "success" : "default" },
+                { label: "Departure", value: values.departure ? new Date(values.departure.date).toLocaleDateString() : 'Not set', icon: CalendarDays, type: "departure", data: values.departure, status: values.departure ? "success" : "default" },
                 { label: "Payment Methods", value: values.paymentMethods?.join(", "), icon: CreditCard, type: "payment", data: values.paymentMethods, status: values.paymentMethods?.length ? "success" : "error", required: true },
             ],
         },

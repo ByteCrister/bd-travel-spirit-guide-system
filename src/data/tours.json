@@ -1,219 +1,217 @@
 {
-  "title": "Moulvibazar Tea Country (6D/5N)",
-  "summary": "A 6-day journey through Moulvibazar, Sylhet Division, covering Lawachara National Park, Madhabkunda Waterfall.",
+  "title": "Khagrachari Hill Adventure (6D/5N)",
+  "summary": "A 6-day journey through Khagrachari, Chattogram Division, covering Alutila Cave, Risang Waterfall.",
   "heroImage": "",
   "gallery": [],
   "seo": {
-    "metaTitle": "Moulvibazar Tea Country | Book Now",
-    "metaDescription": "Explore Moulvibazar with our curated 6-day tour."
+    "metaTitle": "Khagrachari Hill Adventure | Book Now",
+    "metaDescription": "Explore Khagrachari with our curated 6-day tour."
   },
   "tags": [
-    "moulvibazar",
-    "sylhet",
+    "khagrachari",
+    "chattogram",
     "bangladesh"
   ],
-  "status": "archived",
-  "tourType": "culture_history",
-  "division": "sylhet",
-  "district": "moulvibazar",
+  "status": "active",
+  "tourType": "Couples",
+  "division": "chattogram",
+  "district": "khagrachari",
   "accommodationType": [
-    "cottage",
-    "hotel"
+    "homestay"
   ],
   "guideIncluded": true,
-  "transportIncluded": false,
+  "transportIncluded": true,
   "emergencyContacts": {
     "policeNumber": "999",
     "ambulanceNumber": "16263",
     "fireServiceNumber": "102",
-    "localEmergency": "01724407119"
+    "localEmergency": "01982760565"
   },
   "destinations": [
     {
-      "description": "Core exploration zone around Moulvibazar.",
+      "description": "Core exploration zone around Khagrachari.",
       "highlights": [
-        "Lawachara National Park",
-        "Madhabkunda Waterfall"
+        "Alutila Cave",
+        "Risang Waterfall"
       ],
       "attractions": [
         {
-          "title": "Lawachara National Park",
-          "description": "Popular spot: Lawachara National Park",
-          "bestFor": "Couples",
+          "title": "Alutila Cave",
+          "description": "Popular spot: Alutila Cave",
+          "bestFor": "Photography",
           "insiderTip": "Visit early morning to avoid crowds.",
-          "address": "Lawachara National Park, Moulvibazar, Sylhet",
+          "address": "Alutila Cave, Khagrachari, Chattogram",
           "openingHours": "06:00 - 18:00",
           "coordinates": {
-            "lat": 24.40678,
-            "lng": 91.604707
+            "lat": 23.320983,
+            "lng": 90.499951
           }
         },
         {
-          "title": "Madhabkunda Waterfall",
-          "description": "Popular spot: Madhabkunda Waterfall",
-          "bestFor": "Adventure seekers",
+          "title": "Risang Waterfall",
+          "description": "Popular spot: Risang Waterfall",
+          "bestFor": "Couples",
           "insiderTip": "Visit early morning to avoid crowds.",
-          "address": "Madhabkunda Waterfall, Moulvibazar, Sylhet",
+          "address": "Risang Waterfall, Khagrachari, Chattogram",
           "openingHours": "06:00 - 18:00",
           "coordinates": {
-            "lat": 24.208651,
-            "lng": 88.142344
+            "lat": 23.21187,
+            "lng": 89.730286
           }
         }
       ],
       "activities": [
         {
-          "title": "Guided visit to Lawachara National Park",
+          "title": "Guided visit to Alutila Cave",
           "provider": "GreenHill Travels BD",
-          "duration": "3h",
+          "duration": "1h",
           "price": {
-            "amount": 500,
+            "amount": 200,
             "currency": "BDT"
           },
-          "rating": 4.4
+          "rating": 4.9
         },
         {
-          "title": "Guided visit to Madhabkunda Waterfall",
-          "provider": "GreenHill Travels BD",
-          "duration": "4h",
+          "title": "Guided visit to Risang Waterfall",
+          "provider": "Padma Explorers Ltd",
+          "duration": "1h",
           "price": {
-            "amount": 500,
+            "amount": 0,
             "currency": "BDT"
           },
           "rating": 4.3
         }
       ],
       "coordinates": {
-        "lat": 24.631681,
-        "lng": 88.742978
+        "lat": 21.572871,
+        "lng": 92.503806
       }
     }
   ],
   "itinerary": [
     {
       "day": 1,
-      "title": "Day 1: Moulvibazar Tea Country",
-      "description": "Visit Madhabkunda Waterfall and nearby sites.",
-      "mealsProvided": [
-        "Lunch",
-        "Breakfast"
-      ],
-      "accommodation": "homestay",
-      "activities": [
-        "Lawachara National Park",
-        "Madhabkunda Waterfall"
-      ],
-      "travelDistance": "45 km",
-      "travelMode": "ride_share",
-      "estimatedTime": "3h",
-      "importantNotes": [
-        "Local guide accompanies group."
-      ]
-    },
-    {
-      "day": 2,
-      "title": "Day 2: Explore Moulvibazar",
-      "description": "Visit Lawachara National Park and nearby sites.",
-      "mealsProvided": [
-        "Dinner",
-        "Breakfast"
-      ],
-      "accommodation": "homestay",
-      "activities": [
-        "Lawachara National Park",
-        "Madhabkunda Waterfall"
-      ],
-      "travelDistance": "20 km",
-      "travelMode": "domestic_flight",
-      "estimatedTime": "4h",
-      "importantNotes": [
-        "Stay hydrated, humid climate."
-      ]
-    },
-    {
-      "day": 3,
-      "title": "Day 3: Explore Moulvibazar",
-      "description": "Visit Lawachara National Park and nearby sites.",
+      "title": "Day 1: Khagrachari Hill Adventure",
+      "description": "Visit Alutila Cave and nearby sites.",
       "mealsProvided": [
         "Breakfast"
       ],
       "accommodation": "homestay",
       "activities": [
-        "Madhabkunda Waterfall",
-        "Lawachara National Park"
+        "Alutila Cave",
+        "Risang Waterfall"
       ],
-      "travelDistance": "36 km",
+      "travelDistance": "68 km",
       "travelMode": "train",
-      "estimatedTime": "3h",
+      "estimatedTime": "2h",
       "importantNotes": [
         "Respect local customs at religious sites."
       ]
     },
     {
-      "day": 4,
-      "title": "Day 4: Explore Moulvibazar",
-      "description": "Visit Madhabkunda Waterfall and nearby sites.",
+      "day": 2,
+      "title": "Day 2: Explore Khagrachari",
+      "description": "Visit Alutila Cave and nearby sites.",
       "mealsProvided": [
+        "Lunch",
         "Breakfast"
       ],
       "accommodation": "guest_house",
       "activities": [
-        "Madhabkunda Waterfall",
-        "Lawachara National Park"
+        "Risang Waterfall",
+        "Alutila Cave"
       ],
-      "travelDistance": "44 km",
-      "travelMode": "boat",
-      "estimatedTime": "1h",
+      "travelDistance": "61 km",
+      "travelMode": "ride_share",
+      "estimatedTime": "6h",
       "importantNotes": [
         "Carry light woolens for evening."
       ]
     },
     {
-      "day": 5,
-      "title": "Day 5: Explore Moulvibazar",
-      "description": "Visit Madhabkunda Waterfall and nearby sites.",
+      "day": 3,
+      "title": "Day 3: Explore Khagrachari",
+      "description": "Visit Risang Waterfall and nearby sites.",
       "mealsProvided": [
+        "Breakfast"
+      ],
+      "accommodation": "hotel",
+      "activities": [
+        "Alutila Cave",
+        "Risang Waterfall"
+      ],
+      "travelDistance": "57 km",
+      "travelMode": "private_car",
+      "estimatedTime": "3h",
+      "importantNotes": [
+        "Photography allowed at most spots."
+      ]
+    },
+    {
+      "day": 4,
+      "title": "Day 4: Explore Khagrachari",
+      "description": "Visit Risang Waterfall and nearby sites.",
+      "mealsProvided": [
+        "Dinner",
         "Lunch",
+        "Breakfast"
+      ],
+      "accommodation": "homestay",
+      "activities": [
+        "Alutila Cave",
+        "Risang Waterfall"
+      ],
+      "travelDistance": "26 km",
+      "travelMode": "domestic_flight",
+      "estimatedTime": "2h",
+      "importantNotes": [
+        "Local guide accompanies group."
+      ]
+    },
+    {
+      "day": 5,
+      "title": "Day 5: Explore Khagrachari",
+      "description": "Visit Risang Waterfall and nearby sites.",
+      "mealsProvided": [
         "Breakfast",
         "Dinner"
       ],
-      "accommodation": "cottage",
+      "accommodation": "homestay",
       "activities": [
-        "Madhabkunda Waterfall",
-        "Lawachara National Park"
+        "Risang Waterfall",
+        "Alutila Cave"
       ],
-      "travelDistance": "11 km",
-      "travelMode": "domestic_flight",
-      "estimatedTime": "4h",
+      "travelDistance": "26 km",
+      "travelMode": "private_car",
+      "estimatedTime": "2h",
       "importantNotes": [
         "Respect local customs at religious sites."
       ]
     },
     {
       "day": 6,
-      "title": "Day 6: Explore Moulvibazar",
-      "description": "Visit Madhabkunda Waterfall and nearby sites.",
+      "title": "Day 6: Explore Khagrachari",
+      "description": "Visit Risang Waterfall and nearby sites.",
       "mealsProvided": [
-        "Dinner",
         "Breakfast"
       ],
-      "accommodation": "hotel",
+      "accommodation": "camping",
       "activities": [
-        "Madhabkunda Waterfall",
-        "Lawachara National Park"
+        "Alutila Cave",
+        "Risang Waterfall"
       ],
-      "travelDistance": "38 km",
-      "travelMode": "ride_share",
-      "estimatedTime": "3h",
+      "travelDistance": "35 km",
+      "travelMode": "bus",
+      "estimatedTime": "1h",
       "importantNotes": [
-        "Local guide accompanies group."
+        "Photography allowed at most spots."
       ]
     }
   ],
   "inclusions": [
     {
       "label": "Accommodation",
-      "description": "Homestay stay for 5 night(s)"
+      "description": "Cottage stay for 5 night(s)"
     },
     {
       "label": "Meals as per itinerary",
@@ -221,7 +219,7 @@
     },
     {
       "label": "Local transport",
-      "description": "Bus between destinations"
+      "description": "Train between destinations"
     },
     {
       "label": "Guide services",
@@ -236,60 +234,56 @@
     {
       "label": "Travel insurance",
       "description": "Not included, recommended for adventure activities"
-    },
-    {
-      "label": "International/domestic airfare to meeting point",
-      "description": "Excludes fare to reach starting location"
     }
   ],
   "difficulty": "easy",
   "bestSeason": [
-    "winter",
+    "spring",
+    "summer",
     "autumn"
   ],
   "audience": [
-    "seniors"
+    "families",
+    "solo"
   ],
   "categories": [
     "nature",
-    "culture_history"
+    "wildlife"
   ],
   "translations": {
     "en": {
-      "title": "Moulvibazar Tea Country",
-      "summary": "Discover Moulvibazar.",
-      "description": "Join this 6-day tour through Moulvibazar, Sylhet Division, featuring Lawachara National Park, Madhabkunda Waterfall."
+      "title": "Khagrachari Hill Adventure",
+      "summary": "Discover Khagrachari.",
+      "description": "Join this 6-day tour through Khagrachari, Chattogram Division, featuring Alutila Cave, Risang Waterfall."
     },
     "bn": {
-      "title": "Moulvibazar Tea Country (বাংলা)",
+      "title": "Khagrachari Hill Adventure (বাংলা)",
       "summary": "বাংলাদেশের সৌন্দর্য উপভোগ করুন।",
-      "description": "Sylhet বিভাগের Moulvibazar অঞ্চলে 6 দিনের ভ্রমণ।"
+      "description": "Chattogram বিভাগের Khagrachari অঞ্চলে 6 দিনের ভ্রমণ।"
     }
   },
   "mainLocation": {
     "address": {
-      "line1": "Moulvibazar Tea Country Base Camp",
-      "line2": "Madhabkunda Waterfall",
-      "city": "Moulvibazar",
-      "district": "moulvibazar",
-      "region": "sylhet",
-      "postalCode": "5582"
+      "line1": "Khagrachari Hill Adventure Base Camp",
+      "line2": "Risang Waterfall",
+      "city": "Khagrachari",
+      "district": "khagrachari",
+      "region": "chattogram",
+      "postalCode": "9845"
     },
     "coordinates": {
-      "lat": 25.451868,
-      "lng": 90.929235
+      "lat": 26.352794,
+      "lng": 90.508122
     }
   },
   "transportModes": [
-    "bus",
-    "train",
-    "ride_share"
+    "bus"
   ],
   "pickupOptions": [
     {
       "city": "Dhaka",
       "price": 300,
-      "currency": "BDT"
+      "currency": "INR"
     }
   ],
   "meetingPoint": "Central Bus Terminal",
@@ -311,52 +305,46 @@
     }
   ],
   "basePrice": {
-    "amount": 3500,
-    "currency": "BDT"
+    "amount": 30000,
+    "currency": "INR"
   },
-  "discounts": [],
+  "discounts": [
+    {
+      "type": "flat_amount",
+      "discount": "early_bird",
+      "value": 1000,
+      "code": "BD615",
+      "validFrom": "2026-07-23T00:00:00.000Z",
+      "validUntil": "2026-09-13T00:00:00.000Z"
+    }
+  ],
   "duration": {
     "days": 6,
     "nights": 5
   },
-  "operatingWindows": [
-    {
-      "startDate": "2026-08-15T00:00:00.000Z",
-      "endDate": "2027-04-30T00:00:00.000Z",
-      "seatsTotal": 55,
-      "seatsBooked": 11
+  "operatingWindow": {
+    "startDate": "2026-08-23T00:00:00.000Z",
+    "endDate": "2027-03-12T00:00:00.000Z"
+  },
+  "departure": {
+    "date": "2026-07-30T00:00:00.000Z",
+    "seatsTotal": 38,
+    "meetingPoint": "Company Office, Dhaka",
+    "meetingCoordinates": {
+      "lat": 23.544454,
+      "lng": 91.042047
     }
-  ],
-  "departures": [
-    {
-      "date": "2026-11-06T00:00:00.000Z",
-      "seatsTotal": 34,
-      "meetingPoint": "Company Office, Dhaka",
-      "meetingCoordinates": {
-        "lat": 23.500467,
-        "lng": 88.212926
-      }
-    },
-    {
-      "date": "2026-10-06T00:00:00.000Z",
-      "seatsTotal": 37,
-      "meetingPoint": "Local Bus Terminal",
-      "meetingCoordinates": {
-        "lat": 23.342465,
-        "lng": 90.147846
-      }
-    }
-  ],
+  },
   "paymentMethods": [
-    "cash",
+    "bank_transfer",
     "nagad",
-    "card",
-    "stripe"
+    "stripe",
+    "cash"
   ],
-  "licenseRequired": false,
-  "ageSuitability": "adults",
+  "licenseRequired": true,
+  "ageSuitability": "all",
   "accessibility": {
-    "wheelchair": false,
+    "wheelchair": true,
     "familyFriendly": true,
     "petFriendly": false,
     "notes": "Terrain varies; contact operator for accessibility details."
@@ -376,32 +364,32 @@
   },
   "refundPolicy": {
     "method": [
-      "card",
-      "cash"
+      "cash",
+      "bkash"
     ],
-    "processingDays": 8
+    "processingDays": 7
   },
   "terms": "Standard booking terms and conditions apply.",
-  "id": "7767acb7-cecd-49d5-ac74-18147c070ed3",
-  "slug": "moulvibazar-tea-country-14",
-  "tourCode": "BDT-0014",
-  "moderationStatus": "suspended",
+  "id": "f2d7fb43-9cd2-4d63-9bbf-4f30f8b0f30e",
+  "slug": "khagrachari-hill-adventure-49",
+  "tourCode": "BDT-0049",
+  "moderationStatus": "pending",
   "companyInfo": {
     "id": "b181544d-9fb6-4073-9feb-3b94fce43b9e",
     "name": "GreenHill Travels BD",
     "createdAt": "2023-01-05T00:00:00.000Z"
   },
   "authorInfo": {
-    "id": "887b1c7a-64c9-44d6-85cc-6b4b367bb582",
-    "name": "Kamal Hossain",
-    "email": "kamal.hossain@bengaltours.bd",
+    "id": "42607f82-531a-41f9-a68c-1e268aba0325",
+    "name": "Farzana Begum",
+    "email": "farzana.begum@bengaltours.bd",
     "avatarUrl": null
   },
-  "wishlistCount": 362,
+  "wishlistCount": 205,
   "featured": false,
-  "viewCount": 3940,
-  "likeCount": 17,
-  "shareCount": 94,
-  "createdAt": "2026-03-24T00:00:00.000Z",
-  "updatedAt": "2026-07-14T00:00:00.000Z"
+  "viewCount": 1855,
+  "likeCount": 456,
+  "shareCount": 91,
+  "createdAt": "2026-01-22T00:00:00.000Z",
+  "updatedAt": "2026-07-16T00:00:00.000Z"
 }

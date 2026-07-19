@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { Upload, X, Image as ImageIcon, CheckCircle, AlertCircle, Trash2 } from "lucide-react";
@@ -10,16 +10,16 @@ import Image from "next/image";
 // ── Neumorphic style tokens ───────────────────────────────────
 const NEU_SURFACE = "bg-[#E7E5E4]";
 const NEU_CARD_SM =
-    "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+    "rounded-xl bg-[#E7E5E4]  border border-white/60";
 const NEU_INSET =
-    "bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
+    "bg-[#E7E5E4] ";
 const NEU_INSET_SM =
-    "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+    "bg-[#E7E5E4] ";
 
 const NEU_BTN_DANGER =
     "rounded-xl bg-[#E7E5E4] text-[#FF2157] font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    " " +
+    "hover:bg-[#FF2157]/10 hover: " +
     "transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed";
 
 const NEU_HEADING =
@@ -28,10 +28,10 @@ const NEU_MUTED =
     "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_BADGE_PRIMARY =
     "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-    "bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+    "bg-[#006666]/10 text-[#006666] ";
 const NEU_BADGE_WARNING =
     "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-    "bg-[#FE9900]/10 text-[#FE9900] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+    "bg-[#FE9900]/10 text-[#FE9900] ";
 
 // ── Card animation variants ───────────────────────────────────
 const cardVariants = {
@@ -181,7 +181,7 @@ export default function UploadAttractionImage({
                         "flex flex-col items-center gap-4 text-center",
                         "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50",
                         dragOver
-                            ? "border-[#006666]/60 bg-[#006666]/5 shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]"
+                            ? "border-[#006666]/60 bg-[#006666]/5 "
                             : "border-[#1E2938]/15 " + NEU_INSET,
                         disabled || atMax ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:border-[#006666]/40",
                     ].join(" ")}
@@ -191,8 +191,8 @@ export default function UploadAttractionImage({
                         className={[
                             "p-4 rounded-2xl transition-colors duration-200",
                             dragOver
-                                ? "bg-[#006666]/20 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]"
-                                : "bg-[#006666]/10 shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+                                ? "bg-[#006666]/20 "
+                                : "bg-[#006666]/10 ",
                         ].join(" ")}
                     >
                         {isUploading ? (
@@ -241,7 +241,7 @@ export default function UploadAttractionImage({
                         {/* Header row */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <div className="p-1.5 rounded-lg bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]">
+                                <div className="p-1.5 rounded-lg bg-[#006666]/10 ">
                                     <ImageIcon size={14} className="text-[#006666]" />
                                 </div>
                                 <span className={`${NEU_HEADING} text-sm`}>
@@ -300,7 +300,7 @@ export default function UploadAttractionImage({
                                             onClick={() => handleRemoveImage(index)}
                                             disabled={disabled}
                                             aria-label={`Remove image ${index + 1}`}
-                                            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-lg bg-[#E7E5E4]/90 text-[#FF2157] shadow-[2px_2px_4px_#c8c6c5,-1px_-1px_3px_#ffffff] opacity-0 group-hover:opacity-100 hover:bg-[#FF2157] hover:text-white transition-all duration-200 disabled:cursor-not-allowed"
+                                            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-lg bg-[#E7E5E4]/90 text-[#FF2157]  opacity-0 group-hover:opacity-100 hover:bg-[#FF2157] hover:text-white transition-all duration-200 disabled:cursor-not-allowed"
                                         >
                                             <X size={12} />
                                         </button>

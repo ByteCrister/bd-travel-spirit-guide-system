@@ -1,4 +1,4 @@
-// components/ui/ShiftEditor.tsx
+﻿// components/ui/ShiftEditor.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -25,11 +25,11 @@ export default function ShiftEditor({
 
   const remove = (idx: number) => onChange(shifts.filter((_, i) => i !== idx));
 
-  const neumorphCard = "bg-[#E7E5E4] rounded-xl shadow-[8px_8px_16px_#C6C4C3,-8px_-8px_16px_#ffffff]";
+  const neumorphCard = "bg-[#E7E5E4] rounded-xl ";
   const neumorphButtonBase =
-    "bg-[#E7E5E4] shadow-[4px_4px_8px_#C6C4C3,-4px_-4px_8px_#ffffff] hover:shadow-[2px_2px_4px_#C6C4C3,-2px_-2px_4px_#ffffff] active:shadow-[inset_4px_4px_8px_#C6C4C3,inset_-4px_-4px_8px_#ffffff] transition-shadow focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_#006666]";
+    "bg-[#E7E5E4]  hover: active: transition-shadow focus-visible:outline-none focus-visible:";
   const neumorphInput =
-    "bg-[#E7E5E4] shadow-[inset_2px_2px_4px_#C6C4C3,inset_-2px_-2px_4px_#ffffff] rounded-lg px-3 py-2 focus-visible:shadow-[inset_2px_2px_4px_#C6C4C3,inset_-2px_-2px_4px_#ffffff,0_0_0_2px_#006666] outline-none transition-shadow";
+    "bg-[#E7E5E4]  rounded-lg px-3 py-2 focus-visible: outline-none transition-shadow";
 
   return (
     <div className="space-y-4">
@@ -122,9 +122,9 @@ export default function ShiftEditor({
                               }}
                               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-shadow ${
                                 isSelected
-                                  ? "shadow-[inset_2px_2px_4px_#C6C4C3,inset_-2px_-2px_4px_#ffffff] bg-[#E7E5E4] text-[#006666]"
-                                  : "shadow-[4px_4px_8px_#C6C4C3,-4px_-4px_8px_#ffffff] bg-[#E7E5E4] text-[#1E2938] hover:shadow-[2px_2px_4px_#C6C4C3,-2px_-2px_4px_#ffffff]"
-                              } focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_#006666]`}
+                                  ? " bg-[#E7E5E4] text-[#006666]"
+                                  : " bg-[#E7E5E4] text-[#1E2938] hover:"
+                              } focus-visible:outline-none focus-visible:`}
                               style={{ fontFamily: "var(--font-space-mono)" }}
                             >
                               {day}

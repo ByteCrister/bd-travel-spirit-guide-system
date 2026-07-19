@@ -87,8 +87,8 @@ class TourUpdateService {
     async updatePricing(tourId: string, data: UpdateTourPricingDTO) {
         const response = await api.patch<
             ApiResponse<
-                Omit<UpdateTourPricingDTO, "departures"> & {
-                    departures: DepartureDTO[]
+                Omit<UpdateTourPricingDTO, "departure"> & {
+                    departure?: DepartureDTO
                 }
             >
         >(`${this.baseUrl}/${tourId}/pricing`, data);

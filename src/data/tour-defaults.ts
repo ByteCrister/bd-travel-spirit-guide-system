@@ -85,14 +85,11 @@ export const GUIDE_DEFAULT: CreateTourDTO = {
         "days": 8,
         "nights": 7
     },
-    "operatingWindows": [
-        {
-            "startDate": "2026-02-01",
-            "endDate": "2026-07-01",
-            "seatsTotal": 117
-        }
-    ],
-    "departures": [],
+    "operatingWindow": {
+        "startDate": "2026-02-01",
+        "endDate": "2026-07-01"
+    },
+    "departure": undefined,
     "paymentMethods": [PAYMENT_METHOD.CARD],
     "licenseRequired": true,
     "ageSuitability": AGE_SUITABILITY.ALL,
@@ -503,51 +500,19 @@ export const GUIDE_DEFAULT_1: CreateTourDTO = {
         "days": 8,
         "nights": 7
     },
-    "operatingWindows": [
-        {
-            "startDate": "2026-02-01",
-            "endDate": "2026-07-01",
-            "seatsTotal": 117
+    "operatingWindow": {
+        "startDate": "2026-02-01",
+        "endDate": "2026-07-01"
+    },
+    "departure": {
+        "date": "2026-03-12",
+        "seatsTotal": 15,
+        "meetingPoint": "প্রধান হোটেল লবি",
+        "meetingCoordinates": {
+            "lat": 23.761981,
+            "lng": 90.304162
         }
-    ],
-    "departures": [
-        {
-            "date": "2026-03-12",
-            "seatsTotal": 15,
-            "meetingPoint": "প্রধান হোটেল লবি",
-            "meetingCoordinates": {
-                "lat": 23.761981,
-                "lng": 90.304162
-            }
-        },
-        {
-            "date": "2026-03-19",
-            "seatsTotal": 20,
-            "meetingPoint": "প্রধান হোটেল লবি",
-            "meetingCoordinates": {
-                "lat": 22.069077,
-                "lng": 91.889372
-            }
-        },
-        {
-            "date": "2026-03-26",
-            "seatsTotal": 20,
-            "meetingPoint": "প্রধান হোটেল লবি",
-            "meetingCoordinates": {
-                "lat": 22.311057,
-                "lng": 91.702662
-            }
-        },
-        {
-            "date": "2026-04-02",
-            "seatsTotal": 10,
-            "meetingPoint": "প্রধান হোটেল লবি",
-            "meetingCoordinates": {
-                "lat": 24.519512,
-                "lng": 88.713872
-            }
-        }
-    ],
+    },
     "paymentMethods": [PAYMENT_METHOD.CARD],
     "licenseRequired": true,
     "ageSuitability": AGE_SUITABILITY.ALL,

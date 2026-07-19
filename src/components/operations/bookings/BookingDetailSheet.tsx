@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import {
@@ -48,9 +48,9 @@ function canRefundBooking(status: string, totalPaid: number) {
 // Shared neumorphic input style
 const neuInput = [
     'bg-[#E7E5E4] border-0 text-[#1E2938] placeholder:text-[#1E2938]/35',
-    'shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+    '',
     'focus-visible:ring-0 focus-visible:ring-offset-0',
-    'focus-visible:shadow-[inset_4px_4px_8px_#c0bebb,inset_-2px_-2px_4px_#ffffff,0_0_0_2px_#006666]',
+    'focus-visible:',
     'rounded-xl transition-shadow duration-200',
 ].join(' ');
 
@@ -100,11 +100,11 @@ function NeuActionBtn({
                 'flex-1 h-10 px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs font-medium transition-all duration-150',
                 'bg-[#E7E5E4]',
                 disabled
-                    ? 'opacity-30 cursor-not-allowed shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]'
+                    ? 'opacity-30 cursor-not-allowed '
                     : [
-                        'shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff]',
-                        'hover:shadow-[5px_5px_10px_#c8c6c4,-4px_-4px_8px_#ffffff]',
-                        'active:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                        '',
+                        'hover:',
+                        'active:',
                     ].join(' '),
                 colors,
             )}
@@ -140,13 +140,13 @@ function CancelDialog({ bookingId, disabled }: { bookingId: string; disabled: bo
             <AlertDialogContent className={cn(
                 'rounded-2xl border-0 max-w-md p-6',
                 'bg-[#E7E5E4]',
-                'shadow-[0_4px_12px_rgba(0,0,0,0.06)]',
+                '',
             )}>
                 <AlertDialogHeader>
                     <AlertDialogTitle className="text-[#1E2938] text-base font-bold flex items-center gap-2" style={spaceMono.style}>
                         <span className={cn(
                             'w-7 h-7 rounded-lg flex items-center justify-center shrink-0',
-                            'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                            'bg-[#E7E5E4] ',
                         )}>
                             <XCircle size={14} className="text-[#FF2157]" />
                         </span>
@@ -180,8 +180,8 @@ function CancelDialog({ bookingId, disabled }: { bookingId: string; disabled: bo
                         onClick={() => setReason('')}
                         className={cn(
                             'rounded-xl border-0 text-[#1E2938]/55 text-xs h-9 px-4',
-                            'bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_5px_#ffffff]',
-                            'hover:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                            'bg-[#E7E5E4] ',
+                            'hover:',
                         )}
                         style={spaceMono.style}
                     >
@@ -193,9 +193,9 @@ function CancelDialog({ bookingId, disabled }: { bookingId: string; disabled: bo
                         className={cn(
                             'rounded-xl border-0 text-white text-xs h-9 px-4 transition-all',
                             'bg-[#FF2157]',
-                            'shadow-[3px_3px_8px_rgba(255,33,87,0.35)]',
-                            'hover:shadow-[4px_4px_10px_rgba(255,33,87,0.5)]',
-                            'active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]',
+                            '',
+                            'hover:',
+                            'active:',
                             'disabled:opacity-40 disabled:cursor-not-allowed',
                         )}
                         style={spaceMono.style}
@@ -243,13 +243,13 @@ function RefundDialog({
             <AlertDialogContent className={cn(
                 'rounded-2xl border-0 max-w-md p-6',
                 'bg-[#E7E5E4]',
-                'shadow-[0_4px_12px_rgba(0,0,0,0.06)]',
+                '',
             )}>
                 <AlertDialogHeader>
                     <AlertDialogTitle className="text-[#1E2938] text-base font-bold flex items-center gap-2" style={spaceMono.style}>
                         <span className={cn(
                             'w-7 h-7 rounded-lg flex items-center justify-center shrink-0',
-                            'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                            'bg-[#E7E5E4] ',
                         )}>
                             <RotateCcw size={14} className="text-[#006666]" />
                         </span>
@@ -299,8 +299,8 @@ function RefundDialog({
                         onClick={() => { setRefundAmount(''); setReason(''); }}
                         className={cn(
                             'rounded-xl border-0 text-[#1E2938]/55 text-xs h-9 px-4',
-                            'bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_5px_#ffffff]',
-                            'hover:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                            'bg-[#E7E5E4] ',
+                            'hover:',
                         )}
                         style={spaceMono.style}
                     >
@@ -312,9 +312,9 @@ function RefundDialog({
                         className={cn(
                             'rounded-xl border-0 text-white text-xs h-9 px-4 transition-all',
                             'bg-[#006666]',
-                            'shadow-[3px_3px_8px_rgba(0,102,102,0.35)]',
-                            'hover:shadow-[4px_4px_10px_rgba(0,102,102,0.5)]',
-                            'active:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]',
+                            '',
+                            'hover:',
+                            'active:',
                             'disabled:opacity-40 disabled:cursor-not-allowed',
                         )}
                         style={spaceMono.style}
@@ -355,7 +355,7 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                     'w-full sm:max-w-[480px] border-0 p-0 flex flex-col',
                     'bg-[#E7E5E4]',
                     // Deep inset left shadow for sheet panel effect
-                    'shadow-[-12px_0_32px_rgba(0,0,0,0.12)]',
+                    '',
                 )}
                 style={jetbrainsMono.style}
             >
@@ -363,7 +363,7 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                 <SheetHeader className={cn(
                     'sticky top-0 z-10 px-6 py-4 shrink-0 border-b border-[#1E2938]/5',
                     'bg-[#E7E5E4]',
-                    'shadow-[0_2px_8px_rgba(0,0,0,0.04)]',
+                    '',
                 )}>
                     <div className="flex items-start justify-between gap-3">
                         <div>
@@ -382,8 +382,8 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                                     'h-8 w-8 rounded-lg flex items-center justify-center',
                                     'text-[#1E2938]/35 hover:text-[#1E2938]/70',
                                     'bg-[#E7E5E4]',
-                                    'shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_4px_#ffffff]',
-                                    'hover:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                    '',
+                                    'hover:',
                                     'transition-all duration-150',
                                 )}
                             >
@@ -401,7 +401,7 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                         <div className={cn(
                             'rounded-xl p-4 space-y-3',
                             'bg-[#E7E5E4]',
-                            'shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+                            '',
                         )}>
                             <div>
                                 <p className="text-sm font-semibold text-[#1E2938]/80 leading-tight" style={spaceMono.style}>
@@ -487,7 +487,7 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                         <div className={cn(
                             'rounded-xl p-4 space-y-3',
                             'bg-[#E7E5E4]',
-                            'shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+                            '',
                         )}>
                             <div className="flex items-center justify-between">
                                 <span className="text-xs text-[#1E2938]/40" style={spaceMono.style}>Method</span>
@@ -532,7 +532,7 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                                         className={cn(
                                             'flex items-center justify-between rounded-lg px-3 py-2',
                                             'bg-[#E7E5E4]',
-                                            'shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                            '',
                                         )}
                                     >
                                         <span className="text-xs text-[#1E2938]/60 capitalize" style={jetbrainsMono.style}>{d.discount}</span>
@@ -551,7 +551,7 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                             <div className={cn(
                                 'rounded-xl p-4 space-y-3',
                                 'bg-[#E7E5E4]',
-                                'shadow-[inset_3px_3px_6px_rgba(255,33,87,0.08),inset_-2px_-2px_5px_#ffffff]',
+                                '',
                             )}>
                                 <DetailRow
                                     icon={<Calendar size={13} />}
@@ -580,7 +580,7 @@ export function BookingDetailSheet({ booking, open, onClose }: BookingDetailShee
                     <div className={cn(
                         'shrink-0 px-6 pt-4 pb-5 space-y-2 border-t border-[#1E2938]/5',
                         'bg-[#E7E5E4]',
-                        'shadow-[0_-4px_12px_rgba(0,0,0,0.04)]',
+                        '',
                     )}>
                         <div className="flex gap-2">
                             <RefundDialog

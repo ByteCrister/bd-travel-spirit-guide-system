@@ -1,4 +1,4 @@
-// app/operations/tours/[tourId]/update-tour/components/steps/Step1BangladeshInfo.tsx
+﻿// app/operations/tours/[tourId]/update-tour/components/steps/Step1BangladeshInfo.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -28,21 +28,21 @@ import { spaceMono } from '@/styles/fonts';
 // ─── Neumorphism Style Constants ───────────────────────────────────────────────
 const neu = {
   surface: 'bg-[#E7E5E4]',
-  card: 'bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_18px_#c8c6c4,-8px_-8px_18px_#ffffff]',
-  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[inset_4px_4px_9px_#c8c6c4,inset_-4px_-4px_9px_#ffffff]',
-  sectionBox: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
-  iconBox: 'bg-[#E7E5E4] rounded-xl p-2.5 shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] flex items-center justify-center',
-  iconBoxRed: 'bg-[#E7E5E4] rounded-xl p-2.5 shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] flex items-center justify-center',
-  checkboxRow: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] flex items-center gap-3 px-4 py-3 cursor-pointer select-none transition-all duration-200',
-  badge: 'bg-[#E7E5E4] text-[#006666] border border-[#006666]/25 rounded-lg px-3 py-1 text-xs font-[Space_Mono] shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff] inline-flex items-center gap-1.5',
-  btn: 'bg-[#006666] text-white rounded-xl shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff] active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] transition-all duration-200',
-  btnDisabled: 'opacity-50 cursor-not-allowed bg-[#888780] rounded-xl shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff]',
+  card: 'bg-[#E7E5E4] rounded-2xl ',
+  cardInner: 'bg-[#E7E5E4] rounded-xl ',
+  sectionBox: 'bg-[#E7E5E4] rounded-xl ',
+  iconBox: 'bg-[#E7E5E4] rounded-xl p-2.5  flex items-center justify-center',
+  iconBoxRed: 'bg-[#E7E5E4] rounded-xl p-2.5  flex items-center justify-center',
+  checkboxRow: 'bg-[#E7E5E4] rounded-xl  flex items-center gap-3 px-4 py-3 cursor-pointer select-none transition-all duration-200',
+  badge: 'bg-[#E7E5E4] text-[#006666] border border-[#006666]/25 rounded-lg px-3 py-1 text-xs font-[Space_Mono]  inline-flex items-center gap-1.5',
+  btn: 'bg-[#006666] text-white rounded-xl  hover: active: transition-all duration-200',
+  btnDisabled: 'opacity-50 cursor-not-allowed bg-[#888780] rounded-xl ',
   label: 'text-[#1E2938] font-medium text-sm font-[Space_Mono] flex items-center gap-1.5',
   headingFont: 'font-[Space_Mono] font-semibold tracking-tight text-[#1E2938]',
   subText: 'text-[#5a6270] text-sm font-[Space_Mono]',
-  inputOverride: 'font-[Space_Mono] text-sm rounded-xl bg-[#E7E5E4] border-0 shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] focus:ring-1 focus:ring-[#006666] focus:shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] outline-none placeholder:text-[#888780]',
-  alertError: 'bg-[#E7E5E4] border border-[#FF2157]/30 rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] flex items-center gap-3 px-4 py-3',
-  alertSuccess: 'bg-[#E7E5E4] border border-[#00A63D]/30 rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] flex items-center gap-3 px-4 py-3',
+  inputOverride: 'font-[Space_Mono] text-sm rounded-xl bg-[#E7E5E4] border-0  focus:ring-1 focus:ring-[#006666] focus: outline-none placeholder:text-[#888780]',
+  alertError: 'bg-[#E7E5E4] border border-[#FF2157]/30 rounded-xl  flex items-center gap-3 px-4 py-3',
+  alertSuccess: 'bg-[#E7E5E4] border border-[#00A63D]/30 rounded-xl  flex items-center gap-3 px-4 py-3',
   divider: 'border-t border-[#c8c6c4]/70 my-6',
   errorText: 'text-xs text-[#FF2157] font-[Space_Mono] flex items-center gap-1 mt-1.5',
 };
@@ -269,8 +269,8 @@ export default function Step1BangladeshInfo({ tourId, initialData }: Step1Bangla
                 >
                   <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-all duration-200 shrink-0
                     ${formik.values.guideIncluded
-                      ? 'bg-[#006666] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]'
-                      : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]'}`}
+                      ? 'bg-[#006666] '
+                      : 'bg-[#E7E5E4] '}`}
                   >
                     {formik.values.guideIncluded && <CheckCircle2 size={13} className="text-white" />}
                   </div>
@@ -287,8 +287,8 @@ export default function Step1BangladeshInfo({ tourId, initialData }: Step1Bangla
                 >
                   <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-all duration-200 shrink-0
                     ${formik.values.transportIncluded
-                      ? 'bg-[#006666] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]'
-                      : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]'}`}
+                      ? 'bg-[#006666] '
+                      : 'bg-[#E7E5E4] '}`}
                   >
                     {formik.values.transportIncluded && <CheckCircle2 size={13} className="text-white" />}
                   </div>

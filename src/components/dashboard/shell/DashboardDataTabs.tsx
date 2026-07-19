@@ -484,7 +484,7 @@ export function DashboardDataTabs({
                         {isTabLoading('running') ? (
                             <DataTableSkeleton columns={5} rows={8} />
                         ) : (
-                            <TableShell empty={!data.runningTours.length} emptyLabel="No active departures right now.">
+                            <TableShell empty={!data.runningTours.length} emptyLabel="No active departure right now.">
                                 <table className="w-full min-w-[760px]">
                                     <thead style={{ borderBottom: `1px solid rgba(0,102,102,0.1)`, background: 'rgba(0,102,102,0.04)' }}>
                                         <tr>

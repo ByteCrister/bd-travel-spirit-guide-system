@@ -49,7 +49,6 @@ export function LogoutConfirmation({
             className={cn(
               "relative w-full max-w-md rounded-2xl overflow-hidden",
               "bg-[#E7E5E4]",
-              "shadow-[12px_12px_32px_rgba(0,0,0,0.18),-12px_-12px_32px_rgba(255,255,255,0.85)]",
               "border border-[#d0cecc]"
             )}
           >
@@ -57,7 +56,6 @@ export function LogoutConfirmation({
             <div className={cn(
               "relative px-6 py-5",
               "bg-[#E7E5E4]",
-              "shadow-[inset_0_-3px_8px_rgba(0,0,0,0.06)]",
               "border-b border-[#d0cecc]"
             )}>
               <button
@@ -66,8 +64,6 @@ export function LogoutConfirmation({
                 className={cn(
                   "absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg",
                   "bg-[#E7E5E4] text-[#1E2938]/50",
-                  "shadow-[2px_2px_6px_rgba(0,0,0,0.1),-2px_-2px_6px_rgba(255,255,255,0.85)]",
-                  "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.75)]",
                   "hover:text-[#FF2157] transition-all duration-150",
                   "disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none"
                 )}
@@ -78,8 +74,7 @@ export function LogoutConfirmation({
               <div className="flex items-center gap-4">
                 <div className={cn(
                   "flex h-12 w-12 items-center justify-center rounded-xl",
-                  "bg-[#E7E5E4]",
-                  "shadow-[3px_3px_8px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.85)]"
+                  "bg-[#E7E5E4]"
                 )}>
                   <AlertTriangle className="h-6 w-6 text-[#FF2157]" />
                 </div>
@@ -99,8 +94,7 @@ export function LogoutConfirmation({
               {/* User card */}
               <div className={cn(
                 "flex items-center gap-4 rounded-xl p-3",
-                "bg-[#E7E5E4]",
-                "shadow-[inset_2px_2px_6px_rgba(0,0,0,0.09),inset_-2px_-2px_6px_rgba(255,255,255,0.75)]"
+                "bg-[#E7E5E4]"
               )}>
                 <Avatar className="h-10 w-10 ring-2 ring-[#006666]/20">
                   <AvatarImage
@@ -134,8 +128,6 @@ export function LogoutConfirmation({
                     "flex-1 rounded-xl py-2.5 text-xs font-bold tracking-wide",
                     "font-[family-name:var(--font-space-mono)] text-[#1E2938]",
                     "bg-[#E7E5E4]",
-                    "shadow-[3px_3px_8px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.9)]",
-                    "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
                     "transition-all duration-150 focus:outline-none",
                     "disabled:opacity-40 disabled:cursor-not-allowed"
                   )}
@@ -150,8 +142,6 @@ export function LogoutConfirmation({
                     "flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold tracking-wide",
                     "font-[family-name:var(--font-space-mono)] text-white",
                     "bg-[#FF2157]",
-                    "shadow-[3px_3px_10px_rgba(255,33,87,0.4),-1px_-1px_4px_rgba(255,255,255,0.2)]",
-                    "hover:shadow-[inset_2px_2px_6px_rgba(0,0,0,0.2),inset_-1px_-1px_4px_rgba(255,100,120,0.3)]",
                     "transition-all duration-150 focus:outline-none",
                     "disabled:opacity-70 disabled:cursor-not-allowed"
                   )}

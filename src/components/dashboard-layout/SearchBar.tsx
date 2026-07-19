@@ -117,8 +117,8 @@ export function SearchBar({ isMobile = false, onClose }: SearchBarProps) {
           "font-[family-name:var(--font-jetbrains-mono)]",
           "bg-[#E7E5E4]",
           isFocused
-            ? "shadow-[inset_3px_3px_7px_rgba(0,0,0,0.12),inset_-3px_-3px_7px_rgba(255,255,255,0.8)]"
-            : "shadow-[3px_3px_8px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.9)]"
+            ? "shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]"
+            : "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]"
         )}
       >
         <Search className="h-4 w-4 flex-shrink-0 text-[#1E2938]/35" />
@@ -158,7 +158,7 @@ export function SearchBar({ isMobile = false, onClose }: SearchBarProps) {
                 "hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px]",
                 "font-[family-name:var(--font-space-mono)] text-[#1E2938]/40",
                 "bg-[#E7E5E4]",
-                "shadow-[1px_1px_3px_rgba(0,0,0,0.1),-1px_-1px_3px_rgba(255,255,255,0.8)]"
+                "shadow-[1px_1px_3px_#c8c6c5,-1px_-1px_3px_#ffffff]"
               )}>
                 ⌘K
               </kbd>
@@ -169,8 +169,8 @@ export function SearchBar({ isMobile = false, onClose }: SearchBarProps) {
                 className={cn(
                   "p-1 rounded-lg transition-all duration-150",
                   isCommandMode
-                    ? "shadow-[inset_1px_1px_4px_rgba(0,0,0,0.15),inset_-1px_-1px_4px_rgba(255,255,255,0.6)] text-[#006666]"
-                    : "shadow-[1px_1px_3px_rgba(0,0,0,0.1),-1px_-1px_3px_rgba(255,255,255,0.8)] text-[#1E2938]/40"
+                    ? " text-[#006666]"
+                    : " text-[#1E2938]/40"
                 )}
                 aria-label="Toggle command mode"
               >
@@ -193,7 +193,7 @@ export function SearchBar({ isMobile = false, onClose }: SearchBarProps) {
             className={cn(
               "absolute left-0 right-0 top-12 z-50 max-h-80 overflow-y-auto rounded-xl p-2",
               "bg-[#E7E5E4]",
-              "shadow-[6px_6px_20px_rgba(0,0,0,0.14),-6px_-6px_20px_rgba(255,255,255,0.9)]",
+              "shadow-[6px_6px_16px_#c8c6c5,-6px_-6px_16px_#ffffff]",
               "border border-[#d0cecc]"
             )}
           >
@@ -210,7 +210,7 @@ export function SearchBar({ isMobile = false, onClose }: SearchBarProps) {
                 className={cn(
                   "w-full text-left px-3 py-2 rounded-lg mb-1 transition-all duration-150",
                   "font-[family-name:var(--font-jetbrains-mono)]",
-                  "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]"
+                  "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]"
                 )}
               >
                 <p className="text-xs font-semibold text-[#1E2938]">{item.title}</p>
@@ -231,8 +231,8 @@ export function SearchBar({ isMobile = false, onClose }: SearchBarProps) {
           className={cn(
             "flex h-10 w-10 items-center justify-center rounded-xl",
             "bg-[#E7E5E4] text-[#1E2938]",
-            "shadow-[3px_3px_8px_rgba(0,0,0,0.13),-3px_-3px_8px_rgba(255,255,255,0.9)]",
-            "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+            "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+            "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
             "transition-all duration-200"
           )}
           whileTap={{ scale: 0.95 }}
@@ -251,7 +251,7 @@ export function SearchBar({ isMobile = false, onClose }: SearchBarProps) {
               className={cn(
                 "absolute right-0 top-12 z-50 w-80 rounded-xl p-2",
                 "bg-[#E7E5E4]",
-                "shadow-[6px_6px_20px_rgba(0,0,0,0.14),-6px_-6px_20px_rgba(255,255,255,0.9)]",
+                "shadow-[6px_6px_16px_#c8c6c5,-6px_-6px_16px_#ffffff]",
                 "border border-[#d0cecc]"
               )}
             >

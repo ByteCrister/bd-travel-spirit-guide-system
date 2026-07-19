@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useFormikContext } from "formik";
 import Image from "next/image";
@@ -11,23 +11,23 @@ import { ImagePlus, Trash2, Upload, X } from "lucide-react";
 // ── Neumorphic style tokens ───────────────────────────────────
 const NEU_SURFACE = "bg-[#E7E5E4]";
 const NEU_CARD =
-  "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+  "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_CARD_SM =
-  "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+  "rounded-xl bg-[#E7E5E4]  border border-white/60";
 const NEU_INSET =
-  "bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
+  "bg-[#E7E5E4] ";
 
 const NEU_BTN_GHOST =
   "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] " +
-  "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-  "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
-  "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " " +
+  "hover: " +
+  "active: " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40 disabled:opacity-40 disabled:cursor-not-allowed";
 
 const NEU_BTN_ICON =
   "rounded-xl w-9 h-9 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/60 " +
-  "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-  "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " " +
+  "hover:text-[#006666] hover: " +
   "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
   "transition-all duration-200";
 const NEU_HEADING =
@@ -38,10 +38,10 @@ const NEU_MUTED =
   "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_BADGE_PRIMARY =
   "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-  "bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+  "bg-[#006666]/10 text-[#006666] ";
 const NEU_BADGE_DANGER =
   "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-  "bg-[#FF2157]/10 text-[#FF2157] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+  "bg-[#FF2157]/10 text-[#FF2157] ";
 
 // ── Constants ─────────────────────────────────────────────────
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -188,7 +188,7 @@ export default function HeroAndGalleryUpload({
         {values.heroImage ? (
           <div className={`${NEU_CARD_SM} p-3 flex items-center gap-4`}>
             {/* Thumbnail */}
-            <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]">
+            <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 ">
               <Image
                 src={values.heroImage}
                 alt="Hero preview"
@@ -315,7 +315,7 @@ export default function HeroAndGalleryUpload({
                 <button
                   type="button"
                   onClick={() => removeGalleryImage(index)}
-                  className="absolute top-1.5 right-1.5 w-7 h-7 flex items-center justify-center rounded-lg bg-[#E7E5E4]/90 text-[#FF2157] shadow-[2px_2px_5px_#c8c6c5,-1px_-1px_3px_#ffffff] opacity-0 group-hover:opacity-100 hover:bg-[#FF2157] hover:text-white transition-all duration-200"
+                  className="absolute top-1.5 right-1.5 w-7 h-7 flex items-center justify-center rounded-lg bg-[#E7E5E4]/90 text-[#FF2157]  opacity-0 group-hover:opacity-100 hover:bg-[#FF2157] hover:text-white transition-all duration-200"
                   aria-label={`Remove gallery image ${index + 1}`}
                 >
                   <Trash2 size={12} />

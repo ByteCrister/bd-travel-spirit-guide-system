@@ -1,4 +1,4 @@
-// DestinationImageUploader.tsx
+﻿// DestinationImageUploader.tsx
 "use client";
 
 import React, { useState, useRef } from "react";
@@ -9,37 +9,37 @@ import Image from "next/image";
 
 // ── Neumorphic Style Tokens ──────────────────────────────────────────────────
 const NEU_CARD_SM =
-  "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+  "rounded-xl bg-[#E7E5E4]  border border-white/60";
 
 const NEU_SURFACE_INSET =
-  "bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
+  "bg-[#E7E5E4] ";
 
 const NEU_BTN_PRIMARY =
   "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl " +
   "bg-[#006666] text-white font-[family-name:var(--font-space-mono)] text-sm font-bold tracking-wide " +
-  "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
-  "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
-  "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+  " " +
+  "hover: hover:bg-[#007777] " +
+  "active: " +
   "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
 
 const NEU_BTN_GHOST =
   "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl " +
   "bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] text-sm font-bold " +
-  "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-  "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+  " " +
+  "hover: " +
   "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 
 const NEU_BADGE =
   "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold " +
   "font-[family-name:var(--font-space-mono)] bg-[#E7E5E4] text-[#006666] " +
-  "shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+  "";
 
 const NEU_BADGE_WARNING =
   "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold " +
   "font-[family-name:var(--font-space-mono)] bg-[#FE9900]/10 text-[#FE9900] " +
-  "shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+  "";
 
 const NEU_HEADING =
   "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight text-sm";
@@ -53,14 +53,14 @@ const NEU_LABEL =
 const NEU_REMOVE_BTN =
   "absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded-lg " +
   "bg-[#E7E5E4]/90 text-[#FF2157] opacity-0 group-hover:opacity-100 " +
-  "shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff] " +
+  " " +
   "hover:bg-[#FF2157] hover:text-white hover:shadow-none " +
   "transition-all duration-200 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2157]";
 
 const NEU_WARNING_BANNER =
   "flex items-start gap-2.5 rounded-xl p-3.5 " +
   "bg-[#FE9900]/8 border border-[#FE9900]/30 " +
-  "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+  "";
 
 // ── Props ────────────────────────────────────────────────────────────────────
 interface DestinationImageUploaderProps {
@@ -245,7 +245,7 @@ export default function DestinationImageUploader({
           onKeyDown={(e) => e.key === "Enter" && triggerFileInput()}
           aria-label="Upload images"
         >
-          <div className="p-4 rounded-2xl bg-[#E7E5E4] shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff]">
+          <div className="p-4 rounded-2xl bg-[#E7E5E4] ">
             <ImageIcon className="w-8 h-8 text-[#1E2938]/30" />
           </div>
           <div className="text-center">

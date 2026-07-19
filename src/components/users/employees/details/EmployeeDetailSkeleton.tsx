@@ -1,9 +1,9 @@
-// components/ui/EmployeeDetailSkeleton.tsx
+﻿// components/ui/EmployeeDetailSkeleton.tsx
 "use client";
 
 export default function EmployeeDetailSkeleton() {
-  const neumorphCard = "bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_16px_#C6C4C3,-8px_-8px_16px_#ffffff]";
-  const neumorphRaised = "shadow-[4px_4px_8px_#C6C4C3,-4px_-4px_8px_#ffffff] bg-[#E7E5E4]";
+  const neumorphCard = "bg-[#E7E5E4] rounded-2xl ";
+  const neumorphRaised = " bg-[#E7E5E4]";
   const placeholderBlock = "bg-[#C6C4C3] rounded-lg animate-pulse";
 
   return (

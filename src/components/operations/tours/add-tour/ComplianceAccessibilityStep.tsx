@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useFormikContext } from "formik";
 import { motion, Variants } from "framer-motion";
@@ -20,17 +20,17 @@ import { Textarea } from "@/components/ui/textarea";
 // ── Neumorphism Style Tokens ──────────────────────────────────
 const NEU_SURFACE = "bg-[#E7E5E4]";
 const NEU_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_INPUT =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
     "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    " border-none " +
     "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 
 const NEU_SELECT =
     "w-full h-11 rounded-xl bg-[#E7E5E4] text-[#1E2938] " +
     "font-[family-name:var(--font-jetbrains-mono)] text-sm px-3 " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    " border-none " +
     "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200 appearance-none cursor-pointer";
 const NEU_HEADING =
     "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
@@ -40,30 +40,30 @@ const NEU_MUTED =
     "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_DIVIDER = "border-[#1E2938]/10";
 const NEU_ICON_WELL =
-    "p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+    "p-2.5 rounded-xl bg-[#E7E5E4] ";
 
 // Toggle card — inactive
 const NEU_TOGGLE_CARD =
     "flex flex-col items-center justify-center gap-3 p-5 rounded-2xl cursor-pointer text-center " +
     "bg-[#E7E5E4] border border-white/60 " +
-    "shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff] " +
-    "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover: " +
     "transition-all duration-200 select-none";
 
 // Toggle card — active
 const NEU_TOGGLE_CARD_ACTIVE =
     "flex flex-col items-center justify-center gap-3 p-5 rounded-2xl cursor-pointer text-center " +
     "bg-[#006666]/5 border border-[#006666]/30 " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] " +
+    " " +
     "transition-all duration-200 select-none";
 
 // Neumorphic toggle switch
 const NEU_SWITCH_TRACK_OFF =
     "relative inline-flex w-11 h-6 rounded-full cursor-pointer transition-all duration-200 " +
-    "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+    "bg-[#E7E5E4] ";
 const NEU_SWITCH_TRACK_ON =
     "relative inline-flex w-11 h-6 rounded-full cursor-pointer transition-all duration-200 " +
-    "bg-[#006666] shadow-[inset_2px_2px_5px_#004d4d,inset_-1px_-1px_3px_#008080]";
+    "bg-[#006666] ";
 
 // ── Animation Variants ────────────────────────────────────────
 const containerVariants: Variants = {
@@ -95,7 +95,7 @@ function NeuSwitch({
             className={checked ? NEU_SWITCH_TRACK_ON : NEU_SWITCH_TRACK_OFF}
         >
             <span
-                className={`inline-block w-4 h-4 rounded-full bg-white shadow-[1px_1px_3px_rgba(0,0,0,0.15)] transform transition-transform duration-200 ${checked ? "translate-x-6" : "translate-x-1"
+                className={`inline-block w-4 h-4 rounded-full bg-white  transform transition-transform duration-200 ${checked ? "translate-x-6" : "translate-x-1"
                     } mt-1`}
             />
         </button>
@@ -116,7 +116,7 @@ export default function ComplianceAccessibilityStep() {
             {/* Header */}
             <motion.div variants={itemVariants}>
                 <div className="flex items-center gap-4">
-                    <div className="p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]">
+                    <div className="p-2.5 rounded-xl bg-[#006666]/10 ">
                         <Shield className="w-6 h-6 text-[#006666]" />
                     </div>
                     <div>
@@ -249,8 +249,8 @@ export default function ComplianceAccessibilityStep() {
                                     }}
                                 >
                                     <div className={`p-3 rounded-xl transition-colors duration-200 ${values.accessibility?.wheelchair
-                                            ? "bg-[#006666] shadow-[inset_2px_2px_4px_#004d4d]"
-                                            : "bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]"
+                                            ? "bg-[#006666] "
+                                            : "bg-[#E7E5E4] "
                                         }`}>
                                         <Accessibility className={`w-6 h-6 ${values.accessibility?.wheelchair ? "text-white" : "text-[#1E2938]/50"}`} />
                                     </div>
@@ -281,8 +281,8 @@ export default function ComplianceAccessibilityStep() {
                                     }}
                                 >
                                     <div className={`p-3 rounded-xl transition-colors duration-200 ${values.accessibility?.familyFriendly
-                                            ? "bg-[#006666] shadow-[inset_2px_2px_4px_#004d4d]"
-                                            : "bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]"
+                                            ? "bg-[#006666] "
+                                            : "bg-[#E7E5E4] "
                                         }`}>
                                         <Baby className={`w-6 h-6 ${values.accessibility?.familyFriendly ? "text-white" : "text-[#1E2938]/50"}`} />
                                     </div>
@@ -313,8 +313,8 @@ export default function ComplianceAccessibilityStep() {
                                     }}
                                 >
                                     <div className={`p-3 rounded-xl transition-colors duration-200 ${values.accessibility?.petFriendly
-                                            ? "bg-[#006666] shadow-[inset_2px_2px_4px_#004d4d]"
-                                            : "bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]"
+                                            ? "bg-[#006666] "
+                                            : "bg-[#E7E5E4] "
                                         }`}>
                                         <Dog className={`w-6 h-6 ${values.accessibility?.petFriendly ? "text-white" : "text-[#1E2938]/50"}`} />
                                     </div>
@@ -344,9 +344,9 @@ export default function ComplianceAccessibilityStep() {
 
                 {/* Info Alert */}
                 <motion.div variants={itemVariants} className="md:col-span-2">
-                    <div className="flex gap-4 p-5 rounded-2xl bg-[#006666]/5 border border-[#006666]/20 shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff]">
+                    <div className="flex gap-4 p-5 rounded-2xl bg-[#006666]/5 border border-[#006666]/20 ">
                         <div className="shrink-0 mt-0.5">
-                            <div className="p-2 rounded-xl bg-[#006666]/10 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]">
+                            <div className="p-2 rounded-xl bg-[#006666]/10 ">
                                 <Info className="w-4 h-4 text-[#006666]" />
                             </div>
                         </div>

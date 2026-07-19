@@ -35,10 +35,10 @@ import { tourUpdateService } from '@/utils/api/tour.update.api';
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const NEU = {
   surface: 'bg-[#E7E5E4]',
-  card: 'bg-[#E7E5E4] rounded-2xl shadow-[6px_6px_16px_#c8c6c4,-6px_-6px_16px_#ffffff]',
-  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
-  raised: 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff]',
-  iconBox: 'rounded-xl shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff] flex items-center justify-center bg-[#E7E5E4]',
+  card: 'bg-[#E7E5E4] rounded-2xl ',
+  cardInner: 'bg-[#E7E5E4] rounded-xl ',
+  raised: 'bg-[#E7E5E4] ',
+  iconBox: 'rounded-xl  flex items-center justify-center bg-[#E7E5E4]',
   primaryText: 'text-[#1E2938]',
   secondaryText: 'text-[#4a5568]',
   mutedText: 'text-[#718096]',
@@ -47,37 +47,37 @@ const NEU = {
   primaryColor: '#006666',
   btnBack: [
     'flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold',
-    'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff]',
-    'hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff]',
-    'active:shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
+    'bg-[#E7E5E4] ',
+    'hover:',
+    'active:',
     'disabled:opacity-40 disabled:cursor-not-allowed',
     'transition-all duration-200 text-[#4a5568]',
   ].join(' '),
   btnNext: [
     'flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold',
     'bg-[#006666] text-white',
-    'shadow-[4px_4px_10px_#004d4d,-4px_-4px_10px_#008080]',
-    'hover:shadow-[2px_2px_6px_#004d4d,-2px_-2px_6px_#008080]',
-    'active:shadow-[inset_2px_2px_6px_#004d4d,inset_-2px_-2px_6px_#008080]',
+    '',
+    'hover:',
+    'active:',
     'transition-all duration-200',
   ].join(' '),
   btnSubmit: [
     'flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold',
     'bg-[#1E2938] text-white',
-    'shadow-[4px_4px_10px_#111820,-4px_-4px_10px_#2b3a50]',
-    'hover:shadow-[2px_2px_6px_#111820,-2px_-2px_6px_#2b3a50]',
-    'active:shadow-[inset_2px_2px_6px_#111820,inset_-2px_-2px_6px_#2b3a50]',
+    '',
+    'hover:',
+    'active:',
     'disabled:opacity-50 disabled:cursor-not-allowed',
     'transition-all duration-200',
   ].join(' '),
   stepActive: [
-    'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
+    '',
     'ring-2 ring-[#006666]/40',
   ].join(' '),
-  stepDone: 'shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff]',
+  stepDone: '',
   stepIdle: [
-    'shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff]',
-    'hover:shadow-[1px_1px_5px_#c8c6c4,-1px_-1px_5px_#ffffff]',
+    '',
+    'hover:',
   ].join(' '),
   divider: 'border-t border-[#d1cfcd]',
 };
@@ -267,8 +267,8 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
             tourId={tourId}
             initialData={{
               basePrice: tourData.basePrice, discounts: tourData.discounts,
-              duration: tourData.duration, operatingWindows: tourData.operatingWindows,
-              departures: tourData.departures, paymentMethods: tourData.paymentMethods,
+              duration: tourData.duration, operatingWindow: tourData.operatingWindow,
+              departure: tourData.departure, paymentMethods: tourData.paymentMethods,
             }}
           />
         );

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useFormikContext } from "formik";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,16 +8,16 @@ import { Globe } from "lucide-react";
 
 // ── Neumorphism style tokens ──────────────────────────────────
 const NEU_CARD =
-  "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+  "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_SURFACE_INSET =
-  "bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
+  "bg-[#E7E5E4] ";
 const NEU_INPUT =
   "w-full rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
   "font-[family-name:var(--font-jetbrains-mono)] text-sm px-4 py-2.5 " +
-  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+  " border-none " +
   "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 const NEU_ICON_WELL_PRIMARY =
-  "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+  "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_HEADING =
   "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL =
@@ -26,11 +26,11 @@ const NEU_MUTED =
   "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_TAB_ACTIVE =
   "px-4 py-2 rounded-xl font-[family-name:var(--font-space-mono)] text-sm font-600 text-[#006666] " +
-  "bg-[#006666]/10 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] transition-all duration-200";
+  "bg-[#006666]/10  transition-all duration-200";
 const NEU_TAB_DEFAULT =
   "px-4 py-2 rounded-xl font-[family-name:var(--font-space-mono)] text-sm font-500 text-[#1E2938]/60 " +
-  "bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-  "hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] transition-all duration-200";
+  "bg-[#E7E5E4]  " +
+  "hover: transition-all duration-200";
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -165,7 +165,7 @@ export default function TranslationsSection() {
                 const filled = [t?.title, t?.summary, t?.description].filter(Boolean).length;
                 return (
                   <div className="mt-4 flex items-center gap-2">
-                    <div className="flex-1 h-1.5 rounded-full bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c5,inset_-1px_-1px_3px_#ffffff]">
+                    <div className="flex-1 h-1.5 rounded-full bg-[#E7E5E4] ">
                       <motion.div
                         className="h-full rounded-full bg-[#006666]"
                         animate={{ width: `${(filled / 3) * 100}%` }}

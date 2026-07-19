@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -44,7 +44,7 @@ function StatusPill({ status }: { status: string }) {
         <span
             className={cn(
                 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium',
-                'shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_3px_rgba(255,255,255,0.8)]',
+                '',
                 cfg.bg, cfg.textColor,
             )}
             style={jetbrainsMono.style}
@@ -61,7 +61,7 @@ function SkeletonRow() {
             <td className="px-4 py-4 w-10">
                 <div className={cn(
                     'h-6 w-6 rounded-lg mx-auto',
-                    'bg-[#E7E5E4] shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff] animate-pulse',
+                    'bg-[#E7E5E4]  animate-pulse',
                 )} />
             </td>
             {[90, 160, 180, 60, 100, 90, 80].map((w, i) => (
@@ -70,7 +70,7 @@ function SkeletonRow() {
                         <div
                             className={cn(
                                 'h-3 rounded-full animate-pulse',
-                                'bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c4,inset_-1px_-1px_2px_#ffffff]',
+                                'bg-[#E7E5E4] ',
                             )}
                             style={{ width: `${w}px` }}
                         />
@@ -78,7 +78,7 @@ function SkeletonRow() {
                             <div
                                 className={cn(
                                     'h-2.5 rounded-full animate-pulse',
-                                    'bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c4,inset_-1px_-1px_2px_#ffffff]',
+                                    'bg-[#E7E5E4] ',
                                 )}
                                 style={{ width: `${w * 0.6}px` }}
                             />
@@ -99,7 +99,7 @@ function EmptyState() {
                     <div className={cn(
                         'w-14 h-14 rounded-2xl flex items-center justify-center',
                         'bg-[#E7E5E4]',
-                        'shadow-[inset_4px_4px_8px_#c8c6c4,inset_-3px_-3px_6px_#ffffff]',
+                        '',
                     )}>
                         <Calendar size={20} className="text-[#1E2938]/25" />
                     </div>
@@ -137,7 +137,7 @@ function SectionHeader({ icon: Icon, label, accentColor }: { icon: React.Element
         <span className="flex items-center gap-2">
             <span className={cn(
                 'w-5 h-5 rounded-md flex items-center justify-center',
-                'bg-[#E7E5E4] shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                'bg-[#E7E5E4] ',
             )}>
                 <Icon size={11} className={accentColor} />
             </span>
@@ -161,7 +161,7 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
         <div className={cn(
             'rounded-2xl overflow-hidden',
             'bg-[#E7E5E4]',
-            'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-2px_-2px_6px_#ffffff]',
+            '',
         )}>
             <Accordion type="multiple" defaultValue={['booking', 'tour']} className="w-full divide-y divide-[#1E2938]/5">
 
@@ -222,9 +222,9 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                         <div className={cn(
                             'flex items-center gap-3 mb-4 p-3 rounded-xl',
                             'bg-[#E7E5E4]',
-                            'shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                            '',
                         )}>
-                            <Avatar className="w-9 h-9 rounded-xl shrink-0 shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_4px_#ffffff]">
+                            <Avatar className="w-9 h-9 rounded-xl shrink-0 ">
                                 <AvatarFallback className="bg-[#006666]/10 text-[#006666] text-xs font-bold rounded-xl">
                                     {booking.traveler.name?.charAt(0).toUpperCase()}
                                 </AvatarFallback>
@@ -238,7 +238,7 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                             </div>
                             <span className={cn(
                                 'ml-auto shrink-0 text-[9px] font-medium px-2 py-0.5 rounded-full capitalize',
-                                'shadow-[inset_1px_1px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_2px_rgba(255,255,255,0.7)]',
+                                '',
                                 booking.traveler.accountStatus === 'active'
                                     ? 'bg-[#00A63D]/10 text-[#00A63D]'
                                     : 'bg-[#1E2938]/6 text-[#1E2938]/40',
@@ -284,7 +284,7 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                         )}
                         <div className={cn(
                             'mt-3 p-3 rounded-xl flex items-center justify-between',
-                            'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                            'bg-[#E7E5E4] ',
                         )}>
                             <span className="text-xs text-[#1E2938]/45" style={spaceMono.style}>Total paid</span>
                             <span className="text-base font-bold text-[#006666]" style={spaceMono.style}>
@@ -328,7 +328,7 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
         <div className={cn(
             'relative rounded-2xl overflow-hidden',
             'bg-[#E7E5E4]',
-            'shadow-[8px_8px_16px_#c8c6c4,-6px_-6px_12px_#ffffff]',
+            '',
         )}>
             {/* Teal top accent line */}
             <div className="h-[3px] w-full bg-[#006666]" />
@@ -340,7 +340,7 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                     <thead>
                         <tr className={cn(
                             'bg-[#E7E5E4]',
-                            'shadow-[0_2px_4px_rgba(0,0,0,0.04)]',
+                            '',
                         )}>
                             <th className="px-4 py-3.5 w-10 border-b border-[#1E2938]/5" />
                             <ColHeader label="Reference" sortable />
@@ -384,8 +384,8 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                     className={cn(
                                                         'h-7 w-7 rounded-lg flex items-center justify-center mx-auto transition-all duration-200',
                                                         expandedRowId === booking._id
-                                                            ? 'bg-[#E7E5E4] text-[#006666] shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]'
-                                                            : 'text-[#1E2938]/25 hover:text-[#006666] shadow-[2px_2px_4px_#c8c6c4,-1px_-1px_3px_#ffffff] hover:shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_4px_#ffffff]',
+                                                            ? 'bg-[#E7E5E4] text-[#006666] '
+                                                            : 'text-[#1E2938]/25 hover:text-[#006666]  hover:',
                                                     )}
                                                     aria-label={expandedRowId === booking._id ? 'Collapse' : 'Expand'}
                                                 >
@@ -416,7 +416,7 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                 <div className="flex items-center gap-2.5">
                                                     <Avatar className={cn(
                                                         'w-7 h-7 rounded-lg shrink-0',
-                                                        'shadow-[2px_2px_5px_#c8c6c4,-1px_-1px_3px_#ffffff]',
+                                                        '',
                                                     )}>
                                                         <AvatarFallback className="bg-[#006666]/10 text-[#006666] text-[10px] font-bold rounded-lg">
                                                             {booking.traveler.name?.charAt(0).toUpperCase()}
@@ -456,7 +456,7 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                 <div className={cn(
                                                     'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium',
                                                     'bg-[#E7E5E4] text-[#1E2938]/55',
-                                                    'shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                                    '',
                                                 )} style={jetbrainsMono.style}>
                                                     <Users size={9} />
                                                     {booking.totalParticipants}
@@ -506,8 +506,8 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                                     'h-7 w-7 rounded-lg flex items-center justify-center',
                                                                     'text-[#1E2938]/35 hover:text-[#006666]',
                                                                     'bg-[#E7E5E4]',
-                                                                    'shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_4px_#ffffff]',
-                                                                    'hover:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                                                    '',
+                                                                    'hover:',
                                                                     'transition-all duration-150',
                                                                 )}
                                                                 title="View full details"

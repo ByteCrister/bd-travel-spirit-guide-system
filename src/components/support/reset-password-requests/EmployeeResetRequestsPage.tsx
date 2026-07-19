@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion, Variants } from "framer-motion";
@@ -30,13 +30,13 @@ const N = {
   text: "text-[#1E2938] dark:text-white",
   textMuted: "text-[#1E2938]/60 dark:text-white/50",
   raisedLg:
-    "shadow-[12px_12px_24px_#cac8c7,-12px_-12px_24px_#ffffff] dark:shadow-[12px_12px_24px_#1a1a1a,-12px_-12px_24px_#3a3a3a]",
+    " dark:",
   raisedMd:
-    "shadow-[8px_8px_16px_#cac8c7,-8px_-8px_16px_#ffffff] dark:shadow-[8px_8px_16px_#1a1a1a,-8px_-8px_16px_#3a3a3a]",
+    " dark:",
   raisedSm:
-    "shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#3a3a3a]",
+    " dark:",
   raisedXs:
-    "shadow-[2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#1a1a1a,-2px_-2px_4px_#3a3a3a]",
+    " dark:",
   pressedSm:
     "[box-shadow:inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff] dark:[box-shadow:inset_2px_2px_5px_#1a1a1a,inset_-2px_-2px_5px_#3a3a3a]",
   font: "font-['Space_Mono']",
@@ -164,7 +164,7 @@ export default function EmployeeResetRequestsPage() {
 
         {/* ── Divider ── */}
         <motion.div variants={itemVariants}>
-          <Separator className="border-0 h-px bg-transparent shadow-[0_1px_2px_#cac8c7] dark:shadow-[0_1px_2px_#1a1a1a]" />
+          <Separator className="border-0 h-px bg-transparent  dark:" />
         </motion.div>
 
         {/* ── Main content ── */}

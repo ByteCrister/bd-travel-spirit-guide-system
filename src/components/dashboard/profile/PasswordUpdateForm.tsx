@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,7 +28,7 @@ function PasswordInput({
   return (
     <div className="relative">
       <div className="rounded-xl bg-[#E7E5E4]
-        shadow-[inset_4px_4px_9px_rgba(0,0,0,0.13),inset_-4px_-4px_9px_rgba(255,255,255,0.72)]">
+        ">
         <input
           id={id}
           type={show ? "text" : "password"}
@@ -139,14 +139,14 @@ export default function PasswordUpdateForm() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
       {/* Card */}
       <div className="rounded-2xl bg-[#E7E5E4]
-        shadow-[10px_10px_24px_rgba(0,0,0,0.16),-8px_-8px_20px_rgba(255,255,255,0.9)]
+        
         overflow-hidden">
 
         {/* Header */}
         <div className="px-8 py-7 border-b border-[#1E2938]/8 bg-[#E7E5E4]">
           <div className="flex items-center gap-4">
             <div className="p-3.5 rounded-xl bg-[#E7E5E4]
-              shadow-[5px_5px_12px_rgba(0,0,0,0.14),-4px_-4px_10px_rgba(255,255,255,0.85)]">
+              ">
               <Shield className="h-6 w-6 text-[#006666]" />
             </div>
             <div>
@@ -185,9 +185,9 @@ export default function PasswordUpdateForm() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
                   text-[#006666] font-[var(--font-space-mono)]
                   bg-[#E7E5E4]
-                  shadow-[3px_3px_7px_rgba(0,0,0,0.12),-2px_-2px_5px_rgba(255,255,255,0.8)]
-                  hover:shadow-[4px_4px_9px_rgba(0,0,0,0.15),-3px_-3px_7px_rgba(255,255,255,0.85)]
-                  active:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-1px_-1px_3px_rgba(255,255,255,0.6)]
+                  
+                  hover:
+                  active:
                   transition-all duration-150"
               >
                 <RefreshCw className="h-3 w-3" />
@@ -221,7 +221,7 @@ export default function PasswordUpdateForm() {
                   </div>
                   {/* Track — inset */}
                   <div className="h-2 rounded-full bg-[#E7E5E4]
-                    shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]
+                    
                     overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
@@ -243,8 +243,8 @@ export default function PasswordUpdateForm() {
                           font-[var(--font-jetbrains-mono)]
                           bg-[#E7E5E4]
                           ${req.met
-                            ? "shadow-[inset_2px_2px_5px_rgba(0,0,0,0.09),inset_-2px_-2px_4px_rgba(255,255,255,0.65)] text-[#00A63D]"
-                            : "shadow-[3px_3px_7px_rgba(0,0,0,0.1),-2px_-2px_5px_rgba(255,255,255,0.75)] text-[#1E2938]/40"
+                            ? " text-[#00A63D]"
+                            : " text-[#1E2938]/40"
                           }`}
                       >
                         {req.met
@@ -279,7 +279,7 @@ export default function PasswordUpdateForm() {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs text-[#FF2157]
                     font-[var(--font-jetbrains-mono)] border-l-2 border-[#FF2157]
-                    bg-[#E7E5E4] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.09),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
+                    bg-[#E7E5E4] ">
                   <XCircle className="h-4 w-4 shrink-0" /> Passwords do not match
                 </motion.div>
               )}
@@ -287,7 +287,7 @@ export default function PasswordUpdateForm() {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs text-[#00A63D]
                     font-[var(--font-jetbrains-mono)] border-l-2 border-[#00A63D]
-                    bg-[#E7E5E4] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.09),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
+                    bg-[#E7E5E4] ">
                   <CheckCircle2 className="h-4 w-4 shrink-0" /> Passwords match
                 </motion.div>
               )}
@@ -307,7 +307,7 @@ export default function PasswordUpdateForm() {
               <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-[#00A63D]
                   font-[var(--font-jetbrains-mono)] border-l-2 border-[#00A63D]
-                  bg-[#E7E5E4] shadow-[inset_3px_3px_7px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.65)]">
+                  bg-[#E7E5E4] ">
                   <CheckCircle2 className="h-4 w-4 shrink-0" />
                   Password updated successfully!
                 </div>
@@ -317,7 +317,7 @@ export default function PasswordUpdateForm() {
               <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-[#FF2157]
                   font-[var(--font-jetbrains-mono)] border-l-2 border-[#FF2157]
-                  bg-[#E7E5E4] shadow-[inset_3px_3px_7px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.65)]">
+                  bg-[#E7E5E4] ">
                   <AlertTriangle className="h-4 w-4 shrink-0" />
                   {error || updatePasswordMeta?.error}
                 </div>
@@ -337,9 +337,9 @@ export default function PasswordUpdateForm() {
             className="w-full py-3.5 rounded-xl text-sm font-bold text-white
               font-[var(--font-space-mono)] tracking-wide
               bg-[#006666]
-              shadow-[5px_5px_12px_rgba(0,0,0,0.2),-3px_-3px_8px_rgba(255,255,255,0.4)]
+              
               hover:bg-[#005555]
-              active:shadow-[inset_3px_3px_9px_rgba(0,0,0,0.25)]
+              active:
               disabled:opacity-40 disabled:cursor-not-allowed
               transition-all duration-150"
           >

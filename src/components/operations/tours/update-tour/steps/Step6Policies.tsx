@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useFormik } from 'formik';
@@ -43,24 +43,24 @@ import { FaBangladeshiTakaSign } from 'react-icons/fa6';
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const NEU = {
   surface: 'bg-[#E7E5E4]',
-  card: 'bg-[#E7E5E4] rounded-2xl shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff]',
-  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
-  raised: 'bg-[#E7E5E4] rounded-xl shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff]',
-  iconBox: 'rounded-xl shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff] flex items-center justify-center bg-[#E7E5E4]',
+  card: 'bg-[#E7E5E4] rounded-2xl ',
+  cardInner: 'bg-[#E7E5E4] rounded-xl ',
+  raised: 'bg-[#E7E5E4] rounded-xl ',
+  iconBox: 'rounded-xl  flex items-center justify-center bg-[#E7E5E4]',
   primaryText: 'text-[#1E2938]',
   secondaryText: 'text-[#4a5568]',
   mutedText: 'text-[#718096]',
   primaryBg: 'bg-[#006666]',
   primaryColor: '#006666',
-  inputBase: 'bg-[#E7E5E4] shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] border-0 rounded-xl focus:ring-2 focus:ring-[#006666]/30 outline-none transition-all duration-200',
+  inputBase: 'bg-[#E7E5E4]  border-0 rounded-xl focus:ring-2 focus:ring-[#006666]/30 outline-none transition-all duration-200',
   labelFont: 'font-[Space_Mono,monospace] tracking-wide',
   bodyFont: 'font-[JetBrains_Mono,monospace]',
-  btnPrimary: 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff] active:shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] transition-all duration-200 rounded-xl',
-  btnSubmit: 'bg-[#006666] text-white rounded-xl shadow-[4px_4px_10px_#004d4d,-4px_-4px_10px_#008080] hover:shadow-[2px_2px_6px_#004d4d,-2px_-2px_6px_#008080] active:shadow-[inset_2px_2px_6px_#004d4d,inset_-2px_-2px_6px_#008080] transition-all duration-200',
-  btnDanger: 'text-red-500 bg-[#E7E5E4] rounded-lg shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[1px_1px_4px_#c8c6c4,-1px_-1px_4px_#ffffff] active:shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] transition-all duration-200',
+  btnPrimary: 'bg-[#E7E5E4]  hover: active: transition-all duration-200 rounded-xl',
+  btnSubmit: 'bg-[#006666] text-white rounded-xl  hover: active: transition-all duration-200',
+  btnDanger: 'text-red-500 bg-[#E7E5E4] rounded-lg  hover: active: transition-all duration-200',
   divider: 'border-t border-[#d1cfcd]',
-  badge: 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] border-0 text-xs rounded-md px-2.5 py-0.5',
-  infoBox: 'rounded-lg shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+  badge: 'bg-[#E7E5E4]  border-0 text-xs rounded-md px-2.5 py-0.5',
+  infoBox: 'rounded-lg ',
 };
 
 interface Step6PoliciesProps {
@@ -195,8 +195,8 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
                   type="button"
                   className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-200 outline-none
                     ${isCancellationOpen
-                      ? 'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]'
-                      : 'shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff]'
+                      ? ''
+                      : ' hover:'
                     } bg-[#E7E5E4]`}
                 >
                   <div className="flex items-center gap-3">
@@ -359,8 +359,8 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
                   type="button"
                   className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-200 outline-none bg-[#E7E5E4]
                     ${isRefundOpen
-                      ? 'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]'
-                      : 'shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff]'
+                      ? ''
+                      : ' hover:'
                     }`}
                 >
                   <div className="flex items-center gap-3">
@@ -409,14 +409,14 @@ export default function Step6Policies({ tourId, initialData }: Step6PoliciesProp
                             onClick={() => togglePaymentMethod(method)}
                             className={`p-3 rounded-xl transition-all duration-200 outline-none flex items-center gap-2 bg-[#E7E5E4]
                               ${isSelected
-                                ? 'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] ring-2 ring-purple-400/50'
-                                : 'shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff] hover:shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff]'
+                                ? ' ring-2 ring-purple-400/50'
+                                : ' hover:'
                               }`}
                           >
                             <div
                               className={`w-4 h-4 rounded-full flex items-center justify-center transition-all duration-200 ${isSelected
-                                  ? 'bg-purple-500 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.15)]'
-                                  : 'shadow-[2px_2px_4px_#c8c6c4,-2px_-2px_4px_#ffffff] bg-[#E7E5E4]'
+                                  ? 'bg-purple-500 '
+                                  : ' bg-[#E7E5E4]'
                                 }`}
                             >
                               {isSelected && (

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { CountUp } from "./primitives/CountUp";
@@ -43,10 +43,10 @@ const StatCard: React.FC<CardProps> = ({ icon: Icon, label, value, loading, tone
             className={[
                 "relative flex flex-col gap-3 rounded-2xl p-4",
                 "bg-[#E7E5E4]",
-                "shadow-[6px_6px_12px_#c9c7c5,-6px_-6px_12px_#ffffff]",
+                "",
                 "transition-all duration-200",
-                "hover:shadow-[8px_8px_16px_#c9c7c5,-8px_-8px_16px_#ffffff]",
-                "focus-within:shadow-[inset_2px_2px_6px_#c9c7c5,inset_-2px_-2px_6px_#ffffff]",
+                "hover:",
+                "focus-within:",
                 "outline-none",
             ].join(" ")}
             role="group"
@@ -58,7 +58,7 @@ const StatCard: React.FC<CardProps> = ({ icon: Icon, label, value, loading, tone
                 className={[
                     "flex h-9 w-9 items-center justify-center rounded-xl",
                     "bg-[#E7E5E4]",
-                    "shadow-[inset_2px_2px_5px_#c9c7c5,inset_-2px_-2px_5px_#ffffff]",
+                    "",
                     accentColor,
                 ].join(" ")}
                 aria-hidden="true"

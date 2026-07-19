@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
@@ -31,9 +31,9 @@ function NavBtn({
                 disabled
                     ? 'opacity-30 cursor-not-allowed shadow-none'
                     : [
-                        'shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_5px_#ffffff]',
-                        'hover:shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff] hover:text-[#006666]',
-                        'active:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                        '',
+                        'hover: hover:text-[#006666]',
+                        'active:',
                     ].join(' '),
             )}
             aria-disabled={disabled}
@@ -110,15 +110,15 @@ export function BookingsPagination({ pagination, onPageChange }: BookingsPaginat
                                         // Active page: pressed inset with teal accent
                                         ? [
                                             'bg-[#E7E5E4] text-[#006666]',
-                                            'shadow-[inset_3px_3px_6px_#c0bebb,inset_-2px_-2px_5px_#ffffff]',
+                                            '',
                                             'ring-1 ring-[#006666]/20',
                                         ].join(' ')
                                         // Inactive: raised
                                         : [
                                             'bg-[#E7E5E4] text-[#1E2938]/50',
-                                            'shadow-[3px_3px_6px_#c8c6c4,-2px_-2px_5px_#ffffff]',
-                                            'hover:text-[#006666] hover:shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff]',
-                                            'active:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-1px_-1px_3px_#ffffff]',
+                                            '',
+                                            'hover:text-[#006666] hover:',
+                                            'active:',
                                         ].join(' '),
                                 )}
                                 style={jetbrainsMono.style}

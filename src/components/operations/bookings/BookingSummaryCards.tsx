@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 import { Clock, CheckCircle2, XCircle, RotateCcw, Trophy, LayoutGrid } from 'lucide-react';
@@ -27,15 +27,15 @@ function SummaryCard({ label, value, icon, accentColor, accentBg, delay }: Summa
           // Neumorphic base: light surface, dual shadow (outer raised + inset highlight)
           'relative rounded-2xl p-5 overflow-hidden transition-all duration-300 cursor-default select-none',
           'bg-[#E7E5E4]',
-          'shadow-[6px_6px_12px_#c8c6c4,-6px_-6px_12px_#ffffff]',
-          'hover:shadow-[8px_8px_16px_#c8c6c4,-8px_-8px_16px_#ffffff]',
+          '',
+          'hover:',
         )}
       >
         {/* Icon container — inset pressed look */}
         <div className={cn(
           'w-10 h-10 rounded-xl flex items-center justify-center mb-4',
           accentBg,
-          'shadow-[inset_3px_3px_6px_rgba(0,0,0,0.12),inset_-2px_-2px_4px_rgba(255,255,255,0.7)]',
+          '',
         )}>
           {icon}
         </div>

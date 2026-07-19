@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FieldArray, useFormikContext } from "formik";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,12 +7,12 @@ import { Plus, Trash2, X } from "lucide-react";
 
 // ── Neumorphic Style Tokens ──────────────────────────────────────────────────
 const NEU_CARD_ITEM =
-  "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+  "rounded-xl bg-[#E7E5E4]  border border-white/60";
 
 const NEU_INPUT =
   "w-full rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
   "font-[family-name:var(--font-jetbrains-mono)] text-sm px-4 py-2.5 " +
-  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+  " border-none " +
   "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 
 const NEU_LABEL =
@@ -21,23 +21,23 @@ const NEU_LABEL =
 const NEU_BTN_PRIMARY =
   "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl " +
   "bg-[#006666] text-white font-[family-name:var(--font-space-mono)] text-sm font-bold tracking-wide " +
-  "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
-  "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
-  "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+  " " +
+  "hover: hover:bg-[#007777] " +
+  "active: " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
 
 const NEU_BTN_ICON_DANGER =
   "w-9 h-9 flex items-center justify-center rounded-xl " +
   "bg-[#E7E5E4] text-[#FF2157] " +
-  "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-  "hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+  " " +
+  "hover:bg-[#FF2157]/10 hover: " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF2157]/40";
 
 const NEU_HEADING =
   "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight text-base";
 
 const NEU_EMPTY_STATE =
-  "rounded-xl bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] " +
+  "rounded-xl bg-[#E7E5E4]  " +
   "border border-white/40 py-8 flex flex-col items-center justify-center gap-2";
 
 // ── Animation Variants ───────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ const ExclusionsSection = () => {
       <motion.div variants={itemVariants} className="flex items-center gap-3 mb-4">
         <div
           className="p-2 rounded-xl flex items-center justify-center flex-shrink-0
-            shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]"
+            "
           style={{
             background: "linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)",
           }}

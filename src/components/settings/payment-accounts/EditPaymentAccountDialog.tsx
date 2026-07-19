@@ -1,4 +1,4 @@
-// components/PaymentAccounts/EditPaymentAccountDialog.tsx
+﻿// components/PaymentAccounts/EditPaymentAccountDialog.tsx
 "use client";
 
 import { ReactNode, useState } from "react";
@@ -30,13 +30,13 @@ import { Loader2, CreditCard, Shield, Tag, Check, X } from "lucide-react";
 // ── Neumorphism style tokens ──────────────────────────────────
 const DIALOG_CONTENT =
   "sm:max-w-[480px] gap-0 p-0 bg-[#E7E5E4] border border-white/60 overflow-hidden rounded-2xl " +
-  "shadow-[0_4px_12px_rgba(0,0,0,0.06)]";
+  "";
 
 const DIALOG_HEADER =
   "px-6 pt-6 pb-5 border-b border-[#1E2938]/08";
 
 const DIALOG_ICON_WELL =
-  "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+  "p-2.5 rounded-xl bg-[#006666]/10 ";
 
 const DIALOG_TITLE =
   "font-[family-name:var(--font-space-mono)] font-bold text-xl text-[#1E2938] tracking-tight";
@@ -51,16 +51,16 @@ const FIELD_LABEL =
 const NEU_INPUT =
   "w-full h-11 px-3 rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/35 " +
   "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
-  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+  " border-none " +
   "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 
 const BACKUP_CARD =
   "flex items-start gap-4 rounded-xl p-4 cursor-pointer transition-all duration-200 " +
-  "bg-[#E7E5E4] shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff]";
+  "bg-[#E7E5E4] ";
 
 const BACKUP_CARD_ACTIVE =
   "flex items-start gap-4 rounded-xl p-4 cursor-pointer transition-all duration-200 " +
-  "bg-[#E7E5E4] shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+  "bg-[#E7E5E4]  " +
   "ring-2 ring-[#006666]/30";
 
 const BACKUP_TITLE =
@@ -72,22 +72,22 @@ const BACKUP_DESC =
 const ACTIVE_BADGE =
   "inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-lg text-xs " +
   "font-[family-name:var(--font-space-mono)] font-bold " +
-  "bg-[#006666] text-white shadow-[2px_2px_4px_#004d4d]";
+  "bg-[#006666] text-white ";
 
 const DIVIDER = "border-t border-[#1E2938]/08";
 
 const BTN_CANCEL =
   "flex-1 h-11 rounded-xl bg-[#E7E5E4] text-[#1E2938] " +
   "font-[family-name:var(--font-space-mono)] font-bold text-sm " +
-  "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] border-none " +
-  "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+  " border-none " +
+  "hover: " +
   "disabled:opacity-40 transition-all duration-200 flex items-center justify-center gap-2";
 
 const BTN_SAVE =
   "flex-1 h-11 rounded-xl bg-[#006666] text-white " +
   "font-[family-name:var(--font-space-mono)] font-bold text-sm " +
-  "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] border-none " +
-  "hover:bg-[#007777] hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] " +
+  " border-none " +
+  "hover:bg-[#007777] hover: " +
   "disabled:opacity-40 transition-all duration-200 flex items-center justify-center gap-2";
 // ─────────────────────────────────────────────────────────────
 

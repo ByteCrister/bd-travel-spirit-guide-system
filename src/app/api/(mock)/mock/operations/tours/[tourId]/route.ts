@@ -245,8 +245,8 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         description: faker.lorem.sentence()
     }));
 
-    // Generate departures (3-10) - Note: No id field in DepartureDTO
-    const departures = Array.from({ length: faker.number.int({ min: 3, max: 10 }) }).map(() => ({
+    // Generate departure
+    const departure = {
         date: faker.date.future({ years: 1, refDate: new Date() }).toISOString(),
         seatsTotal: faker.number.int({ min: 10, max: 50 }),
         seatsBooked: faker.number.int({ min: 0, max: 45 }),
@@ -255,21 +255,17 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
             lat: faker.location.latitude(),
             lng: faker.location.longitude()
         }
-    })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    };
 
-    // Generate operating windows (1-3)
-    const operatingWindows = Array.from({ length: faker.number.int({ min: 1, max: 3 }) }).map(() => {
-        const startDate = faker.date.future({ years: 1 });
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + faker.number.int({ min: 30, max: 90 }));
+    // Generate operating window
+    const startDate = faker.date.future({ years: 1 });
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + faker.number.int({ min: 30, max: 90 }));
 
-        return {
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString(),
-            seatsTotal: faker.number.int({ min: 20, max: 100 }),
-            seatsBooked: faker.number.int({ min: 0, max: 80 })
-        };
-    });
+    const operatingWindow = {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+    };
 
     // Generate packing list (5-15 items)
     const packingList = Array.from({ length: faker.number.int({ min: 5, max: 15 }) }).map(() => ({
@@ -286,8 +282,8 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
     }));
 
     // Calculate computed fields
-    const totalSeats = departures.reduce((sum, dep) => sum + dep.seatsTotal, 0);
-    const bookedSeats = departures.reduce((sum, dep) => sum + dep.seatsBooked, 0);
+    const totalSeats = departure.seatsTotal;
+    const bookedSeats = departure.seatsBooked;
     const availableSeats = totalSeats - bookedSeats;
     const occupancyPercentage = totalSeats > 0 ? (bookedSeats / totalSeats) * 100 : 0;
 
@@ -298,8 +294,8 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         return now >= validFrom && now <= validUntil;
     });
 
-    const nextDeparture = departures[0]?.date;
-    const isUpcoming = nextDeparture ? new Date(nextDeparture) > new Date() : false;
+    const nextDeparture = departure.date;
+    const isUpcoming = new Date(nextDeparture) > new Date();
     const isExpired = status === TOUR_STATUS.COMPLETED || status === TOUR_STATUS.TERMINATED || status === TOUR_STATUS.ARCHIVED;
 
     const activeDiscount = discounts.find(discount => {
@@ -442,8 +438,8 @@ function generateMockTourDetail(tourId: string): TourDetailDTO {
         basePrice,
         discounts,
         duration,
-        operatingWindows,
-        departures,
+        operatingWindow,
+        departure,
         paymentMethods,
 
         // =============== COMPLIANCE & ACCESSIBILITY ===============

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -78,13 +78,13 @@ import { encodeId } from "@/utils/helpers/mongodb-id-conversions";
 /* ------------------------------------------------------------------ */
 
 const neumorphCard =
-  "bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_16px_#C6C4C3,-8px_-8px_16px_#ffffff]";
+  "bg-[#E7E5E4] rounded-2xl ";
 const neumorphRaised =
-  "bg-[#E7E5E4] rounded-lg shadow-[4px_4px_8px_#C6C4C3,-4px_-4px_8px_#ffffff]";
+  "bg-[#E7E5E4] rounded-lg ";
 const neumorphButton =
-  "bg-[#E7E5E4] rounded-lg shadow-[4px_4px_8px_#C6C4C3,-4px_-4px_8px_#ffffff] hover:shadow-[2px_2px_4px_#C6C4C3,-2px_-2px_4px_#ffffff] active:shadow-[inset_4px_4px_8px_#C6C4C3,inset_-4px_-4px_8px_#ffffff] transition-shadow focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_#006666]";
+  "bg-[#E7E5E4] rounded-lg  hover: active: transition-shadow focus-visible:outline-none focus-visible:";
 const neumorphInput =
-  "bg-[#E7E5E4] shadow-[inset_2px_2px_4px_#C6C4C3,inset_-2px_-2px_4px_#ffffff] rounded-lg px-3 py-2 outline-none focus-visible:shadow-[inset_2px_2px_4px_#C6C4C3,inset_-2px_-2px_4px_#ffffff,0_0_0_2px_#006666] transition-shadow";
+  "bg-[#E7E5E4]  rounded-lg px-3 py-2 outline-none focus-visible: transition-shadow";
 
 /* ------------------------------------------------------------------ */
 /*  Form type                                                         */
@@ -558,7 +558,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                   <TabsTrigger
                     key={value}
                     value={value}
-                    className={`flex items-center gap-2 ${neumorphButton} data-[state=active]:shadow-[inset_4px_4px_8px_#C6C4C3,inset_-4px_-4px_8px_#ffffff] data-[state=active]:text-[#006666]`}
+                    className={`flex items-center gap-2 ${neumorphButton} data-[state=active]: data-[state=active]:text-[#006666]`}
                     style={{ fontFamily: "var(--font-space-mono)" }}
                   >
                     <Icon className="h-4 w-4" />
@@ -597,7 +597,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                         onChange={(e) =>
                           handleAvatarFile(e.target.files?.[0] ?? undefined)
                         }
-                        className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#E7E5E4] file:text-[#1E2938] file:shadow-[4px_4px_8px_#C6C4C3,-4px_-4px_8px_#ffffff] hover:file:shadow-[2px_2px_4px_#C6C4C3,-2px_-2px_4px_#ffffff] file:cursor-pointer cursor-pointer"
+                        className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#E7E5E4] file:text-[#1E2938] file: hover:file: file:cursor-pointer cursor-pointer"
                       />
                       <button
                         onClick={() => {
@@ -760,7 +760,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                         key={i}
                         className={`flex items-start gap-3 p-3 ${neumorphRaised}`}
                       >
-                        <div className="mt-1 p-2 rounded-full bg-[#E7E5E4] shadow-[inset_2px_2px_4px_#C6C4C3,inset_-2px_-2px_4px_#ffffff]">
+                        <div className="mt-1 p-2 rounded-full bg-[#E7E5E4] ">
                           <item.icon className={`h-4 w-4 ${item.color}`} />
                         </div>
                         <div className="flex-1">
@@ -1255,7 +1255,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                     onChange={(e) =>
                       handleDocumentsFiles(e.target.files ?? undefined)
                     }
-                    className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#E7E5E4] file:text-[#1E2938] file:shadow-[4px_4px_8px_#C6C4C3,-4px_-4px_8px_#ffffff] hover:file:shadow-[2px_2px_4px_#C6C4C3,-2px_-2px_4px_#ffffff] file:cursor-pointer cursor-pointer"
+                    className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#E7E5E4] file:text-[#1E2938] file: hover:file: file:cursor-pointer cursor-pointer"
                   />
                   <p className="text-xs text-[#1E2938] mt-2">
                     Images, PDFs and other allowed files. Max 5 MB per file.

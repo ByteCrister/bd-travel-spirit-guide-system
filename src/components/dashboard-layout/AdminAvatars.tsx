@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,7 +47,7 @@ export function AdminAvatars() {
                 className={cn(
                   "rounded-full p-0.5",
                   "bg-[#E7E5E4]",
-                  "shadow-[2px_2px_6px_rgba(0,0,0,0.14),-2px_-2px_6px_rgba(255,255,255,0.9)]"
+                  ""
                 )}
               >
                 <Avatar className="h-7 w-7">
@@ -78,7 +78,7 @@ export function AdminAvatars() {
                       "px-2 py-1 rounded-lg whitespace-nowrap",
                       "font-[family-name:var(--font-space-mono)] text-[10px] font-bold",
                       "text-[#E7E5E4] bg-[#1E2938]",
-                      "shadow-[2px_2px_8px_rgba(0,0,0,0.25)]"
+                      ""
                     )}
                   >
                     {admin.name}
@@ -99,7 +99,7 @@ export function AdminAvatars() {
               "ml-2 flex h-6 w-6 items-center justify-center rounded-full",
               "font-[family-name:var(--font-space-mono)] text-[10px] font-bold text-[#006666]",
               "bg-[#E7E5E4]",
-              "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]"
+              ""
             )}
           >
             +{onlineAdmins.length - 3}
@@ -118,7 +118,7 @@ export function AdminAvatars() {
             className={cn(
               "absolute right-0 top-10 z-50 w-60 rounded-2xl p-2",
               "bg-[#E7E5E4]",
-              "shadow-[6px_6px_20px_rgba(0,0,0,0.14),-6px_-6px_20px_rgba(255,255,255,0.9)]",
+              "",
               "border border-[#d0cecc]"
             )}
           >
@@ -137,8 +137,8 @@ export function AdminAvatars() {
                   transition={{ delay: index * 0.04 }}
                   className={cn(
                     "flex items-center gap-3 rounded-xl p-2 cursor-pointer transition-all duration-150",
-                    "shadow-[1px_1px_4px_rgba(0,0,0,0.08),-1px_-1px_4px_rgba(255,255,255,0.7)]",
-                    "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]"
+                    "",
+                    "hover:"
                   )}
                 >
                   <div className="relative">

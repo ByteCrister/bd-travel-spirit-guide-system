@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Field, FieldArray, useFormikContext } from "formik";
 import { CreateTourDTO } from "@/types/tour/tour.types";
@@ -14,26 +14,26 @@ import { Label } from "@/components/ui/label";
 const NEU_SURFACE = "bg-[#E7E5E4]";
 
 const NEU_CARD =
-  "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+  "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_INPUT =
   "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
   "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
-  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+  " border-none " +
   "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 const NEU_INPUT_ERROR =
   "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
   "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
-  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+  " border-none " +
   "focus:outline-none focus:ring-2 focus:ring-[#FF2157]/50 ring-2 ring-[#FF2157]/40 transition-all duration-200";
 
 const NEU_BTN_ICON =
   "rounded-xl w-10 h-10 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/60 " +
-  "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-  "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " " +
+  "hover:text-[#006666] hover: " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 const NEU_BADGE =
   "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-  "bg-[#E7E5E4] text-[#1E2938] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+  "bg-[#E7E5E4] text-[#1E2938] ";
 const NEU_HEADING =
   "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL =
@@ -42,9 +42,9 @@ const NEU_MUTED =
   "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_DIVIDER = "border-[#1E2938]/10";
 const NEU_ICON_WELL =
-  "p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+  "p-2.5 rounded-xl bg-[#E7E5E4] ";
 const NEU_ICON_WELL_PRIMARY =
-  "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+  "p-2.5 rounded-xl bg-[#006666]/10 ";
 
 export default function BasicInfoStep() {
   const { values, errors, touched } = useFormikContext<CreateTourDTO>();

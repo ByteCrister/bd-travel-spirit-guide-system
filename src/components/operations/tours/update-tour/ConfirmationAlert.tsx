@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
     AlertDialog,
@@ -16,25 +16,25 @@ import { motion } from 'framer-motion';
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const NEU = {
     surface: '#E7E5E4',
-    card: 'bg-[#E7E5E4] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.06)] border-0',
-    iconBox: 'rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.06)] flex items-center justify-center bg-[#E7E5E4]',
+    card: 'bg-[#E7E5E4] rounded-2xl  border-0',
+    iconBox: 'rounded-xl  flex items-center justify-center bg-[#E7E5E4]',
     primaryText: 'text-[#1E2938]',
     mutedText: 'text-[#718096]',
     labelFont: 'font-[Space_Mono,monospace] tracking-wide',
     bodyFont: 'font-[JetBrains_Mono,monospace]',
     btnCancel: [
         'bg-[#E7E5E4]',
-        'shadow-[0_4px_10px_rgba(0,0,0,0.06)]',
-        'hover:shadow-[0_2px_6px_rgba(0,0,0,0.06)]',
-        'active:shadow-[inset_3px_3px_8px_rgba(0,0,0,0.06),inset_-3px_-3px_8px_rgba(0,0,0,0.06)]',
+        '',
+        'hover:',
+        'active:',
         'border-0 rounded-xl transition-all duration-200',
         'text-[#4a5568] font-semibold',
     ].join(' '),
     btnSubmit: [
         'bg-[#006666] text-white rounded-xl',
-        'shadow-[4px_4px_10px_#004d4d,-4px_-4px_10px_#008080]',
-        'hover:shadow-[2px_2px_6px_#004d4d,-2px_-2px_6px_#008080]',
-        'active:shadow-[inset_2px_2px_6px_#004d4d,inset_-2px_-2px_6px_#008080]',
+        '',
+        'hover:',
+        'active:',
         'border-0 transition-all duration-200 font-semibold',
     ].join(' '),
     divider: 'border-t border-[#d1cfcd]',
@@ -75,9 +75,9 @@ export default function ConfirmationAlert({
                         onClick={() => onOpenChange(false)}
                         className={[
                             'w-8 h-8 flex items-center justify-center rounded-lg',
-                            'bg-[#E7E5E4] shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff]',
-                            'hover:shadow-[1px_1px_4px_#c8c6c4,-1px_-1px_4px_#ffffff]',
-                            'active:shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+                            'bg-[#E7E5E4] ',
+                            'hover:',
+                            'active:',
                             'transition-all duration-200 disabled:opacity-40',
                         ].join(' ')}
                         aria-label="Close"

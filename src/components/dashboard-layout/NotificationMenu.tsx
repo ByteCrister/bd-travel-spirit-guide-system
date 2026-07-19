@@ -93,8 +93,8 @@ export function NotificationMenu() {
         className={cn(
           "relative flex h-10 w-10 items-center justify-center rounded-xl",
           "bg-[#E7E5E4] text-[#1E2938]",
-          "shadow-[3px_3px_8px_rgba(0,0,0,0.13),-3px_-3px_8px_rgba(255,255,255,0.9)]",
-          "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+          "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+          "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
           "transition-all duration-200 focus:outline-none"
         )}
         whileTap={{ scale: 0.95 }}
@@ -113,7 +113,7 @@ export function NotificationMenu() {
               "absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full",
               "bg-[#FF2157] text-white text-[10px] font-bold",
               "font-[family-name:var(--font-space-mono)]",
-              "shadow-[0_2px_6px_rgba(255,33,87,0.4)]"
+              "shadow-[2px_2px_4px_#FF2157,-1px_-1px_2px_rgba(255,255,255,0.8)]"
             )}
           >
             {unreadCount > 9 ? "9+" : unreadCount}
@@ -140,7 +140,7 @@ export function NotificationMenu() {
               className={cn(
                 "absolute right-0 top-12 z-50 w-80 rounded-2xl overflow-hidden",
                 "bg-[#E7E5E4]",
-                "shadow-[6px_6px_20px_rgba(0,0,0,0.14),-6px_-6px_20px_rgba(255,255,255,0.9)]",
+                "shadow-[6px_6px_16px_#c8c6c5,-6px_-6px_16px_#ffffff]",
                 "border border-[#d0cecc]"
               )}
               role="dialog"
@@ -157,8 +157,8 @@ export function NotificationMenu() {
                     className={cn(
                       "text-[10px] font-bold tracking-widest uppercase px-2 py-1 rounded-lg",
                       "font-[family-name:var(--font-space-mono)] text-[#006666]",
-                      "shadow-[1px_1px_4px_rgba(0,0,0,0.1),-1px_-1px_4px_rgba(255,255,255,0.8)]",
-                      "hover:shadow-[inset_1px_1px_3px_rgba(0,0,0,0.1),inset_-1px_-1px_3px_rgba(255,255,255,0.7)]",
+                      "shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]",
+                      "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
                       "transition-all duration-150"
                     )}
                   >
@@ -192,11 +192,11 @@ export function NotificationMenu() {
                             "font-[family-name:var(--font-jetbrains-mono)]",
                             notification.isRead
                               ? [
-                                  "shadow-[1px_1px_4px_rgba(0,0,0,0.08),-1px_-1px_4px_rgba(255,255,255,0.7)]",
-                                  "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
+                                  "shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]",
+                                  "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
                                 ]
                               : [
-                                  "shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
+                                  "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
                                   "border border-[#006666]/20",
                                 ]
                           )}

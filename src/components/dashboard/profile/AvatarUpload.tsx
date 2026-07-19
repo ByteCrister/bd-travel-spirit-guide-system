@@ -1,4 +1,4 @@
-// components/global/AvatarUpload.tsx
+﻿// components/global/AvatarUpload.tsx
 "use client";
 
 import { useState, useRef, useCallback } from "react";
@@ -89,9 +89,9 @@ export default function AvatarUpload({ currentAvatarUrl, updateAvatar, meta }: A
                 {/* Avatar ring */}
                 <div className="relative shrink-0">
                     <div className="p-1.5 rounded-full bg-[#E7E5E4]
-                        shadow-[5px_5px_12px_rgba(0,0,0,0.15),-4px_-4px_10px_rgba(255,255,255,0.85)]">
+                        ">
                         <div className="h-20 w-20 rounded-full overflow-hidden
-                            shadow-[inset_3px_3px_7px_rgba(0,0,0,0.12),inset_-3px_-3px_7px_rgba(255,255,255,0.7)]
+                            
                             bg-[#E7E5E4]">
                             {preview ? (
                                 <Image src={preview} alt="User avatar" fill className="object-cover" unoptimized />
@@ -130,9 +130,9 @@ export default function AvatarUpload({ currentAvatarUrl, updateAvatar, meta }: A
                             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
                                 text-[#1E2938]/80 font-[var(--font-space-mono)]
                                 bg-[#E7E5E4]
-                                shadow-[4px_4px_10px_rgba(0,0,0,0.13),-3px_-3px_8px_rgba(255,255,255,0.8)]
-                                hover:shadow-[5px_5px_12px_rgba(0,0,0,0.16),-4px_-4px_10px_rgba(255,255,255,0.85)]
-                                active:shadow-[inset_3px_3px_8px_rgba(0,0,0,0.12),inset_-2px_-2px_5px_rgba(255,255,255,0.65)]
+                                
+                                hover:
+                                active:
                                 disabled:opacity-40 transition-all duration-150"
                         >
                             <Upload className="h-4 w-4" />
@@ -147,9 +147,9 @@ export default function AvatarUpload({ currentAvatarUrl, updateAvatar, meta }: A
                                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
                                     text-white font-[var(--font-space-mono)]
                                     bg-[#006666]
-                                    shadow-[4px_4px_10px_rgba(0,0,0,0.2),-2px_-2px_6px_rgba(255,255,255,0.4)]
+                                    
                                     hover:bg-[#005555]
-                                    active:shadow-[inset_3px_3px_8px_rgba(0,0,0,0.25)]
+                                    active:
                                     disabled:opacity-40 transition-all duration-150"
                             >
                                 {isLoading ? (
@@ -169,7 +169,7 @@ export default function AvatarUpload({ currentAvatarUrl, updateAvatar, meta }: A
                     <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm
                         text-[#FF2157] font-[var(--font-jetbrains-mono)]
                         bg-[#E7E5E4]
-                        shadow-[inset_3px_3px_8px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.65)]
+                        
                         border-l-2 border-[#FF2157]">
                         <AlertCircle className="h-4 w-4 shrink-0" />
                         {error}
@@ -182,7 +182,7 @@ export default function AvatarUpload({ currentAvatarUrl, updateAvatar, meta }: A
                     <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm
                         text-[#00A63D] font-[var(--font-jetbrains-mono)]
                         bg-[#E7E5E4]
-                        shadow-[inset_3px_3px_8px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.65)]
+                        
                         border-l-2 border-[#00A63D]">
                         <CheckCircle2 className="h-4 w-4 shrink-0" />
                         Avatar updated successfully!

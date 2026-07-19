@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useFormikContext } from "formik";
 import { motion } from "framer-motion";
@@ -9,20 +9,20 @@ import { useState, useRef, useEffect } from "react";
 
 // ── Neumorphism style tokens ──────────────────────────────────
 const NEU_CARD =
-  "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+  "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_CARD_HOVER =
-  "hover:shadow-[10px_10px_20px_#c8c6c5,-10px_-10px_20px_#ffffff] hover:-translate-y-0.5 transition-all duration-300";
+  "hover: hover:-translate-y-0.5 transition-all duration-300";
 const NEU_ICON_WELL_PRIMARY =
-  "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+  "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_HEADING =
   "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_SURFACE_INSET =
-  "bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
+  "bg-[#E7E5E4] ";
 const NEU_MUTED =
   "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_BADGE_PRIMARY =
   "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-700 " +
-  "bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+  "bg-[#006666]/10 text-[#006666] ";
 
 const DIFFICULTY_META: Record<
   DifficultyLevel,

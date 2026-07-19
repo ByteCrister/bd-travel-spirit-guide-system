@@ -85,8 +85,8 @@ const getDataForSchema = (tourData: TourDetailDTO, stepIndex: number) => {
         basePrice: tourData.basePrice,
         discounts: tourData.discounts,
         duration: tourData.duration,
-        operatingWindows: tourData.operatingWindows,
-        departures: tourData.departures,
+        operatingWindow: tourData.operatingWindow,
+        departure: tourData.departure,
         paymentMethods: tourData.paymentMethods,
       };
     case 5:

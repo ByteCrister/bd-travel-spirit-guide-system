@@ -1,4 +1,4 @@
-// components/faqs/FaqTable.tsx
+﻿// components/faqs/FaqTable.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -67,16 +67,16 @@ const statusConfig = {
 
 const nmIconBtn =
     'inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#E7E5E4] text-[#1E2938]/60 ' +
-    'shadow-[3px_3px_6px_#cac8c7,-3px_-3px_6px_#ffffff] ' +
+    ' ' +
     'hover:text-[#006666] ' +
-    'active:shadow-[inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff] ' +
+    'active: ' +
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] ' +
     'transition-shadow duration-150 select-none';
 
 const nmInput =
     'h-9 w-[4.5rem] rounded-xl border-0 bg-[#E7E5E4] text-center ' +
     'font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938] ' +
-    'shadow-[inset_3px_3px_6px_#cac8c7,inset_-3px_-3px_6px_#ffffff] ' +
+    ' ' +
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] ' +
     'disabled:opacity-50 transition-shadow duration-150';
 
@@ -130,13 +130,13 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
         return (
             <div
                 className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-[#E7E5E4] py-16
-                    shadow-[6px_6px_12px_#cac8c7,-6px_-6px_12px_#ffffff]"
+                    "
                 role="status"
                 aria-live="polite"
             >
                 <div
                     className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#E7E5E4]
-                        shadow-[inset_4px_4px_8px_#cac8c7,inset_-4px_-4px_8px_#ffffff]"
+                        "
                     aria-hidden="true"
                 >
                     <Clock className="h-6 w-6 text-[#1E2938]/30" />
@@ -153,7 +153,7 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
         <>
             <div
                 className="overflow-hidden rounded-2xl bg-[#E7E5E4]
-                    shadow-[6px_6px_12px_#cac8c7,-6px_-6px_12px_#ffffff]"
+                    "
             >
                 <div className="overflow-x-auto">
                     <Table>
@@ -244,7 +244,7 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
                                                     className={`inline-flex items-center gap-1 rounded-lg px-2 py-1
                                                         font-[family-name:var(--font-jetbrains-mono)] text-xs font-medium
                                                         ${cfg.bg} ${cfg.text}
-                                                        shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.6)]`}
+                                                        `}
                                                 >
                                                     <StatusIcon className="h-3 w-3" aria-hidden="true" />
                                                     {cfg.label}

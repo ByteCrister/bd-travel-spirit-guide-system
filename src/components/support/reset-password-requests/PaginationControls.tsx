@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
@@ -16,11 +16,11 @@ const N = {
     text: "text-[#1E2938] dark:text-white",
     textMuted: "text-[#1E2938]/60 dark:text-white/50",
     raisedMd:
-        "shadow-[6px_6px_12px_#cac8c7,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#1a1a1a,-6px_-6px_12px_#3a3a3a]",
+        " dark:",
     raisedSm:
-        "shadow-[3px_3px_6px_#cac8c7,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#1a1a1a,-3px_-3px_6px_#3a3a3a]",
+        " dark:",
     raisedXs:
-        "shadow-[2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#1a1a1a,-2px_-2px_4px_#3a3a3a]",
+        " dark:",
     pressedSm:
         "[box-shadow:inset_3px_3px_6px_#cac8c7,inset_-3px_-3px_6px_#ffffff] dark:[box-shadow:inset_3px_3px_6px_#1a1a1a,inset_-3px_-3px_6px_#3a3a3a]",
     font: "font-['Space_Mono']",

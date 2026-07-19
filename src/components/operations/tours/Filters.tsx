@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import { FiSearch, FiFilter, FiX } from "react-icons/fi";
@@ -24,34 +24,34 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Neumorphism Design Tokens ──────────────────────────────────────────────
 const NEU_SURFACE = "bg-[#E7E5E4]";
-const NEU_SURFACE_INSET = "bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]";
+const NEU_SURFACE_INSET = "bg-[#E7E5E4] ";
 const NEU_BTN_PRIMARY =
     "rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide " +
-    "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
-    "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
-    "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+    " " +
+    "hover: hover:bg-[#007777] " +
+    "active: " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
 const NEU_BTN_GHOST =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
-    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover: " +
+    "active: " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 const NEU_INPUT =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
     "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    " border-none " +
     "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 const NEU_BADGE_PRIMARY =
     "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-    "bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+    "bg-[#006666]/10 text-[#006666] ";
 const NEU_BADGE =
     "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-    "bg-[#E7E5E4] text-[#1E2938] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+    "bg-[#E7E5E4] text-[#1E2938] ";
 const NEU_HEADING = "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL = "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
 const NEU_MUTED = "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
-const NEU_ICON_WELL_PRIMARY = "p-2 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+const NEU_ICON_WELL_PRIMARY = "p-2 rounded-xl bg-[#006666]/10 ";
 const NEU_DIVIDER = "border-[#1E2938]/10";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

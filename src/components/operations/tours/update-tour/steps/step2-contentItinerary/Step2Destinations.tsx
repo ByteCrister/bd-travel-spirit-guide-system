@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useFormikContext } from 'formik';
@@ -41,16 +41,16 @@ const NEU = {
     surfaceNest: 'bg-[#d8d6d4] dark:bg-[#111110]',
 
     raised:
-        'shadow-[6px_6px_12px_#c8c6c4,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0d0d0c,-6px_-6px_12px_#272624]',
+        ' dark:',
     raisedSm:
-        'shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0d0d0c,-4px_-4px_8px_#272624]',
+        ' dark:',
     raisedXs:
-        'shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff] dark:shadow-[2px_2px_5px_#0d0d0c,-2px_-2px_5px_#272624]',
+        ' dark:',
 
     inset:
-        'shadow-[inset_3px_3px_6px_#c8c6c4,inset_-3px_-3px_6px_#ffffff] dark:shadow-[inset_3px_3px_6px_#0d0d0c,inset_-3px_-3px_6px_#272624]',
+        ' dark:',
     insetSm:
-        'shadow-[inset_2px_2px_4px_#c8c6c4,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#0d0d0c,inset_-2px_-2px_4px_#272624]',
+        ' dark:',
 
     radius: 'rounded-2xl',
     radiusMd: 'rounded-xl',
@@ -185,7 +185,7 @@ const NeuIconBtn = ({
             danger
                 ? 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
                 : `${NEU.text.secondary} hover:bg-[#dedad8] dark:hover:bg-[#141312]`,
-            'active:shadow-[inset_1px_1px_3px_#c8c6c4,inset_-1px_-1px_3px_#ffffff] dark:active:shadow-[inset_1px_1px_3px_#0d0d0c,inset_-1px_-1px_3px_#272624]',
+            'active: dark:active:',
         ].join(' ')}
     >
         {children}
@@ -226,8 +226,8 @@ const NeuAddBtn = ({
                     : [NEU.surface, NEU.raisedSm, NEU.border].join(' '),
                 accentCls,
                 'transition-all duration-200',
-                'hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff] dark:hover:shadow-[2px_2px_6px_#0d0d0c,-2px_-2px_6px_#272624]',
-                'active:shadow-[inset_2px_2px_4px_#c8c6c4,inset_-2px_-2px_4px_#ffffff] dark:active:shadow-[inset_2px_2px_4px_#0d0d0c,inset_-2px_-2px_4px_#272624]',
+                'hover: dark:hover:',
+                'active: dark:active:',
             ].join(' ')}
         >
             <Plus className="w-3.5 h-3.5" />

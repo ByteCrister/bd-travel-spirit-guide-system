@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, Variants } from "framer-motion";
 import { Sparkles } from "lucide-react";
@@ -15,7 +15,7 @@ import TranslationsSection from "./TranslationsSection";
 // ── Neumorphic Style Tokens ──────────────────────────────────────────────────
 const NEU_SURFACE = "bg-[#E7E5E4]";
 const NEU_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_ICON_WELL_GRADIENT =
     "p-3 rounded-xl flex items-center justify-center";
 const NEU_HEADING =
@@ -24,7 +24,7 @@ const NEU_MUTED =
     "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_DIVIDER = "border-[#1E2938]/10";
 const NEU_SURFACE_INSET =
-    "bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]";
+    "bg-[#E7E5E4] ";
 
 // ── Animation Variants ───────────────────────────────────────────────────────
 const containerVariants: Variants = {
@@ -76,7 +76,7 @@ export default function ContentItineraryStep() {
                 <div className="flex items-center gap-3 mb-1.5">
                     {/* Icon well with gradient background */}
                     <div
-                        className={`${NEU_ICON_WELL_GRADIENT} shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff]`}
+                        className={`${NEU_ICON_WELL_GRADIENT} `}
                         style={{
                             background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                         }}

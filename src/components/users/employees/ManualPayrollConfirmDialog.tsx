@@ -16,19 +16,17 @@ import { EmployeeListItemDTO } from "@/types/employee/employee.types";
 import { sumPayrollAmount } from "@/utils/helpers/manual-payroll.helpers";
 
 const NEU_SURFACE_INSET =
-  "bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] rounded-xl border-none";
+  "bg-[#E7E5E4] rounded-xl border border-[#d0cecc]";
 
 const NEU_BTN_GHOST =
   "inline-flex items-center gap-1.5 rounded-xl bg-[#E7E5E4] text-[#1E2938] text-sm sm:w-auto " +
   "font-[family-name:var(--font-space-mono)] px-4 py-2 " +
-  "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-  "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+  "border border-[#d0cecc] hover:bg-[#dbd9d8] " +
   "transition-all duration-200";
 
 const NEU_BTN_PRIMARY =
   "inline-flex items-center gap-1.5 rounded-xl bg-[#006666] text-white text-sm sm:w-auto " +
   "font-[family-name:var(--font-space-mono)] font-bold px-4 py-2 " +
-  "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
   "hover:bg-[#007777] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200";
 
 const NEU_LABEL =
@@ -87,7 +85,7 @@ export default function ManualPayrollConfirmDialog({
         if (!isOpen) handleCancel();
       }}
     >
-      <AlertDialogContent className="sm:max-w-lg rounded-2xl bg-[#E7E5E4] shadow-[0_4px_12px_rgba(0,0,0,0.06)] border border-white/60 p-0 overflow-hidden">
+      <AlertDialogContent className="sm:max-w-lg rounded-2xl bg-[#E7E5E4] border border-[#d0cecc] p-0 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -107,7 +105,7 @@ export default function ManualPayrollConfirmDialog({
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-                    className="mx-auto mb-2 w-14 h-14 rounded-2xl bg-[#006666]/10 flex items-center justify-center shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff]"
+                    className="mx-auto mb-2 w-14 h-14 rounded-2xl bg-[#006666]/10 flex items-center justify-center"
                   >
                     <Banknote className="h-7 w-7 text-[#006666]" />
                   </motion.div>

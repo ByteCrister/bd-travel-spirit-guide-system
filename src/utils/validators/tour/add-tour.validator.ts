@@ -341,10 +341,30 @@ export const Step4PricingSchema = Yup.object().shape({
                     .optional()
                     .test(
                         "not-too-soon",
-                        createNestedErrorMessage("Pricing", "Discounts", "Valid From", "must be at least 10 days from today"),
+                        createNestedErrorMessage("Pricing", "Discounts", "Valid From", "must be at least 0 days from today"),
                         function (value) {
                             if (!value) return true;
-                            return new Date(value) >= minDateFromToday(10);
+                            return new Date(value) >= minDateFromToday(0);
+                        }
+                    )
+                    .test(
+                        "within-operating-window",
+                        createNestedErrorMessage("Pricing", "Discounts", "Valid From", "must be within operating window"),
+                        function (value) {
+                            if (!value) return true;
+                            
+                            const root = this.from && this.from[1] ? this.from[1].value : null;
+                            if (!root || !root.operatingWindow || !root.operatingWindow.startDate || !root.operatingWindow.endDate) return true;
+                            
+                            const start = new Date(root.operatingWindow.startDate);
+                            start.setHours(0, 0, 0, 0);
+                            const end = new Date(root.operatingWindow.endDate);
+                            end.setHours(0, 0, 0, 0);
+                            
+                            const val = new Date(value);
+                            val.setHours(0, 0, 0, 0);
+                            
+                            return val >= start && val <= end;
                         }
                     ),
                 validUntil: Yup.date()
@@ -356,7 +376,7 @@ export const Step4PricingSchema = Yup.object().shape({
                         function (value) {
                             const { validFrom } = this.parent;
                             if (!validFrom || !value) return true;
-                            return new Date(value) > new Date(validFrom);
+                            return new Date(value) >= new Date(validFrom); // Changed > to >= for same day
                         }
                     )
                     .test(
@@ -367,6 +387,26 @@ export const Step4PricingSchema = Yup.object().shape({
                             return (
                                 new Date(value) >= new Date(new Date().setHours(0, 0, 0, 0))
                             );
+                        }
+                    )
+                    .test(
+                        "within-operating-window",
+                        createNestedErrorMessage("Pricing", "Discounts", "Valid Until", "must be within operating window"),
+                        function (value) {
+                            if (!value) return true;
+                            
+                            const root = this.from && this.from[1] ? this.from[1].value : null;
+                            if (!root || !root.operatingWindow || !root.operatingWindow.startDate || !root.operatingWindow.endDate) return true;
+                            
+                            const start = new Date(root.operatingWindow.startDate);
+                            start.setHours(0, 0, 0, 0);
+                            const end = new Date(root.operatingWindow.endDate);
+                            end.setHours(0, 0, 0, 0);
+                            
+                            const val = new Date(value);
+                            val.setHours(0, 0, 0, 0);
+                            
+                            return val >= start && val <= end;
                         }
                     ),
             })
@@ -382,121 +422,89 @@ export const Step4PricingSchema = Yup.object().shape({
         })
         .optional(),
 
-    operatingWindows: Yup.array()
-        .of(
-            Yup.object().shape({
-                startDate: Yup.date()
-                    .typeError(createNestedErrorMessage("Pricing", "Operating Windows", "Start Date", "must be a valid date"))
-                    .required(createNestedErrorMessage("Pricing", "Operating Windows", "Start Date", "is required"))
-                    .test(
-                        "not-too-soon",
-                        createNestedErrorMessage("Pricing", "Operating Windows", "Start Date", "must be at least 10 days from today"),
-                        function (value) {
-                            if (!value) return true;
-                            return new Date(value) >= minDateFromToday(1);
-                        }
-                    ),
-                endDate: Yup.date()
-                    .typeError(createNestedErrorMessage("Pricing", "Operating Windows", "End Date", "must be a valid date"))
-                    .required(createNestedErrorMessage("Pricing", "Operating Windows", "End Date", "is required"))
-                    .test(
-                        "is-after-start",
-                        createNestedErrorMessage("Pricing", "Operating Windows", "End Date", "must be after start date"),
-                        function (value) {
-                            const { startDate } = this.parent;
-                            if (!startDate || !value) return true;
-                            const start = new Date(startDate);
-                            const end = new Date(value);
-                            const minEndDate = new Date(start);
-                            minEndDate.setDate(minEndDate.getDate());
-                            return end >= minEndDate;
-                        }
-                    )
-                    .test(
-                        "min-duration",
-                        createNestedErrorMessage("Pricing", "Operating Windows", "End Date", "must allow for at least one day of operation"),
-                        function (value) {
-                            const { startDate } = this.parent;
-                            if (!startDate || !value) return true;
-                            const start = new Date(startDate);
-                            const end = new Date(value);
-                            const durationInDays = Math.ceil(
-                                (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-                            );
-                            return durationInDays >= 1;
-                        }
-                    ),
-                seatsTotal: Yup.number().min(0, createNestedErrorMessage("Pricing", "Operating Windows", "Seats Total", "must be positive")).optional(),
-            })
-        )
-        .optional()
-        .test(
-            "non-overlapping-windows",
-            createNestedErrorMessage("Pricing", "Operating Windows", "Windows", "cannot overlap"),
-            function (windows) {
-                if (!windows || windows.length <= 1) return true;
-
-                const sortedWindows = [...windows]
-                    .map((w) => ({
-                        start: new Date(w.startDate),
-                        end: new Date(w.endDate),
-                        original: w,
-                    }))
-                    .sort((a, b) => a.start.getTime() - b.start.getTime());
-
-                for (let i = 1; i < sortedWindows.length; i++) {
-                    const prevWindow = sortedWindows[i - 1];
-                    const currentWindow = sortedWindows[i];
-
-                    if (currentWindow.start <= prevWindow.end) {
-                        return this.createError({
-                            message: createNestedErrorMessage("Pricing", "Operating Windows", `Window starting ${currentWindow.original.startDate}`, `overlaps with previous window ending ${prevWindow.original.endDate}`),
-                        });
-                    }
+    operatingWindow: Yup.object().shape({
+        startDate: Yup.date()
+            .typeError(createNestedErrorMessage("Pricing", "Operating Window", "Start Date", "must be a valid date"))
+            .required(createNestedErrorMessage("Pricing", "Operating Window", "Start Date", "is required"))
+            .test(
+                "not-too-soon",
+                createNestedErrorMessage("Pricing", "Operating Window", "Start Date", "must be at least 5 days from today"),
+                function (value) {
+                    if (!value) return true;
+                    return new Date(value) >= minDateFromToday(5);
                 }
-                return true;
-            }
-        ),
-
-    departures: Yup.array()
-        .of(
-            Yup.object().shape({
-                date: Yup.date()
-                    .typeError(createNestedErrorMessage("Pricing", "Departures", "Date", "must be a valid date"))
-                    .required(createNestedErrorMessage("Pricing", "Departures", "Date", "is required"))
-                    .test(
-                        "not-too-soon",
-                        createNestedErrorMessage("Pricing", "Departures", "Date", "must be at least 10 days from today"),
-                        function (value) {
-                            if (!value) return false;
-                            return new Date(value) >= minDateFromToday(10);
-                        }
-                    ),
-                seatsTotal: Yup.number()
-                    .required(createNestedErrorMessage("Pricing", "Departures", "Seats Total", "is required"))
-                    .min(1, createNestedErrorMessage("Pricing", "Departures", "Seats Total", "at least 1 seat is required")),
-                meetingPoint: Yup.string().optional(),
-                meetingCoordinates: BangladeshGeoPointSchema.optional(),
-            })
-        )
-        .optional()
-        .test(
-            "unique-departure-dates",
-            createNestedErrorMessage("Pricing", "Departures", "Dates", "must be unique"),
-            function (departures) {
-                if (!departures) return true;
-
-                const dates = departures.map((d) => new Date(d.date).toDateString());
-                const uniqueDates = new Set(dates);
-
-                if (dates.length !== uniqueDates.size) {
-                    return this.createError({
-                        message: createNestedErrorMessage("Pricing", "Departures", "Dates", "duplicate departure dates are not allowed"),
-                    });
+            ),
+        endDate: Yup.date()
+            .typeError(createNestedErrorMessage("Pricing", "Operating Window", "End Date", "must be a valid date"))
+            .required(createNestedErrorMessage("Pricing", "Operating Window", "End Date", "is required"))
+            .test(
+                "is-after-start",
+                createNestedErrorMessage("Pricing", "Operating Window", "End Date", "must be after start date"),
+                function (value) {
+                    const { startDate } = this.parent;
+                    if (!startDate || !value) return true;
+                    const start = new Date(startDate);
+                    const end = new Date(value);
+                    const minEndDate = new Date(start);
+                    minEndDate.setDate(minEndDate.getDate());
+                    return end >= minEndDate;
                 }
-                return true;
-            }
-        ),
+            )
+            .test(
+                "min-duration",
+                createNestedErrorMessage("Pricing", "Operating Window", "End Date", "must allow for at least one day of operation"),
+                function (value) {
+                    const { startDate } = this.parent;
+                    if (!startDate || !value) return true;
+                    const start = new Date(startDate);
+                    const end = new Date(value);
+                    const durationInDays = Math.ceil(
+                        (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+                    );
+                    return durationInDays >= 1;
+                }
+            ),
+    }).optional(),
+
+    departure: Yup.object().shape({
+        date: Yup.date()
+            .typeError(createNestedErrorMessage("Pricing", "Departure", "Date", "must be a valid date"))
+            .required(createNestedErrorMessage("Pricing", "Departure", "Date", "is required"))
+            .test(
+                "not-too-soon",
+                createNestedErrorMessage("Pricing", "Departure", "Date", "must be at least 10 days from today"),
+                function (value) {
+                    if (!value) return false;
+                    return new Date(value) >= minDateFromToday(10);
+                }
+            )
+            .test(
+                "operating-window-range",
+                createNestedErrorMessage("Pricing", "Departure", "Date", "must be after operating window and at most 10 days after it ends"),
+                function (value) {
+                    if (!value) return true;
+                    
+                    const root = this.from && this.from[1] ? this.from[1].value : null;
+                    if (!root || !root.operatingWindow || !root.operatingWindow.endDate) return true;
+                    
+                    const endDate = new Date(root.operatingWindow.endDate);
+                    endDate.setHours(0, 0, 0, 0);
+                    
+                    const departureDate = new Date(value);
+                    departureDate.setHours(0, 0, 0, 0);
+                    
+                    const maxDate = new Date(endDate);
+                    maxDate.setDate(maxDate.getDate() + 10);
+                    
+                    return departureDate >= endDate && departureDate <= maxDate;
+                }
+            ),
+        seatsTotal: Yup.number()
+            .required(createNestedErrorMessage("Pricing", "Departure", "Seats Total", "is required"))
+            .min(1, createNestedErrorMessage("Pricing", "Departure", "Seats Total", "at least 1 seat is required")),
+        meetingPoint: Yup.string().optional(),
+        meetingCoordinates: BangladeshGeoPointSchema.optional(),
+    }).optional(),
 
     paymentMethods: Yup.array()
         .of(Yup.string().oneOf(Object.values(PAYMENT_METHOD), createErrorMessage("Pricing", "Payment Method", "has invalid value")))

@@ -1,28 +1,28 @@
-"use client";
+﻿"use client";
 
 import { TourDetailDTO } from "@/types/tour/tour.types";
 import { CheckCircle, Package, XCircle, Info } from "lucide-react";
 import { motion } from "framer-motion";
 
 // ── Neumorphism Design Tokens ─────────────────────────────────
-const NEU_CARD = "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
-const NEU_CARD_SM = "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
-const NEU_SURFACE_INSET_SM = "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+const NEU_CARD = "rounded-2xl bg-[#E7E5E4]  border border-white/60";
+const NEU_CARD_SM = "rounded-xl bg-[#E7E5E4]  border border-white/60";
+const NEU_SURFACE_INSET_SM = "bg-[#E7E5E4] ";
 const NEU_HEADING = "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_MUTED = "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_MONO = "font-[family-name:var(--font-jetbrains-mono)] text-[#1E2938]";
-const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_DIVIDER = "border-[#1E2938]/10";
 
 const INCLUSION_ROW =
     "flex items-start gap-3 p-3 rounded-xl border border-[#00A63D]/20 bg-[#00A63D]/5 " +
-    "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
-    "hover:shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] transition-shadow duration-200";
+    " " +
+    "hover: transition-shadow duration-200";
 
 const EXCLUSION_ROW =
     "flex items-start gap-3 p-3 rounded-xl border border-[#FF2157]/20 bg-[#FF2157]/5 " +
-    "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
-    "hover:shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] transition-shadow duration-200";
+    " " +
+    "hover: transition-shadow duration-200";
 
 const EMPTY_STATE = `flex flex-col items-center gap-2 p-6 rounded-xl text-center ${NEU_SURFACE_INSET_SM}`;
 
@@ -57,12 +57,12 @@ const InclusionsExclusions = ({ tour }: InclusionsExclusionsProps) => {
                     className={`${NEU_CARD_SM} p-5 space-y-4`}
                 >
                     <div className="flex items-center gap-2">
-                        <div className="p-2.5 rounded-xl bg-[#00A63D]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]">
+                        <div className="p-2.5 rounded-xl bg-[#00A63D]/10 ">
                             <CheckCircle className="h-4 w-4 text-[#00A63D]" />
                         </div>
                         <span className={`${NEU_HEADING} text-base`}>Inclusions</span>
                         {tour.inclusions && tour.inclusions.length > 0 && (
-                            <span className="ml-auto font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#00A63D] bg-[#00A63D]/10 px-2 py-0.5 rounded-lg shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]">
+                            <span className="ml-auto font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#00A63D] bg-[#00A63D]/10 px-2 py-0.5 rounded-lg ">
                                 {tour.inclusions.length}
                             </span>
                         )}
@@ -105,12 +105,12 @@ const InclusionsExclusions = ({ tour }: InclusionsExclusionsProps) => {
                     className={`${NEU_CARD_SM} p-5 space-y-4`}
                 >
                     <div className="flex items-center gap-2">
-                        <div className="p-2.5 rounded-xl bg-[#FF2157]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]">
+                        <div className="p-2.5 rounded-xl bg-[#FF2157]/10 ">
                             <XCircle className="h-4 w-4 text-[#FF2157]" />
                         </div>
                         <span className={`${NEU_HEADING} text-base`}>Exclusions</span>
                         {tour.exclusions && tour.exclusions.length > 0 && (
-                            <span className="ml-auto font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#FF2157] bg-[#FF2157]/10 px-2 py-0.5 rounded-lg shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]">
+                            <span className="ml-auto font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#FF2157] bg-[#FF2157]/10 px-2 py-0.5 rounded-lg ">
                                 {tour.exclusions.length}
                             </span>
                         )}

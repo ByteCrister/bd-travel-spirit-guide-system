@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { TourDetailDTO } from "@/types/tour/tour.types";
 import {
@@ -8,22 +8,22 @@ import {
 import { motion } from "framer-motion";
 
 // ── Neumorphism Design Tokens ─────────────────────────────────
-const NEU_CARD = "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
-const NEU_CARD_SM = "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
-const NEU_SURFACE_INSET_SM = "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+const NEU_CARD = "rounded-2xl bg-[#E7E5E4]  border border-white/60";
+const NEU_CARD_SM = "rounded-xl bg-[#E7E5E4]  border border-white/60";
+const NEU_SURFACE_INSET_SM = "bg-[#E7E5E4] ";
 const NEU_HEADING = "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL = "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
 const NEU_MUTED = "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_MONO = "font-[family-name:var(--font-jetbrains-mono)] text-[#1E2938]";
-const NEU_ICON_WELL = "p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
-const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+const NEU_ICON_WELL = "p-2.5 rounded-xl bg-[#E7E5E4] ";
+const NEU_ICON_WELL_PRIMARY = "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_DIVIDER = "border-[#1E2938]/10";
-const NEU_BADGE_PRIMARY = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-700 bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
-const NEU_BADGE_SUCCESS = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-700 bg-[#00A63D]/10 text-[#00A63D] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
-const NEU_BADGE_DANGER = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-700 bg-[#FF2157]/10 text-[#FF2157] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+const NEU_BADGE_PRIMARY = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-700 bg-[#006666]/10 text-[#006666] ";
+const NEU_BADGE_SUCCESS = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-700 bg-[#00A63D]/10 text-[#00A63D] ";
+const NEU_BADGE_DANGER = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-700 bg-[#FF2157]/10 text-[#FF2157] ";
 const ROW_ITEM = `flex items-center justify-between p-3 rounded-xl ${NEU_SURFACE_INSET_SM}`;
-const STATUS_POSITIVE = `flex items-center gap-3 p-3 rounded-xl border border-[#00A63D]/20 bg-[#00A63D]/5 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]`;
-const STATUS_NEGATIVE = `flex items-center gap-3 p-3 rounded-xl border border-[#FF2157]/20 bg-[#FF2157]/5 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]`;
+const STATUS_POSITIVE = `flex items-center gap-3 p-3 rounded-xl border border-[#00A63D]/20 bg-[#00A63D]/5 `;
+const STATUS_NEGATIVE = `flex items-center gap-3 p-3 rounded-xl border border-[#FF2157]/20 bg-[#FF2157]/5 `;
 
 interface ComplianceInfoProps {
     tour: TourDetailDTO;
@@ -136,7 +136,7 @@ const ComplianceInfo = ({ tour }: ComplianceInfoProps) => {
                                 <span className={`${NEU_MONO} text-sm font-medium`}>Pet Friendly</span>
                             </div>
                             {tour.accessibility.notes && (
-                                <div className="mt-2 p-3 rounded-xl border border-[#FE9900]/20 bg-[#FE9900]/5 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] space-y-1">
+                                <div className="mt-2 p-3 rounded-xl border border-[#FE9900]/20 bg-[#FE9900]/5  space-y-1">
                                     <div className="flex items-center gap-2">
                                         <AlertTriangle className="h-4 w-4 text-[#FE9900]" />
                                         <span className={`${NEU_LABEL} text-[#FE9900]`}>Notes</span>

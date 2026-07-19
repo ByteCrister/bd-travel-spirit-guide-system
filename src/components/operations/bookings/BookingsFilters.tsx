@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -49,15 +49,15 @@ const DATE_PRESETS = [
 // Shared neumorphic input class — outset surface that presses on focus
 const neuInput = [
   "bg-[#E7E5E4] border-0 text-[#1E2938] placeholder:text-[#1E2938]/35",
-  "shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]",
+  "",
   "focus-visible:ring-0 focus-visible:ring-offset-0",
-  "focus-visible:shadow-[inset_4px_4px_8px_#c0bebb,inset_-2px_-2px_4px_#ffffff,0_0_0_2px_#006666]",
+  "focus-visible:",
   "rounded-xl h-10 transition-shadow duration-200",
 ].join(" ");
 
 const neuSelect = [
   "bg-[#E7E5E4] border-0 text-[#1E2938]",
-  "shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]",
+  "",
   "focus:ring-0 focus:ring-offset-0",
   "rounded-xl h-10 transition-shadow duration-200",
 ].join(" ");
@@ -152,7 +152,7 @@ export function BookingsFilters({
           <SelectTrigger className={cn(neuSelect, "w-[160px]")}>
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
-          <SelectContent className="bg-[#E7E5E4] border-0 shadow-[6px_6px_16px_#c8c6c4,-4px_-4px_12px_#ffffff] rounded-xl text-[#1E2938]">
+          <SelectContent className="bg-[#E7E5E4] border-0  rounded-xl text-[#1E2938]">
             <SelectItem value="all">All statuses</SelectItem>
             {Object.values(BOOKING_STATUS).map((s) => (
               <SelectItem key={s} value={s} className="capitalize">
@@ -179,7 +179,7 @@ export function BookingsFilters({
           <SelectTrigger className={cn(neuSelect, "w-[170px]")}>
             <SelectValue placeholder="Payment status" />
           </SelectTrigger>
-          <SelectContent className="bg-[#E7E5E4] border-0 shadow-[6px_6px_16px_#c8c6c4,-4px_-4px_12px_#ffffff] rounded-xl text-[#1E2938]">
+          <SelectContent className="bg-[#E7E5E4] border-0  rounded-xl text-[#1E2938]">
             <SelectItem value="all">All payments</SelectItem>
             {Object.values(BOOKING_PAYMENT_STATUS).map((s) => (
               <SelectItem key={s} value={s} className="capitalize">
@@ -203,7 +203,7 @@ export function BookingsFilters({
           <SelectTrigger className={cn(neuSelect, "w-[185px]")}>
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
-          <SelectContent className="bg-[#E7E5E4] border-0 shadow-[6px_6px_16px_#c8c6c4,-4px_-4px_12px_#ffffff] rounded-xl text-[#1E2938]">
+          <SelectContent className="bg-[#E7E5E4] border-0  rounded-xl text-[#1E2938]">
             <SelectItem value="bookedAt-desc">Newest first</SelectItem>
             <SelectItem value="bookedAt-asc">Oldest first</SelectItem>
             <SelectItem value="totalPaid-desc">Highest paid</SelectItem>
@@ -219,8 +219,8 @@ export function BookingsFilters({
             className={cn(
               "h-10 px-4 rounded-xl inline-flex items-center gap-2 text-xs font-medium transition-all duration-200",
               expanded
-                ? "bg-[#E7E5E4] text-[#006666] shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]"
-                : "bg-[#E7E5E4] text-[#1E2938]/60 shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff] hover:shadow-[6px_6px_10px_#c8c6c4,-4px_-4px_8px_#ffffff]",
+                ? "bg-[#E7E5E4] text-[#006666] "
+                : "bg-[#E7E5E4] text-[#1E2938]/60  hover:",
             )}
           >
             <SlidersHorizontal size={13} />
@@ -248,8 +248,8 @@ export function BookingsFilters({
               className={cn(
                 "h-10 px-4 rounded-xl inline-flex items-center gap-1.5 text-xs font-medium transition-all duration-200",
                 "text-[#FF2157] bg-[#E7E5E4]",
-                "shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff]",
-                "hover:shadow-[inset_3px_3px_6px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]",
+                "",
+                "hover:",
               )}
             >
               <RotateCcw size={12} />
@@ -273,7 +273,7 @@ export function BookingsFilters({
               className={cn(
                 "rounded-2xl p-4 flex flex-wrap gap-4",
                 "bg-[#E7E5E4]",
-                "shadow-[inset_4px_4px_10px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]",
+                "",
               )}
             >
               {/* Date preset */}
@@ -290,7 +290,7 @@ export function BookingsFilters({
                   <SelectTrigger className={cn(neuSelect, "h-9 text-sm")}>
                     <SelectValue placeholder="Select range" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#E7E5E4] border-0 shadow-[6px_6px_16px_#c8c6c4,-4px_-4px_12px_#ffffff] rounded-xl text-[#1E2938]">
+                  <SelectContent className="bg-[#E7E5E4] border-0  rounded-xl text-[#1E2938]">
                     {DATE_PRESETS.map((p) => (
                       <SelectItem key={p.value} value={p.value}>
                         {p.label}
@@ -356,7 +356,7 @@ export function BookingsFilters({
                   >
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#E7E5E4] border-0 shadow-[6px_6px_16px_#c8c6c4,-4px_-4px_12px_#ffffff] rounded-xl text-[#1E2938]">
+                  <SelectContent className="bg-[#E7E5E4] border-0  rounded-xl text-[#1E2938]">
                     {[10, 20, 50, 100].map((n) => (
                       <SelectItem
                         key={n}

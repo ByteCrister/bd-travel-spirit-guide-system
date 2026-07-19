@@ -61,12 +61,12 @@ export function NavLink({
           isActive
             ? [
                 "bg-[#E7E5E4] text-[#006666]",
-                "shadow-[inset_2px_2px_5px_rgba(0,0,0,0.12),inset_-2px_-2px_5px_rgba(255,255,255,0.75)]",
+                "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
               ]
             : [
                 "bg-[#E7E5E4] text-[#1E2938]/60",
-                "shadow-[1px_1px_4px_rgba(0,0,0,0.08),-1px_-1px_4px_rgba(255,255,255,0.7)]",
-                "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.6)]",
+                "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+                "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
                 "hover:text-[#1E2938]",
               ]
         )}

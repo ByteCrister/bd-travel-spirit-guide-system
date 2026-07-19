@@ -1,4 +1,4 @@
-// components/faqs/VoteModal.tsx
+﻿// components/faqs/VoteModal.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -23,7 +23,7 @@ function VoteSkeleton() {
             {[...Array(4)].map((_, i) => (
                 <div
                     key={i}
-                    className="flex items-center gap-3 rounded-xl bg-[#E7E5E4] p-3 shadow-[inset_2px_2px_5px_#c5c3c2,inset_-2px_-2px_5px_#ffffff] animate-pulse"
+                    className="flex items-center gap-3 rounded-xl bg-[#E7E5E4] p-3  animate-pulse"
                 >
                     {/* Avatar placeholder */}
                     <div className="h-8 w-8 rounded-full bg-[#1E2938]/10" />
@@ -89,11 +89,11 @@ export function VoteModal({ open, onOpenChange, faqId, faqQuestion }: VoteModalP
                             absolute right-6 top-6
                             flex h-8 w-8 items-center justify-center
                             rounded-xl bg-[#E7E5E4]
-                            shadow-[3px_3px_7px_#c5c3c2,-3px_-3px_7px_#ffffff]
+                            
                             text-[#1E2938]/50
                             transition-all duration-150
                             hover:text-[#1E2938]
-                            active:shadow-[inset_2px_2px_5px_#c5c3c2,inset_-2px_-2px_5px_#ffffff]
+                            active:
                         "
                     >
                         <X className="h-4 w-4" strokeWidth={2} />
@@ -116,14 +116,14 @@ export function VoteModal({ open, onOpenChange, faqId, faqQuestion }: VoteModalP
                     {!isLoading && (
                         <div className="mt-3 flex items-center gap-3">
                             {/* Likes tally — raised */}
-                            <div className="flex items-center gap-2 rounded-xl bg-[#E7E5E4] px-3 py-1.5 shadow-[3px_3px_6px_#c5c3c2,-3px_-3px_6px_#ffffff]">
+                            <div className="flex items-center gap-2 rounded-xl bg-[#E7E5E4] px-3 py-1.5 ">
                                 <ThumbsUp className="h-3.5 w-3.5 text-[#006666]" strokeWidth={2.5} />
                                 <span className="font-['JetBrains_Mono'] text-xs font-semibold text-[#006666]">
                                     {likeVotes.length}
                                 </span>
                             </div>
                             {/* Dislikes tally — inset */}
-                            <div className="flex items-center gap-2 rounded-xl bg-[#E7E5E4] px-3 py-1.5 shadow-[inset_2px_2px_5px_#c5c3c2,inset_-2px_-2px_5px_#ffffff]">
+                            <div className="flex items-center gap-2 rounded-xl bg-[#E7E5E4] px-3 py-1.5 ">
                                 <ThumbsDown className="h-3.5 w-3.5 text-[#1E2938]/40" strokeWidth={2.5} />
                                 <span className="font-['JetBrains_Mono'] text-xs font-semibold text-[#1E2938]/50">
                                     {dislikeVotes.length}
@@ -147,7 +147,7 @@ export function VoteModal({ open, onOpenChange, faqId, faqQuestion }: VoteModalP
                                 {/* Section label */}
                                 <div className="flex items-center gap-2">
                                     {/* Raised icon nub */}
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#E7E5E4] shadow-[3px_3px_6px_#c5c3c2,-3px_-3px_6px_#ffffff]">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#E7E5E4] ">
                                         <ThumbsUp className="h-3.5 w-3.5 text-[#006666]" strokeWidth={2.5} />
                                     </div>
                                     <span className="font-['Space_Mono'] text-xs font-bold uppercase tracking-widest text-[#006666]">
@@ -156,7 +156,7 @@ export function VoteModal({ open, onOpenChange, faqId, faqQuestion }: VoteModalP
                                 </div>
 
                                 {/* Inset scroll well */}
-                                <div className="rounded-2xl bg-[#E7E5E4] p-3 shadow-[inset_4px_4px_10px_#c5c3c2,inset_-4px_-4px_10px_#ffffff]">
+                                <div className="rounded-2xl bg-[#E7E5E4] p-3 ">
                                     <ScrollArea className="h-[260px] pr-1">
                                         {likeVotes.length === 0 ? (
                                             <div className="flex h-full items-center justify-center py-12">
@@ -184,7 +184,7 @@ export function VoteModal({ open, onOpenChange, faqId, faqQuestion }: VoteModalP
                             {/* ── Dislikes column ── */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#E7E5E4] shadow-[3px_3px_6px_#c5c3c2,-3px_-3px_6px_#ffffff]">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#E7E5E4] ">
                                         <ThumbsDown className="h-3.5 w-3.5 text-[#1E2938]/50" strokeWidth={2.5} />
                                     </div>
                                     <span className="font-['Space_Mono'] text-xs font-bold uppercase tracking-widest text-[#1E2938]/50">
@@ -192,7 +192,7 @@ export function VoteModal({ open, onOpenChange, faqId, faqQuestion }: VoteModalP
                                     </span>
                                 </div>
 
-                                <div className="rounded-2xl bg-[#E7E5E4] p-3 shadow-[inset_4px_4px_10px_#c5c3c2,inset_-4px_-4px_10px_#ffffff]">
+                                <div className="rounded-2xl bg-[#E7E5E4] p-3 ">
                                     <ScrollArea className="h-[260px] pr-1">
                                         {dislikeVotes.length === 0 ? (
                                             <div className="flex h-full items-center justify-center py-12">
@@ -242,14 +242,14 @@ function VoteRow({ name, avatar, date, accentColor }: VoteRowProps) {
             className="
                 flex items-center gap-3
                 rounded-xl bg-[#E7E5E4] p-2.5
-                shadow-[3px_3px_7px_#c5c3c2,-3px_-3px_7px_#ffffff]
+                
                 transition-all duration-150
-                hover:shadow-[5px_5px_10px_#c5c3c2,-5px_-5px_10px_#ffffff]
-                active:shadow-[inset_2px_2px_5px_#c5c3c2,inset_-2px_-2px_5px_#ffffff]
+                hover:
+                active:
             "
         >
             {/* Avatar — inset ring */}
-            <div className="flex-shrink-0 rounded-full p-0.5 shadow-[inset_1px_1px_3px_#c5c3c2,inset_-1px_-1px_3px_#ffffff]">
+            <div className="flex-shrink-0 rounded-full p-0.5 ">
                 <Avatar className="h-8 w-8">
                     <AvatarImage src={avatar} />
                     <AvatarFallback

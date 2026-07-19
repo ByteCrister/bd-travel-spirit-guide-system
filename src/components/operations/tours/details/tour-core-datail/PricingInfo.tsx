@@ -11,12 +11,12 @@ import { FaBangladeshiTakaSign } from "react-icons/fa6";
 const NEU = {
     surface:  "bg-[#E7E5E4]",
     card:     "bg-[#E7E5E4] rounded-2xl",
-    raised:   "shadow-[6px_6px_12px_#c8c6c4,-6px_-6px_12px_#ffffff] rounded-2xl",
-    raisedSm: "shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] rounded-xl",
-    inset:    "shadow-[inset_4px_4px_8px_#c8c6c4,inset_-4px_-4px_8px_#ffffff] rounded-xl",
-    insetSm:  "shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff] rounded-lg",
-    pill:     "shadow-[3px_3px_6px_#c8c6c4,-3px_-3px_6px_#ffffff] rounded-full",
-    iconWrap: "flex items-center justify-center w-10 h-10 rounded-xl bg-[#E7E5E4] shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff]",
+    raised:   " rounded-2xl",
+    raisedSm: " rounded-xl",
+    inset:    " rounded-xl",
+    insetSm:  " rounded-lg",
+    pill:     " rounded-full",
+    iconWrap: "flex items-center justify-center w-10 h-10 rounded-xl bg-[#E7E5E4] ",
     label:    "text-xs font-mono font-semibold uppercase tracking-widest text-[#006666]",
     heading:  "font-bold text-[#1E2938] font-[Space_Mono,monospace]",
     muted:    "text-sm text-[#1E2938]/50 font-[Space_Mono,monospace]",
@@ -182,26 +182,31 @@ const PricingInfo = ({ tour }: PricingInfoProps) => {
 
                     <div className={NEU.divider} />
 
-                    {/* Departures */}
+                    {/* Departure */}
                     <div>
                         <div className="flex items-center gap-2 mb-3">
                             <Calendar className={`h-4 w-4 ${NEU.accent}`} />
-                            <p className={NEU.label}>Departures</p>
+                            <p className={NEU.label}>Departure</p>
                         </div>
                         <div className="space-y-2">
-                            <div className={`${NEU.insetSm} px-4 py-3 flex items-center justify-between`}>
-                                <span className={NEU.muted}>Total Departures</span>
-                                <span className={`text-sm font-mono font-bold text-[#1E2938] ${NEU.pill} px-3 py-1 bg-[#E7E5E4]`}>
-                                    {tour.departures?.length ?? 0}
-                                </span>
-                            </div>
-
-                            {tour.nextDeparture && (
-                                <div className={`${NEU.insetSm} px-4 py-3 flex items-center justify-between border-l-4 border-[#00A63D] rounded-l-none rounded-r-lg`}>
-                                    <span className={NEU.muted}>Next Departure</span>
-                                    <span className="text-sm font-mono font-bold text-[#00A63D]">
-                                        {new Date(tour.nextDeparture).toLocaleDateString()}
-                                    </span>
+                            {tour.departure ? (
+                                <>
+                                    <div className={`${NEU.insetSm} px-4 py-3 flex items-center justify-between`}>
+                                        <span className={NEU.muted}>Departure Date</span>
+                                        <span className={`text-sm font-mono font-bold text-[#1E2938] ${NEU.pill} px-3 py-1 bg-[#E7E5E4]`}>
+                                            {new Date(tour.departure.date).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                    <div className={`${NEU.insetSm} px-4 py-3 flex items-center justify-between`}>
+                                        <span className={NEU.muted}>Total Seats</span>
+                                        <span className={`text-sm font-mono font-bold text-[#1E2938] ${NEU.pill} px-3 py-1 bg-[#E7E5E4]`}>
+                                            {tour.departure.seatsTotal}
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className={`${NEU.insetSm} px-4 py-3 text-center`}>
+                                    <span className={NEU.muted}>No departure specified</span>
                                 </div>
                             )}
                         </div>

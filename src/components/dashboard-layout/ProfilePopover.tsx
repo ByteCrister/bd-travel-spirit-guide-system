@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,8 +39,8 @@ export function ProfilePopover({ onLogout }: ProfilePopoverProps) {
         className={cn(
           "flex items-center gap-2 rounded-xl p-1.5",
           "bg-[#E7E5E4]",
-          "shadow-[3px_3px_8px_rgba(0,0,0,0.13),-3px_-3px_8px_rgba(255,255,255,0.9)]",
-          "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+          "",
+          "hover:",
           "transition-all duration-200 focus:outline-none"
         )}
         whileTap={{ scale: 0.97 }}
@@ -94,7 +94,7 @@ export function ProfilePopover({ onLogout }: ProfilePopoverProps) {
               className={cn(
                 "absolute right-0 top-12 z-50 w-64 rounded-2xl overflow-hidden",
                 "bg-[#E7E5E4]",
-                "shadow-[6px_6px_20px_rgba(0,0,0,0.14),-6px_-6px_20px_rgba(255,255,255,0.9)]",
+                "",
                 "border border-[#d0cecc]"
               )}
               role="dialog"
@@ -132,8 +132,8 @@ export function ProfilePopover({ onLogout }: ProfilePopoverProps) {
                   className={cn(
                     "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold",
                     "font-[family-name:var(--font-jetbrains-mono)] text-[#FF2157]",
-                    "shadow-[1px_1px_4px_rgba(0,0,0,0.08),-1px_-1px_4px_rgba(255,255,255,0.7)]",
-                    "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.1),inset_-1px_-1px_4px_rgba(255,255,255,0.65)]",
+                    "",
+                    "hover:",
                     "transition-all duration-150 focus:outline-none"
                   )}
                   whileTap={{ scale: 0.97 }}

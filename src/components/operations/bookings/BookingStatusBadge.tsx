@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { cn } from '@/lib/utils';
 import { BookingStatus } from '@/constants/tour/tour-booking.const';
@@ -85,7 +85,7 @@ export default function BookingStatusBadge({ status, size = 'md', animate = fals
       className={cn(
         // Neumorphic inset pill — pressed into the surface
         'inline-flex items-center gap-1.5 rounded-full font-medium tracking-widest uppercase',
-        'shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_3px_rgba(255,255,255,0.8)]',
+        '',
         config.bg,
         config.textColor,
         size === 'sm' ? 'px-2 py-0.5 text-[9px]' : 'px-2.5 py-1 text-[10px]',

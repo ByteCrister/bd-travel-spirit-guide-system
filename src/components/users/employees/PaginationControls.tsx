@@ -29,24 +29,22 @@ export function PaginationControls({
 
     const neuBase = [
         "bg-[#E7E5E4]",
-        "shadow-[4px_4px_8px_#c9c7c5,-4px_-4px_8px_#ffffff]",
-        "hover:shadow-[6px_6px_10px_#c9c7c5,-6px_-6px_10px_#ffffff]",
-        "active:shadow-[inset_2px_2px_5px_#c9c7c5,inset_-2px_-2px_5px_#ffffff]",
+        "border border-[#d0cecc]",
+        "hover:bg-[#dbd9d8]",
         "transition-all duration-150",
-        "border-0 outline-none",
+        "outline-none",
     ].join(" ");
 
     const neuInset = [
         "bg-[#E7E5E4]",
-        "shadow-[inset_2px_2px_5px_#c9c7c5,inset_-2px_-2px_5px_#ffffff]",
+        "border border-[#d0cecc]",
     ].join(" ");
 
     return (
         <div
             className={[
                 "flex flex-col gap-3 rounded-2xl p-4",
-                "bg-[#E7E5E4]",
-                "shadow-[6px_6px_12px_#c9c7c5,-6px_-6px_12px_#ffffff]",
+                "bg-[#E7E5E4] border border-[#d0cecc]",
                 "md:flex-row md:items-center md:justify-between",
             ].join(" ")}
         >
@@ -70,9 +68,8 @@ export function PaginationControls({
                     </SelectTrigger>
                     <SelectContent
                         className={[
-                            "rounded-xl border-0",
-                            "bg-[#E7E5E4]",
-                            "shadow-[6px_6px_16px_#c9c7c5,-6px_-6px_16px_#ffffff]",
+                            "rounded-xl",
+                            "bg-[#E7E5E4] border border-[#d0cecc]",
                         ].join(" ")}
                     >
                         {limits.map((l) => (
@@ -140,13 +137,10 @@ export function PaginationControls({
                     disabled={loading || page >= pages}
                     className={[
                         "inline-flex items-center gap-1.5 rounded-xl px-3 py-2 h-8",
-                        "bg-[#006666]",
-                        "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#007f7f]",
-                        "hover:shadow-[6px_6px_10px_#004d4d,-3px_-3px_8px_#007f7f]",
-                        "active:shadow-[inset_2px_2px_5px_#004d4d,inset_-2px_-2px_5px_#007f7f]",
+                        "bg-[#006666] hover:bg-[#007777]",
                         "text-[12px] font-semibold text-white border-0",
                         "font-[family-name:var(--font-space-mono,'Space_Mono',monospace)]",
-                        "disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed",
+                        "disabled:opacity-40 disabled:cursor-not-allowed",
                         "transition-all duration-150",
                     ].join(" ")}
                     aria-label="Next page"

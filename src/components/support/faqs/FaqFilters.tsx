@@ -1,4 +1,4 @@
-// components/faqs/FaqFilters.tsx
+﻿// components/faqs/FaqFilters.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -26,12 +26,12 @@ interface FaqFiltersProps {
 const nm = {
     card: [
         'rounded-2xl bg-[#E7E5E4] p-5 space-y-4',
-        'shadow-[6px_6px_12px_#cac8c7,-6px_-6px_12px_#ffffff]',
+        '',
     ].join(' '),
 
     input: [
         'w-full rounded-xl border-0 bg-[#E7E5E4]',
-        'shadow-[inset_4px_4px_8px_#cac8c7,inset_-4px_-4px_8px_#ffffff]',
+        '',
         'text-[#1E2938] placeholder:text-[#1E2938]/40',
         'px-4 py-2.5 font-[family-name:var(--font-jetbrains-mono)] text-sm',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-0',
@@ -40,8 +40,8 @@ const nm = {
 
     btn: [
         'inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#E7E5E4]',
-        'shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff]',
-        'active:shadow-[inset_3px_3px_6px_#cac8c7,inset_-3px_-3px_6px_#ffffff]',
+        '',
+        'active:',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]',
         'transition-shadow duration-150 select-none',
     ].join(' '),
@@ -49,7 +49,7 @@ const nm = {
     badge: [
         'inline-flex items-center gap-1 rounded-full bg-[#E7E5E4]',
         'px-3 py-1 font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#1E2938]',
-        'shadow-[3px_3px_6px_#cac8c7,-3px_-3px_6px_#ffffff]',
+        '',
     ].join(' '),
 } as const;
 
@@ -91,7 +91,7 @@ export function FaqFilters({ filters, onFilterChange }: FaqFiltersProps) {
                 <div className="flex items-center gap-2.5">
                     <div
                         className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#E7E5E4]
-                            shadow-[inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff]"
+                            "
                         aria-hidden="true"
                     >
                         <Filter className="h-3.5 w-3.5 text-[#1E2938]/60" />
@@ -167,7 +167,7 @@ export function FaqFilters({ filters, onFilterChange }: FaqFiltersProps) {
                     >
                         <SelectValue placeholder="All statuses" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl border-0 bg-[#E7E5E4] shadow-[6px_6px_14px_#cac8c7,-6px_-6px_14px_#ffffff]">
+                    <SelectContent className="rounded-xl border-0 bg-[#E7E5E4] ">
                         {(['all', 'approved', 'pending', 'rejected'] as const).map((s) => (
                             <SelectItem
                                 key={s}

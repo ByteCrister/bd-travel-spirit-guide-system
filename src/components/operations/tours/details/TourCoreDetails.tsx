@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { tourDetailErrorKey, tourDetailLoadingKey, useTourDetailStore } from "@/store/tour-detail.store";
 import {
@@ -33,64 +33,64 @@ import ModerationAlert from "./tour-core-datail/ModerationAlert";
 // Surfaces
 const NEU_PAGE_BG = "min-h-screen bg-[#E7E5E4]";
 const NEU_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_CARD_HEADER =
-    "rounded-t-2xl bg-[#E7E5E4] shadow-[inset_0_-1px_0_#c8c6c5]";
+    "rounded-t-2xl bg-[#E7E5E4] ";
 const NEU_SURFACE_INSET =
-    "bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]";
+    "bg-[#E7E5E4] ";
 const NEU_SURFACE_INSET_SM =
-    "bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+    "bg-[#E7E5E4] ";
 
 // Buttons
 const NEU_BTN_PRIMARY =
     "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#006666] text-white text-sm " +
     "font-[family-name:var(--font-space-mono)] font-bold tracking-wide " +
-    "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
-    "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
-    "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+    " " +
+    "hover: hover:bg-[#007777] " +
+    "active: " +
     "disabled:opacity-40 disabled:cursor-not-allowed " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
 
 const NEU_BTN_GHOST =
     "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E7E5E4] text-[#1E2938] text-sm " +
     "font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
-    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover: " +
+    "active: " +
     "disabled:opacity-40 disabled:cursor-not-allowed " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 
 const NEU_BTN_WARNING =
     "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E7E5E4] text-[#FE9900] text-sm " +
     "font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:bg-[#FE9900]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    " " +
+    "hover:bg-[#FE9900]/10 hover: " +
     "disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200";
 
 const NEU_BTN_DANGER =
     "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E7E5E4] text-[#FF2157] text-sm " +
     "font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    " " +
+    "hover:bg-[#FF2157]/10 hover: " +
     "disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200";
 
 const NEU_BTN_SUCCESS =
     "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E7E5E4] text-[#00A63D] text-sm " +
     "font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:bg-[#00A63D]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    " " +
+    "hover:bg-[#00A63D]/10 hover: " +
     "disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200";
 
 const NEU_BTN_ICON =
     "w-10 h-10 flex items-center justify-center rounded-xl bg-[#E7E5E4] text-[#1E2938]/60 " +
-    "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-    "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover:text-[#006666] hover: " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 
 // Badges
 const NEU_BADGE_BASE =
     "inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold " +
-    "shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+    "";
 
 const NEU_BADGE_SUCCESS = `${NEU_BADGE_BASE} bg-[#00A63D]/10 text-[#00A63D]`;
 const NEU_BADGE_WARNING = `${NEU_BADGE_BASE} bg-[#FE9900]/10 text-[#FE9900]`;
@@ -110,9 +110,9 @@ const NEU_MUTED =
 
 // Icon well
 const NEU_ICON_WELL =
-    "p-2 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+    "p-2 rounded-xl bg-[#E7E5E4] ";
 const NEU_ICON_WELL_PRIMARY =
-    "p-2 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+    "p-2 rounded-xl bg-[#006666]/10 ";
 
 // Row item inside cards
 const NEU_ROW =
@@ -422,7 +422,7 @@ export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
                                             "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 " +
                                             "transition-all duration-200 " +
                                             "data-[state=active]:bg-[#E7E5E4] " +
-                                            "data-[state=active]:shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
+                                            "data-[state=active]: " +
                                             "data-[state=active]:text-[#006666] " +
                                             "hover:text-[#1E2938] " +
                                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40"
@@ -571,7 +571,7 @@ export default function TourCoreDetails({ tourId }: TourCoreDetailPageProps) {
                                 </div>
 
                                 {tour.deletedAt && (
-                                    <div className="flex justify-between items-center p-3 rounded-xl bg-[#FF2157]/5 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] border border-[#FF2157]/20">
+                                    <div className="flex justify-between items-center p-3 rounded-xl bg-[#FF2157]/5  border border-[#FF2157]/20">
                                         <span className={`${NEU_MUTED} font-medium`}>Deleted At</span>
                                         <span className="font-[family-name:var(--font-jetbrains-mono)] text-sm font-semibold text-[#FF2157]">
                                             {new Date(tour.deletedAt).toLocaleDateString()}

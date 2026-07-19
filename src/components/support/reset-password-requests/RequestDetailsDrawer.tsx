@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,13 +35,13 @@ const N = {
   text: "text-[#1E2938] dark:text-white",
   textMuted: "text-[#1E2938]/70 dark:text-white/60",
   raisedLg:
-    "shadow-[0_4px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]",
+    " dark:",
   raisedMd:
-    "shadow-[0_4px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]",
+    " dark:",
   raisedSm:
-    "shadow-[0_4px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_8px_rgba(0,0,0,0.2)]",
+    " dark:",
   raisedXs:
-    "shadow-[0_4px_4px_rgba(0,0,0,0.06)] dark:shadow-[2px_2px_4px_#1a1a1a,-2px_-2px_4px_#3a3a3a]",
+    " dark:",
   pressedMd:
     "[box-shadow:inset_4px_4px_8px_#cac8c7,inset_-4px_-4px_8px_#ffffff] dark:[box-shadow:inset_4px_4px_8px_#1a1a1a,inset_-4px_-4px_8px_#3a3a3a]",
   pressedSm:
@@ -273,7 +273,7 @@ export default function RequestDetailsDrawer({
           </section>
 
           {/* Divider */}
-          <Separator className="border-0 h-px bg-transparent shadow-[0_1px_2px_#cac8c7] dark:shadow-[0_1px_2px_#1a1a1a]" />
+          <Separator className="border-0 h-px bg-transparent  dark:" />
 
           {/* Request Details */}
           <section className="space-y-4">
@@ -318,7 +318,7 @@ export default function RequestDetailsDrawer({
           </section>
 
           {/* Divider */}
-          <Separator className="border-0 h-px bg-transparent shadow-[0_1px_2px_#cac8c7] dark:shadow-[0_1px_2px_#1a1a1a]" />
+          <Separator className="border-0 h-px bg-transparent  dark:" />
 
           {/* Actions */}
           <section className="space-y-4">

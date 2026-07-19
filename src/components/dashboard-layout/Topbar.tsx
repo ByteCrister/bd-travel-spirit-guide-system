@@ -33,7 +33,7 @@ export function Topbar({
         // Neumorphic surface
         "bg-[#E7E5E4]",
         "border-b border-[#d0cecc]",
-        "shadow-[0_4px_12px_rgba(0,0,0,0.08),0_-1px_0_rgba(255,255,255,0.9)]",
+        "shadow-[0_4px_12px_rgba(0,0,0,0.06)]",
         "font-[family-name:var(--font-jetbrains-mono)]",
         isMobile ? "px-4 left-0" : `px-6 ${desktopLeft}`
       )}
@@ -47,8 +47,8 @@ export function Topbar({
             className={cn(
               "flex h-10 w-10 items-center justify-center rounded-xl",
               "bg-[#E7E5E4] text-[#006666]",
-              "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]",
-              "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.12),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+              "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+              "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
               "transition-all duration-200 focus:outline-none"
             )}
             whileTap={{ scale: 0.95 }}

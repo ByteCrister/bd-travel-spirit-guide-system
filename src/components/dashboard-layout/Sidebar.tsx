@@ -191,7 +191,7 @@ export function Sidebar({
         "bg-[#E7E5E4]",
         "border-r border-[#d0cecc]",
         // Outer shadow to create raised effect
-        "shadow-[4px_0_16px_rgba(0,0,0,0.08),-2px_0_6px_rgba(255,255,255,0.8)]",
+        "shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff]",
         isMobile ? "w-80" : "w-80 lg:relative lg:z-auto",
       )}
       role="navigation"
@@ -221,7 +221,7 @@ export function Sidebar({
                 className={cn(
                   "flex h-10 w-10 items-center justify-center rounded-xl",
                   "bg-[#E7E5E4]",
-                  "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]",
+                  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]",
                 )}
               >
                 <Compass className="h-5 w-5 text-[#006666]" strokeWidth={2} />
@@ -232,7 +232,7 @@ export function Sidebar({
                   BD Travel Spirit
                 </h1>
                 <p className="text-[10px] tracking-widest uppercase text-[#006666] font-semibold">
-                  Admin Dashboard
+                  Guide Dashboard
                 </p>
               </div>
             </motion.div>
@@ -246,7 +246,7 @@ export function Sidebar({
               className={cn(
                 "flex h-12 w-12 items-center justify-center rounded-xl",
                 "bg-[#E7E5E4]",
-                "shadow-[3px_3px_8px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.9)]",
+                "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]",
               )}
             >
               <Compass className="h-6 w-6 text-[#006666]" strokeWidth={2} />
@@ -261,8 +261,8 @@ export function Sidebar({
             className={cn(
               "flex h-8 w-8 items-center justify-center rounded-lg",
               "bg-[#E7E5E4] text-[#1E2938]",
-              "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]",
-              "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+              "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+              "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
               "transition-all duration-200 focus:outline-none",
               isCollapsed && "mt-2",
             )}
@@ -283,8 +283,8 @@ export function Sidebar({
             className={cn(
               "flex h-8 w-8 items-center justify-center rounded-lg",
               "bg-[#E7E5E4] text-[#1E2938]",
-              "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]",
-              "hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.8)]",
+              "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+              "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
               "transition-all duration-200 focus:outline-none",
             )}
             whileTap={{ scale: 0.95 }}
@@ -318,14 +318,14 @@ export function Sidebar({
                     isExpanded
                       ? [
                           "text-[#006666]",
-                          "shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),inset_-2px_-2px_5px_rgba(255,255,255,0.75)]",
+                          "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
                           "bg-[#E7E5E4]",
                         ]
                       : [
                           "text-[#1E2938]/60",
                           "bg-[#E7E5E4]",
-                          "shadow-[2px_2px_6px_rgba(0,0,0,0.1),-2px_-2px_6px_rgba(255,255,255,0.85)]",
-                          "hover:shadow-[inset_1px_1px_4px_rgba(0,0,0,0.08),inset_-1px_-1px_4px_rgba(255,255,255,0.7)]",
+                          "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+                          "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
                           "hover:text-[#1E2938]",
                         ],
                     isCollapsed && "justify-center px-2 py-3",
@@ -422,7 +422,7 @@ export function Sidebar({
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-lg",
                   "bg-[#E7E5E4]",
-                  "shadow-[2px_2px_6px_rgba(0,0,0,0.12),-2px_-2px_6px_rgba(255,255,255,0.85)]",
+                  "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
                 )}
               >
                 <span className="font-[family-name:var(--font-space-mono)] text-[10px] font-bold text-[#006666]">

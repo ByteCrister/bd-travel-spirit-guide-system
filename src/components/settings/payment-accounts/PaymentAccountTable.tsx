@@ -1,4 +1,4 @@
-// components/PaymentAccounts/PaymentAccountTable.tsx
+﻿// components/PaymentAccounts/PaymentAccountTable.tsx
 "use client";
 
 import { PaymentAccount } from "@/types/settings/stripe-payment-account.type";
@@ -37,7 +37,7 @@ import { usePaymentAccountStore } from "@/store/strip-payment-account.store";
 // ── Neumorphism style tokens ──────────────────────────────────
 const TABLE_CARD =
   "rounded-2xl bg-[#E7E5E4] border border-white/60 overflow-hidden " +
-  "shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff]";
+  "";
 
 const TABLE_HEAD_ROW = "border-b border-[#1E2938]/08 hover:bg-transparent";
 
@@ -64,29 +64,29 @@ const PURPOSE_TEXT =
 
 const BTN_ICON =
   "rounded-xl w-9 h-9 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/50 " +
-  "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] border-none " +
-  "hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " border-none " +
+  "hover:text-[#006666] hover: " +
   "transition-all duration-200";
 
 const BTN_ICON_DELETE =
   "rounded-xl w-9 h-9 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/50 " +
-  "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] border-none " +
-  "hover:text-[#FF2157] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " border-none " +
+  "hover:text-[#FF2157] hover: " +
   "transition-all duration-200";
 
 // Brand badge colors
 const BRAND_COLORS: Record<string, string> = {
-  visa: "bg-blue-500/10 text-blue-700 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
-  mastercard: "bg-orange-500/10 text-orange-700 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
-  amex: "bg-cyan-500/10 text-cyan-700 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
-  discover: "bg-amber-500/10 text-amber-700 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
-  default: "bg-[#1E2938]/08 text-[#1E2938]/60 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
+  visa: "bg-blue-500/10 text-blue-700 ",
+  mastercard: "bg-orange-500/10 text-orange-700 ",
+  amex: "bg-cyan-500/10 text-cyan-700 ",
+  discover: "bg-amber-500/10 text-amber-700 ",
+  default: "bg-[#1E2938]/08 text-[#1E2938]/60 ",
 };
 
 const OWNER_COLORS: Record<string, string> = {
-  personal: "bg-[#00A63D]/10 text-[#00A63D] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
-  business: "bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
-  default: "bg-[#1E2938]/08 text-[#1E2938]/50 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
+  personal: "bg-[#00A63D]/10 text-[#00A63D] ",
+  business: "bg-[#006666]/10 text-[#006666] ",
+  default: "bg-[#1E2938]/08 text-[#1E2938]/50 ",
 };
 
 const NEU_BADGE_BASE =
@@ -95,7 +95,7 @@ const NEU_BADGE_BASE =
 // Alert Dialog styles
 const ALERT_CONTENT =
   "bg-[#E7E5E4] border border-white/60 rounded-2xl " +
-  "shadow-[0_4px_12px_rgba(0,0,0,0.06)]";
+  "";
 
 const ALERT_TITLE =
   "font-[family-name:var(--font-space-mono)] font-bold text-xl text-[#1E2938] text-center";
@@ -105,19 +105,19 @@ const ALERT_DESC =
 
 const ALERT_ICON_WELL =
   "mx-auto w-16 h-16 mb-4 rounded-2xl flex items-center justify-center " +
-  "bg-[#FF2157]/10 shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff]";
+  "bg-[#FF2157]/10 ";
 
 const BTN_ALERT_CANCEL =
   "w-full sm:w-auto h-11 rounded-xl bg-[#E7E5E4] text-[#1E2938] " +
   "font-[family-name:var(--font-space-mono)] font-bold text-sm " +
-  "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] border-none " +
-  "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+  " border-none " +
+  "hover: " +
   "transition-all duration-200";
 
 const BTN_ALERT_DELETE =
   "w-full sm:w-auto h-11 rounded-xl bg-[#FF2157] text-white " +
   "font-[family-name:var(--font-space-mono)] font-bold text-sm " +
-  "shadow-[4px_4px_8px_#c8c6c5,-2px_-2px_6px_#ffffff] border-none " +
+  " border-none " +
   "hover:bg-[#e01f4f] transition-all duration-200";
 // ─────────────────────────────────────────────────────────────
 

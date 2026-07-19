@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { motion, Variants } from "framer-motion";
@@ -15,9 +15,9 @@ const N = {
   text: "text-[#1E2938] dark:text-white",
   textMuted: "text-[#1E2938]/60 dark:text-white/50",
   raisedSm:
-    "shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#3a3a3a]",
+    " dark:",
   raisedXs:
-    "shadow-[2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#1a1a1a,-2px_-2px_4px_#3a3a3a]",
+    " dark:",
   pressedSm:
     "[box-shadow:inset_2px_2px_5px_#cac8c7,inset_-2px_-2px_5px_#ffffff] dark:[box-shadow:inset_2px_2px_5px_#1a1a1a,inset_-2px_-2px_5px_#3a3a3a]",
 } as const;

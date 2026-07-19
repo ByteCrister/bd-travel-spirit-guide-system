@@ -1,4 +1,4 @@
-// components/PaymentAccounts/PaymentAccountSkeleton.tsx
+﻿// components/PaymentAccounts/PaymentAccountSkeleton.tsx
 import {
     Table,
     TableBody,
@@ -18,7 +18,7 @@ const NEU_SKELETON =
 
 const TABLE_WRAP =
     "rounded-2xl bg-[#E7E5E4] border border-white/60 overflow-hidden " +
-    "shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff]";
+    "";
 
 const TABLE_HEAD_CELL =
     "font-[family-name:var(--font-space-mono)] text-xs font-bold uppercase tracking-widest text-[#1E2938]/55";

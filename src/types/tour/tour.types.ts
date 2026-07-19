@@ -131,8 +131,6 @@ export interface AddressDTO {
 export interface OperatingWindowDTO {
     startDate: string;
     endDate: string;
-    seatsTotal?: number;
-    seatsBooked?: number;
 }
 
 export interface DepartureDTO {
@@ -251,8 +249,8 @@ export interface TourDetailDTO {
         days: number;
         nights?: number;
     };
-    operatingWindows?: OperatingWindowDTO[];
-    departures?: DepartureDTO[];
+    operatingWindow?: OperatingWindowDTO;
+    departure?: DepartureDTO;
     paymentMethods: PaymentMethod[];
 
     // =============== COMPLIANCE & ACCESSIBILITY ===============
@@ -513,8 +511,8 @@ export interface CreateTourDTO {
         days: number;
         nights?: number;
     };
-    operatingWindows?: OperatingWindowDTO[];
-    departures?: Omit<DepartureDTO, 'seatsBooked'>[]; // seatsBooked starts at 0 //
+    operatingWindow?: OperatingWindowDTO;
+    departure?: Omit<DepartureDTO, 'seatsBooked'>; // seatsBooked starts at 0 //
     paymentMethods: PaymentMethod[];
 
     // =============== COMPLIANCE & ACCESSIBILITY ===============
@@ -642,8 +640,8 @@ export interface UpdateTourPricingDTO {
         days: number;
         nights?: number;
     };
-    operatingWindows?: OperatingWindowDTO[];
-    departures?: Omit<DepartureDTO, 'seatsBooked'>[];
+    operatingWindow?: OperatingWindowDTO;
+    departure?: Omit<DepartureDTO, 'seatsBooked'>;
     paymentMethods?: PaymentMethod[];
 }
 
@@ -668,35 +666,6 @@ export interface UpdateTourPoliciesDTO {
     cancellationPolicy?: CancellationPolicyDTO;
     refundPolicy?: RefundPolicyDTO;
     terms?: string;
-}
-
-// =============== DEPARTURE MANAGEMENT PAYLOADS ===============
-
-/**
- * Payload for adding a new departure to a tour
- */
-export interface AddDepartureDTO {
-    date: string;
-    seatsTotal: number;
-    meetingPoint?: string;
-    meetingCoordinates?: GeoPointDTO;
-}
-
-/**
- * Payload for updating departure seats
- */
-export interface UpdateDepartureSeatsDTO {
-    seatsBooked: number;
-}
-
-/**
- * Payload for updating departure information
- */
-export interface UpdateDepartureDTO {
-    date?: string;
-    seatsTotal?: number;
-    meetingPoint?: string;
-    meetingCoordinates?: GeoPointDTO;
 }
 
 // =============== UTILITY UPDATE TYPES ===============

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useFormikContext } from "formik";
 import { motion, Variants } from "framer-motion";
@@ -28,19 +28,19 @@ const NEU = {
 
   // Neumorphic shadow (raised)
   raised:
-    "shadow-[6px_6px_12px_#c8c6c4,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0d0d0c,-6px_-6px_12px_#272624]",
+    " dark:",
 
   // Neumorphic shadow (inset / pressed)
   inset:
-    "shadow-[inset_4px_4px_8px_#c8c6c4,inset_-4px_-4px_8px_#ffffff] dark:shadow-[inset_4px_4px_8px_#0d0d0c,inset_-4px_-4px_8px_#272624]",
+    " dark:",
 
   // Soft inset for inputs
   inputInset:
-    "shadow-[inset_3px_3px_6px_#c8c6c4,inset_-3px_-3px_6px_#ffffff] dark:shadow-[inset_3px_3px_6px_#0d0d0c,inset_-3px_-3px_6px_#272624]",
+    " dark:",
 
   // Pill / badge inset
   pillInset:
-    "shadow-[inset_2px_2px_4px_#c8c6c4,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#0d0d0c,inset_-2px_-2px_4px_#272624]",
+    " dark:",
 
   radius: "rounded-2xl",
   radiusMd: "rounded-xl",
@@ -343,7 +343,7 @@ const Step2Translations = () => {
                     NEU.iconBg.primary,
                     NEU.raised,
                     "transition-all duration-200",
-                    "group-hover:shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] dark:group-hover:shadow-[4px_4px_8px_#0d0d0c,-4px_-4px_8px_#272624]",
+                    "group-hover: dark:group-hover:",
                   ].join(" ")}
                 >
                   <Languages className={`w-4 h-4 ${NEU.text.accent}`} />

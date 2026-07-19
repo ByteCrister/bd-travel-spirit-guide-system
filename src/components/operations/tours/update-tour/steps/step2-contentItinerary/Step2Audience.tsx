@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AUDIENCE_TYPE, AudienceType } from '@/constants/tour/tour.const';
 import { UpdateTourContentItineraryDTO } from '@/types/tour/tour.types';
@@ -10,14 +10,14 @@ import {
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number; color?: string; strokeWidth?: number }>;
 
 // ── Neumorphism Style Tokens ──────────────────────────────────
-const NEU_CARD = 'rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60';
-const NEU_SURFACE_INSET = 'bg-[#E7E5E4] shadow-[inset_4px_4px_8px_#c8c6c5,inset_-4px_-4px_8px_#ffffff]';
+const NEU_CARD = 'rounded-2xl bg-[#E7E5E4]  border border-white/60';
+const NEU_SURFACE_INSET = 'bg-[#E7E5E4] ';
 const NEU_HEADING = 'font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight';
 const NEU_LABEL = 'font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest';
 const NEU_MUTED = 'font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50';
-const NEU_BADGE_PRIMARY = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#006666]/10 text-[#006666] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]';
+const NEU_BADGE_PRIMARY = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#006666]/10 text-[#006666] ';
 const NEU_DIVIDER = 'border-[#1E2938]/10';
-const NEU_ICON_WELL = 'p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]';
+const NEU_ICON_WELL = 'p-2.5 rounded-xl bg-[#E7E5E4] ';
 const NEU_BTN_DANGER_SM = 'inline-flex items-center gap-1 text-xs font-[family-name:var(--font-space-mono)] text-[#1E2938]/50 hover:text-[#FF2157] transition-colors duration-200';
 // ─────────────────────────────────────────────────────────────
 
@@ -85,7 +85,7 @@ const Step2Audience = () => {
                                 const cfg = AUDIENCE_CONFIG[aud] || { label: aud, icon: Users, accentBg: 'bg-gray-500', accentText: 'text-gray-600' };
                                 const Icon = cfg.icon;
                                 return (
-                                    <span key={aud} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#E7E5E4] shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff] text-[#1E2938]">
+                                    <span key={aud} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-bold bg-[#E7E5E4]  text-[#1E2938]">
                                         <Icon className="h-3 w-3" /> {cfg.label}
                                     </span>
                                 );
@@ -110,14 +110,14 @@ const Step2Audience = () => {
                                     'relative p-4 rounded-xl text-left transition-all duration-200',
                                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50',
                                     selected
-                                        ? `bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-2 ${cfg.accentBorder}`
-                                        : 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border-2 border-transparent hover:shadow-[6px_6px_14px_#c8c6c5,-6px_-6px_14px_#ffffff] hover:-translate-y-0.5',
+                                        ? `bg-[#E7E5E4]  border-2 ${cfg.accentBorder}`
+                                        : 'bg-[#E7E5E4]  border-2 border-transparent hover: hover:-translate-y-0.5',
                                 ].join(' ')}
                             >
                                 {/* Checkmark indicator */}
                                 <div className={[
                                     'absolute top-2.5 right-2.5 h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all duration-200',
-                                    selected ? `${cfg.accentBg} border-transparent` : 'border-[#1E2938]/20 bg-[#E7E5E4] shadow-[inset_1px_1px_3px_#c8c6c5,inset_-1px_-1px_3px_#ffffff]',
+                                    selected ? `${cfg.accentBg} border-transparent` : 'border-[#1E2938]/20 bg-[#E7E5E4] ',
                                 ].join(' ')}>
                                     {selected && <Check className="h-3 w-3 text-white" />}
                                 </div>
@@ -125,7 +125,7 @@ const Step2Audience = () => {
                                 <div className="flex items-center gap-3">
                                     <div className={[
                                         'h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0',
-                                        selected ? cfg.accentBg : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]',
+                                        selected ? cfg.accentBg : 'bg-[#E7E5E4] ',
                                     ].join(' ')}>
                                         <Icon className={`h-5 w-5 ${selected ? 'text-white' : 'text-[#1E2938]/40'}`} />
                                     </div>

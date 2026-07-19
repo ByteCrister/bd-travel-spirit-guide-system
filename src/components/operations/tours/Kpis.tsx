@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { useTourDetailStore } from "@/store/tour-detail.store";
@@ -34,7 +34,7 @@ const KPI_CONFIG = [
     accentColor: "text-[#006666]",
     accentBg: "bg-[#006666]/10",
     accentShadow:
-      "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
+      "",
     dot: "bg-[#006666]",
   },
   {
@@ -44,7 +44,7 @@ const KPI_CONFIG = [
     accentColor: "text-[#00A63D]",
     accentBg: "bg-[#00A63D]/10",
     accentShadow:
-      "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
+      "",
     dot: "bg-[#00A63D]",
   },
   {
@@ -54,7 +54,7 @@ const KPI_CONFIG = [
     accentColor: "text-[#FE9900]",
     accentBg: "bg-[#FE9900]/10",
     accentShadow:
-      "shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
+      "",
     dot: "bg-[#FE9900]",
   },
 ] as const;
@@ -117,7 +117,7 @@ export const Kpis: React.FC = () => {
 
           {/* Bottom accent bar */}
           <div
-            className={`h-1 w-12 rounded-full ${kpi.accentBg} shadow-[inset_1px_1px_3px_#c8c6c5,inset_-1px_-1px_3px_#ffffff]`}
+            className={`h-1 w-12 rounded-full ${kpi.accentBg} `}
           />
         </motion.div>
       ))}

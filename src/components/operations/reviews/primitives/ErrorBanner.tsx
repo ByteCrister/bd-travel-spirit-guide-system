@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type { ApiError } from "@/types/tour/reviews.types";
 import { JSX, useState } from "react";
@@ -33,7 +33,7 @@ export function ErrorBanner({
             className={cn(
                 // Neumorphic raised surface
                 "relative overflow-hidden rounded-2xl border-l-4 border-danger bg-surface p-4 text-text",
-                "shadow-[6px_6px_12px_#c8c6c5,-6px_-6px_12px_#ffffff]",
+                "",
                 className,
             )}
         >
@@ -42,7 +42,7 @@ export function ErrorBanner({
 
             <div className="flex items-start gap-3">
                 {/* Error icon with neumorphic pressed circle */}
-                <div className="mt-0.5 flex-shrink-0 rounded-full bg-surface p-1.5 shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]">
+                <div className="mt-0.5 flex-shrink-0 rounded-full bg-surface p-1.5 ">
                     <HiExclamationCircle aria-hidden="true" className="h-5 w-5 text-danger" />
                 </div>
 
@@ -61,10 +61,10 @@ export function ErrorBanner({
                                 onClick={onRetry}
                                 className={cn(
                                     "inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-sm font-medium",
-                                    "bg-surface text-primary shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff]",
+                                    "bg-surface text-primary ",
                                     "transition-all duration-150 ease-out",
-                                    "hover:shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
-                                    "active:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff]",
+                                    "hover:",
+                                    "active:",
                                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2",
                                 )}
                             >
@@ -80,10 +80,10 @@ export function ErrorBanner({
                             aria-controls="error-details"
                             className={cn(
                                 "inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-sm font-medium",
-                                "bg-surface text-danger shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff]",
+                                "bg-surface text-danger ",
                                 "transition-all duration-150 ease-out",
-                                "hover:shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]",
-                                "active:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff]",
+                                "hover:",
+                                "active:",
                                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/50 focus-visible:ring-offset-2",
                             )}
                         >
@@ -108,7 +108,7 @@ export function ErrorBanner({
                             <div
                                 className={cn(
                                     "rounded-lg p-3 text-xs text-text/80",
-                                    "bg-surface shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]",
+                                    "bg-surface ",
                                 )}
                             >
                                 <div className="font-medium">Technical details</div>
@@ -139,10 +139,10 @@ export function ErrorBanner({
                         onClick={() => setOpen(false)}
                         className={cn(
                             "mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full",
-                            "bg-surface shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]",
+                            "bg-surface ",
                             "text-text/60 transition-all duration-150 ease-out",
-                            "hover:text-danger hover:shadow-[1px_1px_3px_#c8c6c5,-1px_-1px_3px_#ffffff]",
-                            "active:shadow-[inset_1px_1px_3px_#c8c6c5,inset_-1px_-1px_3px_#ffffff]",
+                            "hover:text-danger hover:",
+                            "active:",
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/50",
                         )}
                     >

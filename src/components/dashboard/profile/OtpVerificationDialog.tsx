@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState, useEffect, useCallback, KeyboardEvent, ClipboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,19 +23,19 @@ import { EMAIL_VERIFICATION_PURPOSE } from "@/constants/common/email-verificatio
 
 // ── Neumorphism tokens (mirror PasswordUpdateForm) ────────────────────────────
 const NEU_SURFACE_INSET =
-  "bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]";
+  "bg-[#E7E5E4] ";
 const NEU_BTN_PRIMARY =
   "rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide " +
-  "shadow-[0_4px_12px_rgba(0,0,0,0.06)] " +
+  " " +
   "hover:bg-[#007777] " +
-  "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+  "active: " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50 " +
   "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none";
 const NEU_BTN_GHOST =
   "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] text-sm " +
-  "shadow-[0_4px_12px_rgba(0,0,0,0.06)] " +
-  "hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] " +
-  "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " " +
+  "hover: " +
+  "active: " +
   "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 const NEU_LABEL =
   "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
@@ -217,7 +217,7 @@ export default function OtpVerificationDialog({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.94, y: 16 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="relative rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_20px_#c8c6c5,-8px_-8px_20px_#ffffff] border border-white/60 overflow-hidden"
+          className="relative rounded-2xl bg-[#E7E5E4]  border border-white/60 overflow-hidden"
         >
           {/* Close button */}
           <button
@@ -225,8 +225,8 @@ export default function OtpVerificationDialog({
             disabled={isBusy}
             className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-xl
               bg-[#E7E5E4] text-[#1E2938]/40
-              shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]
-              hover:text-[#006666] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]
+              
+              hover:text-[#006666] hover:
               transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
             aria-label="Close OTP dialog"
           >
@@ -236,7 +236,7 @@ export default function OtpVerificationDialog({
           {/* Header */}
           <DialogHeader className="px-6 pt-6 pb-0">
             <div className="flex items-center gap-3 mb-1">
-              <div className="p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]">
+              <div className="p-2.5 rounded-xl bg-[#E7E5E4] ">
                 <AnimatePresence mode="wait">
                   {isVerified ? (
                     <motion.span
@@ -322,12 +322,12 @@ export default function OtpVerificationDialog({
                         "transition-all duration-200 focus:outline-none",
                         "disabled:cursor-not-allowed",
                         isVerified
-                          ? "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] text-[#00A63D] bg-[#E7E5E4]"
+                          ? " text-[#00A63D] bg-[#E7E5E4]"
                           : phase === "error"
-                          ? "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] text-[#FF2157] bg-[#E7E5E4]"
+                          ? " text-[#FF2157] bg-[#E7E5E4]"
                           : otp[i]
-                          ? "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] text-[#006666] bg-[#E7E5E4] ring-2 ring-[#006666]/30"
-                          : "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] text-[#1E2938] bg-[#E7E5E4] focus:shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] focus:ring-2 focus:ring-[#006666]/30",
+                          ? " text-[#006666] bg-[#E7E5E4] ring-2 ring-[#006666]/30"
+                          : " text-[#1E2938] bg-[#E7E5E4] focus: focus:ring-2 focus:ring-[#006666]/30",
                       ].join(" ")}
                     />
                   </motion.div>

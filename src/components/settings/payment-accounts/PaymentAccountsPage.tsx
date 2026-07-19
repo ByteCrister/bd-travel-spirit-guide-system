@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -27,20 +27,20 @@ import { usePaymentAccountStore } from "@/store/strip-payment-account.store";
 const NEU_PAGE_BG = "min-h-screen bg-[#E7E5E4]";
 
 const NEU_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 
 const NEU_BTN_PRIMARY =
     "rounded-xl bg-[#006666] text-white font-bold tracking-wide " +
-    "shadow-[0_4px_12px_rgba(0,0,0,0.06)] " +
-    "hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] hover:bg-[#007777] " +
-    "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+    " " +
+    "hover: hover:bg-[#007777] " +
+    "active: " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
 
 const NEU_BTN_GHOST =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-bold " +
-    "shadow-[0_4px_12px_rgba(0,0,0,0.06)] " +
-    "hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] " +
-    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover: " +
+    "active: " +
     "transition-all duration-200 border border-white/60 " +
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 
@@ -48,19 +48,19 @@ const NEU_HEADING = "font-bold text-[#1E2938] tracking-tight";
 const NEU_MUTED = "text-sm text-[#1E2938]/50";
 
 const NEU_ICON_WELL_PRIMARY =
-    "p-3 rounded-xl bg-[#006666]/10 shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+    "p-3 rounded-xl bg-[#006666]/10 ";
 
 const NEU_DIVIDER = "border-[#1E2938]/10";
 
 const NEU_PAGINATION_ACTIVE =
     "rounded-lg bg-[#006666] text-white font-bold " +
-    "shadow-[inset_2px_2px_5px_#004d4d,inset_-2px_-2px_5px_#008080] " +
+    " " +
     "hover:bg-[#007777] border-0";
 
 const NEU_PAGINATION_ITEM =
     "rounded-lg bg-[#E7E5E4] text-[#1E2938] font-medium " +
-    "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-    "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover: " +
     "transition-all duration-200 border-0";
 
 // ── Animation Variants ────────────────────────────────────────────────────────
@@ -199,7 +199,7 @@ export default function PaymentAccountsPage() {
                                     initial={{ scale: 0.5, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.15 }}
-                                    className="mx-auto w-20 h-20 mb-6 flex items-center justify-center rounded-2xl bg-[#E7E5E4] shadow-[inset_4px_4px_10px_#c8c6c5,inset_-4px_-4px_10px_#ffffff] relative"
+                                    className="mx-auto w-20 h-20 mb-6 flex items-center justify-center rounded-2xl bg-[#E7E5E4]  relative"
                                 >
                                     <CreditCard className="h-9 w-9 text-[#1E2938]/30" />
                                     <motion.div

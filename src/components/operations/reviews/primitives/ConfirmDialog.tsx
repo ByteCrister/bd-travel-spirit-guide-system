@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { JSX, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -69,7 +69,7 @@ export default function ConfirmDialog({
                             // Responsive width & neumorphic surface
                             "w-[calc(100vw-1.5rem)] max-w-[480px] sm:max-w-[480px]",
                             "rounded-[2rem] border-0 p-0",
-                            "bg-[#E7E5E4] shadow-[0_4px_12px_rgba(0,0,0,0.06)]",
+                            "bg-[#E7E5E4] ",
                             // Override shadcn’s default overflow
                             "[&>button]:hidden",
                             className
@@ -89,7 +89,7 @@ export default function ConfirmDialog({
                                     <div
                                         className={cn(
                                             "mt-0.5 flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center",
-                                            "shadow-[inset_2px_2px_4px_#cfcdcb,inset_-2px_-2px_4px_#ffffff]",
+                                            "",
                                             "bg-[#E7E5E4]",
                                             isDestructive ? "text-[#FF2157]" : "text-[#006666]"
                                         )}
@@ -126,8 +126,8 @@ export default function ConfirmDialog({
                                     className={cn(
                                         "rounded-xl font-mono font-semibold text-[#1E2938]",
                                         "bg-[#E7E5E4] border-0",
-                                        "shadow-[3px_3px_6px_#cfcdcb,-3px_-3px_6px_#f9f8f7]",
-                                        "hover:shadow-[inset_3px_3px_6px_#cfcdcb,inset_-3px_-3px_6px_#f9f8f7]",
+                                        "",
+                                        "hover:",
                                         "hover:bg-[#dfdddb] transition-all",
                                         "focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2"
                                     )}
@@ -144,15 +144,15 @@ export default function ConfirmDialog({
                                         isDestructive
                                             ? cn(
                                                 "bg-[#FF2157] text-white",
-                                                "shadow-[3px_3px_6px_#cc1a45,-3px_-3px_6px_#ff527a]",
-                                                "hover:shadow-[inset_3px_3px_6px_#cc1a45,inset_-3px_-3px_6px_#ff527a]",
+                                                "",
+                                                "hover:",
                                                 "hover:bg-[#e61a4e]",
                                                 "focus-visible:ring-2 focus-visible:ring-[#FF2157] focus-visible:ring-offset-2"
                                             )
                                             : cn(
                                                 "bg-[#006666] text-white",
-                                                "shadow-[3px_3px_6px_#004d4d,-3px_-3px_6px_#008080]",
-                                                "hover:shadow-[inset_3px_3px_6px_#004d4d,inset_-3px_-3px_6px_#008080]",
+                                                "",
+                                                "hover:",
                                                 "hover:bg-[#005555]",
                                                 "focus-visible:ring-2 focus-visible:ring-[#006666] focus-visible:ring-offset-2"
                                             ),

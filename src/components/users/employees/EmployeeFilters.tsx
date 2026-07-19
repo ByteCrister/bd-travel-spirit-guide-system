@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -98,9 +98,9 @@ const STATUS_VARIANTS: Record<EmployeeStatus, "default" | "secondary" | "destruc
 };
 
 // ── Shared neumorphism class strings ──────────────────────────────────────────
-const NEU_SURFACE = "bg-[#E7E5E4] shadow-[6px_6px_12px_#c9c7c5,-6px_-6px_12px_#ffffff]";
-const NEU_INSET = "bg-[#E7E5E4] shadow-[inset_3px_3px_7px_#c9c7c5,inset_-3px_-3px_7px_#ffffff]";
-const NEU_BTN = "bg-[#E7E5E4] shadow-[4px_4px_8px_#c9c7c5,-4px_-4px_8px_#ffffff] hover:shadow-[6px_6px_10px_#c9c7c5,-6px_-6px_10px_#ffffff] active:shadow-[inset_2px_2px_5px_#c9c7c5,inset_-2px_-2px_5px_#ffffff] transition-all duration-150 border-0";
+const NEU_SURFACE = "bg-[#E7E5E4] ";
+const NEU_INSET = "bg-[#E7E5E4] ";
+const NEU_BTN = "bg-[#E7E5E4]  hover: active: transition-all duration-150 border-0";
 const MONO = "font-[family-name:var(--font-space-mono,'Space_Mono',monospace)]";
 const JETBRAINS = "font-[family-name:var(--font-jetbrains-mono,'JetBrains_Mono',monospace)]";
 
@@ -590,7 +590,7 @@ function ShadcnFilterSelect({
                         className={[
                             "rounded-xl border-0",
                             "bg-[#E7E5E4]",
-                            "shadow-[8px_8px_20px_#c9c7c5,-8px_-8px_20px_#ffffff]",
+                            "",
                         ].join(" ")}
                     >
                         <SelectItem

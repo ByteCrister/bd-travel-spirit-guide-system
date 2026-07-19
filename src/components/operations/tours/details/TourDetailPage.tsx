@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -32,20 +32,20 @@ const NEU_TAB_BASE =
 
 const NEU_TAB_IDLE =
     "bg-[#E7E5E4] text-[#1E2938]/50 " +
-    "shadow-[3px_3px_7px_#c8c6c5,-3px_-3px_7px_#ffffff] " +
-    "hover:text-[#1E2938]/80 hover:shadow-[4px_4px_9px_#c8c6c5,-4px_-4px_9px_#ffffff]";
+    " " +
+    "hover:text-[#1E2938]/80 hover:";
 
 const NEU_TAB_ACTIVE =
     "bg-[#E7E5E4] text-[#006666] " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]";
+    "";
 
 const NEU_TAB_WRAPPER =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_18px_#c8c6c5,-8px_-8px_18px_#ffffff] border border-white/60 p-2";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60 p-2";
 
 const NEU_CONTENT_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[10px_10px_20px_#c8c6c5,-10px_-10px_20px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_ACTIVE_DOT =
-    "w-1 h-1 rounded-full bg-[#006666] shadow-[0_0_6px_#006666]";
+    "w-1 h-1 rounded-full bg-[#006666] ";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 interface TourDetailProps {
@@ -108,7 +108,7 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                 <Breadcrumbs items={breadCrumbs} />
                 <Link
                     href="/operations/tours/add-tour"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide  hover: hover:bg-[#007777] active: transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50"
                 >
                     <Plus className="w-5 h-5" />
                     Create Tour

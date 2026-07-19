@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useFormik } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -39,11 +39,11 @@ import { ValidationError } from 'yup';
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const NEU = {
   surface: 'bg-[#E7E5E4]',
-  card: 'bg-[#E7E5E4] rounded-2xl shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff]',
-  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
-  raised: 'bg-[#E7E5E4] rounded-xl shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff]',
-  pressed: 'shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff]',
-  iconBox: 'rounded-xl shadow-[3px_3px_8px_#c8c6c4,-3px_-3px_8px_#ffffff] flex items-center justify-center',
+  card: 'bg-[#E7E5E4] rounded-2xl ',
+  cardInner: 'bg-[#E7E5E4] rounded-xl ',
+  raised: 'bg-[#E7E5E4] rounded-xl ',
+  pressed: '',
+  iconBox: 'rounded-xl  flex items-center justify-center',
   primaryText: 'text-[#1E2938]',
   secondaryText: 'text-[#4a5568]',
   mutedText: 'text-[#718096]',
@@ -51,12 +51,12 @@ const NEU = {
   primaryBg: 'bg-[#006666]',
   primaryText2: 'text-[#006666]',
   border: 'border border-[#d1cfcd]',
-  inputBase: 'bg-[#E7E5E4] shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] border-0 rounded-xl focus:ring-2 focus:ring-[#006666]/30 outline-none transition-all duration-200',
+  inputBase: 'bg-[#E7E5E4]  border-0 rounded-xl focus:ring-2 focus:ring-[#006666]/30 outline-none transition-all duration-200',
   labelFont: 'font-[Space_Mono,monospace] tracking-wide',
   bodyFont: 'font-[JetBrains_Mono,monospace]',
-  btnPrimary: 'bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff] active:shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] transition-all duration-200 rounded-xl text-[#006666] font-semibold',
-  btnSubmit: 'bg-[#006666] text-white rounded-xl shadow-[4px_4px_10px_#004d4d,-4px_-4px_10px_#008080] hover:shadow-[2px_2px_6px_#004d4d,-2px_-2px_6px_#008080] active:shadow-[inset_2px_2px_6px_#004d4d,inset_-2px_-2px_6px_#008080] transition-all duration-200 font-semibold',
-  badge: 'rounded-lg shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]',
+  btnPrimary: 'bg-[#E7E5E4]  hover: active: transition-all duration-200 rounded-xl text-[#006666] font-semibold',
+  btnSubmit: 'bg-[#006666] text-white rounded-xl  hover: active: transition-all duration-200 font-semibold',
+  badge: 'rounded-lg ',
   divider: 'border-t border-[#d1cfcd]',
 };
 
@@ -316,8 +316,8 @@ export default function Step5Compliance({ tourId, initialData }: Step5Compliance
                   className={`
                     ${NEU.surface} p-4 rounded-xl transition-all duration-200 outline-none
                     ${active
-                      ? `shadow-[inset_3px_3px_8px_#c8c6c4,inset_-3px_-3px_8px_#ffffff] ${activeBorder}`
-                      : 'shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[2px_2px_6px_#c8c6c4,-2px_-2px_6px_#ffffff]'
+                      ? ` ${activeBorder}`
+                      : ' hover:'
                     }
                   `}
                 >
@@ -334,8 +334,8 @@ export default function Step5Compliance({ tourId, initialData }: Step5Compliance
                     <div
                       className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 ${
                         active
-                          ? 'shadow-[inset_2px_2px_4px_rgba(0,0,0,0.15)]'
-                          : 'shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff]'
+                          ? ''
+                          : ''
                       }`}
                       style={{ background: active ? '#006666' : '#E7E5E4' }}
                     >

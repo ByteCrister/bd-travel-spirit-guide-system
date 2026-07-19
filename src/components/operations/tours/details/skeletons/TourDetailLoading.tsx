@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 
@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 // Neumorphism skeleton tokens
 // ─────────────────────────────────────────────────────────────
 const NEU_PAGE_BG = "min-h-screen bg-[#E7E5E4]";
-const NEU_CARD = "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
-const NEU_CARD_HDR = "px-6 py-4 rounded-t-2xl shadow-[inset_0_-1px_0_#c8c6c5]";
-const NEU_INSET_SM = "bg-[#E7E5E4] rounded-xl shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
-const NEU_RAISED_SM = "bg-[#E7E5E4] rounded-xl shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+const NEU_CARD = "rounded-2xl bg-[#E7E5E4]  border border-white/60";
+const NEU_CARD_HDR = "px-6 py-4 rounded-t-2xl ";
+const NEU_INSET_SM = "bg-[#E7E5E4] rounded-xl ";
+const NEU_RAISED_SM = "bg-[#E7E5E4] rounded-xl ";
 
 // Skeleton pulse on the neu surface
 const SK_BASE = "animate-pulse rounded-lg bg-[#d0cecd]";          // neutral

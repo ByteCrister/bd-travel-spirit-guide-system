@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,11 +20,11 @@ const N = {
   text: "text-[#1E2938] dark:text-white",
   textMuted: "text-[#1E2938]/70 dark:text-white/60",
   raised:
-    "shadow-[0_4px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]",
+    " dark:",
   raisedSm:
-    "shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#1a1a1a,-4px_-4px_8px_#3a3a3a]",
+    " dark:",
   raisedXs:
-    "shadow-[2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#1a1a1a,-2px_-2px_4px_#3a3a3a]",
+    " dark:",
   pressedMd:
     "[box-shadow:inset_4px_4px_8px_#cac8c7,inset_-4px_-4px_8px_#ffffff] dark:[box-shadow:inset_4px_4px_8px_#1a1a1a,inset_-4px_-4px_8px_#3a3a3a]",
   pressedLg:
@@ -267,8 +267,8 @@ export default function DenyDialog({
                     className={`
                       h-11 rounded-xl border-none font-semibold gap-2
                       bg-[#FF2157] text-white
-                      shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff]
-                      hover:shadow-[2px_2px_4px_#cac8c7,-2px_-2px_4px_#ffffff]
+                      
+                      hover:
                       active:[box-shadow:inset_4px_4px_8px_rgba(0,0,0,0.2)]
                       transition-all duration-150
                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF2157]/60 focus-visible:ring-offset-2

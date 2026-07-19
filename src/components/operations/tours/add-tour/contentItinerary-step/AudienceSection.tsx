@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useFormikContext } from "formik";
 import { motion } from "framer-motion";
@@ -8,21 +8,21 @@ import { Users } from "lucide-react";
 
 // ── Neumorphism style tokens ──────────────────────────────────
 const NEU_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_ICON_WELL_PRIMARY =
-    "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+    "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_HEADING =
     "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL =
     "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
 const NEU_CHIP_DEFAULT =
     "inline-flex items-center px-3.5 py-1.5 rounded-xl text-sm font-[family-name:var(--font-space-mono)] font-500 text-[#1E2938]/70 " +
-    "bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-    "hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    "bg-[#E7E5E4]  " +
+    "hover: " +
     "cursor-pointer transition-all duration-200 select-none";
 const NEU_CHIP_ACTIVE =
     "inline-flex items-center px-3.5 py-1.5 rounded-xl text-sm font-[family-name:var(--font-space-mono)] font-600 text-white " +
-    "bg-[#006666] shadow-[inset_2px_2px_5px_#004d4d,inset_-2px_-2px_5px_#008080] " +
+    "bg-[#006666]  " +
     "cursor-pointer transition-all duration-200 select-none";
 
 const itemVariants = {

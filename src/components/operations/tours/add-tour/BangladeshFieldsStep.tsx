@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { useFormikContext } from "formik";
@@ -45,22 +45,22 @@ import { getDistrictsByDivision } from "@/utils/helpers/conversions.tour";
 // ── Neumorphism Style Tokens ──────────────────────────────────
 const NEU_SURFACE = "bg-[#E7E5E4]";
 const NEU_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_INPUT =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
     "font-[family-name:var(--font-jetbrains-mono)] text-sm h-11 " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    " border-none " +
     "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 const NEU_BTN_COMBOBOX =
     "w-full justify-between h-11 rounded-xl bg-[#E7E5E4] text-[#1E2938] " +
     "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] border border-white/60 " +
-    "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " border border-white/60 " +
+    "hover: " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 const NEU_BTN_COMBOBOX_ERROR =
     "w-full justify-between h-11 rounded-xl bg-[#E7E5E4] text-[#1E2938] " +
     "font-[family-name:var(--font-jetbrains-mono)] text-sm " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    " border-none " +
     "ring-2 ring-[#FF2157]/40 transition-all duration-200";
 const NEU_HEADING =
     "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
@@ -70,17 +70,17 @@ const NEU_MUTED =
     "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_DIVIDER = "border-[#1E2938]/10";
 const NEU_ICON_WELL =
-    "p-2.5 rounded-xl bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff]";
+    "p-2.5 rounded-xl bg-[#E7E5E4] ";
 const NEU_BADGE_OUTLINE =
     "inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-[family-name:var(--font-space-mono)] font-bold " +
-    "text-[#006666] bg-[#006666]/10 shadow-[1px_1px_3px_#c8c6c5,-1px_-1px_3px_#ffffff]";
+    "text-[#006666] bg-[#006666]/10 ";
 const NEU_CHECKBOX_CARD_BASE =
     "rounded-xl p-4 cursor-pointer transition-all duration-200 border border-white/60 " +
-    "bg-[#E7E5E4] shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]";
+    "bg-[#E7E5E4]  " +
+    "hover:";
 const NEU_CHECKBOX_CARD_ACTIVE =
     "rounded-xl p-4 cursor-pointer transition-all duration-200 border border-[#006666]/30 " +
-    "bg-[#006666]/5 shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff]";
+    "bg-[#006666]/5 ";
 
 // ── Animation Variants ────────────────────────────────────────
 const containerVariants: Variants = {
@@ -197,7 +197,7 @@ export default function BangladeshFieldsStep() {
                                             <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-40" />
                                         </button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-full p-0 rounded-xl shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60 bg-[#E7E5E4]" align="start">
+                                    <PopoverContent className="w-full p-0 rounded-xl  border border-white/60 bg-[#E7E5E4]" align="start">
                                         <Command className="bg-[#E7E5E4]">
                                             <CommandInput placeholder="Search tour type..." className="font-[family-name:var(--font-jetbrains-mono)]" />
                                             <CommandList>
@@ -253,7 +253,7 @@ export default function BangladeshFieldsStep() {
                                             <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-40" />
                                         </button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-full p-0 rounded-xl shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60 bg-[#E7E5E4]" align="start">
+                                    <PopoverContent className="w-full p-0 rounded-xl  border border-white/60 bg-[#E7E5E4]" align="start">
                                         <Command className="bg-[#E7E5E4]">
                                             <CommandInput placeholder="Search division..." className="font-[family-name:var(--font-jetbrains-mono)]" />
                                             <CommandList>
@@ -310,7 +310,7 @@ export default function BangladeshFieldsStep() {
                                             <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-40" />
                                         </button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-full p-0 rounded-xl shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60 bg-[#E7E5E4]" align="start">
+                                    <PopoverContent className="w-full p-0 rounded-xl  border border-white/60 bg-[#E7E5E4]" align="start">
                                         <Command className="bg-[#E7E5E4]">
                                             <CommandInput placeholder="Search district..." className="font-[family-name:var(--font-jetbrains-mono)]" />
                                             <CommandList>
@@ -447,7 +447,7 @@ export default function BangladeshFieldsStep() {
                 <div className={`${NEU_CARD} overflow-hidden`}>
                     <div className="p-5 pb-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2.5 rounded-xl bg-[#FF2157]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]">
+                            <div className="p-2.5 rounded-xl bg-[#FF2157]/10 ">
                                 <MdPhone className="w-5 h-5 text-[#FF2157]" />
                             </div>
                             <div>

@@ -14,27 +14,27 @@ export function Badge({
         default: [
             "bg-[#E7E5E4]",
             "text-[#1E2938]",
-            "shadow-[2px_2px_5px_#c9c7c5,-2px_-2px_5px_#ffffff]",
+            "border border-[#d0cecc]",
         ].join(" "),
         success: [
             "bg-[#E7E5E4]",
             "text-[#00A63D]",
-            "shadow-[2px_2px_5px_#c9c7c5,-2px_-2px_5px_#ffffff]",
+            "border border-[#d0cecc]",
         ].join(" "),
         warning: [
             "bg-[#E7E5E4]",
             "text-[#FE9900]",
-            "shadow-[2px_2px_5px_#c9c7c5,-2px_-2px_5px_#ffffff]",
+            "border border-[#d0cecc]",
         ].join(" "),
         danger: [
             "bg-[#E7E5E4]",
             "text-[#FF2157]",
-            "shadow-[2px_2px_5px_#c9c7c5,-2px_-2px_5px_#ffffff]",
+            "border border-[#d0cecc]",
         ].join(" "),
         muted: [
             "bg-[#E7E5E4]",
             "text-[#1E2938]/50",
-            "shadow-[1px_1px_3px_#c9c7c5,-1px_-1px_3px_#ffffff]",
+            "border border-[#d0cecc]",
         ].join(" "),
     };
 

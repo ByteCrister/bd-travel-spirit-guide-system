@@ -1,4 +1,4 @@
-// app/faqs/TourFaqsPage.tsx
+﻿// app/faqs/TourFaqsPage.tsx
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -79,7 +79,7 @@ export default function TourFaqsManagementPage() {
                     <div className="space-y-1">
                         <div className="flex items-center gap-4">
                             {/* Neumorphic icon pill — raised */}
-                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c5c3c2,-4px_-4px_10px_#ffffff]">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#E7E5E4] ">
                                 <HelpCircle className="h-5 w-5 text-[#006666]" strokeWidth={2} />
                             </div>
 
@@ -94,7 +94,7 @@ export default function TourFaqsManagementPage() {
                     </div>
 
                     {/* Raised neumorphic badge — page meta */}
-                    <div className="self-start rounded-xl bg-[#E7E5E4] px-4 py-2 shadow-[4px_4px_8px_#c5c3c2,-4px_-4px_8px_#ffffff] sm:self-auto">
+                    <div className="self-start rounded-xl bg-[#E7E5E4] px-4 py-2  sm:self-auto">
                         <span className="font-['JetBrains_Mono'] text-xs font-medium text-[#006666]">
                             FAQ Management
                         </span>
@@ -116,7 +116,7 @@ export default function TourFaqsManagementPage() {
                 {/* ── Filters — inset neumorphic well ── */}
                 <section
                     aria-label="Filters"
-                    className="rounded-2xl bg-[#E7E5E4] p-5 shadow-[inset_4px_4px_10px_#c5c3c2,inset_-4px_-4px_10px_#ffffff]"
+                    className="rounded-2xl bg-[#E7E5E4] p-5 "
                 >
                     <p className="mb-3 font-['JetBrains_Mono'] text-[10px] font-semibold uppercase tracking-[0.15em] text-[#1E2938]/40">
                         Filter &amp; Sort
@@ -127,7 +127,7 @@ export default function TourFaqsManagementPage() {
                 {/* ── Table — raised card ── */}
                 <section
                     aria-label="FAQ List"
-                    className="overflow-x-auto rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_18px_#c5c3c2,-8px_-8px_18px_#ffffff]"
+                    className="overflow-x-auto rounded-2xl bg-[#E7E5E4] "
                 >
                     <AnimatePresence mode="wait">
                         {isLoading ? (
@@ -164,7 +164,7 @@ export default function TourFaqsManagementPage() {
                         className="flex justify-center pt-2"
                     >
                         {/* Inset pill for pagination context */}
-                        <div className="rounded-2xl bg-[#E7E5E4] px-6 py-3 shadow-[inset_3px_3px_7px_#c5c3c2,inset_-3px_-3px_7px_#ffffff]">
+                        <div className="rounded-2xl bg-[#E7E5E4] px-6 py-3 ">
                             <FaqPagination
                                 currentPage={pagination.page}
                                 totalPages={pagination.totalPages}

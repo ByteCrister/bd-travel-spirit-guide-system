@@ -33,28 +33,28 @@ import {
 // ─── Neumorphism + Font Style Constants ───────────────────────────────────────
 const neu = {
   // surfaces
-  card: 'bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_18px_#c8c6c4,-8px_-8px_18px_#ffffff]',
-  cardInner: 'bg-[#E7E5E4] rounded-xl border border-[#d4d2d0] shadow-[5px_5px_12px_#c8c6c4,-5px_-5px_12px_#ffffff] hover:shadow-[7px_7px_16px_#c8c6c4,-7px_-7px_16px_#ffffff] transition-all duration-300',
-  inset: 'bg-[#E7E5E4] rounded-xl shadow-[inset_4px_4px_9px_#c8c6c4,inset_-4px_-4px_9px_#ffffff]',
-  insetSm: 'bg-[#E7E5E4] rounded-lg  shadow-[inset_3px_3px_6px_#c8c6c4,inset_-3px_-3px_6px_#ffffff]',
+  card: 'bg-[#E7E5E4] rounded-2xl ',
+  cardInner: 'bg-[#E7E5E4] rounded-xl border border-[#d4d2d0]  hover: transition-all duration-300',
+  inset: 'bg-[#E7E5E4] rounded-xl ',
+  insetSm: 'bg-[#E7E5E4] rounded-lg  ',
   flat: 'bg-[#E7E5E4] rounded-xl border border-[#d4d2d0]',
 
   // interactive
-  iconBox: (color: string) => `rounded-xl p-2.5 shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] flex items-center justify-center ${color}`,
-  btn: 'inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm rounded-xl text-white bg-[#006666] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff] active:shadow-[inset_3px_3px_7px_rgba(0,0,0,0.25)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-[var(--font-space-mono)]',
-  btnSm: 'inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs rounded-lg text-white bg-[#006666] shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] active:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.25)] transition-all duration-200 font-[var(--font-space-mono)]',
-  btnGhost: 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg text-[#FF2157] border border-[#FF2157]/25 shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff] hover:shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:bg-[#FF2157]/5 transition-all duration-200 font-[var(--font-space-mono)]',
-  btnOutline: 'inline-flex items-center gap-2 px-3 py-2 text-sm rounded-xl bg-[#E7E5E4] text-[#1E2938] border border-[#d4d2d0] shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[4px_4px_9px_#c8c6c4,-4px_-4px_9px_#ffffff] transition-all font-[var(--font-jetbrains-mono)]',
-  input: 'w-full bg-[#E7E5E4] rounded-xl px-3.5 py-2.5 text-sm text-[#1E2938] placeholder:text-[#888780] border-0 outline-none shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] focus:ring-1 focus:ring-[#006666]/50 transition-all font-[var(--font-jetbrains-mono)]',
+  iconBox: (color: string) => `rounded-xl p-2.5  flex items-center justify-center ${color}`,
+  btn: 'inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm rounded-xl text-white bg-[#006666]  hover: active: transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-[var(--font-space-mono)]',
+  btnSm: 'inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs rounded-lg text-white bg-[#006666]  hover: active: transition-all duration-200 font-[var(--font-space-mono)]',
+  btnGhost: 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg text-[#FF2157] border border-[#FF2157]/25  hover: hover:bg-[#FF2157]/5 transition-all duration-200 font-[var(--font-space-mono)]',
+  btnOutline: 'inline-flex items-center gap-2 px-3 py-2 text-sm rounded-xl bg-[#E7E5E4] text-[#1E2938] border border-[#d4d2d0]  hover: transition-all font-[var(--font-jetbrains-mono)]',
+  input: 'w-full bg-[#E7E5E4] rounded-xl px-3.5 py-2.5 text-sm text-[#1E2938] placeholder:text-[#888780] border-0 outline-none  focus:ring-1 focus:ring-[#006666]/50 transition-all font-[var(--font-jetbrains-mono)]',
   inputErr: 'ring-1 ring-[#FF2157]/50',
-  checkTile: (a: boolean) => `flex items-center gap-2.5 p-3 rounded-xl cursor-pointer select-none transition-all duration-200 bg-[#E7E5E4] ${a ? 'shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] ring-1 ring-[#006666]/35' : 'shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[4px_4px_9px_#c8c6c4,-4px_-4px_9px_#ffffff]'}`,
-  checkbox: (a: boolean) => `w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-all duration-200 ${a ? 'bg-[#006666] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]' : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]'}`,
-  badge: 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-[var(--font-space-mono)] bg-[#E7E5E4] text-[#888780] shadow-[2px_2px_4px_#c8c6c4,-2px_-2px_4px_#ffffff] border border-[#d4d2d0]',
+  checkTile: (a: boolean) => `flex items-center gap-2.5 p-3 rounded-xl cursor-pointer select-none transition-all duration-200 bg-[#E7E5E4] ${a ? ' ring-1 ring-[#006666]/35' : ' hover:'}`,
+  checkbox: (a: boolean) => `w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-all duration-200 ${a ? 'bg-[#006666] ' : 'bg-[#E7E5E4] '}`,
+  badge: 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-[var(--font-space-mono)] bg-[#E7E5E4] text-[#888780]  border border-[#d4d2d0]',
   divider: 'border-t border-[#d4d2d0] my-5',
 
   // alerts
-  alertErr: 'flex items-start gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#FF2157]/30 shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
-  alertOk: 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#00A63D]/30 shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
+  alertErr: 'flex items-start gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#FF2157]/30 ',
+  alertOk: 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#00A63D]/30 ',
   errText: 'text-xs text-[#FF2157] font-[var(--font-jetbrains-mono)] flex items-center gap-1 mt-1',
 
   // typography
@@ -129,7 +129,7 @@ const parseNum = (v: string): number => {
 };
 
 // ─── Accordion section id type ────────────────────────────────────────────────
-type SectionId = 'basePrice' | 'duration' | 'discounts' | 'windows' | 'departures' | 'payments';
+type SectionId = 'basePrice' | 'duration' | 'discounts' | 'windows' | 'departure' | 'payments';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface Step4PricingProps {
@@ -154,9 +154,8 @@ const itemIn = {
 export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: Step4PricingProps) {
   const queryClient = useQueryClient();
   const [mapOpen, setMapOpen] = useState(false);
-  const [editDepIdx, setEditDepIdx] = useState<number | null>(null);
   const [basePriceInput, setBasePriceInput] = useState(initialData.basePrice?.amount?.toString() ?? '');
-  const [openSections, setOpenSections] = useState<SectionId[]>(['basePrice', 'duration', 'discounts', 'windows', 'departures', 'payments']);
+  const [openSections, setOpenSections] = useState<SectionId[]>(['basePrice', 'duration', 'discounts', 'windows', 'departure', 'payments']);
 
   const toggleSection = (id: SectionId) =>
     setOpenSections(p => p.includes(id) ? p.filter(s => s !== id) : [...p, id]);
@@ -180,8 +179,8 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
       basePrice: initialData.basePrice ?? { amount: 0, currency: CURRENCY.BDT },
       discounts: initialData.discounts?.map(normalizeDiscount) ?? [],
       duration: initialData.duration ?? { days: 1, nights: 0 },
-      operatingWindows: initialData.operatingWindows ?? [],
-      departures: initialData.departures ?? [],
+      operatingWindow: initialData.operatingWindow,
+      departure: initialData.departure,
       paymentMethods: initialData.paymentMethods ?? [PAYMENT_METHOD.BANK_TRANSFER],
     },
     validationSchema: Step4PricingSchema,
@@ -222,38 +221,18 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
     formik.setFieldTouched(`discounts[${i}].${field}`, true);
   };
 
-  // ── Operating Windows ─────────────────────────────────────────────────────
-  const addWindow = () => {
-    const t = new Date(); t.setDate(t.getDate() + 1);
-    const n = new Date(); n.setDate(n.getDate() + 7);
-    formik.setFieldValue('operatingWindows', [...(formik.values.operatingWindows ?? []), { startDate: t.toISOString(), endDate: n.toISOString() }]);
+  // ── Operating Window ─────────────────────────────────────────────────────
+  const updateOperatingWindow = (field: keyof OperatingWindowDTO, val: unknown) => {
+    formik.setFieldValue(`operatingWindow.${field}`, val);
+    formik.setFieldTouched(`operatingWindow.${field}`, true);
   };
-  const removeWindow = (i: number) => { const a = [...(formik.values.operatingWindows ?? [])]; a.splice(i, 1); formik.setFieldValue('operatingWindows', a); };
-  const updateWindow = (i: number, field: keyof OperatingWindowDTO, val: unknown) => {
-    const a = [...(formik.values.operatingWindows ?? [])];
-    a[i] = { ...a[i], [field]: val };
-    formik.setFieldValue('operatingWindows', a);
-    formik.setFieldTouched(`operatingWindows[${i}].${field}`, true);
+  const clearOperatingWindow = () => {
+    formik.setFieldValue('operatingWindow', undefined);
   };
 
-  // ── Departures ────────────────────────────────────────────────────────────
-  const addDeparture = () => {
-    const t = new Date(); t.setDate(t.getDate() + 1);
-    formik.setFieldValue('departures', [...(formik.values.departures ?? []), { date: t.toISOString(), seatsTotal: 1, seatsBooked: 0 }]);
-  };
-  const removeDeparture = (i: number) => { const a = [...(formik.values.departures ?? [])]; a.splice(i, 1); formik.setFieldValue('departures', a); };
-  const updateDeparture = (i: number, field: keyof DepartureDTO, val: unknown) => {
-    const a = [...(formik.values.departures ?? [])];
-    a[i] = { ...a[i], [field]: (field === 'seatsTotal' || field === 'seatsBooked') && typeof val === 'string' ? parseInt(val) || 0 : val };
-    formik.setFieldValue('departures', a);
-    formik.setFieldTouched(`departures[${i}].${field}`, true);
-  };
+  // ── Departure ────────────────────────────────────────────────────────────
   const handleMapSelect = (lat: number, lng: number) => {
-    if (editDepIdx !== null) {
-      const a = [...(formik.values.departures ?? [])];
-      a[editDepIdx] = { ...a[editDepIdx], meetingCoordinates: { lat, lng } };
-      formik.setFieldValue('departures', a);
-    }
+    formik.setFieldValue('departure.meetingCoordinates', { lat, lng });
   };
 
   // ── Payment methods ───────────────────────────────────────────────────────
@@ -541,7 +520,19 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                                                   disabled={(d) => {
                                                     const today = new Date(); today.setHours(0, 0, 0, 0);
                                                     if (d < today) return true;
-                                                    if (field === 'validUntil' && disc.validFrom) return d < new Date(disc.validFrom);
+                                                    if (field === 'validUntil' && disc.validFrom) {
+                                                      const fromDate = new Date(disc.validFrom);
+                                                      fromDate.setHours(0,0,0,0);
+                                                      if (d < fromDate) return true;
+                                                    }
+                                                    
+                                                    const opWin = formik.values.operatingWindow;
+                                                    if (opWin && opWin.startDate && opWin.endDate) {
+                                                      const start = new Date(opWin.startDate); start.setHours(0,0,0,0);
+                                                      const end = new Date(opWin.endDate); end.setHours(0,0,0,0);
+                                                      if (d < start || d > end) return true;
+                                                    }
+                                                    
                                                     return false;
                                                   }}
                                                   initialFocus
@@ -570,80 +561,47 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className={neu.cardInner}>
                   <SectionHeader
                     id="windows" icon={CalendarDays} iconColor={neu.colorBlue}
-                    title="Operating Windows" description="Define available booking periods"
-                    action={<button type="button" onClick={addWindow} className={`${neu.btnSm} ml-3`}><Plus size={13} /> Add Window</button>}
+                    title="Operating Window" description="Define the date range when this tour is available"
                   />
                   <AnimatePresence>
                     {isOpen('windows') && (
                       <motion.div key="win" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.27 }} className="overflow-hidden">
                         <div className="px-5 md:px-6 py-5">
-                          {(formik.values.operatingWindows ?? []).length === 0 ? (
-                            <div className={`${neu.inset} flex flex-col items-center justify-center py-10 gap-4`}>
-                              <div className={neu.iconBox(neu.colorBlue)}><CalendarDays size={24} className="text-[#006666]" /></div>
-                              <div className="text-center">
-                                <p className={`${neu.subheading} text-sm`}>No operating windows added</p>
-                                <p className={`${neu.body} text-xs mt-1`}>Define time periods when your tour is available for booking</p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {(['startDate', 'endDate'] as (keyof OperatingWindowDTO)[]).map((field) => (
+                              <div key={field} className="flex flex-col gap-1.5">
+                                <label className={`${neu.label} flex items-center gap-1`}>
+                                  {field === 'startDate' ? 'Start Date' : 'End Date'} <span className="text-[#FF2157]">*</span>
+                                </label>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button type="button" className="w-full">
+                                      <DateBtn value={formik.values.operatingWindow?.[field] as string | undefined} />
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                      mode="single"
+                                      selected={formik.values.operatingWindow?.[field] ? new Date(formik.values.operatingWindow[field] as string) : undefined}
+                                      onSelect={(d) => updateOperatingWindow(field, d?.toISOString())}
+                                      disabled={(d) => {
+                                        const today = new Date(); today.setHours(0, 0, 0, 0);
+                                        if (d < today) return true;
+                                        if (field === 'endDate' && formik.values.operatingWindow?.startDate) return d < new Date(formik.values.operatingWindow.startDate);
+                                        return false;
+                                      }}
+                                      initialFocus
+                                    />
+                                  </PopoverContent>
+                                </Popover>
+                                {getErr(`operatingWindow.${field}`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`operatingWindow.${field}`)}</p>}
                               </div>
-                              <button type="button" onClick={addWindow} className={neu.btnSm}><Plus size={13} /> Add First Window</button>
-                            </div>
-                          ) : (
-                            <div className="flex flex-col gap-4">
-                              <AnimatePresence>
-                                {(formik.values.operatingWindows ?? []).map((win, i) => (
-                                  <motion.div key={i} variants={itemIn} initial="hidden" animate="visible" exit="exit" className={neu.insetSm}>
-                                    <div className="p-4">
-                                      <div className="flex items-center gap-2 mb-4">
-                                        <CalendarDays size={15} className="text-[#006666] shrink-0" />
-                                        <span className={`${neu.subheading} text-sm flex-1`}>Window {i + 1}</span>
-                                        <button type="button" onClick={() => removeWindow(i)} className={neu.btnGhost}><Trash2 size={12} /></button>
-                                      </div>
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {([
-                                          { field: 'startDate' as keyof OperatingWindowDTO, label: 'Start Date' },
-                                          { field: 'endDate' as keyof OperatingWindowDTO, label: 'End Date' },
-                                        ] as { field: keyof OperatingWindowDTO; label: string }[]).map(({ field, label }) => (
-                                          <div key={field} className="flex flex-col gap-1.5">
-                                            <label className={`${neu.label} flex items-center gap-1`}>{label} <span className="text-[#FF2157]">*</span></label>
-                                            <Popover>
-                                              <PopoverTrigger asChild>
-                                                <button type="button" className="w-full">
-                                                  <DateBtn value={win[field] as string | undefined} />
-                                                </button>
-                                              </PopoverTrigger>
-                                              <PopoverContent className="w-auto p-0">
-                                                <Calendar
-                                                  mode="single"
-                                                  selected={win[field] ? new Date(win[field] as string) : undefined}
-                                                  onSelect={(d) => updateWindow(i, field, d?.toISOString())}
-                                                  disabled={(d) => {
-                                                    const today = new Date(); today.setHours(0, 0, 0, 0);
-                                                    if (d < today) return true;
-                                                    if (field === 'endDate') return d < new Date(win.startDate);
-                                                    return false;
-                                                  }}
-                                                  initialFocus
-                                                />
-                                              </PopoverContent>
-                                            </Popover>
-                                            {getErr(`operatingWindows[${i}].${field}`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`operatingWindows[${i}].${field}`)}</p>}
-                                          </div>
-                                        ))}
-                                      </div>
-                                      <div className="flex flex-col gap-1.5 mt-4">
-                                        <label className={neu.label}>Total Seats</label>
-                                        <input
-                                          type="number" min="0" placeholder="50"
-                                          value={win.seatsTotal || ''}
-                                          onChange={(e) => updateWindow(i, 'seatsTotal', parseInt(e.target.value) || 0)}
-                                          className={`${neu.input} ${getErr(`operatingWindows[${i}].seatsTotal`) ? neu.inputErr : ''}`}
-                                        />
-                                        {getErr(`operatingWindows[${i}].seatsTotal`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`operatingWindows[${i}].seatsTotal`)}</p>}
-                                      </div>
-                                    </div>
-                                  </motion.div>
-                                ))}
-                              </AnimatePresence>
-                            </div>
+                            ))}
+                          </div>
+                          {formik.values.operatingWindow && (
+                            <button type="button" onClick={clearOperatingWindow} className={`${neu.btnGhost} mt-4`}>
+                              <X size={12} /> Clear Operating Window
+                            </button>
                           )}
                         </div>
                       </motion.div>
@@ -652,124 +610,133 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                 </motion.div>
 
                 {/* ══════════════════════════════════════════════════════════
-                    SECTION 5 — Departures
+                    SECTION 5 — Departure
                 ══════════════════════════════════════════════════════════ */}
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className={neu.cardInner}>
                   <SectionHeader
-                    id="departures" icon={Plane} iconColor={neu.colorGray}
-                    title="Departure Schedules" description="Schedule specific departure dates and times"
-                    action={<button type="button" onClick={addDeparture} className={`${neu.btnSm} ml-3`}><Plus size={13} /> Add Departure</button>}
+                    id="departure" icon={Plane} iconColor={neu.colorGray}
+                    title="Departure Schedule" description="Schedule specific departure date and time"
+                    action={!formik.values.departure && <button type="button" onClick={() => formik.setFieldValue('departure', { date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(), seatsTotal: 20 })} className={`${neu.btnSm} ml-3`}><Plus size={13} /> Add Departure</button>}
                   />
                   <AnimatePresence>
-                    {isOpen('departures') && (
+                    {isOpen('departure') && (
                       <motion.div key="dep" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.27 }} className="overflow-hidden">
                         <div className="px-5 md:px-6 py-5">
-                          {(formik.values.departures ?? []).length === 0 ? (
+                          {!formik.values.departure ? (
                             <div className={`${neu.inset} flex flex-col items-center justify-center py-10 gap-4`}>
                               <div className={neu.iconBox(neu.colorGray)}><Plane size={24} className="text-[#888780]" /></div>
                               <div className="text-center">
-                                <p className={`${neu.subheading} text-sm`}>No departure schedules added</p>
+                                <p className={`${neu.subheading} text-sm`}>No departure schedule added</p>
                                 <p className={`${neu.body} text-xs mt-1`}>Schedule specific dates and times when your tour will depart</p>
                               </div>
-                              <button type="button" onClick={addDeparture} className={neu.btnSm}><Plus size={13} /> Add First Departure</button>
+                              <button type="button" onClick={() => formik.setFieldValue('departure', { date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(), seatsTotal: 20 })} className={neu.btnSm}><Plus size={13} /> Add Departure</button>
                             </div>
                           ) : (
                             <div className="flex flex-col gap-4">
-                              <AnimatePresence>
-                                {(formik.values.departures ?? []).map((dep, i) => (
-                                  <motion.div key={i} variants={itemIn} initial="hidden" animate="visible" exit="exit" className={neu.insetSm}>
-                                    <div className="p-4">
-                                      <div className="flex items-center gap-2 mb-4">
-                                        <Navigation size={15} className="text-[#888780] shrink-0" />
-                                        <span className={`${neu.subheading} text-sm flex-1`}>Departure {i + 1}</span>
-                                        <button type="button" onClick={() => removeDeparture(i)} className={neu.btnGhost}><Trash2 size={12} /></button>
-                                      </div>
+                              <motion.div variants={itemIn} initial="hidden" animate="visible" exit="exit" className={neu.insetSm}>
+                                <div className="p-4">
+                                  <div className="flex items-center gap-2 mb-4">
+                                    <Navigation size={15} className="text-[#888780] shrink-0" />
+                                    <span className={`${neu.subheading} text-sm flex-1`}>Departure Details</span>
+                                    <button type="button" onClick={() => formik.setFieldValue('departure', undefined)} className={neu.btnGhost}><Trash2 size={12} /></button>
+                                  </div>
 
-                                      {/* Date */}
-                                      <div className="flex flex-col gap-1.5 mb-4">
-                                        <label className={`${neu.label} flex items-center gap-1`}>Departure Date <span className="text-[#FF2157]">*</span></label>
-                                        <Popover>
-                                          <PopoverTrigger asChild>
-                                            <button type="button" className="w-full">
-                                              <DateBtn value={dep.date} />
-                                            </button>
-                                          </PopoverTrigger>
-                                          <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                              mode="single"
-                                              selected={dep.date ? new Date(dep.date) : undefined}
-                                              onSelect={(d) => updateDeparture(i, 'date', d?.toISOString())}
-                                              disabled={(d) => { const t = new Date(); t.setHours(0, 0, 0, 0); return d < t; }}
-                                              initialFocus
-                                            />
-                                          </PopoverContent>
-                                        </Popover>
-                                        {getErr(`departures[${i}].date`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departures[${i}].date`)}</p>}
-                                      </div>
-
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {/* Total Seats */}
-                                        <div className="flex flex-col gap-1.5">
-                                          <label className={`${neu.label} flex items-center gap-1`}>Total Seats <span className="text-[#FF2157]">*</span></label>
-                                          <div className="relative">
-                                            <input
-                                              type="number" min="1" placeholder="20"
-                                              value={dep.seatsTotal}
-                                              onChange={(e) => updateDeparture(i, 'seatsTotal', e.target.value)}
-                                              className={`${neu.input} pr-10 ${getErr(`departures[${i}].seatsTotal`) ? neu.inputErr : ''}`}
-                                            />
-                                            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                                              <Users size={14} className="text-[#888780]" />
-                                            </div>
-                                          </div>
-                                          {getErr(`departures[${i}].seatsTotal`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departures[${i}].seatsTotal`)}</p>}
-                                        </div>
-                                        {/* Meeting Point */}
-                                        <div className="flex flex-col gap-1.5">
-                                          <label className={neu.label}>Meeting Point</label>
-                                          <div className="relative">
-                                            <input
-                                              placeholder="Hotel lobby, airport gate…"
-                                              value={dep.meetingPoint || ''}
-                                              onChange={(e) => updateDeparture(i, 'meetingPoint', e.target.value)}
-                                              className={`${neu.input} pr-10 ${getErr(`departures[${i}].meetingPoint`) ? neu.inputErr : ''}`}
-                                            />
-                                            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                                              <MapPin size={14} className="text-[#888780]" />
-                                            </div>
-                                          </div>
-                                          {getErr(`departures[${i}].meetingPoint`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departures[${i}].meetingPoint`)}</p>}
-                                        </div>
-                                      </div>
-
-                                      {/* Map coordinates */}
-                                      <div className="flex flex-col gap-1.5 mt-4">
-                                        <label className={neu.label}>Meeting Coordinates</label>
-                                        <div className="flex gap-2">
-                                          <input
-                                            readOnly
-                                            placeholder="Latitude, Longitude"
-                                            value={
-                                              dep.meetingCoordinates?.lat && dep.meetingCoordinates?.lng
-                                                ? `${dep.meetingCoordinates.lat.toFixed(6)}, ${dep.meetingCoordinates.lng.toFixed(6)}`
-                                                : ''
+                                  {/* Date */}
+                                  <div className="flex flex-col gap-1.5 mb-4">
+                                    <label className={`${neu.label} flex items-center gap-1`}>Departure Date <span className="text-[#FF2157]">*</span></label>
+                                    <Popover>
+                                      <PopoverTrigger asChild>
+                                        <button type="button" className="w-full">
+                                          <DateBtn value={formik.values.departure.date} />
+                                        </button>
+                                      </PopoverTrigger>
+                                      <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                          mode="single"
+                                          selected={formik.values.departure.date ? new Date(formik.values.departure.date) : undefined}
+                                          onSelect={(d) => formik.setFieldValue('departure.date', d?.toISOString())}
+                                          disabled={(d) => {
+                                            const today = new Date(); today.setHours(0, 0, 0, 0);
+                                            if (d < today) return true;
+                                            
+                                            const opWin = formik.values.operatingWindow;
+                                            if (opWin && opWin.endDate) {
+                                                const endDate = new Date(opWin.endDate);
+                                                endDate.setHours(0, 0, 0, 0);
+                                                const maxDate = new Date(endDate);
+                                                maxDate.setDate(maxDate.getDate() + 10);
+                                                if (d < endDate || d > maxDate) return true;
                                             }
-                                            className={`${neu.input} flex-1`}
-                                          />
-                                          <button
-                                            type="button"
-                                            onClick={() => { setEditDepIdx(i); setMapOpen(true); }}
-                                            className={`${neu.btnOutline} shrink-0 px-3`}
-                                          >
-                                            <MapPin size={15} className="text-[#006666]" />
-                                          </button>
+                                            return false;
+                                          }}
+                                          initialFocus
+                                        />
+                                      </PopoverContent>
+                                    </Popover>
+                                    {getErr(`departure.date`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departure.date`)}</p>}
+                                  </div>
+
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Total Seats */}
+                                    <div className="flex flex-col gap-1.5">
+                                      <label className={`${neu.label} flex items-center gap-1`}>Total Seats <span className="text-[#FF2157]">*</span></label>
+                                      <div className="relative">
+                                        <input
+                                          type="number" min="1" placeholder="20"
+                                          value={formik.values.departure.seatsTotal}
+                                          onChange={(e) => formik.setFieldValue('departure.seatsTotal', parseInt(e.target.value, 10))}
+                                          className={`${neu.input} pr-10 ${getErr(`departure.seatsTotal`) ? neu.inputErr : ''}`}
+                                        />
+                                        <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                          <Users size={14} className="text-[#888780]" />
                                         </div>
-                                        {getErr(`departures[${i}].meetingCoordinates`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departures[${i}].meetingCoordinates`)}</p>}
                                       </div>
+                                      {getErr(`departure.seatsTotal`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departure.seatsTotal`)}</p>}
                                     </div>
-                                  </motion.div>
-                                ))}
-                              </AnimatePresence>
+                                    {/* Meeting Point */}
+                                    <div className="flex flex-col gap-1.5">
+                                      <label className={neu.label}>Meeting Point</label>
+                                      <div className="relative">
+                                        <input
+                                          placeholder="Hotel lobby, airport gate…"
+                                          value={formik.values.departure.meetingPoint || ''}
+                                          onChange={(e) => formik.setFieldValue('departure.meetingPoint', e.target.value)}
+                                          className={`${neu.input} pr-10 ${getErr(`departure.meetingPoint`) ? neu.inputErr : ''}`}
+                                        />
+                                        <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                          <MapPin size={14} className="text-[#888780]" />
+                                        </div>
+                                      </div>
+                                      {getErr(`departure.meetingPoint`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departure.meetingPoint`)}</p>}
+                                    </div>
+                                  </div>
+
+                                  {/* Map coordinates */}
+                                  <div className="flex flex-col gap-1.5 mt-4">
+                                    <label className={neu.label}>Meeting Coordinates</label>
+                                    <div className="flex gap-2">
+                                      <input
+                                        readOnly
+                                        placeholder="Latitude, Longitude"
+                                        value={
+                                          formik.values.departure?.meetingCoordinates?.lat && formik.values.departure?.meetingCoordinates?.lng
+                                            ? `${formik.values.departure.meetingCoordinates.lat.toFixed(6)}, ${formik.values.departure.meetingCoordinates.lng.toFixed(6)}`
+                                            : ''
+                                        }
+                                        className={`${neu.input} flex-1`}
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => { setMapOpen(true); }}
+                                        className={`${neu.btnOutline} shrink-0 px-3`}
+                                      >
+                                        <MapPin size={15} className="text-[#006666]" />
+                                      </button>
+                                    </div>
+                                    {getErr(`departure.meetingCoordinates`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`departure.meetingCoordinates`)}</p>}
+                                  </div>
+                                </div>
+                              </motion.div>
                             </div>
                           )}
                         </div>
@@ -879,11 +846,11 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
       {/* ── Map Picker (retained exactly) ── */}
       <MapPickerDialog
         open={mapOpen}
-        onClose={() => { setMapOpen(false); setEditDepIdx(null); }}
+        onClose={() => { setMapOpen(false); }}
         onSelect={handleMapSelect}
         initialPosition={
-          editDepIdx !== null && formik.values.departures?.[editDepIdx]?.meetingCoordinates
-            ? [formik.values.departures[editDepIdx].meetingCoordinates!.lat, formik.values.departures[editDepIdx].meetingCoordinates!.lng]
+          formik.values.departure?.meetingCoordinates
+            ? [formik.values.departure.meetingCoordinates.lat, formik.values.departure.meetingCoordinates.lng]
             : undefined
         }
       />

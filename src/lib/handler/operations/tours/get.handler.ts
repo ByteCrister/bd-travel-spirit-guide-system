@@ -201,12 +201,10 @@ const GetTourListHandler = async (req: NextRequest) => {
     const endDate = searchParams.get("endDate");
 
     if (startDate || endDate) {
-        filter.departures = {
-            $elemMatch: {
-                ...(startDate && { date: { $gte: new Date(startDate) } }),
-                ...(endDate && { date: { $lte: new Date(endDate) } }),
-            },
-        };
+        const dateFilter: Record<string, unknown> = {};
+        if (startDate) dateFilter['$gte'] = new Date(startDate);
+        if (endDate) dateFilter['$lte'] = new Date(endDate);
+        filter['departure.date'] = dateFilter;
     }
 
     await ConnectDB();
@@ -250,18 +248,11 @@ const GetTourListHandler = async (req: NextRequest) => {
 
     /* ---------------- Map to TourListItemDTO ---------------- */
     const mappedDocs = docs.map((t) => {
-        const nextDeparture = t.departures
-            ?.map((d) => new Date(d.date))
-            .filter((d: Date) => d > new Date())
-            .sort((a: Date, b: Date) => +a - +b)[0];
+        const depDate = t.departure?.date ? new Date(t.departure.date) : undefined;
+        const nextDeparture = depDate && depDate > new Date() ? depDate : undefined;
 
-        const totalSeats =
-            t.departures?.reduce((sum, d) => sum + d.seatsTotal, 0) || 0;
-        const bookedSeats =
-            t.departures?.reduce(
-                (sum, d) => sum + d.seatsBooked,
-                0
-            ) || 0;
+        const totalSeats = t.departure?.seatsTotal || 0;
+        const bookedSeats = t.departure?.seatsBooked || 0;
 
         return {
             id: String(t._id),

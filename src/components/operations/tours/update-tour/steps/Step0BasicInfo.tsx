@@ -1,4 +1,4 @@
-// app/operations/tours/[tourId]/update-tour/components/steps/Step0BasicInfo.tsx
+﻿// app/operations/tours/[tourId]/update-tour/components/steps/Step0BasicInfo.tsx
 'use client';
 
 import { useFormik } from 'formik';
@@ -20,18 +20,18 @@ import { spaceMono } from '@/styles/fonts';
 // ─── Neumorphism Style Constants ───────────────────────────────────────────────
 const neu = {
   surface: 'bg-[#E7E5E4]',
-  card: 'bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_16px_#c8c6c4,-8px_-8px_16px_#ffffff]',
-  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[inset_4px_4px_8px_#c8c6c4,inset_-4px_-4px_8px_#ffffff]',
-  inputWrap: 'bg-[#E7E5E4] rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
-  btn: 'bg-[#006666] text-white rounded-xl shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff] active:shadow-[inset_4px_4px_8px_rgba(0,0,0,0.2)] transition-all duration-200',
-  btnDisabled: 'opacity-50 cursor-not-allowed shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff]',
-  iconBox: 'bg-[#E7E5E4] rounded-xl p-2.5 shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] flex items-center justify-center',
+  card: 'bg-[#E7E5E4] rounded-2xl ',
+  cardInner: 'bg-[#E7E5E4] rounded-xl ',
+  inputWrap: 'bg-[#E7E5E4] rounded-xl ',
+  btn: 'bg-[#006666] text-white rounded-xl  hover: active: transition-all duration-200',
+  btnDisabled: 'opacity-50 cursor-not-allowed ',
+  iconBox: 'bg-[#E7E5E4] rounded-xl p-2.5  flex items-center justify-center',
   label: 'text-[#1E2938] font-medium text-sm font-[Space_Mono]',
   headingFont: 'font-[Space_Mono] font-semibold tracking-tight text-[#1E2938]',
   subText: 'text-[#5a6270] text-sm font-[Space_Mono]',
-  chip: 'bg-[#E7E5E4] text-[#006666] rounded-lg shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff] border border-[#006666]/20',
-  alertError: 'bg-[#E7E5E4] border border-[#FF2157]/30 rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
-  alertSuccess: 'bg-[#E7E5E4] border border-[#00A63D]/30 rounded-xl shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
+  chip: 'bg-[#E7E5E4] text-[#006666] rounded-lg  border border-[#006666]/20',
+  alertError: 'bg-[#E7E5E4] border border-[#FF2157]/30 rounded-xl ',
+  alertSuccess: 'bg-[#E7E5E4] border border-[#00A63D]/30 rounded-xl ',
   sectionDivider: 'border-t border-[#c8c6c4]/60 my-6',
 };
 

@@ -51,8 +51,7 @@ export function PaymentStatusBadge({
             <span
                 className={cn(
                     "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1",
-                    "bg-[#E7E5E4]",
-                    "shadow-[2px_2px_5px_#c9c7c5,-2px_-2px_5px_#ffffff]",
+                    "bg-[#E7E5E4] border border-[#d0cecc]",
                     "text-[11px] font-semibold tracking-wide",
                     "font-[family-name:var(--font-space-mono,'Space_Mono',monospace)]",
                     currentConfig.color
@@ -77,10 +76,7 @@ export function PaymentStatusBadge({
                     disabled={isLoading}
                     className={cn(
                         "h-7 w-7 p-0 rounded-lg",
-                        "bg-[#E7E5E4]",
-                        "shadow-[2px_2px_5px_#c9c7c5,-2px_-2px_5px_#ffffff]",
-                        "hover:shadow-[inset_2px_2px_5px_#c9c7c5,inset_-2px_-2px_5px_#ffffff]",
-                        "active:shadow-[inset_2px_2px_5px_#c9c7c5,inset_-2px_-2px_5px_#ffffff]",
+                        "bg-[#E7E5E4] border border-[#d0cecc] hover:bg-[#dbd9d8]",
                         "transition-all duration-150",
                         "text-[#FF2157]",
                         "disabled:opacity-40"

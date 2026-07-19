@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
     AlertDialog,
@@ -18,16 +18,16 @@ const NEU_DIVIDER = "border-[#1E2938]/10";
 
 const NEU_BTN_GHOST =
     "rounded-xl bg-[#E7E5E4] text-[#1E2938] font-[family-name:var(--font-space-mono)] text-sm px-4 py-2 " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
-    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover: " +
+    "active: " +
     "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/40";
 
 const NEU_INPUT =
     "w-full rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 resize-none " +
     "font-[family-name:var(--font-jetbrains-mono)] text-sm px-4 py-3 " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    " border-none " +
     "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 
 // ── Variant configs ───────────────────────────────────────────
@@ -36,9 +36,9 @@ const VARIANT_CONFIG = {
         titleColor: "text-[#006666]",
         btnClass:
             "rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] text-sm px-4 py-2 " +
-            "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
-            "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
-            "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+            " " +
+            "hover: hover:bg-[#007777] " +
+            "active: " +
             "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
             "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50",
     },
@@ -46,9 +46,9 @@ const VARIANT_CONFIG = {
         titleColor: "text-[#FF2157]",
         btnClass:
             "rounded-xl bg-[#FF2157] text-white font-[family-name:var(--font-space-mono)] text-sm px-4 py-2 " +
-            "shadow-[4px_4px_8px_#cc1a45,-2px_-2px_6px_#ff4d7a] " +
-            "hover:shadow-[6px_6px_12px_#cc1a45,-3px_-3px_8px_#ff4d7a] hover:bg-[#e01e4e] " +
-            "active:shadow-[inset_3px_3px_6px_#cc1a45,inset_-2px_-2px_4px_#ff4d7a] " +
+            " " +
+            "hover: hover:bg-[#e01e4e] " +
+            "active: " +
             "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
             "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF2157]/50",
     },
@@ -56,9 +56,9 @@ const VARIANT_CONFIG = {
         titleColor: "text-[#FE9900]",
         btnClass:
             "rounded-xl bg-[#FE9900] text-white font-[family-name:var(--font-space-mono)] text-sm px-4 py-2 " +
-            "shadow-[4px_4px_8px_#c87a00,-2px_-2px_6px_#ffb733] " +
-            "hover:shadow-[6px_6px_12px_#c87a00,-3px_-3px_8px_#ffb733] hover:bg-[#e68900] " +
-            "active:shadow-[inset_3px_3px_6px_#c87a00,inset_-2px_-2px_4px_#ffb733] " +
+            " " +
+            "hover: hover:bg-[#e68900] " +
+            "active: " +
             "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
             "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9900]/50",
     },
@@ -66,9 +66,9 @@ const VARIANT_CONFIG = {
         titleColor: "text-[#00A63D]",
         btnClass:
             "rounded-xl bg-[#00A63D] text-white font-[family-name:var(--font-space-mono)] text-sm px-4 py-2 " +
-            "shadow-[4px_4px_8px_#007a2d,-2px_-2px_6px_#00d24d] " +
-            "hover:shadow-[6px_6px_12px_#007a2d,-3px_-3px_8px_#00d24d] hover:bg-[#009636] " +
-            "active:shadow-[inset_3px_3px_6px_#007a2d,inset_-2px_-2px_4px_#00d24d] " +
+            " " +
+            "hover: hover:bg-[#009636] " +
+            "active: " +
             "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none " +
             "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00A63D]/50",
     },
@@ -108,7 +108,7 @@ export default function ModerationAlert({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="bg-[#E7E5E4] shadow-[0_4px_12px_rgba(0,0,0,0.06)] border border-white/60 rounded-2xl p-0 overflow-hidden max-w-md w-full">
+            <AlertDialogContent className="bg-[#E7E5E4]  border border-white/60 rounded-2xl p-0 overflow-hidden max-w-md w-full">
                 {/* Content wrapper */}
                 <div className="p-6 space-y-5">
                     <AlertDialogHeader className="space-y-2">

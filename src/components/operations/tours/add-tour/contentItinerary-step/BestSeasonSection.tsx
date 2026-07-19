@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useFormikContext } from "formik";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,11 +8,11 @@ import { Sun, Calendar } from "lucide-react";
 
 // ── Neumorphism style tokens ──────────────────────────────────
 const NEU_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_CARD_HOVER =
-    "hover:shadow-[10px_10px_20px_#c8c6c5,-10px_-10px_20px_#ffffff] hover:-translate-y-0.5 transition-all duration-300";
+    "hover: hover:-translate-y-0.5 transition-all duration-300";
 const NEU_ICON_WELL_PRIMARY =
-    "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+    "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_HEADING =
     "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL =
@@ -21,12 +21,12 @@ const NEU_MUTED =
     "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_CHIP_DEFAULT =
     "flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-[family-name:var(--font-space-mono)] font-500 text-[#1E2938]/70 " +
-    "bg-[#E7E5E4] shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
+    "bg-[#E7E5E4]  " +
+    "hover: " +
     "cursor-pointer transition-all duration-200 select-none w-full";
 const NEU_CHIP_ACTIVE =
     "flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-[family-name:var(--font-space-mono)] font-600 text-white " +
-    "bg-[#006666] shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_5px_#008080] " +
+    "bg-[#006666]  " +
     "cursor-pointer transition-all duration-200 select-none w-full";
 
 // Season metadata

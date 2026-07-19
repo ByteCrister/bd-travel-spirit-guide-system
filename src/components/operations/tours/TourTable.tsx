@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { ChevronDown, MapPin, TrendingUp, Eye, Heart, Share2, Calendar, Clock } from "lucide-react";
@@ -72,7 +72,7 @@ export const TourTable: React.FC<Props> = ({ list }) => {
         animate={{ opacity: 1, y: 0 }}
         className={`${NEU_SURFACE_INSET} rounded-2xl py-16 text-center flex flex-col items-center gap-3`}
       >
-        <div className="w-14 h-14 rounded-2xl bg-[#E7E5E4] shadow-[5px_5px_10px_#c8c6c5,-5px_-5px_10px_#ffffff] flex items-center justify-center">
+        <div className="w-14 h-14 rounded-2xl bg-[#E7E5E4]  flex items-center justify-center">
           <MapPin className="h-7 w-7 text-[#006666]/50" />
         </div>
         <p className={`${NEU_HEADING} text-base`}>No tours found</p>
@@ -142,7 +142,7 @@ export const TourTable: React.FC<Props> = ({ list }) => {
                       onClick={(e) => toggleRow(t.id, e)}
                       className={`${NEU_BTN_ICON} ${
                         isExpanded
-                          ? "!bg-[#006666]/10 !text-[#006666] shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff]"
+                          ? "!bg-[#006666]/10 !text-[#006666] "
                           : ""
                       }`}
                     >
@@ -308,7 +308,7 @@ const InfoTile = ({
   <div
     className={`
       ${NEU_CARD_SM} p-3 flex flex-col gap-1.5
-      hover:shadow-[5px_5px_10px_#c8c6c5,-5px_-5px_10px_#ffffff]
+      hover:
       transition-all duration-200
     `}
   >

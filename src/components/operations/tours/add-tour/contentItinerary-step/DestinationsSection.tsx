@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FieldArray, useFormikContext } from "formik";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,59 +20,59 @@ import { MapPickerDialog } from "@/components/global/MapPickerDialog";
 
 // ── Neumorphism style tokens ──────────────────────────────────
 const NEU_CARD =
-  "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+  "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_CARD_SM =
-  "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+  "rounded-xl bg-[#E7E5E4]  border border-white/60";
 const NEU_INPUT =
   "w-full rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
   "font-[family-name:var(--font-jetbrains-mono)] text-sm px-4 py-2.5 " +
-  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+  " border-none " +
   "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 const NEU_SELECT =
   "w-full rounded-xl bg-[#E7E5E4] text-[#1E2938] " +
   "font-[family-name:var(--font-jetbrains-mono)] text-sm px-4 py-2.5 " +
-  "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+  " border-none " +
   "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200 appearance-none";
 const NEU_BTN_PRIMARY =
   "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#006666] text-white text-sm " +
   "font-[family-name:var(--font-space-mono)] font-600 tracking-wide " +
-  "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
-  "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
-  "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+  " " +
+  "hover: hover:bg-[#007777] " +
+  "active: " +
   "transition-all duration-200 focus-visible:outline-none";
 const NEU_BTN_GHOST =
   "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#E7E5E4] text-[#1E2938] text-sm " +
   "font-[family-name:var(--font-space-mono)] " +
-  "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-  "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
-  "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " " +
+  "hover: " +
+  "active: " +
   "transition-all duration-200";
 const NEU_BTN_DANGER =
   "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#E7E5E4] text-[#FF2157] text-sm " +
   "font-[family-name:var(--font-space-mono)] " +
-  "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-  "hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+  " " +
+  "hover:bg-[#FF2157]/10 hover: " +
   "transition-all duration-200";
 const NEU_BTN_ICON =
   "rounded-xl w-8 h-8 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/60 " +
-  "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-  "hover:text-[#FF2157] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+  " " +
+  "hover:text-[#FF2157] hover: " +
   "transition-all duration-200";
 const NEU_BTN_MAP =
   "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#006666]/10 text-[#006666] text-xs " +
   "font-[family-name:var(--font-space-mono)] font-600 " +
-  "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-  "hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+  " " +
+  "hover: " +
   "transition-all duration-200";
 const NEU_ICON_WELL_PRIMARY =
-  "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+  "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_HEADING =
   "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL =
   "font-[family-name:var(--font-space-mono)] text-xs font-bold text-[#1E2938]/60 uppercase tracking-widest";
 const NEU_BADGE =
   "inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-[family-name:var(--font-space-mono)] font-600 " +
-  "bg-[#E7E5E4] text-[#1E2938]/70 shadow-[2px_2px_4px_#c8c6c5,-2px_-2px_4px_#ffffff]";
+  "bg-[#E7E5E4] text-[#1E2938]/70 ";
 
 const cardVariants = {
   hidden: { opacity: 0, scale: 0.97 },
@@ -439,7 +439,7 @@ export default function DestinationsSection() {
                           onClick={() => setExpandedDest(expandedDest === index ? null : index)}
                           className="w-full flex items-center gap-3 px-5 py-4 hover:bg-[#1E2938]/3 transition-colors duration-150"
                         >
-                          <div className="min-w-[36px] h-9 flex items-center justify-center rounded-xl bg-[#006666] text-white text-sm font-[family-name:var(--font-space-mono)] font-700 shadow-[inset_2px_2px_5px_#004d4d]">
+                          <div className="min-w-[36px] h-9 flex items-center justify-center rounded-xl bg-[#006666] text-white text-sm font-[family-name:var(--font-space-mono)] font-700 ">
                             {index + 1}
                           </div>
                           <div className="flex-1 text-left">

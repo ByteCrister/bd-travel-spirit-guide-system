@@ -1,4 +1,4 @@
-// components/faqs/FaqStats.tsx
+﻿// components/faqs/FaqStats.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -39,12 +39,12 @@ function StatCard({ title, value, icon: Icon, iconColor, iconBg }: StatCardProps
             whileTap={{ scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 360, damping: 22 }}
             className="flex flex-col gap-3 rounded-2xl bg-[#E7E5E4] p-4
-                shadow-[6px_6px_12px_#cac8c7,-6px_-6px_12px_#ffffff]"
+                "
         >
             {/* Icon pill */}
             <div
                 className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg}
-                    shadow-[inset_3px_3px_6px_#cac8c7,inset_-3px_-3px_6px_#ffffff]`}
+                    `}
                 aria-hidden="true"
             >
                 <Icon className={`h-5 w-5 ${iconColor}`} />
@@ -121,9 +121,9 @@ export function FaqStats({ stats, onRefresh }: FaqStatsProps) {
                     onClick={onRefresh}
                     className="inline-flex items-center gap-2 rounded-xl bg-[#E7E5E4] px-4 py-2
                         font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#1E2938]/70
-                        shadow-[4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff]
+                        
                         hover:text-[#006666]
-                        active:shadow-[inset_3px_3px_6px_#cac8c7,inset_-3px_-3px_6px_#ffffff]
+                        active:
                         focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]
                         transition-shadow duration-150 select-none"
                     aria-label="Refresh FAQ statistics"

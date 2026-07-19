@@ -89,35 +89,25 @@ export const PATCH = withErrorHandler(async (
             };
         }
 
-        if (validatedData.operatingWindows !== undefined) {
-            const operatingWindows = validatedData.operatingWindows.map(window => ({
-                ...window,
-                startDate: new Date(window.startDate),
-                endDate: new Date(window.endDate),
-                seatsBooked: window.seatsBooked || 0,
-            }));
-            tour.operatingWindows = operatingWindows;
+        if (validatedData.operatingWindow !== undefined) {
+            tour.operatingWindow = validatedData.operatingWindow ? {
+                startDate: new Date(validatedData.operatingWindow.startDate),
+                endDate: new Date(validatedData.operatingWindow.endDate),
+            } : undefined;
         }
 
-        if (validatedData.departures !== undefined) {
-            const currentDepartures = tour.departures || [];
-
-            const newDepartures = validatedData.departures.map(dep => {
-                const existing = currentDepartures.find(
-                    d => d.date.toISOString() === new Date(dep.date).toISOString()
-                );
-
-                return {
-                    date: new Date(dep.date),
-                    seatsTotal: dep.seatsTotal,
-                    seatsBooked: existing?.seatsBooked ?? 0,
-                    meetingPoint: dep.meetingPoint,
-                    meetingCoordinates: dep.meetingCoordinates,
+        if (validatedData.departure !== undefined) {
+            if (validatedData.departure) {
+                tour.departure = {
+                    date: new Date(validatedData.departure.date),
+                    seatsTotal: validatedData.departure.seatsTotal,
+                    seatsBooked: tour.departure?.seatsBooked ?? 0, // preserve existing bookings
+                    meetingPoint: validatedData.departure.meetingPoint,
+                    meetingCoordinates: validatedData.departure.meetingCoordinates,
                 };
-            });
-
-            tour.departures = newDepartures;
-
+            } else {
+                tour.departure = undefined;
+            }
         }
 
         if (validatedData.paymentMethods !== undefined) {
@@ -141,19 +131,17 @@ export const PATCH = withErrorHandler(async (
             validUntil: d.validUntil?.toISOString(),
         })) || [],
         duration: updatedTour.duration,
-        operatingWindows: updatedTour.operatingWindows?.map(w => ({
-            startDate: w.startDate.toISOString(),
-            endDate: w.endDate.toISOString(),
-            seatsTotal: w.seatsTotal,
-            seatsBooked: w.seatsBooked,
-        })) || [],
-        departures: updatedTour.departures?.map(d => ({
-            date: d.date.toISOString(),
-            seatsTotal: d.seatsTotal,
-            seatsBooked: d.seatsBooked,
-            meetingPoint: d.meetingPoint,
-            meetingCoordinates: d.meetingCoordinates,
-        })) || [],
+        operatingWindow: updatedTour.operatingWindow ? {
+            startDate: updatedTour.operatingWindow.startDate.toISOString(),
+            endDate: updatedTour.operatingWindow.endDate.toISOString(),
+        } : undefined,
+        departure: updatedTour.departure ? {
+            date: updatedTour.departure.date.toISOString(),
+            seatsTotal: updatedTour.departure.seatsTotal,
+            seatsBooked: updatedTour.departure.seatsBooked,
+            meetingPoint: updatedTour.departure.meetingPoint,
+            meetingCoordinates: updatedTour.departure.meetingCoordinates,
+        } : undefined,
         paymentMethods: updatedTour.paymentMethods,
     };
 

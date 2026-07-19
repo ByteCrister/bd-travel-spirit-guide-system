@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { Formik, Form, Field, FieldArray, FieldProps, FormikErrors, FormikHelpers } from "formik";
@@ -775,7 +775,7 @@ export default function AddEmployeePage() {
                                                                 >
                                                                     <SelectValue placeholder="Select card brand" />
                                                                 </SelectTrigger>
-                                                                <SelectContent className="rounded-xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60">
+                                                                <SelectContent className="rounded-xl bg-[#E7E5E4]  border border-white/60">
                                                                     {Object.values(CARD_BRAND).map((brand) => (
                                                                         <SelectItem
                                                                             key={brand}
@@ -842,7 +842,7 @@ export default function AddEmployeePage() {
                                                                 >
                                                                     <SelectValue placeholder="Month" />
                                                                 </SelectTrigger>
-                                                                <SelectContent className="rounded-xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60">
+                                                                <SelectContent className="rounded-xl bg-[#E7E5E4]  border border-white/60">
                                                                     {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                                                                         <SelectItem
                                                                             key={m}
@@ -881,7 +881,7 @@ export default function AddEmployeePage() {
                                                                 >
                                                                     <SelectValue placeholder="Year" />
                                                                 </SelectTrigger>
-                                                                <SelectContent className="rounded-xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60">
+                                                                <SelectContent className="rounded-xl bg-[#E7E5E4]  border border-white/60">
                                                                     {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map((y) => (
                                                                         <SelectItem
                                                                             key={y}

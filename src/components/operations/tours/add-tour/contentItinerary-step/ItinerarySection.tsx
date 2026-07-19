@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FieldArray, getIn, useFormikContext } from "formik";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,41 +21,41 @@ import { useState } from "react";
 
 // ── Neumorphism style tokens ──────────────────────────────────
 const NEU_CARD =
-    "rounded-2xl bg-[#E7E5E4] shadow-[8px_8px_16px_#c8c6c5,-8px_-8px_16px_#ffffff] border border-white/60";
+    "rounded-2xl bg-[#E7E5E4]  border border-white/60";
 const NEU_CARD_SM =
-    "rounded-xl bg-[#E7E5E4] shadow-[4px_4px_10px_#c8c6c5,-4px_-4px_10px_#ffffff] border border-white/60";
+    "rounded-xl bg-[#E7E5E4]  border border-white/60";
 const NEU_INPUT =
     "w-full rounded-xl bg-[#E7E5E4] text-[#1E2938] placeholder:text-[#1E2938]/40 " +
     "font-[family-name:var(--font-jetbrains-mono)] text-sm px-4 py-2.5 " +
-    "shadow-[inset_3px_3px_7px_#c8c6c5,inset_-3px_-3px_7px_#ffffff] border-none " +
+    " border-none " +
     "focus:outline-none focus:ring-2 focus:ring-[#006666]/50 transition-all duration-200";
 const NEU_BTN_PRIMARY =
     "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#006666] text-white text-sm " +
     "font-[family-name:var(--font-space-mono)] font-600 tracking-wide " +
-    "shadow-[4px_4px_8px_#004d4d,-2px_-2px_6px_#008080] " +
-    "hover:shadow-[6px_6px_12px_#004d4d,-3px_-3px_8px_#008080] hover:bg-[#007777] " +
-    "active:shadow-[inset_3px_3px_6px_#004d4d,inset_-2px_-2px_4px_#008080] " +
+    " " +
+    "hover: hover:bg-[#007777] " +
+    "active: " +
     "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50";
 const NEU_BTN_GHOST =
     "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#E7E5E4] text-[#1E2938] text-sm " +
     "font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:shadow-[inset_3px_3px_6px_#c8c6c5,inset_-3px_-3px_6px_#ffffff] " +
-    "active:shadow-[inset_4px_4px_8px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover: " +
+    "active: " +
     "transition-all duration-200";
 const NEU_BTN_DANGER =
     "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#E7E5E4] text-[#FF2157] text-sm " +
     "font-[family-name:var(--font-space-mono)] " +
-    "shadow-[4px_4px_8px_#c8c6c5,-4px_-4px_8px_#ffffff] " +
-    "hover:bg-[#FF2157]/10 hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    " " +
+    "hover:bg-[#FF2157]/10 hover: " +
     "transition-all duration-200";
 const NEU_BTN_ICON =
     "rounded-xl w-8 h-8 flex items-center justify-center bg-[#E7E5E4] text-[#1E2938]/60 " +
-    "shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-    "hover:text-[#FF2157] hover:shadow-[inset_2px_2px_5px_#c8c6c5,inset_-2px_-2px_5px_#ffffff] " +
+    " " +
+    "hover:text-[#FF2157] hover: " +
     "transition-all duration-200";
 const NEU_ICON_WELL_PRIMARY =
-    "p-2.5 rounded-xl bg-[#006666]/10 shadow-[2px_2px_5px_#c8c6c5,-2px_-2px_5px_#ffffff]";
+    "p-2.5 rounded-xl bg-[#006666]/10 ";
 const NEU_HEADING =
     "font-[family-name:var(--font-space-mono)] font-bold text-[#1E2938] tracking-tight";
 const NEU_LABEL =
@@ -64,12 +64,12 @@ const NEU_MUTED =
     "font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938]/50";
 const NEU_CHIP_DEFAULT =
     "inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-[family-name:var(--font-space-mono)] font-500 text-[#1E2938]/70 " +
-    "bg-[#E7E5E4] shadow-[3px_3px_6px_#c8c6c5,-3px_-3px_6px_#ffffff] " +
-    "hover:shadow-[inset_2px_2px_4px_#c8c6c5,inset_-2px_-2px_4px_#ffffff] " +
+    "bg-[#E7E5E4]  " +
+    "hover: " +
     "cursor-pointer transition-all duration-200 select-none";
 const NEU_CHIP_ACTIVE =
     "inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-[family-name:var(--font-space-mono)] font-600 text-white " +
-    "bg-[#006666] shadow-[inset_2px_2px_5px_#004d4d,inset_-2px_-2px_5px_#008080] " +
+    "bg-[#006666]  " +
     "cursor-pointer transition-all duration-200 select-none";
 
 const cardVariants = {
@@ -112,7 +112,7 @@ function DayAccordion({
                 className={`w-full flex items-center gap-3 px-5 py-4 hover:bg-[#1E2938]/3 transition-colors duration-150`}
             >
                 {/* Day badge */}
-                <div className="min-w-[56px] px-2 py-1 rounded-xl bg-[#006666] text-white text-xs font-[family-name:var(--font-space-mono)] font-700 text-center shadow-[inset_2px_2px_5px_#004d4d]">
+                <div className="min-w-[56px] px-2 py-1 rounded-xl bg-[#006666] text-white text-xs font-[family-name:var(--font-space-mono)] font-700 text-center ">
                     Day {day.day}
                 </div>
                 <div className="flex-1 text-left">

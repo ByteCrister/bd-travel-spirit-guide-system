@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useFormik } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -31,26 +31,26 @@ import {
 const neu = {
   // surfaces
   page: 'bg-[#E7E5E4]',
-  card: 'bg-[#E7E5E4] rounded-2xl shadow-[8px_8px_18px_#c8c6c4,-8px_-8px_18px_#ffffff]',
-  cardInner: 'bg-[#E7E5E4] rounded-xl shadow-[5px_5px_12px_#c8c6c4,-5px_-5px_12px_#ffffff] border border-[#d4d2d0]',
-  inset: 'bg-[#E7E5E4] rounded-xl shadow-[inset_4px_4px_9px_#c8c6c4,inset_-4px_-4px_9px_#ffffff]',
-  insetSm: 'bg-[#E7E5E4] rounded-lg  shadow-[inset_3px_3px_6px_#c8c6c4,inset_-3px_-3px_6px_#ffffff]',
+  card: 'bg-[#E7E5E4] rounded-2xl ',
+  cardInner: 'bg-[#E7E5E4] rounded-xl  border border-[#d4d2d0]',
+  inset: 'bg-[#E7E5E4] rounded-xl ',
+  insetSm: 'bg-[#E7E5E4] rounded-lg  ',
 
   // interactive
-  iconBox: (color: string) => `rounded-xl p-2.5 shadow-[4px_4px_8px_#c8c6c4,-4px_-4px_8px_#ffffff] flex items-center justify-center ${color}`,
-  btn: 'inline-flex items-center gap-2 px-6 py-2.5 text-sm rounded-xl text-white bg-[#006666] shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] hover:shadow-[6px_6px_14px_#c8c6c4,-6px_-6px_14px_#ffffff] active:shadow-[inset_3px_3px_7px_rgba(0,0,0,0.25)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
-  btnSm: 'inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs rounded-lg text-white bg-[#006666] shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[4px_4px_10px_#c8c6c4,-4px_-4px_10px_#ffffff] active:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.25)] transition-all duration-200',
-  btnGhost: 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg text-[#FF2157] border border-[#FF2157]/25 shadow-[2px_2px_5px_#c8c6c4,-2px_-2px_5px_#ffffff] hover:shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:bg-[#FF2157]/5 transition-all duration-200',
-  input: 'w-full bg-[#E7E5E4] rounded-xl px-3.5 py-2.5 text-sm text-[#1E2938] placeholder:text-[#888780] border-0 outline-none shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] focus:ring-1 focus:ring-[#006666]/50 transition-all font-[var(--font-jetbrains-mono)]',
-  textarea: 'w-full bg-[#E7E5E4] rounded-xl px-3.5 py-2.5 text-sm text-[#1E2938] placeholder:text-[#888780] border-0 outline-none shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] focus:ring-1 focus:ring-[#006666]/50 transition-all resize-none font-[var(--font-jetbrains-mono)]',
-  checkTile: (active: boolean) => `flex items-center gap-3 p-3.5 rounded-xl cursor-pointer select-none transition-all duration-200 ${active ? 'shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff] ring-1 ring-[#006666]/40' : 'shadow-[3px_3px_7px_#c8c6c4,-3px_-3px_7px_#ffffff] hover:shadow-[4px_4px_9px_#c8c6c4,-4px_-4px_9px_#ffffff]'} bg-[#E7E5E4]`,
-  checkbox: (active: boolean) => `w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-all duration-200 ${active ? 'bg-[#006666] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]' : 'bg-[#E7E5E4] shadow-[inset_2px_2px_5px_#c8c6c4,inset_-2px_-2px_5px_#ffffff]'}`,
-  badge: 'inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-[var(--font-space-mono)] bg-[#E7E5E4] text-[#888780] shadow-[2px_2px_4px_#c8c6c4,-2px_-2px_4px_#ffffff] border border-[#d4d2d0]',
+  iconBox: (color: string) => `rounded-xl p-2.5  flex items-center justify-center ${color}`,
+  btn: 'inline-flex items-center gap-2 px-6 py-2.5 text-sm rounded-xl text-white bg-[#006666]  hover: active: transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
+  btnSm: 'inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs rounded-lg text-white bg-[#006666]  hover: active: transition-all duration-200',
+  btnGhost: 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg text-[#FF2157] border border-[#FF2157]/25  hover: hover:bg-[#FF2157]/5 transition-all duration-200',
+  input: 'w-full bg-[#E7E5E4] rounded-xl px-3.5 py-2.5 text-sm text-[#1E2938] placeholder:text-[#888780] border-0 outline-none  focus:ring-1 focus:ring-[#006666]/50 transition-all font-[var(--font-jetbrains-mono)]',
+  textarea: 'w-full bg-[#E7E5E4] rounded-xl px-3.5 py-2.5 text-sm text-[#1E2938] placeholder:text-[#888780] border-0 outline-none  focus:ring-1 focus:ring-[#006666]/50 transition-all resize-none font-[var(--font-jetbrains-mono)]',
+  checkTile: (active: boolean) => `flex items-center gap-3 p-3.5 rounded-xl cursor-pointer select-none transition-all duration-200 ${active ? ' ring-1 ring-[#006666]/40' : ' hover:'} bg-[#E7E5E4]`,
+  checkbox: (active: boolean) => `w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-all duration-200 ${active ? 'bg-[#006666] ' : 'bg-[#E7E5E4] '}`,
+  badge: 'inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-[var(--font-space-mono)] bg-[#E7E5E4] text-[#888780]  border border-[#d4d2d0]',
   divider: 'border-t border-[#d4d2d0] my-5',
 
   // alerts
-  alertErr: 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#FF2157]/30 shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
-  alertOk: 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#00A63D]/30 shadow-[inset_3px_3px_7px_#c8c6c4,inset_-3px_-3px_7px_#ffffff]',
+  alertErr: 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#FF2157]/30 ',
+  alertOk: 'flex items-center gap-3 px-4 py-3 rounded-xl bg-[#E7E5E4] border border-[#00A63D]/30 ',
   errText: 'text-xs text-[#FF2157] font-[var(--font-jetbrains-mono)] flex items-center gap-1 mt-1',
 
   // typography

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -29,9 +29,9 @@ const NeuBtn = ({
     variant?: "raised" | "inset" | "primary"; className?: string;
 }) => {
     const shadows = {
-        raised: "shadow-[4px_4px_10px_rgba(0,0,0,0.13),-3px_-3px_8px_rgba(255,255,255,0.8)] hover:shadow-[5px_5px_12px_rgba(0,0,0,0.16),-4px_-4px_10px_rgba(255,255,255,0.88)] active:shadow-[inset_3px_3px_7px_rgba(0,0,0,0.12),inset_-2px_-2px_5px_rgba(255,255,255,0.65)]",
-        inset: "shadow-[inset_3px_3px_7px_rgba(0,0,0,0.1),inset_-3px_-3px_7px_rgba(255,255,255,0.7)]",
-        primary: "bg-[#006666] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.2),-2px_-2px_6px_rgba(255,255,255,0.4)] hover:bg-[#005555] active:shadow-[inset_3px_3px_8px_rgba(0,0,0,0.25)]",
+        raised: " hover: active:",
+        inset: "",
+        primary: "bg-[#006666] text-white  hover:bg-[#005555] active:",
     };
     return (
         <button
@@ -125,10 +125,10 @@ export default function AuditLogsSection() {
         return (
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
                 className="p-6 rounded-2xl bg-[#E7E5E4]
-                    shadow-[6px_6px_16px_rgba(0,0,0,0.13),-5px_-5px_14px_rgba(255,255,255,0.85)]">
+                    ">
                 <div className="flex items-center gap-3 mb-3">
                     <div className="p-3 rounded-xl bg-[#E7E5E4]
-                        shadow-[4px_4px_10px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.8)]">
+                        ">
                         <AlertCircle className="h-5 w-5 text-[#FF2157]" />
                     </div>
                     <h3 className="font-bold text-[#1E2938] font-[var(--font-space-mono)]">Error Loading Audit Logs</h3>
@@ -144,7 +144,7 @@ export default function AuditLogsSection() {
     const DatePickerBtn = ({ value, label }: { value?: Date; label: string }) => (
         <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-[var(--font-jetbrains-mono)]
             text-[#1E2938]/60 bg-[#E7E5E4]
-            shadow-[inset_3px_3px_7px_rgba(0,0,0,0.1),inset_-3px_-3px_7px_rgba(255,255,255,0.7)]
+            
             min-w-[140px]">
             <CalendarIcon className="h-3.5 w-3.5 text-[#006666]" />
             {value ? format(value, "MMM d, yyyy") : <span className="text-[#1E2938]/30">{label}</span>}
@@ -156,12 +156,12 @@ export default function AuditLogsSection() {
             <AccordionItem value="audits" className="border-0">
                 {/* Trigger */}
                 <div className="rounded-2xl bg-[#E7E5E4]
-                    shadow-[8px_8px_20px_rgba(0,0,0,0.15),-6px_-6px_16px_rgba(255,255,255,0.88)]">
+                    ">
                     <AccordionTrigger className="hover:no-underline px-6 py-5 rounded-2xl hover:bg-transparent
                         data-[state=open]:rounded-b-none">
                         <div className="flex items-center gap-4">
                             <div className="p-3 rounded-xl bg-[#E7E5E4]
-                                shadow-[4px_4px_10px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.8)]">
+                                ">
                                 <Shield className="h-5 w-5 text-[#006666]" />
                             </div>
                             <div className="text-left">
@@ -176,7 +176,7 @@ export default function AuditLogsSection() {
                     <AccordionContent className="px-6 pb-6 pt-2">
                         {/* Filter panel */}
                         <div className="mb-6 p-4 rounded-xl bg-[#E7E5E4]
-                            shadow-[inset_4px_4px_10px_rgba(0,0,0,0.1),inset_-4px_-4px_10px_rgba(255,255,255,0.7)]">
+                            ">
                             <div className="flex items-center justify-between mb-3">
                                 <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest
                                     text-[#1E2938]/60 font-[var(--font-space-mono)]">
@@ -209,7 +209,7 @@ export default function AuditLogsSection() {
                                         {auditFilters.date && (
                                             <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs
                                                 text-[#006666] font-[var(--font-jetbrains-mono)]
-                                                bg-[#E7E5E4] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.09),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
+                                                bg-[#E7E5E4] ">
                                                 <CalendarIcon className="h-3 w-3" />
                                                 {format(new Date(auditFilters.date), "MMM d, yyyy")}
                                             </span>
@@ -217,14 +217,14 @@ export default function AuditLogsSection() {
                                         {auditFilters.startDate && (
                                             <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs
                                                 text-[#006666] font-[var(--font-jetbrains-mono)]
-                                                bg-[#E7E5E4] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.09),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
+                                                bg-[#E7E5E4] ">
                                                 From: {format(new Date(auditFilters.startDate), "MMM d, yyyy")}
                                             </span>
                                         )}
                                         {auditFilters.endDate && (
                                             <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs
                                                 text-[#006666] font-[var(--font-jetbrains-mono)]
-                                                bg-[#E7E5E4] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.09),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
+                                                bg-[#E7E5E4] ">
                                                 To: {format(new Date(auditFilters.endDate), "MMM d, yyyy")}
                                             </span>
                                         )}
@@ -311,7 +311,7 @@ export default function AuditLogsSection() {
 
                         {/* Table */}
                         <div className="rounded-xl overflow-hidden bg-[#E7E5E4]
-                            shadow-[inset_4px_4px_10px_rgba(0,0,0,0.1),inset_-4px_-4px_10px_rgba(255,255,255,0.7)]">
+                            ">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="hover:bg-transparent border-b border-[#1E2938]/8">
@@ -339,7 +339,7 @@ export default function AuditLogsSection() {
                                             <TableCell colSpan={5} className="text-center py-16">
                                                 <div className="flex flex-col items-center gap-3">
                                                     <div className="p-4 rounded-xl bg-[#E7E5E4]
-                                                        shadow-[4px_4px_10px_rgba(0,0,0,0.12),-3px_-3px_8px_rgba(255,255,255,0.8)]">
+                                                        ">
                                                         <FileText className="h-6 w-6 text-[#1E2938]/30" />
                                                     </div>
                                                     <p className="font-bold text-[#1E2938]/50 text-sm font-[var(--font-space-mono)]">
@@ -362,7 +362,7 @@ export default function AuditLogsSection() {
                                                     <TableCell className="py-3.5">
                                                         <span className={`flex items-center gap-1.5 w-fit px-2.5 py-1.5 rounded-lg text-xs font-bold
                                                             font-[var(--font-space-mono)] bg-[#E7E5E4]
-                                                            shadow-[2px_2px_5px_rgba(0,0,0,0.1),-2px_-2px_4px_rgba(255,255,255,0.7)]
+                                                            
                                                             ${ACTION_COLORS[actionKey] || "text-[#1E2938]/50"}`}>
                                                             {ACTION_ICONS[actionKey] || <Shield className="h-3 w-3" />}
                                                             {log.action}
@@ -371,7 +371,7 @@ export default function AuditLogsSection() {
                                                     <TableCell className="py-3.5">
                                                         <div className="flex items-center gap-2">
                                                             <div className="p-1.5 rounded-lg bg-[#E7E5E4]
-                                                                shadow-[2px_2px_5px_rgba(0,0,0,0.1),-2px_-2px_4px_rgba(255,255,255,0.7)]">
+                                                                ">
                                                                 <Database className="h-3.5 w-3.5 text-[#006666]" />
                                                             </div>
                                                             <div>
@@ -384,7 +384,7 @@ export default function AuditLogsSection() {
                                                         {log.changes ? (
                                                             <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs
                                                                 text-[#006666] font-[var(--font-jetbrains-mono)]
-                                                                bg-[#E7E5E4] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
+                                                                bg-[#E7E5E4] ">
                                                                 <Activity className="h-3 w-3" /> Modified
                                                             </span>
                                                         ) : (
@@ -396,7 +396,7 @@ export default function AuditLogsSection() {
                                                     <TableCell className="py-3.5">
                                                         <code className="px-2 py-1 rounded-lg text-xs font-[var(--font-jetbrains-mono)]
                                                             text-[#1E2938]/60 bg-[#E7E5E4]
-                                                            shadow-[inset_2px_2px_4px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_rgba(255,255,255,0.65)]">
+                                                            ">
                                                             {log.ip || "—"}
                                                         </code>
                                                     </TableCell>
@@ -438,7 +438,7 @@ export default function AuditLogsSection() {
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
                                 className="mt-4 flex items-center justify-between px-4 py-3 rounded-xl
                                     bg-[#E7E5E4]
-                                    shadow-[inset_3px_3px_7px_rgba(0,0,0,0.09),inset_-3px_-3px_7px_rgba(255,255,255,0.65)]">
+                                    ">
                                 <span className="flex items-center gap-2 text-xs text-[#1E2938]/50 font-[var(--font-jetbrains-mono)]">
                                     <Database className="h-3.5 w-3.5 text-[#006666]" />
                                     <span className="font-bold text-[#1E2938]">{audits.length}</span> records shown

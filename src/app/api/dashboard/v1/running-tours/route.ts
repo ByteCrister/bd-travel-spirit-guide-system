@@ -79,42 +79,30 @@ async function getRunningToursHandler(request: NextRequest): Promise<HandlerResu
         companyId,
         deletedAt: null,
         status: TOUR_STATUS.ACTIVE,
-        departures: { $exists: true, $ne: [] },
+        departure: { $exists: true, $ne: null },
     };
 
     const tours = await TourModel.find(filter)
-        .select('_id slug title departures')
+        .select('_id slug title departure')
         .lean();
 
     // 6. Compute RunningTourInfo for each tour
     const runningTours: RunningTourInfo[] = [];
 
     for (const tour of tours) {
-        // Filter departures by date range if provided
-        let filteredDepartures = tour.departures || [];
-        if (fromDate || toDate) {
-            filteredDepartures = filteredDepartures.filter((dep) => {
-                const depDate = new Date(dep.date);
-                if (fromDate && depDate < fromDate) return false;
-                if (toDate && depDate > toDate) return false;
-                return true;
-            });
-        }
+        // Filter departure by date range if provided
+        const dep = tour.departure;
+        if (!dep) continue;
+        
+        const depDate = new Date(dep.date);
+        
+        if (fromDate && depDate < fromDate) continue;
+        if (toDate && depDate > toDate) continue;
 
-        if (filteredDepartures.length === 0) continue;
-
-        let totalSeats = 0;
-        let currentBookings = 0;
-        let windowStart: Date = filteredDepartures[0].date;
-        let windowEnd: Date = filteredDepartures[0].date;
-
-        for (const dep of filteredDepartures) {
-            totalSeats += dep.seatsTotal ?? 0;
-            currentBookings += dep.seatsBooked ?? 0;
-            const depDate = new Date(dep.date);
-            if (depDate < windowStart) windowStart = depDate;
-            if (depDate > windowEnd) windowEnd = depDate;
-        }
+        let totalSeats = dep.seatsTotal ?? 0;
+        let currentBookings = dep.seatsBooked ?? 0;
+        let windowStart: Date = depDate;
+        let windowEnd: Date = depDate;
 
         runningTours.push({
             tourId: tour._id.toString(),

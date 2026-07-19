@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -81,7 +81,7 @@ export function BookingsPage() {
                     <div className={cn(
                         'w-10 h-10 rounded-2xl flex items-center justify-center shrink-0',
                         'bg-[#E7E5E4]',
-                        'shadow-[5px_5px_10px_#c8c6c4,-4px_-4px_8px_#ffffff]',
+                        '',
                     )}>
                         <BookOpen size={17} className="text-[#006666]" />
                     </div>
@@ -110,11 +110,11 @@ export function BookingsPage() {
                         'h-9 px-4 rounded-xl inline-flex items-center gap-2 text-xs font-medium transition-all duration-150',
                         'bg-[#E7E5E4] text-[#1E2938]/55',
                         isLoading
-                            ? 'shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff] cursor-not-allowed opacity-70'
+                            ? ' cursor-not-allowed opacity-70'
                             : [
-                                'shadow-[4px_4px_8px_#c8c6c4,-3px_-3px_6px_#ffffff]',
-                                'hover:shadow-[5px_5px_10px_#c8c6c4,-4px_-4px_8px_#ffffff] hover:text-[#006666]',
-                                'active:shadow-[inset_2px_2px_5px_#c8c6c4,inset_-1px_-1px_4px_#ffffff]',
+                                '',
+                                'hover: hover:text-[#006666]',
+                                'active:',
                             ].join(' '),
                     )}
                     style={jetbrainsMono.style}
@@ -135,7 +135,7 @@ export function BookingsPage() {
                             className={cn(
                                 'h-28 rounded-2xl animate-pulse',
                                 'bg-[#E7E5E4]',
-                                'shadow-[inset_4px_4px_8px_#c8c6c4,inset_-3px_-3px_6px_#ffffff]',
+                                '',
                             )}
                         />
                     ))}
@@ -158,7 +158,7 @@ export function BookingsPage() {
                     className={cn(
                         'rounded-xl px-4 py-3 text-xs text-[#FF2157]',
                         'bg-[#E7E5E4]',
-                        'shadow-[inset_3px_3px_6px_rgba(255,33,87,0.12),inset_-2px_-2px_5px_#ffffff]',
+                        '',
                     )}
                     style={jetbrainsMono.style}
                 >
