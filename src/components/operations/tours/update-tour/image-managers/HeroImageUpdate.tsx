@@ -1,4 +1,4 @@
-﻿// app/operations/tours/[tourId]/update-tour/components/HeroImageUpdate.tsx
+// app/operations/tours/[tourId]/update-tour/components/HeroImageUpdate.tsx
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -294,6 +294,7 @@ export default function HeroImageUpdate({ tourId, currentHeroImage, updateData }
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 224px"
+                    priority
                   />
                   {pendingImage && (
                     <motion.div

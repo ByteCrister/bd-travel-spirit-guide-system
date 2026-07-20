@@ -476,7 +476,7 @@ export function notifyEmployeeNewPassword(
             
             <!-- Action Buttons -->
             <div style="text-align: center; margin: 30px 0;">
-                <a href="https://bd-travel-spirit.com/login" class="btn login-btn">Login to Your Account</a>
+                <a href="https://bd-travel-spirit-guide-system.vercel.app" class="btn login-btn">Login to Your Account</a>
                 <a href="https://bd-travel-spirit.com/support" class="btn support-btn">Get Support</a>
             </div>
             

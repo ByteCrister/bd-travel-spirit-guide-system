@@ -1,395 +1,246 @@
 {
-  "title": "Khagrachari Hill Adventure (6D/5N)",
-  "summary": "A 6-day journey through Khagrachari, Chattogram Division, covering Alutila Cave, Risang Waterfall.",
-  "heroImage": "",
-  "gallery": [],
-  "seo": {
-    "metaTitle": "Khagrachari Hill Adventure | Book Now",
-    "metaDescription": "Explore Khagrachari with our curated 6-day tour."
-  },
-  "tags": [
-    "khagrachari",
-    "chattogram",
-    "bangladesh"
-  ],
-  "status": "active",
-  "tourType": "Couples",
-  "division": "chattogram",
-  "district": "khagrachari",
-  "accommodationType": [
-    "homestay"
-  ],
-  "guideIncluded": true,
-  "transportIncluded": true,
-  "emergencyContacts": {
-    "policeNumber": "999",
-    "ambulanceNumber": "16263",
-    "fireServiceNumber": "102",
-    "localEmergency": "01982760565"
-  },
-  "destinations": [
-    {
-      "description": "Core exploration zone around Khagrachari.",
-      "highlights": [
-        "Alutila Cave",
-        "Risang Waterfall"
-      ],
-      "attractions": [
-        {
-          "title": "Alutila Cave",
-          "description": "Popular spot: Alutila Cave",
-          "bestFor": "Photography",
-          "insiderTip": "Visit early morning to avoid crowds.",
-          "address": "Alutila Cave, Khagrachari, Chattogram",
-          "openingHours": "06:00 - 18:00",
-          "coordinates": {
-            "lat": 23.320983,
-            "lng": 90.499951
-          }
-        },
-        {
-          "title": "Risang Waterfall",
-          "description": "Popular spot: Risang Waterfall",
-          "bestFor": "Couples",
-          "insiderTip": "Visit early morning to avoid crowds.",
-          "address": "Risang Waterfall, Khagrachari, Chattogram",
-          "openingHours": "06:00 - 18:00",
-          "coordinates": {
-            "lat": 23.21187,
-            "lng": 89.730286
-          }
-        }
-      ],
-      "activities": [
-        {
-          "title": "Guided visit to Alutila Cave",
-          "provider": "GreenHill Travels BD",
-          "duration": "1h",
-          "price": {
-            "amount": 200,
-            "currency": "BDT"
-          },
-          "rating": 4.9
-        },
-        {
-          "title": "Guided visit to Risang Waterfall",
-          "provider": "Padma Explorers Ltd",
-          "duration": "1h",
-          "price": {
-            "amount": 0,
-            "currency": "BDT"
-          },
-          "rating": 4.3
-        }
-      ],
-      "coordinates": {
-        "lat": 21.572871,
-        "lng": 92.503806
-      }
-    }
-  ],
-  "itinerary": [
-    {
-      "day": 1,
-      "title": "Day 1: Khagrachari Hill Adventure",
-      "description": "Visit Alutila Cave and nearby sites.",
-      "mealsProvided": [
-        "Breakfast"
-      ],
-      "accommodation": "homestay",
-      "activities": [
-        "Alutila Cave",
-        "Risang Waterfall"
-      ],
-      "travelDistance": "68 km",
-      "travelMode": "train",
-      "estimatedTime": "2h",
-      "importantNotes": [
-        "Respect local customs at religious sites."
-      ]
+    "title": "Sunamganj Haor & Tanguar Swamp Escape",
+    "slug": "sunamganj-haor-tanguar-swamp-escape",
+    "summary": "Boat cruise thru Tanguar Haor, sunset on open water, stay in floating houseboat.",
+    "heroImage": "",
+    "gallery": [],
+    "seo": {
+      "metaTitle": "Sunamganj Haor Tour",
+      "metaDescription": "Explore Tanguar Haor wetlands by boat."
     },
-    {
-      "day": 2,
-      "title": "Day 2: Explore Khagrachari",
-      "description": "Visit Alutila Cave and nearby sites.",
-      "mealsProvided": [
-        "Lunch",
-        "Breakfast"
-      ],
-      "accommodation": "guest_house",
-      "activities": [
-        "Risang Waterfall",
-        "Alutila Cave"
-      ],
-      "travelDistance": "61 km",
-      "travelMode": "ride_share",
-      "estimatedTime": "6h",
-      "importantNotes": [
-        "Carry light woolens for evening."
-      ]
+    "tourType": "Adventure Seekers",
+    "division": "sylhet",
+    "district": "sunamganj",
+    "accommodationType": [
+      "homestay"
+    ],
+    "guideIncluded": true,
+    "transportIncluded": true,
+    "emergencyContacts": {
+      "policeNumber": "999",
+      "ambulanceNumber": "16263",
+      "fireServiceNumber": "102"
     },
-    {
-      "day": 3,
-      "title": "Day 3: Explore Khagrachari",
-      "description": "Visit Risang Waterfall and nearby sites.",
-      "mealsProvided": [
-        "Breakfast"
-      ],
-      "accommodation": "hotel",
-      "activities": [
-        "Alutila Cave",
-        "Risang Waterfall"
-      ],
-      "travelDistance": "57 km",
-      "travelMode": "private_car",
-      "estimatedTime": "3h",
-      "importantNotes": [
-        "Photography allowed at most spots."
-      ]
-    },
-    {
-      "day": 4,
-      "title": "Day 4: Explore Khagrachari",
-      "description": "Visit Risang Waterfall and nearby sites.",
-      "mealsProvided": [
-        "Dinner",
-        "Lunch",
-        "Breakfast"
-      ],
-      "accommodation": "homestay",
-      "activities": [
-        "Alutila Cave",
-        "Risang Waterfall"
-      ],
-      "travelDistance": "26 km",
-      "travelMode": "domestic_flight",
-      "estimatedTime": "2h",
-      "importantNotes": [
-        "Local guide accompanies group."
-      ]
-    },
-    {
-      "day": 5,
-      "title": "Day 5: Explore Khagrachari",
-      "description": "Visit Risang Waterfall and nearby sites.",
-      "mealsProvided": [
-        "Breakfast",
-        "Dinner"
-      ],
-      "accommodation": "homestay",
-      "activities": [
-        "Risang Waterfall",
-        "Alutila Cave"
-      ],
-      "travelDistance": "26 km",
-      "travelMode": "private_car",
-      "estimatedTime": "2h",
-      "importantNotes": [
-        "Respect local customs at religious sites."
-      ]
-    },
-    {
-      "day": 6,
-      "title": "Day 6: Explore Khagrachari",
-      "description": "Visit Risang Waterfall and nearby sites.",
-      "mealsProvided": [
-        "Breakfast"
-      ],
-      "accommodation": "camping",
-      "activities": [
-        "Alutila Cave",
-        "Risang Waterfall"
-      ],
-      "travelDistance": "35 km",
-      "travelMode": "bus",
-      "estimatedTime": "1h",
-      "importantNotes": [
-        "Photography allowed at most spots."
-      ]
-    }
-  ],
-  "inclusions": [
-    {
-      "label": "Accommodation",
-      "description": "Cottage stay for 5 night(s)"
-    },
-    {
-      "label": "Meals as per itinerary",
-      "description": "Breakfast, lunch, and/or dinner as listed in daily plan"
-    },
-    {
-      "label": "Local transport",
-      "description": "Train between destinations"
-    },
-    {
-      "label": "Guide services",
-      "description": "English/Bangla speaking local guide"
-    }
-  ],
-  "exclusions": [
-    {
-      "label": "Personal expenses",
-      "description": "Shopping, tips, and other personal costs"
-    },
-    {
-      "label": "Travel insurance",
-      "description": "Not included, recommended for adventure activities"
-    }
-  ],
-  "difficulty": "easy",
-  "bestSeason": [
-    "spring",
-    "summer",
-    "autumn"
-  ],
-  "audience": [
-    "families",
-    "solo"
-  ],
-  "categories": [
-    "nature",
-    "wildlife"
-  ],
-  "translations": {
-    "en": {
-      "title": "Khagrachari Hill Adventure",
-      "summary": "Discover Khagrachari.",
-      "description": "Join this 6-day tour through Khagrachari, Chattogram Division, featuring Alutila Cave, Risang Waterfall."
-    },
-    "bn": {
-      "title": "Khagrachari Hill Adventure (বাংলা)",
-      "summary": "বাংলাদেশের সৌন্দর্য উপভোগ করুন।",
-      "description": "Chattogram বিভাগের Khagrachari অঞ্চলে 6 দিনের ভ্রমণ।"
-    }
-  },
-  "mainLocation": {
-    "address": {
-      "line1": "Khagrachari Hill Adventure Base Camp",
-      "line2": "Risang Waterfall",
-      "city": "Khagrachari",
-      "district": "khagrachari",
-      "region": "chattogram",
-      "postalCode": "9845"
-    },
-    "coordinates": {
-      "lat": 26.352794,
-      "lng": 90.508122
-    }
-  },
-  "transportModes": [
-    "bus"
-  ],
-  "pickupOptions": [
-    {
-      "city": "Dhaka",
-      "price": 300,
-      "currency": "INR"
-    }
-  ],
-  "meetingPoint": "Central Bus Terminal",
-  "packingList": [
-    {
-      "item": "Comfortable shoes",
-      "required": true,
-      "notes": "Trekking-grade for hilly terrain."
-    },
-    {
-      "item": "Rain jacket",
-      "required": true,
-      "notes": "Monsoon season risk in this region."
-    },
-    {
-      "item": "Sunscreen",
-      "required": true,
-      "notes": "SPF 30+ recommended."
-    }
-  ],
-  "basePrice": {
-    "amount": 30000,
-    "currency": "INR"
-  },
-  "discounts": [
-    {
-      "type": "flat_amount",
-      "discount": "early_bird",
-      "value": 1000,
-      "code": "BD615",
-      "validFrom": "2026-07-23T00:00:00.000Z",
-      "validUntil": "2026-09-13T00:00:00.000Z"
-    }
-  ],
-  "duration": {
-    "days": 6,
-    "nights": 5
-  },
-  "operatingWindow": {
-    "startDate": "2026-08-23T00:00:00.000Z",
-    "endDate": "2027-03-12T00:00:00.000Z"
-  },
-  "departure": {
-    "date": "2026-07-30T00:00:00.000Z",
-    "seatsTotal": 38,
-    "meetingPoint": "Company Office, Dhaka",
-    "meetingCoordinates": {
-      "lat": 23.544454,
-      "lng": 91.042047
-    }
-  },
-  "paymentMethods": [
-    "bank_transfer",
-    "nagad",
-    "stripe",
-    "cash"
-  ],
-  "licenseRequired": true,
-  "ageSuitability": "all",
-  "accessibility": {
-    "wheelchair": true,
-    "familyFriendly": true,
-    "petFriendly": false,
-    "notes": "Terrain varies; contact operator for accessibility details."
-  },
-  "cancellationPolicy": {
-    "refundable": true,
-    "rules": [
+    "localEmergency": "Sunamganj Sadar Police Station",
+    "destinations": [
       {
-        "daysBefore": 7,
-        "refundPercent": 80
+        "description": "Tanguar Haor, one of Bangladesh's largest wetlands, home to migratory birds.",
+        "highlights": [
+          "Sunrise boat ride",
+          "Bird watching",
+          "Floating village visit"
+        ],
+        "attractions": [
+          {
+            "title": "Tanguar Haor",
+            "description": "Vast freshwater wetland ecosystem.",
+            "bestFor": "Nature lovers",
+            "insiderTip": "Go early morning for mist views.",
+            "address": "Tahirpur, Sunamganj",
+            "openingHours": "06:00-18:00",
+            "images": [],
+            "coordinates": {
+              "lat": 25.1214,
+              "lng": 91.1197
+            }
+          }
+        ],
+        "activities": [
+          {
+            "title": "Boat safari",
+            "duration": "3h",
+            "rating": 4.7,
+            "price": {
+              "amount": 500,
+              "currency": "BDT"
+            }
+          }
+        ],
+        "images": [],
+        "coordinates": {
+          "lat": 25.1214,
+          "lng": 91.1197
+        }
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Arrival & Haor Cruise",
+        "description": "Arrive Sunamganj, board boat, cruise Tanguar Haor.",
+        "mealsProvided": [
+          "Lunch",
+          "Dinner"
+        ],
+        "accommodation": "Houseboat",
+        "activities": [
+          "Boat cruise",
+          "Bird watching"
+        ],
+        "travelDistance": "35km",
+        "travelMode": "boat",
+        "estimatedTime": "2h",
+        "importantNotes": [
+          "Bring light jacket for evening wind"
+        ]
       },
       {
-        "daysBefore": 3,
-        "refundPercent": 40
+        "day": 2,
+        "title": "Sunrise & Departure",
+        "description": "Sunrise over haor, breakfast, return trip.",
+        "mealsProvided": [
+          "Breakfast"
+        ],
+        "accommodation": "N/A",
+        "activities": [
+          "Sunrise viewing"
+        ],
+        "travelDistance": "35km",
+        "travelMode": "boat",
+        "estimatedTime": "2h",
+        "importantNotes": []
       }
-    ]
-  },
-  "refundPolicy": {
-    "method": [
-      "cash",
-      "bkash"
     ],
-    "processingDays": 7
-  },
-  "terms": "Standard booking terms and conditions apply.",
-  "id": "f2d7fb43-9cd2-4d63-9bbf-4f30f8b0f30e",
-  "slug": "khagrachari-hill-adventure-49",
-  "tourCode": "BDT-0049",
-  "moderationStatus": "pending",
-  "companyInfo": {
-    "id": "b181544d-9fb6-4073-9feb-3b94fce43b9e",
-    "name": "GreenHill Travels BD",
-    "createdAt": "2023-01-05T00:00:00.000Z"
-  },
-  "authorInfo": {
-    "id": "42607f82-531a-41f9-a68c-1e268aba0325",
-    "name": "Farzana Begum",
-    "email": "farzana.begum@bengaltours.bd",
-    "avatarUrl": null
-  },
-  "wishlistCount": 205,
-  "featured": false,
-  "viewCount": 1855,
-  "likeCount": 456,
-  "shareCount": 91,
-  "createdAt": "2026-01-22T00:00:00.000Z",
-  "updatedAt": "2026-07-16T00:00:00.000Z"
-}
+    "inclusions": [
+      {
+        "label": "Boat rental",
+        "description": "Full day boat use"
+      },
+      {
+        "label": "Meals",
+        "description": "2 lunch, 1 dinner, 1 breakfast"
+      }
+    ],
+    "exclusions": [
+      {
+        "label": "Personal expenses"
+      }
+    ],
+    "difficulty": "easy",
+    "bestSeason": [
+      "monsoon",
+      "autumn"
+    ],
+    "audience": [
+      "adventure",
+      "solo"
+    ],
+    "categories": [
+      "nature",
+      "wildlife"
+    ],
+    "translations": {
+      "en": {
+        "title": "Sunamganj Haor & Tanguar Swamp Escape",
+        "summary": "Boat cruise thru wetlands."
+      },
+      "bn": {
+        "title": "সুনামগঞ্জ হাওর ভ্রমণ",
+        "summary": "টাঙ্গুয়ার হাওরে নৌকা ভ্রমণ।"
+      }
+    },
+    "mainLocation": {
+      "address": {
+        "city": "Tahirpur",
+        "district": "Sunamganj",
+        "region": "Sylhet"
+      },
+      "coordinates": {
+        "lat": 25.1214,
+        "lng": 91.1197
+      }
+    },
+    "transportModes": [
+      "boat",
+      "private_car"
+    ],
+    "pickupOptions": [
+      {
+        "city": "Sylhet",
+        "price": 500,
+        "currency": "BDT"
+      }
+    ],
+    "meetingPoint": "Sunamganj Boat Terminal",
+    "packingList": [
+      {
+        "item": "Rain jacket",
+        "required": true
+      },
+      {
+        "item": "Sunscreen",
+        "required": false
+      }
+    ],
+    "basePrice": {
+      "amount": 3500,
+      "currency": "BDT"
+    },
+    "discounts": [
+      {
+        "type": "percentage",
+        "discount": "early_bird",
+        "value": 10
+      }
+    ],
+    "duration": {
+      "days": 2,
+      "nights": 1
+    },
+    "paymentMethods": [
+      "card",
+      "stripe"
+    ],
+    "licenseRequired": false,
+    "ageSuitability": "all",
+    "accessibility": {
+      "wheelchair": false,
+      "familyFriendly": true,
+      "petFriendly": false,
+      "notes": "Boat access has narrow gangway."
+    },
+    "cancellationPolicy": {
+      "refundable": true,
+      "rules": [
+        {
+          "daysBefore": 3,
+          "refundPercent": 80
+        }
+      ]
+    },
+    "refundPolicy": {
+      "method": [
+        "card",
+        "stripe"
+      ],
+      "processingDays": 5
+    },
+    "terms": "Standard tour terms apply.",
+    "featured": false,
+    "status": "draft",
+    "moderationStatus": "pending",
+    "wishlistCount": 0,
+    "ratings": {
+      "average": 0,
+      "count": 0
+    },
+    "tags": [],
+    "viewCount": 0,
+    "likeCount": 0,
+    "shareCount": 0,
+    "publishedAt": null,
+    "operatingWindow": {
+      "startDate": "2026-10-15T00:00:00.000Z",
+      "endDate": "2027-03-31T00:00:00.000Z"
+    },
+    "departure": {
+      "date": "2026-10-15T08:00:00.000Z",
+      "seatsTotal": 20,
+      "seatsBooked": 0,
+      "meetingPoint": "Sunamganj Boat Terminal",
+      "meetingCoordinates": {
+        "lat": 25.1214,
+        "lng": 91.1197
+      }
+    }
+  }

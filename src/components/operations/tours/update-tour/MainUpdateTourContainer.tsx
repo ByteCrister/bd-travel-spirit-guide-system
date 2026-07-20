@@ -102,7 +102,7 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const { fetchTourDetail, updateTourLocal, tourDetails, loading } = useTourDetailStore();
+  const { fetchTourDetail, updateTourLocal, tourDetails, loading, error } = useTourDetailStore();
   const tourData = tourDetails[tourId];
   const router = useRouter();
 
@@ -173,11 +173,14 @@ export default function MainUpdateTourContainer({ tourId }: MainUpdateTourContai
   };
 
   // ─── Loading / Error States ──────────────────────────────────────────────────
-  if (loading[tourDetailLoadingKey(tourId)]) {
+  const isLoading = loading[tourDetailLoadingKey(tourId)];
+  const hasError = error[tourDetailErrorKey(tourId)];
+
+  if (isLoading || (isLoading === undefined && !tourData)) {
     return <LoadingUpdateTourContainer />;
   }
 
-  if (loading[tourDetailErrorKey(tourId)] || !tourData) {
+  if (hasError || !tourData) {
     return (
       <div className={`min-h-screen ${NEU.surface} flex items-center justify-center p-6`}>
         <div className={`${NEU.card} p-8 max-w-md w-full flex items-start gap-4`}>

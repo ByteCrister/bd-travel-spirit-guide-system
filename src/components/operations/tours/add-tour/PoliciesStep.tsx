@@ -1,11 +1,11 @@
-﻿"use client";
+"use client";
 
 import { Field, FieldArray, getIn, useFormikContext } from "formik";
 import { motion, AnimatePresence } from "framer-motion";
 import { CreateTourDTO } from "@/types/tour/tour.types";
 import { PAYMENT_METHOD } from "@/constants/tour/tour.const";
 import {
-    FileText, XCircle, CreditCard, Clock, Plus, Trash2,
+    FileText, XCircle, CreditCard, Clock, Plus, Minus, Trash2,
     AlertTriangle, Info, Shield, CheckCircle2,
 } from "lucide-react";
 
@@ -250,19 +250,43 @@ export default function PoliciesStep() {
                                                                 <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_40px] gap-3 items-center">
                                                                     <div>
                                                                         <span className={`${NEU_LABEL} sm:hidden`}>Days Before</span>
-                                                                        <input
-                                                                            type="number"
-                                                                            min={0}
-                                                                            value={rule.daysBefore}
-                                                                            onChange={(e) =>
-                                                                                setFieldValue(
-                                                                                    `cancellationPolicy.rules[${idx}].daysBefore`,
-                                                                                    parseInt(e.target.value)
-                                                                                )
-                                                                            }
-                                                                            placeholder="e.g. 7"
-                                                                            className={NEU_INPUT}
-                                                                        />
+                                                                        <div className="flex items-center gap-2">
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    let newDay = rule.daysBefore - 1;
+                                                                                    const usedDays = new Set(values.cancellationPolicy?.rules?.map((r, i) => i !== idx ? r.daysBefore : -1) || []);
+                                                                                    while (usedDays.has(newDay) && newDay >= 0) {
+                                                                                        newDay--;
+                                                                                    }
+                                                                                    if (newDay >= 0) {
+                                                                                        setFieldValue(`cancellationPolicy.rules[${idx}].daysBefore`, newDay);
+                                                                                    }
+                                                                                }}
+                                                                                className={`${NEU_BTN_GHOST} w-9 h-9 flex items-center justify-center !rounded-lg`}
+                                                                            >
+                                                                                <Minus className="w-4 h-4" />
+                                                                            </button>
+                                                                            
+                                                                            <div className={`${NEU_INPUT} !w-16 text-center flex items-center justify-center font-bold px-0`}>
+                                                                                {rule.daysBefore}
+                                                                            </div>
+                                                                            
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    let newDay = rule.daysBefore + 1;
+                                                                                    const usedDays = new Set(values.cancellationPolicy?.rules?.map((r, i) => i !== idx ? r.daysBefore : -1) || []);
+                                                                                    while (usedDays.has(newDay)) {
+                                                                                        newDay++;
+                                                                                    }
+                                                                                    setFieldValue(`cancellationPolicy.rules[${idx}].daysBefore`, newDay);
+                                                                                }}
+                                                                                className={`${NEU_BTN_GHOST} w-9 h-9 flex items-center justify-center !rounded-lg`}
+                                                                            >
+                                                                                <Plus className="w-4 h-4" />
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
                                                                     <div>
                                                                         <span className={`${NEU_LABEL} sm:hidden`}>Refund %</span>

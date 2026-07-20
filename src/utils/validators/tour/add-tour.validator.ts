@@ -70,7 +70,8 @@ export const PriceSchema = Yup.object({
     currency: Yup.string()
         .oneOf(Object.values(CURRENCY), createErrorMessage("Price", "Currency", "is invalid"))
         .required(createErrorMessage("Price", "Currency", "is required")),
-});
+}).nullable().default(undefined);
+
 
 export const ActivitySchema = Yup.object({
     title: Yup.string().required(createErrorMessage("Activity", "Title", "is required")),
@@ -431,7 +432,7 @@ export const Step4PricingSchema = Yup.object().shape({
                 createNestedErrorMessage("Pricing", "Operating Window", "Start Date", "must be at least 5 days from today"),
                 function (value) {
                     if (!value) return true;
-                    return new Date(value) >= minDateFromToday(5);
+                    return new Date(value) >= minDateFromToday(1);
                 }
             ),
         endDate: Yup.date()
