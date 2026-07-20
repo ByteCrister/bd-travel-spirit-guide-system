@@ -45,6 +45,7 @@ export function notifyEmployeeNewPassword(
         
         .email-container {
             max-width: 600px;
+            width: 100%;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -53,7 +54,7 @@ export function notifyEmployeeNewPassword(
         }
         
         .header {
-            background: linear-gradient(135deg, #ffffff 0%, #ffffff 50%, #ffffff 100%);
+            background: #ffffff;
             padding: 40px 30px 30px;
             text-align: center;
             position: relative;
@@ -122,7 +123,6 @@ export function notifyEmployeeNewPassword(
             display: inline-block;
             padding-bottom: 8px;
             margin-top: 4px;
-            position: relative;
             z-index: 1;
         }
         
@@ -315,8 +315,16 @@ export function notifyEmployeeNewPassword(
         }
         
         .support-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            background: #ffffff;
+            color: #0f766e;
+            border: 1.5px solid #ccfbf1;
+            box-shadow: none;
             margin-left: 10px;
+        }
+        
+        .support-btn:hover {
+            background: #f0fdfa;
+            border-color: #99f6e4;
         }
         
         @media (max-width: 600px) {
@@ -336,6 +344,55 @@ export function notifyEmployeeNewPassword(
             .footer-links {
                 flex-direction: column;
                 gap: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 30px 16px 24px;
+            }
+            
+            .content {
+                padding: 24px 16px;
+            }
+            
+            .logo-container {
+                padding: 14px;
+            }
+            
+            .logo-bd {
+                font-size: 26px;
+            }
+            
+            .brand-name {
+                font-size: 20px;
+            }
+            
+            .greeting {
+                font-size: 18px;
+            }
+            
+            .password-value {
+                font-size: 16px;
+                padding: 10px 14px;
+            }
+            
+            .btn {
+                display: block;
+                width: 100%;
+                margin: 8px 0;
+            }
+            
+            .support-btn {
+                margin-left: 0;
+            }
+            
+            .footer {
+                padding: 24px 16px;
             }
         }
         
@@ -407,6 +464,12 @@ export function notifyEmployeeNewPassword(
             
             .instructions li strong {
                 color: #f1f5f9;
+            }
+            
+            .support-btn {
+                background: #1e293b;
+                color: #5eead4;
+                border-color: #334155;
             }
         }
     </style>
