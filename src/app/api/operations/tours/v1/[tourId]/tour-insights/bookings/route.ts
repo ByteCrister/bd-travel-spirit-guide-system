@@ -78,14 +78,6 @@ async function getTourBookingsHandler(
         throw new ApiError("Tour not found", 404);
     }
 
-    // Check if the logged-in user is the tour author
-    if (tour.authorId.toString() !== userId) {
-        throw new ApiError(
-            "Forbidden: You are not allowed to view these bookings",
-            403
-        );
-    }
-
     // 4. Parse pagination and sorting
     const searchParams = req.nextUrl.searchParams;
     const page = Math.max(

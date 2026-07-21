@@ -197,7 +197,7 @@ export class ReviewResponseService {
                                 as: "traveler",
                             },
                         },
-                        { $unwind: "$traveler" },
+                        { $unwind: { path: "$traveler", preserveNullAndEmptyArrays: true } },
 
                         /* ------------------------------ User ------------------------------- */
                         {
@@ -208,7 +208,7 @@ export class ReviewResponseService {
                                 as: "reviewUser",
                             },
                         },
-                        { $unwind: "$reviewUser" },
+                        { $unwind: { path: "$reviewUser", preserveNullAndEmptyArrays: true } },
 
                         /* ----------------------------- Avatar ------------------------------ */
                         {
@@ -231,16 +231,8 @@ export class ReviewResponseService {
                         /* =========================== REPLIES =============================== */
                         {
                             $lookup: {
-                                from: getCollectionName(EmployeeModel),
-                                localField: "replies.employee",
-                                foreignField: "_id",
-                                as: "replyEmployees",
-                            },
-                        },
-                        {
-                            $lookup: {
                                 from: getCollectionName(UserModel),
-                                localField: "replyEmployees.user",
+                                localField: "replies.author",
                                 foreignField: "_id",
                                 as: "replyUsers",
                             },
@@ -328,12 +320,15 @@ export class ReviewResponseService {
                                         },
                                         as: "r",
                                         in: {
-                                            id: "$$r._id",
+                                            _id: "$$r._id",
                                             message: "$$r.message",
                                             isApproved: "$$r.isApproved",
                                             createdAt: "$$r.createdAt",
                                             updatedAt: "$$r.updatedAt",
                                             employee: {
+                                                id: {
+                                                    $arrayElemAt: ["$replyUsers._id", 0],
+                                                },
                                                 name: {
                                                     $arrayElemAt: ["$replyUsers.name", 0],
                                                 },
@@ -371,7 +366,7 @@ export class ReviewResponseService {
                                     },
                                 },
 
-                                ratingBreakdown: {
+                                ratingsArray: {
                                     $push: "$rating",
                                 },
                             },
@@ -387,7 +382,7 @@ export class ReviewResponseService {
                                     1: {
                                         $size: {
                                             $filter: {
-                                                input: "$ratingBreakdown",
+                                                input: "$ratingsArray",
                                                 as: "r",
                                                 cond: { $eq: ["$$r", 1] },
                                             },
@@ -396,7 +391,7 @@ export class ReviewResponseService {
                                     2: {
                                         $size: {
                                             $filter: {
-                                                input: "$ratingBreakdown",
+                                                input: "$ratingsArray",
                                                 as: "r",
                                                 cond: { $eq: ["$$r", 2] },
                                             },
@@ -405,7 +400,7 @@ export class ReviewResponseService {
                                     3: {
                                         $size: {
                                             $filter: {
-                                                input: "$ratingBreakdown",
+                                                input: "$ratingsArray",
                                                 as: "r",
                                                 cond: { $eq: ["$$r", 3] },
                                             },
@@ -414,7 +409,7 @@ export class ReviewResponseService {
                                     4: {
                                         $size: {
                                             $filter: {
-                                                input: "$ratingBreakdown",
+                                                input: "$ratingsArray",
                                                 as: "r",
                                                 cond: { $eq: ["$$r", 4] },
                                             },
@@ -423,7 +418,7 @@ export class ReviewResponseService {
                                     5: {
                                         $size: {
                                             $filter: {
-                                                input: "$ratingBreakdown",
+                                                input: "$ratingsArray",
                                                 as: "r",
                                                 cond: { $eq: ["$$r", 5] },
                                             },
@@ -460,9 +455,9 @@ export class ReviewResponseService {
             id: review._id.toString(),
             tourId: review.tour.toString(),
             user: {
-                id: review.user.id.toString(),
-                name: review.user.name,
-                avatar: review.user.avatar
+                id: review.user?.id?.toString() || '',
+                name: review.user?.name || 'Unknown User',
+                avatar: review.user?.avatar
             },
             rating: review.rating,
             title: review.title,
@@ -474,9 +469,9 @@ export class ReviewResponseService {
             helpfulCount: review.helpfulCount ?? 0,
             createdAt: review.createdAt.toISOString(),
             replies: (review.replies ?? []).map((item) => ({
-                id: item._id.toString(),
+                id: item._id ? item._id.toString() : (item as any).id?.toString() ?? '',
                 employee: {
-                    id: item.employee.id.toString(),
+                    id: item.employee.id ? item.employee.id.toString() : '',
                     name: item.employee.name,
                     avatar: item.employee.avatar
                 },

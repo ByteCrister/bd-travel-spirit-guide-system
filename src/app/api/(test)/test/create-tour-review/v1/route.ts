@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
         const review = new ReviewModel({
             tour: new mongoose.Types.ObjectId(tourId),
-            user: new mongoose.Types.ObjectId(userObjectId),
+            user: new mongoose.Types.ObjectId(travelerId),
             rating: faker.number.int({ min: 1, max: 5 }),
             title: faker.lorem.sentence({ min: 3, max: 8 }),
             comment: faker.lorem.paragraphs({ min: 1, max: 3 }),
