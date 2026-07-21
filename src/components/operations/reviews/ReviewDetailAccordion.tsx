@@ -160,7 +160,7 @@ export default function ReviewDetailAccordion({
     }, [deleteReply, reviewId, fetchDetail]);
 
     const canModifyReply = useCallback(
-        (reply: ReviewReplyDTO) => currentUserId === reply.employeeId,
+        (reply: ReviewReplyDTO) => currentUserId === reply.authorId,
         [currentUserId]
     );
 
@@ -443,7 +443,7 @@ export default function ReviewDetailAccordion({
                                                 className="text-xs"
                                                 style={{ color: MUTED, fontFamily: MONO }}
                                             >
-                                                {reply.employeeId} · {reply.createdAt ? formatRelativeDate(reply.createdAt) : ""}
+                                                {reply.authorId} · {reply.createdAt ? formatRelativeDate(reply.createdAt) : ""}
                                             </span>
                                             <div className="flex gap-2">
                                                 <button
@@ -481,7 +481,7 @@ export default function ReviewDetailAccordion({
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-1.5 text-xs" style={{ color: MUTED, fontFamily: MONO }}>
-                                                <span className="font-medium" style={{ color: TEXT }}>{reply.employeeId}</span>
+                                                <span className="font-medium" style={{ color: TEXT }}>{reply.authorId}</span>
                                                 <span>·</span>
                                                 <span>{reply.createdAt ? formatRelativeDate(reply.createdAt) : ""}</span>
                                                 {reply.updatedAt !== reply.createdAt && (

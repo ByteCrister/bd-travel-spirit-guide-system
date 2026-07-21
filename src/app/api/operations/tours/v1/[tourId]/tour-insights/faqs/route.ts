@@ -8,12 +8,12 @@ import {
     GetTourFaqsResponse,
 } from "@/types/tour/tour-detail-faqs.types";
 import { TourFAQModel, ITourFAQ } from "@/models/tours/tourFAQ.model";
-import { TravelerModel } from "@/models/travelers/traveler.model";
 import UserModel from "@/models/user.model";
 import AssetModel from "@/models/assets/asset.model";
 import AssetFileModel from "@/models/assets/asset-file.model";
 import { ModerationStatus } from "@/constants/tour/tour.const";
 import { PipelineStage } from "mongoose";
+import { TravelerModel } from "@/models/travelers/traveler.model";
 
 /* -------------------------------------------------------------------------- */
 /*                                   Types                                    */
@@ -210,20 +210,11 @@ export class FAQResponseService {
                             },
                         },
 
-                        /* ---------------- ANSWERED BY ---------------- */
-                        {
-                            $lookup: {
-                                from: getCollectionName(TravelerModel),
-                                localField: "answeredBy",
-                                foreignField: "_id",
-                                as: "answeredByTraveler",
-                            },
-                        },
-                        { $unwind: { path: "$answeredByTraveler", preserveNullAndEmptyArrays: true } },
+                        /* ---------------- ANSWERED BY (User._id direct) ---------------- */
                         {
                             $lookup: {
                                 from: getCollectionName(UserModel),
-                                localField: "answeredByTraveler.user",
+                                localField: "answeredBy",
                                 foreignField: "_id",
                                 as: "answeredByUser",
                             },
@@ -246,20 +237,11 @@ export class FAQResponseService {
                             },
                         },
 
-                        /* ---------------- EDITED BY ---------------- */
-                        {
-                            $lookup: {
-                                from: getCollectionName(TravelerModel),
-                                localField: "editedBy",
-                                foreignField: "_id",
-                                as: "editedByTraveler",
-                            },
-                        },
-                        { $unwind: { path: "$editedByTraveler", preserveNullAndEmptyArrays: true } },
+                        /* ---------------- EDITED BY (User._id direct) ---------------- */
                         {
                             $lookup: {
                                 from: getCollectionName(UserModel),
-                                localField: "editedByTraveler.user",
+                                localField: "editedBy",
                                 foreignField: "_id",
                                 as: "editedByUser",
                             },
@@ -328,9 +310,9 @@ export class FAQResponseService {
 
                                 answeredBy: {
                                     $cond: {
-                                        if: { $ifNull: ["$answeredByTraveler._id", false] },
+                                        if: { $ifNull: ["$answeredByUser._id", false] },
                                         then: {
-                                            id: "$answeredByTraveler._id",
+                                            id: "$answeredByUser._id",
                                             name: "$answeredByUser.name",
                                             avatarUrl: {
                                                 $arrayElemAt: ["$answeredByAvatarFile.publicUrl", 0],
@@ -342,9 +324,9 @@ export class FAQResponseService {
 
                                 editedBy: {
                                     $cond: {
-                                        if: { $ifNull: ["$editedByTraveler._id", false] },
+                                        if: { $ifNull: ["$editedByUser._id", false] },
                                         then: {
-                                            id: "$editedByTraveler._id",
+                                            id: "$editedByUser._id",
                                             name: "$editedByUser.name",
                                         },
                                         else: null,

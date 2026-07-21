@@ -7,7 +7,7 @@ import AssetModel from "@/models/assets/asset.model";
 import AssetFileModel from "@/models/assets/asset-file.model";
 import { TravelerModel } from "@/models/travelers/traveler.model";
 import UserModel from "@/models/user.model";
-import EmployeeModel from "@/models/employees/employees.model";
+
 
 // Helper types for populated fields
 export type PopulatedUser = {
@@ -36,7 +36,7 @@ export type PopulatedEmployee = {
 
 export type PopulatedReviewReply = {
     _id: Types.ObjectId;
-    employee: PopulatedEmployee | Types.ObjectId;
+    author: PopulatedUser | Types.ObjectId;
     message: string;
     isApproved: boolean;
     approvedAt?: Date | null;
@@ -122,10 +122,10 @@ export async function buildTourReviewDTO(
             },
         }) as ReviewQuery;
 
-        // Populate replies' employee
+        // Populate replies' author (User)
         query = query.populate<{ replies: PopulatedReviewReply[] }>({
-            path: "replies.employee",
-            model: EmployeeModel,
+            path: "replies.author",
+            model: UserModel,
             select: "_id name",
         }) as ReviewQuery;
 
@@ -166,10 +166,10 @@ export async function buildTourReviewDTO(
             deletedAt: review.deletedAt?.toISOString() || null,
             replies: review.replies.map(reply => ({
                 _id: toObjectIdString(reply._id),
-                employeeId:
-                    reply.employee && typeof reply.employee === "object" && "_id" in reply.employee
-                        ? toObjectIdString(reply.employee._id)
-                        : toObjectIdString(reply.employee as Types.ObjectId),
+                authorId:
+                    reply.author && typeof reply.author === "object" && "_id" in reply.author
+                        ? toObjectIdString(reply.author._id)
+                        : toObjectIdString(reply.author as Types.ObjectId),
                 message: reply.message,
                 isApproved: reply.isApproved,
                 createdAt: reply.createdAt.toISOString(),

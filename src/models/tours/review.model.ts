@@ -16,7 +16,7 @@ import TourModel from "./tour.model";
 
 export interface IReviewReply {
     _id: Types.ObjectId;
-    employee: Types.ObjectId;
+    author: Types.ObjectId; // User who replied (guide or assistant)
     message: string;
     isApproved: boolean;
     approvedAt?: Date | null;
@@ -30,9 +30,9 @@ export interface IReviewReply {
 
 const ReviewReplySchema = new Schema<IReviewReply>(
     {
-        employee: {
+        author: {
             type: Schema.Types.ObjectId,
-            ref: "Employee",
+            ref: "User", // guide or assistant — any User with management access
             required: true,
             index: true,
         },
@@ -145,7 +145,7 @@ export interface IReview extends Document {
     deleteReview(reason?: string, session?: ClientSession): Promise<this>;
     restore(session?: ClientSession): Promise<this>;
     addReply(
-        employeeId: Types.ObjectId,
+        authorId: Types.ObjectId,
         message: string,
         session?: ClientSession
     ): Promise<this>;
@@ -392,13 +392,13 @@ ReviewSchema.methods.restore = async function (
  */
 ReviewSchema.methods.addReply = async function (
     this: IReview,
-    employeeId: Types.ObjectId,
+    authorId: Types.ObjectId,
     message: string,
     session?: ClientSession
 ): Promise<IReview> {
     const newReply = {
         _id: new mongoose.Types.ObjectId(),
-        employee: employeeId,
+        author: authorId,
         message,
         isApproved: true,
         approvedAt: new Date(),

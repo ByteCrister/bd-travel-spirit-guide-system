@@ -1,4 +1,4 @@
-// models/tourFAQVote.model.ts
+// models/tours/tourFAQ.model.ts
 import { defineModel } from "@/lib/helpers/defineModel";
 import { Schema, Document, Types } from "mongoose";
 

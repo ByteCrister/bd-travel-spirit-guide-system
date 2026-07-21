@@ -1,16 +1,16 @@
 // api/operations/reviews/v1/[reviewId]/replies/[replyId]/route.ts
 
-import { EMPLOYEE_ROLE } from "@/constants/employee/employee.const";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { buildTourReviewDTO } from "@/lib/build-responses/build-tour-review-dto";
 import { ApiError, withErrorHandler } from "@/lib/helpers/withErrorHandler";
 import { withTransaction } from "@/lib/helpers/withTransaction";
-import EmployeeModel from "@/models/employees/employees.model";
+import UserModel from "@/models/user.model";
 import { ReviewModel } from "@/models/tours/review.model";
 import { Types } from "mongoose";
 import { NextRequest } from "next/server";
 import z from "zod";
 import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 
 // Validation schema for request body
 const UpdateReplySchema = z.object({
@@ -29,8 +29,25 @@ interface Params {
 }
 
 /**
- * PATCH /api/reviews/[reviewId]/replies
- * Update a reply to a review
+ * Helper: validate that the current session user is a guide or assistant.
+ * Returns the User._id as an ObjectId.
+ */
+async function resolveAuthor(userId: string): Promise<Types.ObjectId> {
+    const user = await UserModel.findById(userId).select("role").lean();
+    if (
+        !user ||
+        ![USER_ROLE.GUIDE, USER_ROLE.ASSISTANT].includes(
+            user.role as typeof USER_ROLE[keyof typeof USER_ROLE]
+        )
+    ) {
+        throw new ApiError("Only guide or assistant users can manage replies", 403);
+    }
+    return new Types.ObjectId(userId);
+}
+
+/**
+ * PATCH /api/reviews/[reviewId]/replies/[replyId]
+ * Update a reply — guide and assistant only, reply owner only
  */
 export const PATCH = withErrorHandler(
     async (req: NextRequest, { params }: Params) => {
@@ -44,34 +61,7 @@ export const PATCH = withErrorHandler(
             throw new ApiError("Unauthorized", 401);
         }
 
-        // Get employee from session
-        const [employee] = await EmployeeModel.aggregate([
-            {
-                $match: { user: new Types.ObjectId(userId) },
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "user",
-                    foreignField: "_id",
-                    as: "user",
-                },
-            },
-            { $unwind: "$user" },
-            {
-                $match: { "user.role": EMPLOYEE_ROLE.ASSISTANT },
-            },
-            {
-                $project: { _id: 1, name: 1 },
-            },
-        ]);
-
-        if (!employee) {
-            throw new ApiError(
-                "Only assistant employees can update replays",
-                403
-            );
-        }
+        const authorObjectId = await resolveAuthor(userId);
 
         // 2. Validate request body
         const body = await req.json() as { replyId: string; message: string };
@@ -85,7 +75,6 @@ export const PATCH = withErrorHandler(
         }
 
         const { message } = validation.data;
-
 
         // 3. Validate IDs format
         if (!Types.ObjectId.isValid(reviewId) || !Types.ObjectId.isValid(replyId)) {
@@ -123,39 +112,21 @@ export const PATCH = withErrorHandler(
                 throw new ApiError("Cannot update a deleted reply", 400);
             }
 
-            // Check if employee is the owner of the reply
-            if (!reply.employee.equals(employee._id)) {
+            // Check if the current user is the author of the reply
+            if (!reply.author.equals(authorObjectId)) {
                 throw new ApiError("You can only update your own replies", 403);
             }
 
-            // Check if reply is rejected (if rejection prevents updates)
+            // Check if reply is rejected
             if (reply.rejectedAt && !reply.isApproved) {
                 throw new ApiError("Cannot update a rejected reply", 400);
             }
 
-            // Update the reply using the new instance method
+            // Update the reply using the instance method
             await review.updateReply(replyObjectId, message, session);
 
-            // Fetch the updated reply
-            const updatedReview = await ReviewModel.findById(reviewObjectId)
-                .populate({
-                    path: "replies.employee",
-                    select: "_id name"
-                })
-                .session(session);
-
-            if (!updatedReview) {
-                throw new ApiError("Failed to fetch updated review", 500);
-            }
-
-            const updatedReply = updatedReview.replies.id(replyObjectId);
-            if (!updatedReply) {
-                throw new ApiError("Failed to fetch updated reply", 500);
-            }
-
-            // Convert to DTO
-            const replyDTO = await buildTourReviewDTO(reviewId, false, session)
-
+            // Fetch the updated review DTO
+            const replyDTO = await buildTourReviewDTO(reviewId, false, session);
             return replyDTO;
         });
 
@@ -175,12 +146,7 @@ export const PATCH = withErrorHandler(
 
 /**
  * DELETE /api/reviews/[reviewId]/replies/[replyId]
- * Delete a reply (soft delete)
- * 
- * Response:
- * {
- *   data: { success: true };
- * }
+ * Soft-delete a reply — guide and assistant only, reply owner only
  */
 export const DELETE = withErrorHandler(
     async (req: NextRequest, { params }: Params) => {
@@ -193,34 +159,7 @@ export const DELETE = withErrorHandler(
             throw new ApiError("Unauthorized", 401);
         }
 
-        // Get employee from session
-        const [employee] = await EmployeeModel.aggregate([
-            {
-                $match: { user: new Types.ObjectId(userId) },
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "user",
-                    foreignField: "_id",
-                    as: "user",
-                },
-            },
-            { $unwind: "$user" },
-            {
-                $match: { "user.role": EMPLOYEE_ROLE.ASSISTANT },
-            },
-            {
-                $project: { _id: 1, name: 1 },
-            },
-        ]);
-
-        if (!employee) {
-            throw new ApiError(
-                "Only assistant employees can update replays",
-                403
-            );
-        }
+        const authorObjectId = await resolveAuthor(userId);
 
         // 2. Validate IDs format
         if (!Types.ObjectId.isValid(reviewId) || !Types.ObjectId.isValid(replyId)) {
@@ -229,7 +168,6 @@ export const DELETE = withErrorHandler(
 
         const reviewObjectId = new Types.ObjectId(reviewId);
         const replyObjectId = new Types.ObjectId(replyId);
-        const employeeObjectId = new Types.ObjectId(employee._id);
 
         // 3. Check for optional reason in query parameters
         const url = new URL(req.url);
@@ -258,10 +196,8 @@ export const DELETE = withErrorHandler(
                 throw new ApiError("Reply is already deleted", 400);
             }
 
-            // Check if employee is the owner of the reply (or has admin rights)
-            if (!reply.employee.equals(employeeObjectId)) {
-                // Optional: Check if user has admin/moderation permissions
-                // For now, only allow owners to delete
+            // Check if the current user is the author of the reply
+            if (!reply.author.equals(authorObjectId)) {
                 throw new ApiError("You can only delete your own replies", 403);
             }
 

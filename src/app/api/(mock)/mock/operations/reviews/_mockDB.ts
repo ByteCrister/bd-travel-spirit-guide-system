@@ -152,7 +152,7 @@ function makeReviewDetail(overrides: Partial<StoredReview> = {}): StoredReview {
 
             return {
                 _id: makeId("rep_"),
-                employeeId: makeId("emp_"),
+                authorId: makeId("emp_"),
                 employeeName: faker.person.fullName(),
                 employeeAvatar: faker.datatype.boolean(0.7) ? faker.image.avatar() : null,
                 message: faker.lorem.paragraphs({ min: 1, max: 2 }),
@@ -348,7 +348,7 @@ function toDetailDTO(r: StoredReview): ReviewDetailDTO {
         ...toListDTO(r),
         replies: (r.replies ?? []).map((rep) => ({
             _id: rep._id,
-            employeeId: rep.employeeId,
+            authorId: rep.authorId,
             message: rep.message,
             isApproved: rep.isApproved,
             createdAt: rep.createdAt,

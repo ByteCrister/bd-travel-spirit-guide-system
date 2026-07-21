@@ -16,7 +16,7 @@ export type ObjectIdStr = string;
 /** Reply left by an employee on a review */
 export interface ReviewReplyDTO {
     _id: ObjectIdStr;
-    employeeId: ObjectIdStr;
+    authorId: ObjectIdStr;
     message: string;
     isApproved: boolean;
     createdAt: string; // ISO

@@ -13,6 +13,7 @@ import { combineSchemas } from "@/types/common/validator.yup";
 import { ValidationError } from "yup";
 import { CreateTourDTO, TourDetailDTO } from "@/types/tour/tour.types";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
+import GuideModel from "@/models/guide/guide.model";
 import EmployeeModel from "@/models/employees/employees.model";
 import { ApiError } from "@/lib/helpers/withErrorHandler";
 import { slugify } from "@/lib/helpers/slugify";
@@ -21,6 +22,7 @@ import { SupportSystemNotificationModel } from "@/models/notifications/support-s
 import { SUPPORT_SYSTEM_NOTIFICATION_TYPE, SUPPORT_SYSTEM_NOTIFICATION_PRIORITY } from "@/constants/notifications/support-system-notification.const";
 import { triggerSocketEvent } from "@/socket/triggerSocketEvent";
 import { SocketTTriggerTypes } from "@/constants/socket/socket.const";
+import { getCollectionName } from "@/lib/helpers/get-collection-name";
 // POST Helper function to map destinations & attractions
 function mapDestinations(
     destinations: CreateTourDTO["destinations"],
@@ -64,13 +66,57 @@ const TourPostHandler = async (request: NextRequest) => {
     if (!authorIdStr) throw new ApiError("Unauthorized", 401);
     const authorId = new Types.ObjectId(authorIdStr);
 
-    // 5️⃣ Get companyId
-    const employee = await EmployeeModel.findOne({ user: authorId }).select("companyId").lean();
-    if (!employee?.companyId) throw new ApiError("Employee or company not found", 404);
-    const companyId =
-        employee.companyId instanceof Types.ObjectId
-            ? employee.companyId
-            : new Types.ObjectId(employee.companyId);
+    // 5️⃣ Resolve companyId for both guide and assistant roles
+    const [userData] = await UserModel.aggregate([
+        { $match: { _id: authorId } },
+        {
+            $lookup: {
+                from: getCollectionName(GuideModel),
+                localField: "_id",
+                foreignField: "owner.user",
+                as: "guide",
+            },
+        },
+        {
+            $lookup: {
+                from: getCollectionName(EmployeeModel),
+                localField: "_id",
+                foreignField: "user",
+                as: "employee",
+            },
+        },
+        {
+            $project: {
+                _id: 1,
+                role: 1,
+                companyId: {
+                    $switch: {
+                        branches: [
+                            {
+                                case: { $eq: ["$role", USER_ROLE.GUIDE] },
+                                then: { $arrayElemAt: ["$guide._id", 0] },
+                            },
+                            {
+                                case: { $eq: ["$role", USER_ROLE.ASSISTANT] },
+                                then: { $arrayElemAt: ["$employee.companyId", 0] },
+                            },
+                        ],
+                        default: null,
+                    },
+                },
+            },
+        },
+    ]);
+
+    if (!userData) throw new ApiError("User not found", 404);
+    if (!userData.companyId)
+        throw new ApiError(
+            "Access denied: only guide or assistant users can create tours",
+            403
+        );
+    const companyId = userData.companyId instanceof Types.ObjectId
+        ? userData.companyId
+        : new Types.ObjectId(userData.companyId);
 
     // 6️⃣ Upload images & create tour in transaction
     const tourDetailDTO = await withTransaction<TourDetailDTO>(async session => {
