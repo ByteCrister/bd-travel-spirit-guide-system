@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -106,13 +106,22 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
         <div className={cn("w-full space-y-6 overflow-x-hidden container mx-auto max-w-7xl p-4 sm:p-6 lg:p-8", NEU_SURFACE, "min-h-screen")}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <Breadcrumbs items={breadCrumbs} />
-                <Link
-                    href="/operations/tours/add-tour"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide  hover: hover:bg-[#007777] active: transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50"
-                >
-                    <Plus className="w-5 h-5" />
-                    Create Tour
-                </Link>
+                <div className="flex items-center gap-3">
+                    <Link
+                        href={`/operations/tours/${encodeURIComponent(encodeId(tourId ?? "-"))}/history`}
+                        className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-white border border-[#006666] text-[#006666] font-[family-name:var(--font-space-mono)] font-bold tracking-wide hover:bg-gray-50 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50"
+                    >
+                        <LayoutDashboard className="w-5 h-5" />
+                        View History
+                    </Link>
+                    <Link
+                        href="/operations/tours/add-tour"
+                        className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#006666] text-white font-[family-name:var(--font-space-mono)] font-bold tracking-wide  hover: hover:bg-[#007777] active: transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Create Tour
+                    </Link>
+                </div>
             </div>
 
             {/* ── Tab Bar ── */}
