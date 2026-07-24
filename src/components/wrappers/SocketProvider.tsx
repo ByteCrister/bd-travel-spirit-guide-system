@@ -7,7 +7,6 @@ import {
     EMIT_SOCKET,
     LISTEN_SOCKET_AGET_EVENT,
     LISTEN_SOCKET_CHAT_EVENT,
-    LISTEN_SOCKET_NOTIFICATION_EVENT,
     SOCKET_NAMESPACES,
 } from "@/constants/socket/socket.const";
 import { disconnectSocket, getSocket } from "@/socket/initiateSocket";
@@ -15,8 +14,7 @@ import { useChatMessageStore } from "@/store/chat-message.store";
 import type { ChatMessage } from "@/types/chat/chatMessage.types";
 import { useOnlineAgentsStore } from "@/store/online-agents.store";
 import { Agent } from "@/constants/current-user/agent";
-import { useNotificationStore } from "@/store/notification.store";
-import { IGuideSystemNotificationData } from "@/models/notifications/guide-system-notification.model";
+
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
     const { baseUser } = useCurrentUserStore();
@@ -80,21 +78,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         socket.on(LISTEN_SOCKET_CHAT_EVENT.MARK_AS_SEEN, onMarkSeen);
         socket.on(LISTEN_SOCKET_CHAT_EVENT.INCREASE_UNSEEN_MESSAGE_COUNT, onUnseenCount);
 
-        // ── Notification listeners ──────────────────────────────
-        // These fire when the Express server broadcasts to the company room.
-        // Use getState() to avoid adding the store to effect dependencies.
-        const onEmpForgotPassword = (payload: { data: IGuideSystemNotificationData }) => {
-            console.log("[Socket] Employee forgot password notification:", payload);
-            useNotificationStore.getState().addNotification(payload.data);
-        };
 
-        const onGuideForgotPassword = (payload: { data: IGuideSystemNotificationData }) => {
-            console.log("[Socket] Guide forgot password notification:", payload);
-            useNotificationStore.getState().addNotification(payload.data);
-        };
-
-        socket.on(LISTEN_SOCKET_NOTIFICATION_EVENT.GUIDE_EMP_FORGOT_PASSWORD, onEmpForgotPassword);
-        socket.on(LISTEN_SOCKET_NOTIFICATION_EVENT.GUIDE_FORGOT_PASSWORD, onGuideForgotPassword);
 
         // ── Agent listeners (only for company users) ────────────
         let cleanupAgentListeners = () => { };
@@ -124,8 +108,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
             socket.off(LISTEN_SOCKET_CHAT_EVENT.DELETE_CHAT_MESSAGE, onDeleteMessage);
             socket.off(LISTEN_SOCKET_CHAT_EVENT.MARK_AS_SEEN, onMarkSeen);
             socket.off(LISTEN_SOCKET_CHAT_EVENT.INCREASE_UNSEEN_MESSAGE_COUNT, onUnseenCount);
-            socket.off(LISTEN_SOCKET_NOTIFICATION_EVENT.GUIDE_EMP_FORGOT_PASSWORD, onEmpForgotPassword);
-            socket.off(LISTEN_SOCKET_NOTIFICATION_EVENT.GUIDE_FORGOT_PASSWORD, onGuideForgotPassword);
+
             cleanupAgentListeners();
             disconnectSocket(SOCKET_NAMESPACES.USER_ONLINE);
         };

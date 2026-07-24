@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { DashboardLayout } from "@/components/dashboard-layout/DashboardLayout";
+import { GuideSystemNotificationWrapper } from "./GuideSystemNotificationWrapper";
 // import { useCurrentUserStore } from "@/store/current-user.store";
 // import LoadingDashboard from "../global/LoadingDashboard";
 
@@ -41,7 +42,11 @@ export function DashboardProvider({ children }: DashboardProviderProps) {
   // if (baseMeta.loading) return <LoadingDashboard />
 
   if (shouldUseDashboardLayout) {
-    return <DashboardLayout>{children}</DashboardLayout>;
+    return (
+      <GuideSystemNotificationWrapper>
+        <DashboardLayout>{children}</DashboardLayout>
+      </GuideSystemNotificationWrapper>
+    );
   }
 
   return <>{children}</>;

@@ -249,7 +249,7 @@ export function SearchBar({ isMobile = false, onClose }: SearchBarProps) {
               exit={{ opacity: 0, scale: 0.95, y: -8 }}
               transition={{ duration: 0.18 }}
               className={cn(
-                "absolute right-0 top-12 z-50 w-80 rounded-xl p-2",
+                "fixed left-4 right-4 top-20 z-50 p-2 rounded-xl sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-96",
                 "bg-[#E7E5E4]",
                 "shadow-[6px_6px_16px_#c8c6c5,-6px_-6px_16px_#ffffff]",
                 "border border-[#d0cecc]"

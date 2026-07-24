@@ -131,23 +131,7 @@ AssetSchema.query.notDeleted = function () {
  * Hooks
  * ======================================================= */
 
-AssetSchema.pre("save", async function () {
-    const session = this.$session() ?? undefined; // convert null to undefined
 
-    if (this.isNew) {
-        const assetFile = await AssetFileModel.findById(this.file).session(session ?? null);
-        if (assetFile && assetFile.refCount > 1) return; // already counted
-        if (assetFile && assetFile.refCount === 1) return; // newly created, don't increment
-        // Only increment if refCount > 1 is not the case
-        await AssetFileModel.incrementRef(this.file.toString(), session);
-    } else if (this.isModified("deletedAt")) {
-        if (this.deletedAt) {
-            await AssetFileModel.decrementRef(this.file.toString(), session);
-        } else {
-            await AssetFileModel.incrementRef(this.file.toString(), session);
-        }
-    }
-});
 
 /* =========================================================
  * Instance methods
@@ -215,8 +199,7 @@ AssetSchema.statics.softDeleteMany = async function (
         { session }
     );
 
-    // 2️⃣ Decrement refCount for all associated files at once
-    await AssetFileModel.decrementManyRef(fileIds, session);
+
 
     return { matchedCount: assets.length, modifiedCount: assets.length };
 };
