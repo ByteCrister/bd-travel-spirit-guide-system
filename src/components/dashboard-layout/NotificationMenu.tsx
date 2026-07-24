@@ -167,7 +167,7 @@ export function NotificationMenu() {
                 )}
               </div>
 
-              <ScrollArea className="max-h-96">
+              <div className="max-h-96 overflow-y-auto overflow-x-hidden">
                 <div className="p-2 space-y-1">
                   {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-10 gap-2 text-[#1E2938]/40">
@@ -230,7 +230,7 @@ export function NotificationMenu() {
                     })
                   )}
                 </div>
-              </ScrollArea>
+              </div>
             </motion.div>
           </>
         )}

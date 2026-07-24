@@ -8,7 +8,6 @@ import {
     ClientSession,
     HydratedDocument,
 } from "mongoose";
-import AssetFileModel from "./asset-file.model";
 
 /* =========================================================
  * Types
