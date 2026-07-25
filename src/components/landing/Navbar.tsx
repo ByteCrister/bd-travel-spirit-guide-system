@@ -11,6 +11,9 @@ import { useScrollStore } from "@/hooks/scroll-store";
 import { useCurrentUserStore } from "@/store/current-user.store";
 import DottedLoader from "../global/DottedLoader";
 
+const REGISTER_AS_GUIDE=`https://bd-travel-spirit-support-system.vercel.app/register-as-guide`;
+const MAIN_WEB_SITE=`https://bd-travel-spirit-traveller-q26s.vercel.app`;
+
 export default function Navbar() {
     const {
         scrollToSection,
@@ -174,7 +177,7 @@ export default function Navbar() {
 
                     <div className="flex items-center gap-3">
                         <Link
-                            href="https://www.example.com"
+                            href={MAIN_WEB_SITE}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group hidden lg:flex items-center gap-2 rounded-2xl px-5 py-2 bg-white/5 text-slate-900 border border-white/10 font-semibold hover:shadow-md transition-all duration-200"
@@ -185,7 +188,7 @@ export default function Navbar() {
 
                         {/* Register as Guide CTA */}
                         <Link
-                            href="/register-guide"
+                            href={REGISTER_AS_GUIDE}
                             className="flex items-center gap-2 rounded-2xl px-5 py-2 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white font-semibold shadow-lg hover:scale-105 transition-transform duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                             aria-label="Register as Guide"
                         >
@@ -284,7 +287,7 @@ export default function Navbar() {
                             )}
 
                             <Link
-                                href="/register-guide"
+                                href={REGISTER_AS_GUIDE}
                                 className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white rounded-xl font-semibold mt-1 hover:scale-105 transition-transform"
                                 onClick={() => setMobileOpen(false)}
                                 aria-label="Register as Guide"
@@ -294,7 +297,7 @@ export default function Navbar() {
                             </Link>
 
                             <Link
-                                href="https://www.example.com"
+                                href={MAIN_WEB_SITE}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white rounded-xl font-semibold mt-2 hover:scale-105 transition-transform"

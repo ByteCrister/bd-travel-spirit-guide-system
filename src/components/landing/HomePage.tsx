@@ -31,7 +31,7 @@ export default function HomePage({ pageData }: { pageData: HomePageDataTypes }) 
                 <FinalCTA />
             </main>
 
-            <Footer />
+            <Footer socialLinks={pageData.socialLinks} locations={pageData.locations} />
         </div>
     );
 }

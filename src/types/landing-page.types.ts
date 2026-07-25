@@ -9,6 +9,21 @@ export type Stat = {
     prefix?: string;
 };
 
+export type SocialLink = {
+    label?: string;
+    icon: string;
+    url: string;
+    order?: number;
+};
+
+export type LocationInfo = {
+    country: string;
+    city?: string;
+    region?: string;
+};
+
 export interface HomePageDataTypes {
-    heroStats: Stat[]
-}
+    heroStats: Stat[];
+    socialLinks: SocialLink[];
+    locations: LocationInfo[];
+}

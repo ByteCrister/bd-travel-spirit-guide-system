@@ -26,8 +26,30 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "../ui/button";
+import { SocialLink, LocationInfo } from "@/types/landing-page.types";
 
-export default function Footer() {
+interface FooterProps {
+  socialLinks?: SocialLink[];
+  locations?: LocationInfo[];
+}
+
+export default function Footer({ socialLinks = [], locations = [] }: FooterProps) {
+  const IconMap: Record<string, React.ElementType> = {
+    FaFacebook,
+    FaInstagram,
+    FaLinkedin,
+    FaTwitter,
+    FaYoutube,
+    FaTiktok,
+    FaDiscord,
+    facebook: FaFacebook,
+    instagram: FaInstagram,
+    linkedin: FaLinkedin,
+    twitter: FaTwitter,
+    youtube: FaYoutube,
+    tiktok: FaTiktok,
+    discord: FaDiscord,
+  };
   return (
     <footer className="relative overflow-hidden" role="contentinfo">
       {/* Premium gradient background with enhanced depth */}
@@ -208,10 +230,19 @@ export default function Footer() {
                 <span className="text-base">+880 123 456 789</span>
               </div>
 
-              <div className="flex items-center gap-3 text-slate-300">
-                <MapPin className="h-5 w-5 text-emerald-400" />
-                <span className="text-base">Dhaka, Bangladesh</span>
-              </div>
+              {locations.length > 0 ? (
+                locations.map((loc, i) => (
+                  <div key={i} className="flex items-center gap-3 text-slate-300">
+                    <MapPin className="h-5 w-5 text-emerald-400" />
+                    <span className="text-base">{loc.city ? `${loc.city}, ` : ''}{loc.country}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center gap-3 text-slate-300">
+                  <MapPin className="h-5 w-5 text-emerald-400" />
+                  <span className="text-base">Sylhet, Bangladesh</span>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -298,26 +329,46 @@ export default function Footer() {
             <p className="text-slate-300 text-sm font-medium">Follow us</p>
 
             <div className="flex gap-3">
-              {[
-                { icon: FaFacebook, label: "Facebook", color: "hover:text-blue-500", bg: "hover:bg-blue-500/10" },
-                { icon: FaTwitter, label: "Twitter/X", color: "hover:text-sky-400", bg: "hover:bg-sky-500/10" },
-                { icon: FaInstagram, label: "Instagram", color: "hover:text-pink-500", bg: "hover:bg-pink-500/10" },
-                { icon: FaLinkedin, label: "LinkedIn", color: "hover:text-blue-600", bg: "hover:bg-blue-600/10" },
-                { icon: FaYoutube, label: "YouTube", color: "hover:text-red-500", bg: "hover:bg-red-500/10" },
-                { icon: FaTiktok, label: "TikTok", color: "hover:text-black", bg: "hover:bg-black/10" },
-                { icon: FaDiscord, label: "Discord", color: "hover:text-indigo-500", bg: "hover:bg-indigo-500/10" },
-              ].map(({ icon: Icon, label, color, bg }, i) => (
-                <motion.a
-                  key={i}
-                  whileHover={{ scale: 1.1, y: -3 }}
-                  whileTap={{ scale: 0.95 }}
-                  href="#"
-                  aria-label={label}
-                  className={`p-3 rounded-xl bg-white/5 border border-white/10 transition-all duration-300 text-slate-300 ${color} ${bg}`}
-                >
-                  <Icon className="h-5 w-5" />
-                </motion.a>
-              ))}
+              {socialLinks.length > 0 ? (
+                socialLinks.map((link, i) => {
+                  const Icon = IconMap[link.icon] || IconMap[link.icon?.toLowerCase()] || Globe;
+                  return (
+                    <motion.a
+                      key={i}
+                      whileHover={{ scale: 1.1, y: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={link.label || "Social Link"}
+                      className="p-3 rounded-xl bg-white/5 border border-white/10 transition-all duration-300 text-slate-300 hover:text-emerald-400 hover:bg-emerald-500/10"
+                    >
+                      <Icon className="h-5 w-5" />
+                    </motion.a>
+                  );
+                })
+              ) : (
+                [
+                  { icon: FaFacebook, label: "Facebook", color: "hover:text-blue-500", bg: "hover:bg-blue-500/10" },
+                  { icon: FaTwitter, label: "Twitter/X", color: "hover:text-sky-400", bg: "hover:bg-sky-500/10" },
+                  { icon: FaInstagram, label: "Instagram", color: "hover:text-pink-500", bg: "hover:bg-pink-500/10" },
+                  { icon: FaLinkedin, label: "LinkedIn", color: "hover:text-blue-600", bg: "hover:bg-blue-600/10" },
+                  { icon: FaYoutube, label: "YouTube", color: "hover:text-red-500", bg: "hover:bg-red-500/10" },
+                  { icon: FaTiktok, label: "TikTok", color: "hover:text-black", bg: "hover:bg-black/10" },
+                  { icon: FaDiscord, label: "Discord", color: "hover:text-indigo-500", bg: "hover:bg-indigo-500/10" },
+                ].map(({ icon: Icon, label, color, bg }, i) => (
+                  <motion.a
+                    key={i}
+                    whileHover={{ scale: 1.1, y: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                    href="#"
+                    aria-label={label}
+                    className={`p-3 rounded-xl bg-white/5 border border-white/10 transition-all duration-300 text-slate-300 ${color} ${bg}`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </motion.a>
+                ))
+              )}
             </div>
           </div>
         </motion.div>
