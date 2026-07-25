@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose, { Types } from 'mongoose';
 import ConnectDB from '@/config/db';
-import { UserTourInteractionModel } from '@/models/travelers/traveler-tour-interaction.model';
+import UserTourInteractionModel from '@/models/travelers/traveler-tour-interaction.model';
 
 // Define static test IDs
 // You can replace these with actual IDs from your database
@@ -13,9 +13,11 @@ const STATIC_TOUR_ID = '6789abcd1234ef5678901235'; // Replace with a real Tour _
 interface CreateTourInteractionRequest {
     user?: string; // Optional - will use static if not provided
     bookingHistory?: string[];
-    cart?: string[];
     wishlist?: string[];
-    hiddenTours?: string[];
+    sharedTours?: string[];
+    likedTours?: string[];
+    viewedTours?: string[];
+    ratedTours?: string[];
 }
 
 // Response interfaces
@@ -94,10 +96,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
         // Prepare interaction data
         const interactionData = {
             user: userObjectId,
-            bookingHistory: body.bookingHistory?.map(id => new Types.ObjectId(id)) || [tourObjectId],
-            cart: body.cart?.map(id => new Types.ObjectId(id)) || [tourObjectId],
-            wishlist: body.wishlist?.map(id => new Types.ObjectId(id)) || [tourObjectId],
-            hiddenTours: body.hiddenTours?.map(id => new Types.ObjectId(id)) || [tourObjectId],
+            bookingHistory: body.bookingHistory?.map(id => ({ tour: new Types.ObjectId(id) })) || [{ tour: tourObjectId }],
+            wishlist: body.wishlist?.map(id => ({ tour: new Types.ObjectId(id) })) || [{ tour: tourObjectId }],
+            sharedTours: body.sharedTours?.map(id => ({ tour: new Types.ObjectId(id) })) || [{ tour: tourObjectId }],
+            likedTours: body.likedTours?.map(id => ({ tour: new Types.ObjectId(id) })) || [{ tour: tourObjectId }],
+            viewedTours: body.viewedTours?.map(id => ({ tour: new Types.ObjectId(id), viewCount: 1 })) || [{ tour: tourObjectId, viewCount: 1 }],
+            ratedTours: body.ratedTours?.map(id => ({ tour: new Types.ObjectId(id), rating: 5 })) || [{ tour: tourObjectId, rating: 5 }],
         };
 
         // Create the interaction document
@@ -111,10 +115,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
         const responseData = {
             _id: (savedInteraction._id as Types.ObjectId).toString(),
             user: savedInteraction.user.toString(),
-            bookingHistory: savedInteraction.bookingHistory.map(id => id.toString()),
-            cart: savedInteraction.cart.map(id => id.toString()),
-            wishlist: savedInteraction.wishlist.map(id => id.toString()),
-            hiddenTours: savedInteraction.hiddenTours.map(id => id.toString()),
+            bookingHistory: savedInteraction.bookingHistory.map(item => item.tour.toString()),
+            wishlist: savedInteraction.wishlist.map(item => item.tour.toString()),
+            sharedTours: savedInteraction.sharedTours.map(item => item.tour.toString()),
+            likedTours: savedInteraction.likedTours.map(item => item.tour.toString()),
+            viewedTours: savedInteraction.viewedTours.map(item => item.tour.toString()),
+            ratedTours: savedInteraction.ratedTours.map(item => item.tour.toString()),
         };
 
         return createSuccessResponse(

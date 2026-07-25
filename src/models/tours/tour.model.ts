@@ -447,7 +447,6 @@ const TourSchema = new Schema<ITour>(
       required: true,
       unique: true,
       trim: true,
-      index: true,
     },
     status: {
       type: String,
