@@ -264,16 +264,16 @@ export default function Footer({ socialLinks = [], locations = [] }: FooterProps
             </p>
 
             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-              <div className="flex flex-col sm:flex-row items-stretch w-full">
+              <div className="flex flex-col sm:flex-row items-stretch w-full gap-3 sm:gap-0">
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="flex-1 min-w-0 h-12 px-4 rounded-l-2xl sm:rounded-l-2xl sm:rounded-r-none text-base text-slate-900 bg-white border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none transition-all"
+                  className="flex-1 min-w-0 h-12 px-4 rounded-xl sm:rounded-l-2xl sm:rounded-r-none text-base text-slate-900 bg-white border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none transition-all"
                 />
 
                 <Button
                   type="submit"
-                  className="h-12 rounded-r-2xl rounded-l-none bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-6 py-3 text-white font-semibold shadow-lg hover:shadow-emerald transition-all duration-300"
+                  className="h-12 rounded-xl sm:rounded-r-2xl sm:rounded-l-none bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-6 py-3 text-white font-semibold shadow-lg hover:shadow-emerald transition-all duration-300"
                 >
                   Subscribe
                 </Button>
@@ -328,7 +328,7 @@ export default function Footer({ socialLinks = [], locations = [] }: FooterProps
           <div className="flex flex-col items-center gap-4">
             <p className="text-slate-300 text-sm font-medium">Follow us</p>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap justify-center gap-3">
               {socialLinks.length > 0 ? (
                 socialLinks.map((link, i) => {
                   const Icon = IconMap[link.icon] || IconMap[link.icon?.toLowerCase()] || Globe;
