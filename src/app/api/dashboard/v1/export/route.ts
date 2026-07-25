@@ -45,8 +45,8 @@ function arrayToCSV(data: object[], headers?: string[]): string {
 
 // ─── Zod schema for query parameters ──────────────────────────────
 const exportQuerySchema = z.object({
-  globalDateRangeFrom: z.string().datetime().optional(),
-  globalDateRangeTo: z.string().datetime().optional(),
+  globalDateRangeFrom: z.string().optional(),
+  globalDateRangeTo: z.string().optional(),
   tourStatus: z.string().optional(),
   employeeStatus: z.string().optional(),
   reportStatus: z.string().optional(),
