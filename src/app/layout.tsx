@@ -76,14 +76,14 @@ export const metadata: Metadata = {
       "Comprehensive guide system for Bangladesh tourism. Professional tour guides, travel companies, and support staff platform. Discover, manage, and book authentic Bangladesh travel experiences.",
     images: [
       {
-        url: "/og-image.png", // Create this image (1200x630px recommended)
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "BD Travel Spirit Guide System - Professional Tour Management Platform",
         type: "image/png",
       },
       {
-        url: "/og-image-square.png", // Square variant (1200x1200px)
+        url: "/og-image-square.png",
         width: 1200,
         height: 1200,
         alt: "BD Travel Spirit Guide System - Bangladesh Tourism Platform",
@@ -100,7 +100,7 @@ export const metadata: Metadata = {
     title: "BD Travel Spirit Support | Bangladesh Tour Management Platform",
     description:
       "Professional tour management and support system for Bangladesh tourism. Connect with expert guides, manage tours, and explore Bangladesh's natural beauty.",
-    images: ["/twitter-image.png"], // Create this image (1200x600px recommended)
+    images: ["/og-image.png"],
   },
 
   // Robots & Indexing
