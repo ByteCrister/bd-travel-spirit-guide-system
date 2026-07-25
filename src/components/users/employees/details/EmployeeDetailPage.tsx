@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -64,6 +64,7 @@ import { CARD_BRAND, CardBrand } from "@/constants/payment/payment.const";
 import Image from "next/image";
 import ConfirmationDialog from "./ConfirmationDialog";
 import EmployeeDetailSkeleton from "./EmployeeDetailSkeleton";
+import { DocumentViewerDialog } from "@/components/shared/DocumentViewerDialog";
 import { useEmployeeStore } from "@/store/employee.store";
 import { extractErrorMessage } from "@/utils/axios/extractErrorMessage";
 import { validateUpdateEmployeePayload } from "@/utils/validators/employee/employee.update-validator";
@@ -153,6 +154,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
 
   const [generatedPassword, setGeneratedPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
+  const [viewerDoc, setViewerDoc] = useState<DocumentDTO | null>(null);
 
   // NEW: Separate state for payment card updates
   const [cardForm, setCardForm] = useState<PaymentCardDTO | null>(null);
@@ -1293,7 +1295,7 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                             className="text-sm font-medium line-clamp-1 text-[#1E2938]"
                             style={{ fontFamily: "var(--font-space-mono)" }}
                           >
-                            {doc.type}
+                            {doc.name || doc.type}
                           </p>
                           <p
                             className="text-xs text-[#1E2938] flex items-center gap-1"
@@ -1302,14 +1304,13 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                             <Calendar className="h-3 w-3" />
                             {formatDate(doc.uploadedAt)}
                           </p>
-                          <a
+                          <button
+                            type="button"
                             className="inline-flex items-center gap-2 text-sm text-[#006666] hover:text-[#004d4d] font-medium mt-2"
-                            href={doc.url}
-                            target="_blank"
-                            rel="noreferrer"
+                            onClick={() => setViewerDoc(doc)}
                           >
                             View Document →
-                          </a>
+                          </button>
                         </div>
                         <button
                           onClick={() => removeDocumentAt(i)}
@@ -1320,6 +1321,16 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
                       </div>
                     ))}
                   </div>
+                )}
+                {viewerDoc && (
+                  <DocumentViewerDialog
+                    open={!!viewerDoc}
+                    onClose={() => setViewerDoc(null)}
+                    url={viewerDoc.url}
+                    filename={viewerDoc.name || viewerDoc.type}
+                    type={viewerDoc.type}
+                    uploadedAt={viewerDoc.uploadedAt}
+                  />
                 )}
               </InfoCard>
             </TabsContent>

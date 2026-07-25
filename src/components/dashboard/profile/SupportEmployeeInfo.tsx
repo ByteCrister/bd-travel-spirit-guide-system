@@ -11,6 +11,9 @@ import {
 import { FaBangladeshiTakaSign } from "react-icons/fa6";
 import { format } from "date-fns";
 import SupportEmployeeInfoSkeleton from "./skeletons/SupportEmployeeInfoSkeleton";
+import { DocumentViewerDialog } from "@/components/shared/DocumentViewerDialog";
+import { DocumentDTO } from "@/types/employee/employee.types";
+import { useState } from "react";
 
 // ─── Neumorphism Design Tokens ────────────────────────────────────────────────
 const N = {
@@ -102,6 +105,8 @@ interface SupportEmployeeInfoProps {
 }
 
 export default function SupportEmployeeInfo({ employeeInfo, isLoading }: SupportEmployeeInfoProps) {
+    const [viewerDoc, setViewerDoc] = useState<DocumentDTO | null>(null);
+
     if (isLoading) return <SupportEmployeeInfoSkeleton />;
 
     if (!employeeInfo) {
@@ -315,26 +320,35 @@ export default function SupportEmployeeInfo({ employeeInfo, isLoading }: Support
                                                 <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: N.surface, boxShadow: N.shadowOut }}>
                                                     <FileText className="h-5 w-5" style={{ color: N.primary }} />
                                                 </div>
-                                                <div>
-                                                    <p className="text-xs font-bold" style={{ color: N.text }}>{doc.type}</p>
+                                                <div className="text-left">
+                                                    <p className="text-xs font-bold" style={{ color: N.text }}>{doc.name || doc.type}</p>
                                                     <p className="text-xs mt-0.5 flex items-center gap-1" style={{ color: N.muted, fontFamily: N.fontBody }}>
                                                         <Calendar className="h-3 w-3" />
                                                         Uploaded {format(new Date(doc.uploadedAt), "MMM d, yyyy")}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <a
-                                                href={doc.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <button
+                                                type="button"
+                                                onClick={() => setViewerDoc(doc)}
                                                 className="inline-flex items-center gap-1.5 text-xs font-bold"
                                                 style={{ color: N.primary, fontFamily: N.fontMono }}
                                             >
                                                 View <ExternalLink className="h-3.5 w-3.5" />
-                                            </a>
+                                            </button>
                                         </motion.div>
                                     ))}
                                 </div>
+                                {viewerDoc && (
+                                  <DocumentViewerDialog
+                                    open={!!viewerDoc}
+                                    onClose={() => setViewerDoc(null)}
+                                    url={viewerDoc.url}
+                                    filename={viewerDoc.name || viewerDoc.type}
+                                    type={viewerDoc.type}
+                                    uploadedAt={viewerDoc.uploadedAt}
+                                  />
+                                )}
                             </NeuCard>
                         </motion.div>
                     )}

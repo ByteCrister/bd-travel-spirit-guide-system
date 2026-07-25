@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { Formik, Form, Field, FieldArray, FieldProps, FormikErrors, FormikHelpers } from "formik";
@@ -16,6 +16,7 @@ import {
     Info
 } from "lucide-react";
 import Image from "next/image";
+import { DocumentViewerDialog } from "@/components/shared/DocumentViewerDialog";
 
 import { CreateEmployeeFormValues, createEmployeeValidationSchema } from "@/utils/validators/employee/employee.validator";
 import { CreateEmployeePayload, ShiftDTO, DayOfWeek, DocumentDTO } from "@/types/employee/employee.types";
@@ -131,6 +132,7 @@ export default function AddEmployeePage() {
 
     const [verifying, setVerifying] = useState(false);
     const [verificationError, setVerificationError] = useState<string | null>(null);
+    const [viewerDoc, setViewerDoc] = useState<DocumentDTO | null>(null);
 
     const avatarInputRef = useRef<HTMLInputElement>(null);
     const documentInputRef = useRef<HTMLInputElement>(null);
@@ -1342,6 +1344,17 @@ export default function AddEmployeePage() {
                                                             })
                                                         )}
                                                     </AnimatePresence>
+
+                                                    {viewerDoc && (
+                                                        <DocumentViewerDialog
+                                                            open={!!viewerDoc}
+                                                            onClose={() => setViewerDoc(null)}
+                                                            url={viewerDoc.url}
+                                                            filename={viewerDoc.name || viewerDoc.type}
+                                                            type={viewerDoc.type}
+                                                            uploadedAt={viewerDoc.uploadedAt}
+                                                        />
+                                                    )}
                                                 </div>
                                             )}
                                         </FieldArray>
@@ -1430,8 +1443,16 @@ export default function AddEmployeePage() {
                                                                                 <File className="h-6 w-6" style={{ color: '#006666' }} />
                                                                             )}
                                                                         </div>
-                                                                        <div>
-                                                                            <p className="text-sm font-medium" style={{ color: '#1E2938' }}>{doc.type}</p>
+                                                                        <div className="text-left">
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => setViewerDoc(doc)}
+                                                                                className="text-sm font-medium hover:text-[#006666] transition-colors cursor-pointer block truncate max-w-[200px] sm:max-w-xs text-left"
+                                                                                style={{ color: '#1E2938' }}
+                                                                                title={doc.name || doc.type}
+                                                                            >
+                                                                                {doc.name || doc.type}
+                                                                            </button>
                                                                             {documentErrors[i] && <FormMessage>{documentErrors[i]}</FormMessage>}
                                                                         </div>
                                                                     </div>
