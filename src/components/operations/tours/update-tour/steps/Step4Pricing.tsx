@@ -211,7 +211,7 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
   // ── Discounts ─────────────────────────────────────────────────────────────
   const addDiscount = () => formik.setFieldValue('discounts', [
     ...(formik.values.discounts ?? []),
-    { type: TOUR_DISCOUNT_TYPE.PERCENTAGE, discount: TOUR_DISCOUNT.SEASONAL, value: 0, code: '' } as DiscountDTO,
+    { type: TOUR_DISCOUNT_TYPE.PERCENTAGE, discount: TOUR_DISCOUNT.FIXED, value: 0, code: '' } as DiscountDTO,
   ]);
   const removeDiscount = (i: number) => { const a = [...(formik.values.discounts ?? [])]; a.splice(i, 1); formik.setFieldValue('discounts', a); };
   const updateDiscount = (i: number, field: keyof DiscountDTO, val: unknown) => {
@@ -414,7 +414,7 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                   <SectionHeader
                     id="discounts" icon={Tag} iconColor={neu.colorAmber}
                     title="Discounts & Promotions" description="Create special offers and discount codes"
-                    action={<button type="button" onClick={addDiscount} className={`${neu.btnSm} ml-3`}><Plus size={13} /> Add Discount</button>}
+                    action={(formik.values.discounts ?? []).length < 1 ? <button type="button" onClick={addDiscount} className={`${neu.btnSm} ml-3`}><Plus size={13} /> Add Discount</button> : undefined}
                   />
                   <AnimatePresence>
                     {isOpen('discounts') && (
@@ -461,7 +461,9 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                                         <div className="flex flex-col gap-1.5">
                                           <label className={`${neu.label} flex items-center gap-1`}>Discount Category <span className="text-[#FF2157]">*</span></label>
                                           <NeuSelect value={disc.discount} onValueChange={(v) => updateDiscount(i, 'discount', v)}>
-                                            {Object.values(TOUR_DISCOUNT).map(t => <SelectItem key={t} value={t} className="font-[var(--font-jetbrains-mono)] text-sm">{DISCOUNT_CAT_LABELS[t]}</SelectItem>)}
+                                            {Object.values(TOUR_DISCOUNT)
+                                              .filter(t => t === TOUR_DISCOUNT.FIXED)
+                                              .map(t => <SelectItem key={t} value={t} className="font-[var(--font-jetbrains-mono)] text-sm">{DISCOUNT_CAT_LABELS[t]}</SelectItem>)}
                                           </NeuSelect>
                                           {getErr(`discounts[${i}].discount`) && <p className={neu.errText}><AlertCircle size={11} />{getErr(`discounts[${i}].discount`)}</p>}
                                         </div>

@@ -304,26 +304,28 @@ export default function PricingCommerceStep() {
                           <div>
                             <label className={NEU_LABEL + " mb-1.5 block"}>Discount</label>
                             <div className="relative">
-                              <select
-                                value={
-                                  Object.values(TOUR_DISCOUNT).includes(
-                                    discount.discount as (typeof TOUR_DISCOUNT)[keyof typeof TOUR_DISCOUNT]
-                                  )
-                                    ? discount.discount
-                                    : TOUR_DISCOUNT.SEASONAL
-                                }
-                                onChange={(e) =>
-                                  setFieldValue(
-                                    `discounts[${index}].discount`,
-                                    e.target.value
-                                  )
-                                }
-                                className={NEU_SELECT}
-                              >
-                                {Object.values(TOUR_DISCOUNT).map((discountType) => (
-                                  <option key={discountType} value={discountType}>{discountType}</option>
-                                ))}
-                              </select>
+                                <select
+                                  value={
+                                    Object.values(TOUR_DISCOUNT).includes(
+                                      discount.discount as (typeof TOUR_DISCOUNT)[keyof typeof TOUR_DISCOUNT]
+                                    )
+                                      ? discount.discount
+                                      : TOUR_DISCOUNT.FIXED
+                                  }
+                                  onChange={(e) =>
+                                    setFieldValue(
+                                      `discounts[${index}].discount`,
+                                      e.target.value
+                                    )
+                                  }
+                                  className={NEU_SELECT}
+                                >
+                                  {Object.values(TOUR_DISCOUNT)
+                                    .filter((discountType) => discountType === TOUR_DISCOUNT.FIXED)
+                                    .map((discountType) => (
+                                      <option key={discountType} value={discountType}>{discountType}</option>
+                                  ))}
+                                </select>
                               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#1E2938]/50">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -457,20 +459,22 @@ export default function PricingCommerceStep() {
                     ))}
                   </AnimatePresence>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      push({
-                        type: TOUR_DISCOUNT_TYPE.PERCENTAGE,
-                        discount: TOUR_DISCOUNT.SEASONAL,
-                        value: 0,
-                      })
-                    }
-                    className={`${NEU_BTN_GHOST} flex items-center gap-2 px-4 py-2.5 text-sm`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Discount
-                  </button>
+                  {(!values.discounts || values.discounts.length < 1) && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        push({
+                          type: TOUR_DISCOUNT_TYPE.PERCENTAGE,
+                          discount: TOUR_DISCOUNT.FIXED,
+                          value: 0,
+                        })
+                      }
+                      className={`${NEU_BTN_GHOST} flex items-center gap-2 px-4 py-2.5 text-sm`}
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Discount
+                    </button>
+                  )}
                 </div>
               )}
             </FieldArray>

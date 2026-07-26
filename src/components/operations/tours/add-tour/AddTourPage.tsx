@@ -21,8 +21,6 @@ import ComplianceAccessibilityStep from './ComplianceAccessibilityStep';
 import PoliciesStep from './PoliciesStep';
 import ReviewStep from './ReviewStep';
 import { Breadcrumbs } from '@/components/global/Breadcrumbs';
-import { GUIDE_DEFAULT_1 } from '@/data/tour-defaults';
-import toursData from '@/data/tours.json';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
 import { encodeId } from '@/utils/helpers/mongodb-id-conversions';
 import { tourUpdateService } from '@/utils/api/tour.update.api';
@@ -78,8 +76,9 @@ const STEPS = [
   { label: 'Review & Submit', icon: '/images/tour-review/code-review.png' },
 ];
 
-// const INITIAL_VALUES: CreateTourDTO = GUIDE_DEFAULT_1;
-const INITIAL_VALUES: CreateTourDTO = toursData as unknown as CreateTourDTO;
+import { GUIDE_DEFAULT, GUIDE_DEFAULT_1 } from '@/data/tour-defaults';
+import toursData from '@/data/tours.json';
+// INITIAL_VALUES is now determined dynamically by state
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function getFirstErrorMessage<T>(errors: FormikErrors<T>): string | null {
@@ -125,6 +124,8 @@ export default function AddTourPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(true);
+  const [tourIndex, setTourIndex] = useState(0);
   const router = useRouter();
 
   const currentValidationSchema = validationSchemas[activeStep];
@@ -197,21 +198,36 @@ export default function AddTourPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-6 mb-8 flex items-center gap-4"
+            className="mt-6 mb-8 flex items-center justify-between gap-4"
           >
-            <div className={NEU_ICON_WELL_PRIMARY}>
-              <Image
-                src="/images/tour-review/pin.png"
-                alt="Tour"
-                width={28}
-                height={28}
-                className="object-contain"
-              />
+            <div className="flex items-center gap-4">
+              <div className={NEU_ICON_WELL_PRIMARY}>
+                <Image
+                  src="/images/tour-review/pin.png"
+                  alt="Tour"
+                  width={28}
+                  height={28}
+                  className="object-contain"
+                />
+              </div>
+              <div>
+                <h1 className={`${NEU_HEADING} text-2xl sm:text-3xl`}>Create New Tour</h1>
+                <p className={NEU_MUTED}>Fill in all required fields to create an amazing tour package</p>
+              </div>
             </div>
-            <div>
-              <h1 className={`${NEU_HEADING} text-2xl sm:text-3xl`}>Create New Tour</h1>
-              <p className={NEU_MUTED}>Fill in all required fields to create an amazing tour package</p>
-            </div>
+            <button
+              onClick={() => {
+                if (isDataLoaded) {
+                  setIsDataLoaded(false);
+                } else {
+                  setTourIndex((prev) => (prev + 1) % ((toursData as unknown as any[])?.length || 1));
+                  setIsDataLoaded(true);
+                }
+              }}
+              className={`${NEU_BTN_GHOST} px-4 py-2 text-sm whitespace-nowrap`}
+            >
+              {isDataLoaded ? "Clear Form" : `Load Tour ${(tourIndex + 1) % ((toursData as unknown as any[])?.length || 1) + 1}`}
+            </button>
           </motion.div>
 
           {/* ── Progress Bar ──────────────────────────────────────────────── */}
@@ -366,12 +382,13 @@ export default function AddTourPage() {
 
             {/* Formik */}
             <Formik
-              initialValues={INITIAL_VALUES}
+              initialValues={isDataLoaded ? (toursData as unknown as CreateTourDTO[])[tourIndex] : GUIDE_DEFAULT}
               validationSchema={currentValidationSchema}
               onSubmit={handleSubmit}
               validateOnMount={false}
               validateOnChange={false}
               validateOnBlur={true}
+              enableReinitialize={true}
             >
               {({ validateForm, isSubmitting, submitForm }) => (
                 <Form>

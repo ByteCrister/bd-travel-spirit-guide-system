@@ -1,5 +1,6 @@
-{
-    "title": "Sunamganj Haor & Tanguar Swamp Escape",
+[
+  {
+    "title": "Tour 1: Sunamganj Haor",
     "slug": "sunamganj-haor-tanguar-swamp-escape",
     "summary": "Boat cruise thru Tanguar Haor, sunset on open water, stay in floating houseboat.",
     "heroImage": "",
@@ -179,7 +180,7 @@
     "discounts": [
       {
         "type": "percentage",
-        "discount": "early_bird",
+        "discount": "fixed",
         "value": 10
       }
     ],
@@ -243,4 +244,251 @@
         "lng": 91.1197
       }
     }
+  },
+  {
+    "title": "Tour 2: Sylhet Adventure",
+    "slug": "sylhet-adventure",
+    "summary": "Boat cruise thru Tanguar Haor, sunset on open water, stay in floating houseboat.",
+    "heroImage": "",
+    "gallery": [],
+    "seo": {
+      "metaTitle": "Sunamganj Haor Tour",
+      "metaDescription": "Explore Tanguar Haor wetlands by boat."
+    },
+    "tourType": "Adventure Seekers",
+    "division": "sylhet",
+    "district": "sunamganj",
+    "accommodationType": [
+      "homestay"
+    ],
+    "guideIncluded": true,
+    "transportIncluded": true,
+    "emergencyContacts": {
+      "policeNumber": "999",
+      "ambulanceNumber": "16263",
+      "fireServiceNumber": "102"
+    },
+    "localEmergency": "Sunamganj Sadar Police Station",
+    "destinations": [
+      {
+        "description": "Tanguar Haor, one of Bangladesh's largest wetlands, home to migratory birds.",
+        "highlights": [
+          "Sunrise boat ride",
+          "Bird watching",
+          "Floating village visit"
+        ],
+        "attractions": [
+          {
+            "title": "Tanguar Haor",
+            "description": "Vast freshwater wetland ecosystem.",
+            "bestFor": "Nature lovers",
+            "insiderTip": "Go early morning for mist views.",
+            "address": "Tahirpur, Sunamganj",
+            "openingHours": "06:00-18:00",
+            "images": [],
+            "coordinates": {
+              "lat": 25.1214,
+              "lng": 91.1197
+            }
+          }
+        ],
+        "activities": [
+          {
+            "title": "Boat safari",
+            "duration": "3h",
+            "rating": 4.7,
+            "price": {
+              "amount": 500,
+              "currency": "BDT"
+            }
+          }
+        ],
+        "images": [],
+        "coordinates": {
+          "lat": 25.1214,
+          "lng": 91.1197
+        }
+      }
+    ],
+    "itinerary": [
+      {
+        "day": 1,
+        "title": "Arrival & Haor Cruise",
+        "description": "Arrive Sunamganj, board boat, cruise Tanguar Haor.",
+        "mealsProvided": [
+          "Lunch",
+          "Dinner"
+        ],
+        "accommodation": "Houseboat",
+        "activities": [
+          "Boat cruise",
+          "Bird watching"
+        ],
+        "travelDistance": "35km",
+        "travelMode": "boat",
+        "estimatedTime": "2h",
+        "importantNotes": [
+          "Bring light jacket for evening wind"
+        ]
+      },
+      {
+        "day": 2,
+        "title": "Sunrise & Departure",
+        "description": "Sunrise over haor, breakfast, return trip.",
+        "mealsProvided": [
+          "Breakfast"
+        ],
+        "accommodation": "N/A",
+        "activities": [
+          "Sunrise viewing"
+        ],
+        "travelDistance": "35km",
+        "travelMode": "boat",
+        "estimatedTime": "2h",
+        "importantNotes": []
+      }
+    ],
+    "inclusions": [
+      {
+        "label": "Boat rental",
+        "description": "Full day boat use"
+      },
+      {
+        "label": "Meals",
+        "description": "2 lunch, 1 dinner, 1 breakfast"
+      }
+    ],
+    "exclusions": [
+      {
+        "label": "Personal expenses"
+      }
+    ],
+    "difficulty": "easy",
+    "bestSeason": [
+      "monsoon",
+      "autumn"
+    ],
+    "audience": [
+      "adventure",
+      "solo"
+    ],
+    "categories": [
+      "nature",
+      "wildlife"
+    ],
+    "translations": {
+      "en": {
+        "title": "Sunamganj Haor & Tanguar Swamp Escape",
+        "summary": "Boat cruise thru wetlands."
+      },
+      "bn": {
+        "title": "সুনামগঞ্জ হাওর ভ্রমণ",
+        "summary": "টাঙ্গুয়ার হাওরে নৌকা ভ্রমণ।"
+      }
+    },
+    "mainLocation": {
+      "address": {
+        "city": "Tahirpur",
+        "district": "Sunamganj",
+        "region": "Sylhet"
+      },
+      "coordinates": {
+        "lat": 25.1214,
+        "lng": 91.1197
+      }
+    },
+    "transportModes": [
+      "boat",
+      "private_car"
+    ],
+    "pickupOptions": [
+      {
+        "city": "Sylhet",
+        "price": 500,
+        "currency": "BDT"
+      }
+    ],
+    "meetingPoint": "Sunamganj Boat Terminal",
+    "packingList": [
+      {
+        "item": "Rain jacket",
+        "required": true
+      },
+      {
+        "item": "Sunscreen",
+        "required": false
+      }
+    ],
+    "basePrice": {
+      "amount": 3500,
+      "currency": "BDT"
+    },
+    "discounts": [
+      {
+        "type": "flat_amount",
+        "discount": "fixed",
+        "value": 500
+      }
+    ],
+    "duration": {
+      "days": 2,
+      "nights": 1
+    },
+    "paymentMethods": [
+      "card",
+      "stripe"
+    ],
+    "licenseRequired": false,
+    "ageSuitability": "all",
+    "accessibility": {
+      "wheelchair": false,
+      "familyFriendly": true,
+      "petFriendly": false,
+      "notes": "Boat access has narrow gangway."
+    },
+    "cancellationPolicy": {
+      "refundable": true,
+      "rules": [
+        {
+          "daysBefore": 3,
+          "refundPercent": 80
+        }
+      ]
+    },
+    "refundPolicy": {
+      "method": [
+        "card",
+        "stripe"
+      ],
+      "processingDays": 5
+    },
+    "terms": "Standard tour terms apply.",
+    "featured": false,
+    "status": "draft",
+    "moderationStatus": "pending",
+    "wishlistCount": 0,
+    "ratings": {
+      "average": 0,
+      "count": 0
+    },
+    "tags": [],
+    "viewCount": 0,
+    "likeCount": 0,
+    "shareCount": 0,
+    "publishedAt": null,
+    "operatingWindow": {
+      "startDate": "2026-10-15T00:00:00.000Z",
+      "endDate": "2027-03-31T00:00:00.000Z"
+    },
+    "departure": {
+      "date": "2026-10-15T08:00:00.000Z",
+      "seatsTotal": 20,
+      "seatsBooked": 0,
+      "meetingPoint": "Sunamganj Boat Terminal",
+      "meetingCoordinates": {
+        "lat": 25.1214,
+        "lng": 91.1197
+      }
+    }
   }
+]
