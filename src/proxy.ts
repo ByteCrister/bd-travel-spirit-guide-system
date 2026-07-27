@@ -125,6 +125,33 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return NextResponse.next();
   }
 
+  // ── Layer 1.5: Read-only mode for test user ───────────────────────────────
+  // The test user is allowed to view everything their role permits, but cannot
+  // make state-modifying requests (POST, PUT, PATCH, DELETE).
+  // This check is performed after public routes so login/logout still work.
+  if (
+    process.env.TEST_USER_EMAIL &&
+    ["POST", "PUT", "PATCH", "DELETE"].includes(request.method)
+  ) {
+    const session = await auth();
+    if (session?.user?.email === process.env.TEST_USER_EMAIL) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Read-only access: test user cannot perform this action.",
+          },
+          { status: 403 }
+        );
+      } else {
+        // For page routes (e.g., Server Actions)
+        const dashboardUrl = new URL("/dashboard", request.url);
+        dashboardUrl.searchParams.set("error", "test_user_readonly");
+        return NextResponse.redirect(dashboardUrl);
+      }
+    }
+  }
+
   // ── Layer 2: API rate limiting ──────────────────────────────────────────────
   // All /api/* routes (excluding /api/auth/* which was already passed through)
   // are rate-limited per client IP to prevent abuse.

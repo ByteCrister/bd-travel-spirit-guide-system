@@ -46,7 +46,8 @@ export const useNotificationStore = create<NotificationStoreState>()(
             fetchNotifications: async (limit = 50) => {
                 try {
                     const response = await api.get(`/notifications/guide/v1?limit=${limit}`);
-                    const notifications: IGuideSystemNotificationData[] = response.data;
+                    // withErrorHandler wraps the response payload in { data: ... }
+                    const notifications: IGuideSystemNotificationData[] = response.data?.data || [];
                     const unreadCount = notifications.filter((n) => !n.isRead).length;
 
                     set(
