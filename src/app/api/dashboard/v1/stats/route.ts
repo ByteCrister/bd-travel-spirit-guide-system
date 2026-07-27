@@ -43,6 +43,9 @@ const EMP_STATUSES = new Set<string>(Object.values(EMPLOYEE_STATUS));
 const REPORT_STATUSES = new Set<string>(Object.values(REPORT_STATUS));
 const BOOKING_STATUSES = new Set<string>(Object.values(BOOKING_STATUS));
 
+/** The tour company's share of each booking's revenue (85%). */
+const COMPANY_REVENUE_SHARE = 0.85;
+
 function parseOptionalEnum<T extends string>(
     value: string | null,
     allowed: Set<string>,
@@ -169,7 +172,9 @@ async function getBookingStats(
     ]).session(session);
 
     if (!result.length) return { total: 0, revenue: 0 };
-    return { total: result[0].totalBookings, revenue: result[0].totalRevenue ?? 0 };
+    // Apply the company's 85% revenue share to the gross booking total
+    const grossRevenue: number = result[0].totalRevenue ?? 0;
+    return { total: result[0].totalBookings, revenue: Math.round(grossRevenue * COMPANY_REVENUE_SHARE * 100) / 100 };
 }
 
 async function getPendingReportsCount(

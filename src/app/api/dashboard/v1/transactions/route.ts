@@ -19,6 +19,9 @@ import type { ApiPaginatedResponse, Transaction } from '@/types/dashboard/dashbo
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+/** The tour company's share of each booking's revenue (85%). */
+const COMPANY_REVENUE_SHARE = 0.85;
+
 function mapTransactionStatusToBookingPayment(status: TransactionStatus): BookingPaymentStatus {
     switch (status) {
         case TRANSACTION_STATUS.SUCCEEDED:
@@ -111,10 +114,12 @@ function mapDocToTransaction(doc: TxLean): Transaction {
         doc.description?.trim() ||
         doc.stripePaymentIntentId ||
         doc._id.toString();
+    // Apply the company's 85% revenue share to the gross transaction amount
+    const netAmount = Math.round(doc.amount * COMPANY_REVENUE_SHARE * 100) / 100;
     return {
         _id: doc._id.toString(),
         bookingReference: ref.slice(0, 64),
-        amount: doc.amount,
+        amount: netAmount,
         currency: doc.currency as Transaction['currency'],
         method: 'stripe',
         status: mapTransactionStatusToBookingPayment(doc.status),
