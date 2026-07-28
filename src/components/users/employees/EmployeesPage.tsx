@@ -222,26 +222,12 @@ export default function EmployeesPage() {
                         borderRadius: "10px",
                         padding: "0 16px",
                         height: "36px",
-                        boxShadow:
-                            "4px 4px 8px rgba(0,0,0,0.18), -2px -2px 6px rgba(255,255,255,0.55)",
-                        transition: "box-shadow 0.15s ease, transform 0.1s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                            "2px 2px 5px rgba(0,0,0,0.22), -1px -1px 4px rgba(255,255,255,0.45)";
-                    }}
-                    onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                            "4px 4px 8px rgba(0,0,0,0.18), -2px -2px 6px rgba(255,255,255,0.55)";
+                        transition: "transform 0.1s ease",
                     }}
                     onMouseDown={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                            "inset 2px 2px 5px rgba(0,0,0,0.2), inset -1px -1px 4px rgba(255,255,255,0.4)";
                         (e.currentTarget as HTMLButtonElement).style.transform = "translateY(1px)";
                     }}
                     onMouseUp={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                            "4px 4px 8px rgba(0,0,0,0.18), -2px -2px 6px rgba(255,255,255,0.55)";
                         (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
                     }}
                 >

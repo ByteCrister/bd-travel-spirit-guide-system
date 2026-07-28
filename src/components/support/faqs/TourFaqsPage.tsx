@@ -93,7 +93,7 @@ export default function TourFaqsManagementPage() {
                     </div>
 
                     {/* Raised neumorphic badge — page meta */}
-                    <div className="self-start rounded-xl bg-[#E7E5E4] px-4 py-2  sm:self-auto">
+                    <div className="self-start rounded-xl bg-[#E7E5E4] px-4 py-2 [box-shadow:4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff] sm:self-auto">
                         <span className="font-['JetBrains_Mono'] text-xs font-medium text-[#006666]">
                             FAQ Management
                         </span>
@@ -115,7 +115,7 @@ export default function TourFaqsManagementPage() {
                 {/* ── Filters — inset neumorphic well ── */}
                 <section
                     aria-label="Filters"
-                    className="rounded-2xl bg-[#E7E5E4] p-5 "
+                    className="rounded-2xl bg-[#E7E5E4] p-5 [box-shadow:inset_4px_4px_8px_#cac8c7,inset_-4px_-4px_8px_#ffffff]"
                 >
                     <p className="mb-3 font-['JetBrains_Mono'] text-[10px] font-semibold uppercase tracking-[0.15em] text-[#1E2938]/40">
                         Filter &amp; Sort
@@ -126,7 +126,7 @@ export default function TourFaqsManagementPage() {
                 {/* ── Table — raised card ── */}
                 <section
                     aria-label="FAQ List"
-                    className="overflow-x-auto rounded-2xl bg-[#E7E5E4] "
+                    className="overflow-x-auto rounded-2xl bg-[#E7E5E4] [box-shadow:6px_6px_14px_#cac8c7,-6px_-6px_14px_#ffffff]"
                 >
                     <AnimatePresence mode="wait">
                         {isLoading ? (
@@ -163,7 +163,7 @@ export default function TourFaqsManagementPage() {
                         className="flex justify-center pt-2"
                     >
                         {/* Inset pill for pagination context */}
-                        <div className="rounded-2xl bg-[#E7E5E4] px-6 py-3 ">
+                        <div className="rounded-2xl bg-[#E7E5E4] px-6 py-3 [box-shadow:inset_4px_4px_8px_#cac8c7,inset_-4px_-4px_8px_#ffffff]">
                             <FaqPagination
                                 currentPage={pagination.page}
                                 totalPages={pagination.totalPages}
