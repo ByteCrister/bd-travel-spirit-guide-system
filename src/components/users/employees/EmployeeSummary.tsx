@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { CountUp } from "./primitives/CountUp";
@@ -43,7 +43,7 @@ const StatCard: React.FC<CardProps> = ({ icon: Icon, label, value, loading, tone
             className={[
                 "relative flex flex-col gap-3 rounded-2xl p-4",
                 "bg-[#E7E5E4]",
-                "",
+                "[box-shadow:6px_6px_14px_#cac8c7,-6px_-6px_14px_#ffffff]",
                 "transition-all duration-200",
                 "hover:",
                 "focus-within:",

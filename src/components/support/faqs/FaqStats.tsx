@@ -1,4 +1,4 @@
-﻿// components/faqs/FaqStats.tsx
+// components/faqs/FaqStats.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -38,8 +38,7 @@ function StatCard({ title, value, icon: Icon, iconColor, iconBg }: StatCardProps
             whileHover={{ y: -3 }}
             whileTap={{ scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 360, damping: 22 }}
-            className="flex flex-col gap-3 rounded-2xl bg-[#E7E5E4] p-4
-                "
+            className="flex flex-col gap-3 rounded-2xl bg-[#E7E5E4] p-4 [box-shadow:6px_6px_14px_#cac8c7,-6px_-6px_14px_#ffffff]"
         >
             {/* Icon pill */}
             <div

@@ -23,6 +23,14 @@ export interface FAQVoteEntry {
     createdAt: string;
 }
 
+export interface FAQReport {
+    reportedBy: string | TravelerInfo;
+    reason?: string;
+    customReason?: string;
+    explanation?: string;
+    createdAt: string;
+}
+
 export interface FAQ {
     _id: string;
     tour: string | TourInfo;
@@ -35,7 +43,7 @@ export interface FAQ {
     answeredBy?: TravelerInfo;
     likes: FAQVoteEntry[];
     dislikes: FAQVoteEntry[];
-    reports: unknown[];
+    reports: FAQReport[];
     likeCount: number;
     dislikeCount: number;
     isAnswered: boolean;
@@ -119,6 +127,10 @@ export type FAQReorderApiResponse = ApiResponse<{
     faqs: FAQ[];
 }>;
 
+export type FAQReportsApiResponse = ApiResponse<{
+    reports: FAQReport[];
+}>;
+
 /* ------------------------------------------------------------------ */
 /*  Zustand Store State                                               */
 /* ------------------------------------------------------------------ */
@@ -164,4 +176,13 @@ export interface FAQStoreState {
 
     /** Fetch aggregate FAQ stats */
     fetchFAQStats: () => Promise<void>;
+
+    /** Update an FAQ (question, answer, status) */
+    updateFAQ: (faqId: string, payload: Partial<FAQ>) => Promise<void>;
+
+    /** Soft delete an FAQ */
+    deleteFAQ: (faqId: string) => Promise<void>;
+
+    /** Fetch reports for a specific FAQ */
+    fetchFAQReports: (faqId: string) => Promise<FAQReport[]>;
 }

@@ -1,4 +1,4 @@
-﻿// components/faqs/FaqTable.tsx
+// components/faqs/FaqTable.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -29,9 +29,8 @@ import {
 } from 'lucide-react';
 import { FAQ } from '@/types/tour/faqs.types';
 import { useFAQStore } from '@/store/faq-store';
-import { VoteModal } from './VoteModal';
+import { FaqManageModal } from './FaqManageModal';
 import { showToast } from '@/components/global/showToast';
-import api from '@/utils/axios/axios';
 
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 // surface: #E7E5E4 | text: #1E2938 | primary: #006666
@@ -81,10 +80,10 @@ const nmInput =
     'disabled:opacity-50 transition-shadow duration-150';
 
 export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
-    const { toggleFAQActive, updateFAQOrder } = useFAQStore();
+    const { toggleFAQActive, updateFAQOrder, updateFAQ } = useFAQStore();
     const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
-    const [selectedFaqId, setSelectedFaqId] = useState<string | null>(null);
-    const [showVoteModal, setShowVoteModal] = useState(false);
+    const [selectedFaq, setSelectedFaq] = useState<FAQ | null>(null);
+    const [showManageModal, setShowManageModal] = useState(false);
 
     const handleToggleActive = async (faqId: string) => {
         await toggleFAQActive(faqId);
@@ -105,24 +104,13 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
         faqId: string,
         newStatus: 'approved' | 'pending' | 'rejected'
     ) => {
-        try {
-            const { data } = await api.put(`/mock/support/tour-faq/${faqId}/status`, {
-                status: newStatus,
-            });
-            if (data.success) {
-                showToast.success(`Status updated to ${newStatus}`);
-                onRefresh();
-            } else {
-                throw new Error(data.message || 'Failed to update status');
-            }
-        } catch {
-            showToast.error('Failed to update status');
-        }
+        await updateFAQ(faqId, { status: newStatus });
+        onRefresh();
     };
 
-    const handleViewVotes = (faqId: string) => {
-        setSelectedFaqId(faqId);
-        setShowVoteModal(true);
+    const handleManageFaq = (faq: FAQ) => {
+        setSelectedFaq(faq);
+        setShowManageModal(true);
     };
 
     // ── Empty state ────────────────────────────────────────────────────────────
@@ -286,7 +274,7 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
                                             <div className="flex items-center gap-3">
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleViewVotes(faq._id)}
+                                                    onClick={() => handleManageFaq(faq)}
                                                     className="flex items-center gap-1.5 rounded-lg px-2 py-1
                                                         font-[family-name:var(--font-jetbrains-mono)] text-xs font-medium
                                                         text-[#006666] transition-colors hover:bg-[#006666]/10
@@ -314,14 +302,14 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
                                                         <button
                                                             type="button"
                                                             className={nmIconBtn}
-                                                            onClick={() => handleViewVotes(faq._id)}
-                                                            aria-label="View vote details"
+                                                            onClick={() => handleManageFaq(faq)}
+                                                            aria-label="Manage FAQ"
                                                         >
                                                             <Eye className="h-4 w-4" />
                                                         </button>
                                                     </TooltipTrigger>
                                                     <TooltipContent className="font-[family-name:var(--font-jetbrains-mono)] text-xs">
-                                                        View votes
+                                                        Manage FAQ
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -334,11 +322,10 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
                 </div>
             </div>
 
-            <VoteModal
-                open={showVoteModal}
-                onOpenChange={setShowVoteModal}
-                faqId={selectedFaqId}
-                faqQuestion={faqs.find((f) => f._id === selectedFaqId)?.question}
+            <FaqManageModal
+                open={showManageModal}
+                onOpenChange={setShowManageModal}
+                faq={selectedFaq}
             />
         </>
     );

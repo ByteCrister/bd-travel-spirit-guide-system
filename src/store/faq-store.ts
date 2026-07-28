@@ -8,6 +8,9 @@ import type {
     FAQStoreState,
     FAQFilterParams,
     FAQVoteFilterParams,
+    FAQ,
+    FAQReport,
+    FAQReportsApiResponse,
 } from '@/types/tour/faqs.types';
 import api from '@/utils/axios/axios';
 import { showToast } from '@/components/global/showToast';
@@ -279,6 +282,120 @@ export const useFAQStore = create<FAQStoreState>()((set, get) => ({
             const message = extractErrorMessage(err);
             showToast.error(message);
             set({ statsLoading: false, statsError: message });
+        }
+    },
+
+    /* ================================================================ */
+    /*  updateFAQ (optimistic / reactive)                               */
+    /* ================================================================ */
+    updateFAQ: async (faqId: string, payload: Partial<FAQ>) => {
+        const { allFAQs } = get();
+        const originalFAQs = allFAQs.data;
+        const faqIndex = originalFAQs.findIndex((f) => f._id === faqId);
+
+        if (faqIndex === -1) {
+            showToast.error('FAQ not found in cache');
+            return;
+        }
+
+        const optimisticFAQs = originalFAQs.map((faq, idx) =>
+            idx === faqIndex ? { ...faq, ...payload } : faq
+        );
+
+        set({
+            allFAQs: {
+                ...allFAQs,
+                data: optimisticFAQs,
+            },
+        });
+
+        try {
+            const { data } = await api.put<{ data: FAQ; message: string; error?: string }>(
+                `${URL_AFTER_API}/${faqId}`,
+                payload
+            );
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            set({
+                allFAQs: {
+                    ...get().allFAQs,
+                    data: get().allFAQs.data.map((faq) =>
+                        faq._id === faqId ? data.data! : faq
+                    ),
+                },
+            });
+            showToast.success('FAQ updated successfully');
+        } catch (err) {
+            const message = extractErrorMessage(err);
+            showToast.error(message);
+            set({
+                allFAQs: {
+                    ...get().allFAQs,
+                    data: originalFAQs,
+                },
+            });
+        }
+    },
+
+    /* ================================================================ */
+    /*  deleteFAQ (optimistic / reactive)                               */
+    /* ================================================================ */
+    deleteFAQ: async (faqId: string) => {
+        const { allFAQs } = get();
+        const originalFAQs = allFAQs.data;
+
+        const optimisticFAQs = originalFAQs.filter((faq) => faq._id !== faqId);
+
+        set({
+            allFAQs: {
+                ...allFAQs,
+                data: optimisticFAQs,
+            },
+        });
+
+        try {
+            const { data } = await api.delete<{ message: string; error?: string }>(
+                `${URL_AFTER_API}/${faqId}`
+            );
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            showToast.success('FAQ deleted successfully');
+        } catch (err) {
+            const message = extractErrorMessage(err);
+            showToast.error(message);
+            set({
+                allFAQs: {
+                    ...get().allFAQs,
+                    data: originalFAQs,
+                },
+            });
+        }
+    },
+
+    /* ================================================================ */
+    /*  fetchFAQReports                                                 */
+    /* ================================================================ */
+    fetchFAQReports: async (faqId: string) => {
+        try {
+            const { data } = await api.get<FAQReportsApiResponse>(
+                `${URL_AFTER_API}/${faqId}/reports`
+            );
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            return data.data?.reports || [];
+        } catch (err) {
+            const message = extractErrorMessage(err);
+            showToast.error(message);
+            return [];
         }
     },
 }));

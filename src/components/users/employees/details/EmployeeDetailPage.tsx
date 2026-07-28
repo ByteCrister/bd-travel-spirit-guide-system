@@ -79,9 +79,9 @@ import { encodeId } from "@/utils/helpers/mongodb-id-conversions";
 /* ------------------------------------------------------------------ */
 
 const neumorphCard =
-  "bg-[#E7E5E4] rounded-2xl ";
+  "bg-[#E7E5E4] rounded-2xl [box-shadow:6px_6px_14px_#cac8c7,-6px_-6px_14px_#ffffff]";
 const neumorphRaised =
-  "bg-[#E7E5E4] rounded-lg ";
+  "bg-[#E7E5E4] rounded-lg [box-shadow:4px_4px_8px_#cac8c7,-4px_-4px_8px_#ffffff]";
 const neumorphButton =
   "bg-[#E7E5E4] rounded-lg  hover: active: transition-shadow focus-visible:outline-none focus-visible:";
 const neumorphInput =
