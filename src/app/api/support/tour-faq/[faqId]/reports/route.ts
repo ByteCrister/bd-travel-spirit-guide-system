@@ -4,6 +4,7 @@ import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import ConnectDB from '@/config/db';
 import { TourFAQModel } from '@/models/tours/tourFAQ.model';
 import { getUserIdFromSession } from '@/lib/auth/session.auth';
+import { TravelerModel } from '@/models/travelers/traveler.model';
 
 /* ------------------------------------------------------------------
    GET /api/support/tour-faq/[faqId]/reports
@@ -28,7 +29,7 @@ export const GET = withErrorHandler(
             .populate({
                 path: 'reports.reportedBy',
                 select: '_id name avatar email',
-                model: 'Traveler'
+                model: TravelerModel
             })
             .lean();
 
