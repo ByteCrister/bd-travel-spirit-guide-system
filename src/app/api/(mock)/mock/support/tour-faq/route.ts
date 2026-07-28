@@ -119,7 +119,6 @@ export async function GET(request: NextRequest) {
     const paginatedFAQs = filtered.slice(start, start + limit);
   
     const responseBody: FAQListApiResponse = {
-      success: true,
       data: {
         faqs: paginatedFAQs,
         pagination: {

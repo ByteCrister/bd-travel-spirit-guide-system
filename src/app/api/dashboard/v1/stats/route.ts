@@ -44,7 +44,7 @@ const REPORT_STATUSES = new Set<string>(Object.values(REPORT_STATUS));
 const BOOKING_STATUSES = new Set<string>(Object.values(BOOKING_STATUS));
 
 /** The tour company's share of each booking's revenue (85%). */
-const COMPANY_REVENUE_SHARE = 0.85;
+const COMPANY_REVENUE_SHARE = parseFloat(process.env.GUIDE_SHARE_RATE!); // 0.85
 
 function parseOptionalEnum<T extends string>(
     value: string | null,

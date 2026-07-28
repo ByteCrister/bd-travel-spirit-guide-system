@@ -68,11 +68,11 @@ const navigationGroups: NavGroup[] = [
     title: "Support",
     icon: Headphones,
     items: [
-      {
-        href: "/support/travelers",
-        label: "Customer Support",
-        icon: Headphones,
-      },
+      // {
+      //   href: "/support/travelers",
+      //   label: "Customer Support",
+      //   icon: Headphones,
+      // },
       { href: "/support/faqs", label: "FAQs", icon: FileText },
       {
         href: "/support/reset-password-requests",

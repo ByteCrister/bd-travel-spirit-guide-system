@@ -18,8 +18,8 @@ const ADMIN_ROUTES = [
   
   "/users/employees",
   
+  // "/support/travelers",
   "/support/faqs",
-  "/support/travelers",
   "/support/reset-password-requests", // for "assistant" employees
 
   "/settings/payment-accounts",

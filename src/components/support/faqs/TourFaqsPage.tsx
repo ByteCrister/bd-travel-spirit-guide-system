@@ -1,4 +1,4 @@
-﻿// app/faqs/TourFaqsPage.tsx
+// app/faqs/TourFaqsPage.tsx
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -22,7 +22,6 @@ export default function TourFaqsManagementPage() {
         limit: 10,
         search: '',
         status: undefined,
-        tourId: undefined,
         sortBy: 'order',
         sortOrder: 'asc',
     });

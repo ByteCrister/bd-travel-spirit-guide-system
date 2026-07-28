@@ -20,7 +20,7 @@ import type { ApiPaginatedResponse, Transaction } from '@/types/dashboard/dashbo
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** The tour company's share of each booking's revenue (85%). */
-const COMPANY_REVENUE_SHARE = 0.85;
+const COMPANY_REVENUE_SHARE = parseFloat(process.env.GUIDE_SHARE_RATE!); // 0.85
 
 function mapTransactionStatusToBookingPayment(status: TransactionStatus): BookingPaymentStatus {
     switch (status) {

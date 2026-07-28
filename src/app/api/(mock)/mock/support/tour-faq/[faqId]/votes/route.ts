@@ -45,7 +45,6 @@ export async function GET(
     const paginatedVotes = allVotes.slice(start, start + limit);
 
     const response: FAQVotesApiResponse = {
-        success: true,
         data: {
             votes: paginatedVotes,
             pagination: { page, perPage: limit, total, totalPages },

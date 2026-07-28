@@ -13,7 +13,7 @@ import api from '@/utils/axios/axios';
 import { showToast } from '@/components/global/showToast';
 import { extractErrorMessage } from '@/utils/axios/extractErrorMessage';
 
-const URL_AFTER_API = `/mock/support/tour-faq`;
+const URL_AFTER_API = `/support/tour-faq`;
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
@@ -59,11 +59,11 @@ export const useFAQStore = create<FAQStoreState>()((set, get) => ({
         try {
             const { data } = await api.get<FAQListApiResponse>(URL_AFTER_API, { params });
 
-            if (!data.success) {
-                throw new Error(data.message ?? 'Failed to fetch FAQs');
+            if (data.error) {
+                throw new Error(data.error);
             }
 
-            const { faqs, pagination } = data.data;
+            const { faqs, pagination } = data.data!;
             set({
                 allFAQs: {
                     data: faqs,
@@ -230,11 +230,11 @@ export const useFAQStore = create<FAQStoreState>()((set, get) => ({
                 { params }
             );
 
-            if (!data.success) {
-                throw new Error(data.message ?? 'Failed to fetch votes');
+            if (data.error) {
+                throw new Error(data.error);
             }
 
-            const { votes, pagination } = data.data;
+            const { votes, pagination } = data.data!;
             set({
                 faqVotes: {
                     ...get().faqVotes,

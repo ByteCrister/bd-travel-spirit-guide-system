@@ -8,6 +8,9 @@ import type { JWT as DefaultJWT } from "next-auth/jwt";
 import ConnectDB from "@/config/db";
 import UserModel from "@/models/user.model";
 import { USER_ROLE } from "@/constants/current-user/user.const";
+import GuideModel from "@/models/guide/guide.model";
+import EmployeeModel from "@/models/employees/employees.model";
+import { GUIDE_STATUS } from "@/constants/guide/guide.const";
 
 interface MyJWT extends DefaultJWT {
     id: string;
@@ -49,6 +52,14 @@ export const authConfig: NextAuthConfig = {
                 const isPasswordCorrect = await compare(password, user.password);
                 if (!isPasswordCorrect) return null;
 
+                if (user.role === USER_ROLE.GUIDE) {
+                    const guide = await GuideModel.findOne({ "owner.user": user._id });
+                    if (!guide || guide.status !== GUIDE_STATUS.APPROVED) return null;
+                } else if (user.role === USER_ROLE.ASSISTANT) {
+                    const employee = await EmployeeModel.findOne({ user: user._id });
+                    if (!employee || employee.deletedAt) return null;
+                }
+
                 // Return all necessary user data
                 return {
                     id: (user._id as Types.ObjectId).toString(),
@@ -76,6 +87,14 @@ export const authConfig: NextAuthConfig = {
 
                 const existingUser = await UserModel.findOne({ email: user.email });
                 if (!existingUser) return false;
+
+                if (existingUser.role === USER_ROLE.GUIDE) {
+                    const guide = await GuideModel.findOne({ "owner.user": existingUser._id });
+                    if (!guide || guide.status !== GUIDE_STATUS.APPROVED) return false;
+                } else if (existingUser.role === USER_ROLE.ASSISTANT) {
+                    const employee = await EmployeeModel.findOne({ user: existingUser._id });
+                    if (!employee || employee.deletedAt) return false;
+                }
 
                 user.id = (existingUser._id as Types.ObjectId).toString();
                 user.role = existingUser.role as `${USER_ROLE.GUIDE}` | `${USER_ROLE.ASSISTANT}`;

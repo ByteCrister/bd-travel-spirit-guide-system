@@ -59,20 +59,15 @@ export interface FAQFilterParams {
     page?: number;
     limit?: number;
     search?: string;
-    tourId?: string;
     status?: 'pending' | 'approved' | 'rejected';
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
 }
 
-export interface FAQListApiResponse {
-    success: boolean;
-    data: {
-        faqs: FAQ[];
-        pagination: PaginationMeta;
-    };
-    message?: string;
-}
+export type FAQListApiResponse = ApiResponse<{
+    faqs: FAQ[];
+    pagination: PaginationMeta;
+}>;
 
 /* ------------------------------------------------------------------ */
 /*  FAQ Votes (separate endpoint)                                     */
@@ -92,14 +87,10 @@ export interface FAQVoteFilterParams {
     type?: 'like' | 'dislike';       // filter by vote type
 }
 
-export interface FAQVotesApiResponse {
-    success: boolean;
-    data: {
-        votes: FAQVoteRecord[];
-        pagination: PaginationMeta;
-    };
-    message?: string;
-}
+export type FAQVotesApiResponse = ApiResponse<{
+    votes: FAQVoteRecord[];
+    pagination: PaginationMeta;
+}>;
 
 /* ------------------------------------------------------------------ */
 /*  FAQ Stats                                                         */
