@@ -21,6 +21,8 @@ import AssetFileModel from "@/models/assets/asset-file.model";
 import { PopulatedAssetLean } from "@/types/common/populated-asset.types";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { AUDIT_ACTION, logAuditForActor } from "@/lib/audit/audit-logger";
+import { mailer } from "@/config/node-mailer";
+import { EmployeeUpdateEmail, EmployeeUpdateChange } from "@/lib/html/employee-update-html";
 
 interface Params {
     params: Promise<{ employeeId: string }>
@@ -34,6 +36,7 @@ export type EmployeeLeanPopulated =
         user: {
             _id: Types.ObjectId;
             name: string;
+            email: string;
             avatar?: PopulatedAssetLean;
             role: UserRole;
         };
@@ -208,6 +211,76 @@ export const PUT = withErrorHandler(async (req: NextRequest, { params }: Params)
         action: AUDIT_ACTION.UPDATE,
         note: "Updated employee profile",
     });
+
+    // Build diff of changed fields and send email notification (non-blocking)
+    try {
+        const changes: EmployeeUpdateChange[] = [];
+
+        const formatDate = (v?: string | Date | null) =>
+            v ? new Date(v).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "—";
+
+        const formatSalary = (salary?: number | null, currency?: string) =>
+            salary != null ? `${currency ?? ""} ${salary.toLocaleString()}` : "—";
+
+        const formatShifts = (shifts?: { startTime: string; endTime: string; days: string[] }[]) =>
+            shifts && shifts.length > 0
+                ? shifts.map(s => `${s.startTime}–${s.endTime} (${s.days.join(", ")})`).join(" | ")
+                : "None";
+
+        if ((body.name ?? "").trim() !== (employeeOut.user.name ?? "").trim()) {
+            changes.push({ field: "Name", before: employeeOut.user.name, after: body.name });
+        }
+        if (body.status !== employeeOut.status) {
+            changes.push({ field: "Status", before: employeeOut.status ?? "—", after: body.status });
+        }
+        if (body.employmentType !== employeeOut.employmentType) {
+            changes.push({ field: "Employment Type", before: employeeOut.employmentType ?? "—", after: body.employmentType });
+        }
+        if (body.salary !== employeeOut.salary) {
+            changes.push({
+                field: "Salary",
+                before: formatSalary(employeeOut.salary, employeeOut.currency),
+                after: formatSalary(body.salary, body.currency),
+            });
+        }
+        if (body.currency !== employeeOut.currency) {
+            changes.push({ field: "Currency", before: employeeOut.currency ?? "—", after: body.currency });
+        }
+        if (body.paymentMode !== employeeOut.paymentMode) {
+            changes.push({ field: "Payment Mode", before: employeeOut.paymentMode ?? "—", after: body.paymentMode });
+        }
+        if (formatDate(body.dateOfJoining) !== formatDate(employeeOut.dateOfJoining as Date | undefined)) {
+            changes.push({ field: "Date of Joining", before: formatDate(employeeOut.dateOfJoining as Date | undefined), after: formatDate(body.dateOfJoining) });
+        }
+        if (formatDate(body.dateOfLeaving) !== formatDate(employeeOut.dateOfLeaving as Date | undefined)) {
+            changes.push({ field: "Date of Leaving", before: formatDate(employeeOut.dateOfLeaving as Date | undefined), after: formatDate(body.dateOfLeaving) });
+        }
+        if (body.contactInfo?.phone !== employeeOut.contactInfo?.phone) {
+            changes.push({ field: "Phone", before: employeeOut.contactInfo?.phone ?? "—", after: body.contactInfo?.phone ?? "—" });
+        }
+        if (body.contactInfo?.email !== employeeOut.contactInfo?.email) {
+            changes.push({ field: "Contact Email", before: employeeOut.contactInfo?.email ?? "—", after: body.contactInfo?.email ?? "—" });
+        }
+        if ((body.notes ?? "") !== (employeeOut.notes ?? "")) {
+            changes.push({ field: "Notes", before: employeeOut.notes ?? "—", after: body.notes ?? "—" });
+        }
+        if (formatShifts(body.shifts) !== formatShifts(employeeOut.shifts as { startTime: string; endTime: string; days: string[] }[] | undefined)) {
+            changes.push({ field: "Shifts", before: formatShifts(employeeOut.shifts as { startTime: string; endTime: string; days: string[] }[] | undefined), after: formatShifts(body.shifts) });
+        }
+
+        if (changes.length > 0) {
+            const employeeEmail = employeeOut.contactInfo?.email || employeeOut.user.email;
+            if (employeeEmail) {
+                const { subject, html } = EmployeeUpdateEmail(
+                    { name: body.name, email: employeeEmail, changes, updatedAt: new Date() },
+                    "BD Travel Spirit"
+                );
+                await mailer(employeeEmail, subject, html);
+            }
+        }
+    } catch (emailErr) {
+        console.error("[Employee Update] Failed to send update notification email:", emailErr);
+    }
 
     return {
         data: dto,

@@ -77,7 +77,7 @@ const getInitialValues = (): CreateEmployeeFormValues => ({
     },
     dateOfJoining: new Date(),
     contactInfo: { phone: "", email: "", emergencyContact: { name: "", phone: "", relation: "" } },
-    shifts: [],
+    shifts: [{ startTime: "09:00", endTime: "17:00", days: [] }],
     documents: [],
     notes: "",
 });
@@ -1169,52 +1169,19 @@ export default function AddEmployeePage() {
                                                 </div>
                                                 Work Shifts
                                             </h3>
-                                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    disabled={showVerificationDialog}
-                                                    className="rounded-xl font-medium"
-                                                    style={{
-                                                        backgroundColor: '#E7E5E4',
-                                                        boxShadow: '4px 4px 8px #d1cfce, -4px -4px 8px #ffffff',
-                                                        border: 'none',
-                                                        color: '#1E2938'
-                                                    }}
-                                                    onClick={() => setFieldValue("shifts", [...values.shifts, { startTime: "09:00", endTime: "17:00", days: [] }])}
-                                                >
-                                                    <Plus className="mr-2 h-4 w-4" /> Add Shift
-                                                </Button>
-                                            </motion.div>
                                         </div>
 
                                         <FieldArray name="shifts">
-                                            {({ remove }) => (
+                                            {() => (
                                                 <div className="space-y-4">
                                                     <AnimatePresence mode="popLayout">
-                                                        {values.shifts.length === 0 ? (
-                                                            <motion.div
-                                                                initial={{ opacity: 0, scale: 0.9 }}
-                                                                animate={{ opacity: 1, scale: 1 }}
-                                                                exit={{ opacity: 0, scale: 0.9 }}
-                                                                className="text-center py-12 rounded-xl"
-                                                                style={{
-                                                                    backgroundColor: '#E7E5E4',
-                                                                    boxShadow: 'inset 4px 4px 8px #d1cfce, inset -4px -4px 8px #ffffff'
-                                                                }}
-                                                            >
-                                                                <Clock className="h-16 w-16 mx-auto mb-3" style={{ color: '#1E2938' }} />
-                                                                <p className="font-medium" style={{ color: '#1E2938' }}>No shifts added yet</p>
-                                                                <p className="text-sm" style={{ color: '#1E2938' }}>Click &quot;Add Shift&quot; to get started</p>
-                                                            </motion.div>
-                                                        ) : (
-                                                            values.shifts.map((shift, index) => {
-                                                                const shiftError = errors.shifts?.[index];
-                                                                const touchedShift = touched.shifts?.[index];
-                                                                const startTimeError = getShiftError(shiftError, "startTime");
-                                                                const endTimeError = getShiftError(shiftError, "endTime");
-                                                                return (
-                                                                    <motion.div
+                                                        {values.shifts.map((shift, index) => {
+                                                            const shiftError = errors.shifts?.[index];
+                                                            const touchedShift = touched.shifts?.[index];
+                                                            const startTimeError = getShiftError(shiftError, "startTime");
+                                                            const endTimeError = getShiftError(shiftError, "endTime");
+                                                            return (
+                                                                <motion.div
                                                                         key={index}
                                                                         initial={{ opacity: 0, x: -20 }}
                                                                         animate={{ opacity: 1, x: 0 }}
@@ -1238,24 +1205,8 @@ export default function AddEmployeePage() {
                                                                                 >
                                                                                     {index + 1}
                                                                                 </div>
-                                                                                Shift {index + 1}
+                                                                                Configure employee work schedule
                                                                             </h4>
-                                                                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                                                                <Button
-                                                                                    type="button"
-                                                                                    variant="ghost"
-                                                                                    size="sm"
-                                                                                    disabled={showVerificationDialog}
-                                                                                    className="rounded-lg"
-                                                                                    style={{
-                                                                                        backgroundColor: 'transparent',
-                                                                                        color: '#FF2157'
-                                                                                    }}
-                                                                                    onClick={() => remove(index)}
-                                                                                >
-                                                                                    <Trash2 className="h-4 w-4" />
-                                                                                </Button>
-                                                                            </motion.div>
                                                                         </div>
 
                                                                         <div className="grid grid-cols-2 gap-4">
@@ -1313,12 +1264,12 @@ export default function AddEmployeePage() {
                                                                                                         <Badge
                                                                                                             className={`cursor-pointer px-4 py-2 transition-all font-medium rounded-lg ${showVerificationDialog ? "pointer-events-none opacity-60" : ""}`}
                                                                                                             style={{
-                                                                                                                backgroundColor: '#E7E5E4',
+                                                                                                                backgroundColor: isSelected ? '#006644' : '#E7E5E4',
                                                                                                                 boxShadow: isSelected
-                                                                                                                    ? 'inset 3px 3px 6px #d1cfce, inset -3px -3px 6px #ffffff'
+                                                                                                                    ? '3px 3px 6px #004d33, -3px -3px 6px #008055'
                                                                                                                     : '3px 3px 6px #d1cfce, -3px -3px 6px #ffffff',
                                                                                                                 border: 'none',
-                                                                                                                color: isSelected ? '#006666' : '#1E2938',
+                                                                                                                color: isSelected ? '#ffffff' : '#1E2938',
                                                                                                                 fontWeight: isSelected ? 700 : 500
                                                                                                             }}
                                                                                                             onClick={() => {
@@ -1342,7 +1293,7 @@ export default function AddEmployeePage() {
                                                                     </motion.div>
                                                                 );
                                                             })
-                                                        )}
+                                                        }
                                                     </AnimatePresence>
 
                                                     {viewerDoc && (
