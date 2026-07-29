@@ -7,6 +7,7 @@ import EmployeeModel from '@/models/employees/employees.model';
 import GuideModel from '@/models/guide/guide.model';
 import TourModel from '@/models/tours/tour.model';
 import BookingModel, { IBooking } from '@/models/tours/booking.model';
+import '@/models/travelers/traveler.model';
 import { USER_ROLE } from '@/constants/current-user/user.const';
 import { Currency } from '@/constants/tour/tour.const';
 import { BookingStatus, BOOKING_STATUS } from '@/constants/tour/tour-booking.const';
@@ -118,9 +119,13 @@ async function getBookingsHandler(request: NextRequest): Promise<HandlerResult<B
 
     // 7. Fetch bookings with population
     const bookings = await BookingModel.find(bookingFilter)
-        .populate<{ traveler: { _id: Types.ObjectId; name: string; email: string } }>({
+        .populate<{ traveler: { _id: Types.ObjectId; name: string; user?: { email: string } } }>({
             path: 'traveler',
-            select: 'name email',
+            select: 'name user',
+            populate: {
+                path: 'user',
+                select: 'email'
+            }
         })
         .populate<{ tour: { _id: Types.ObjectId; title: string } }>({
             path: 'tour',
@@ -140,7 +145,7 @@ async function getBookingsHandler(request: NextRequest): Promise<HandlerResult<B
             traveler: {
                 _id: traveler?._id?.toString() ?? '',
                 name: traveler?.name ?? 'Unknown',
-                email: traveler?.email ?? '',
+                email: traveler?.user?.email ?? '',
             },
             tour: {
                 _id: tour?._id?.toString() ?? '',
@@ -154,6 +159,8 @@ async function getBookingsHandler(request: NextRequest): Promise<HandlerResult<B
             bookedAt: booking.bookedAt,
         };
     });
+
+    console.log(JSON.stringify(summaries, null, 2));
 
     return { data: summaries };
 }
