@@ -156,6 +156,7 @@ export const useFAQStore = create<FAQStoreState>()((set, get) => ({
             return;
         }
 
+        // Optimistic: only update the target FAQ's order in place
         const optimisticFAQs = originalFAQs.map((faq, idx) =>
             idx === faqIndex ? { ...faq, order: newOrder } : faq
         );
@@ -177,27 +178,36 @@ export const useFAQStore = create<FAQStoreState>()((set, get) => ({
                 throw new Error(data.error);
             }
 
-            const { tourId, faqs: updatedTourFAQs } = data.data!;
+            const { tourId, faqs: updatedTourFAQs, clampedOrder } = data.data!;
             const currentFAQs = get().allFAQs.data;
+
+            // Replace every FAQ that belongs to the reordered tour with server data
             const mergedFAQs = currentFAQs.map((faq) => {
-                if (
+                const belongsToTour =
                     faq.tour === tourId ||
-                    (typeof faq.tour !== 'string' && faq.tour._id === tourId)
-                ) {
+                    (typeof faq.tour !== 'string' && faq.tour._id === tourId);
+                if (belongsToTour) {
                     const updated = updatedTourFAQs.find((uf) => uf._id === faq._id);
                     return updated ?? faq;
                 }
                 return faq;
             });
 
+            // Re-sort by order so the table row sequence is correct immediately
+            const sortedFAQs = [...mergedFAQs].sort((a, b) => {
+                const aOrder = a.order ?? 0;
+                const bOrder = b.order ?? 0;
+                return aOrder - bOrder;
+            });
+
             set({
                 allFAQs: {
                     ...get().allFAQs,
-                    data: mergedFAQs,
+                    data: sortedFAQs,
                     lastFetched: Date.now(),
                 },
             });
-            showToast.success('FAQ order updated');
+            showToast.success(`FAQ order updated to ${clampedOrder}`);
         } catch (err) {
             const message = extractErrorMessage(err);
             showToast.error(message);

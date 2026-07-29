@@ -360,7 +360,7 @@ export default function Step4Pricing({ tourId, initialData, onUpdateSuccess }: S
                           <div className="flex flex-col gap-1.5">
                             <label className={`${neu.label} flex items-center gap-1`}>Currency <span className="text-[#FF2157]">*</span></label>
                             <NeuSelect value={formik.values?.basePrice?.currency ?? CURRENCY.BDT} onValueChange={(v) => updateBasePrice('currency', v)}>
-                              {Object.values(CURRENCY).map(c => <SelectItem key={c} value={c} className="font-[var(--font-jetbrains-mono)] text-sm">{CURRENCY_LABELS[c]}</SelectItem>)}
+                              {Object.values([CURRENCY.BDT]).map(c => <SelectItem key={c} value={c} className="font-[var(--font-jetbrains-mono)] text-sm">{CURRENCY_LABELS[c]}</SelectItem>)}
                             </NeuSelect>
                             {getErr('basePrice.currency') && <p className={neu.errText}><AlertCircle size={11} />{getErr('basePrice.currency')}</p>}
                           </div>

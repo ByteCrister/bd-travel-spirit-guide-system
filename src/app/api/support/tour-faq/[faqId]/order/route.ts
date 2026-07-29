@@ -62,38 +62,46 @@ export const PUT = withErrorHandler(async (
         const tourId = targetFaq.tour;
         const oldOrder = targetFaq.order ?? 0;
 
+        // Count total active FAQs for this tour so we can clamp the new order
+        const activeFaqCount = await TourFAQModel.countDocuments(
+            { tour: tourId, deletedAt: null },
+            { session }
+        );
+        const maxOrder = Math.max(activeFaqCount - 1, 0);
+        const clampedOrder = Math.min(Math.max(newOrder, 0), maxOrder);
+
         // Shift other FAQs in the same tour to make room
-        if (newOrder > oldOrder) {
+        if (clampedOrder > oldOrder) {
             // Moving down: shift intermediate FAQs up by 1
             await TourFAQModel.updateMany(
                 {
                     tour: tourId,
                     _id: { $ne: targetFaq._id },
                     deletedAt: null,
-                    order: { $gt: oldOrder, $lte: newOrder },
+                    order: { $gt: oldOrder, $lte: clampedOrder },
                 },
                 { $inc: { order: -1 } },
                 { session }
             );
-        } else if (newOrder < oldOrder) {
+        } else if (clampedOrder < oldOrder) {
             // Moving up: shift intermediate FAQs down by 1
             await TourFAQModel.updateMany(
                 {
                     tour: tourId,
                     _id: { $ne: targetFaq._id },
                     deletedAt: null,
-                    order: { $gte: newOrder, $lt: oldOrder },
+                    order: { $gte: clampedOrder, $lt: oldOrder },
                 },
                 { $inc: { order: 1 } },
                 { session }
             );
         }
 
-        // Apply new order to the target FAQ
-        targetFaq.order = newOrder;
+        // Apply clamped order to the target FAQ
+        targetFaq.order = clampedOrder;
         await targetFaq.save({ session });
 
-        // Return all FAQs for this tour so the store can merge correctly
+        // Return all active FAQs for this tour so the store can merge correctly
         const updatedFaqs = await TourFAQModel.find(
             { tour: tourId, deletedAt: null },
             null,
@@ -105,7 +113,7 @@ export const PUT = withErrorHandler(async (
             .sort({ order: 1 })
             .lean({ virtuals: true });
 
-        return { tourId: tourId.toString(), faqs: updatedFaqs };
+        return { tourId: tourId.toString(), faqs: updatedFaqs, clampedOrder };
     });
 
     return { data: result };

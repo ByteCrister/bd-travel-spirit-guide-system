@@ -10,6 +10,11 @@ import { FilterQuery, PipelineStage } from 'mongoose';
 import { ITourFAQ } from '@/models/tours/tourFAQ.model';
 import { getUserIdFromSession } from '@/lib/auth/session.auth';
 import { getAuthorizedTourIds } from '@/lib/helpers/get-authorized-tour-ids';
+import { getCollectionName } from '@/lib/helpers/get-collection-name';
+import { TravelerModel } from '@/models/travelers/traveler.model';
+import UserModel from '@/models/user.model';
+import TourModel from '@/models/tours/tour.model';
+import { MODERATION_STATUS } from '@/constants/tour/tour.const';
 
 /* ------------------------------------------------------------------
    Query param shape
@@ -21,6 +26,8 @@ interface ListQueryParams {
     sortOrder?: 'asc' | 'desc';
     page?: string;
     limit?: string;
+    /** 'no' = active only (default) | 'only' = deleted only | 'yes' = all */
+    includeDeleted?: 'yes' | 'no' | 'only';
 }
 
 /* ------------------------------------------------------------------
@@ -37,6 +44,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
         sortOrder = 'desc',
         page = '1',
         limit = '10',
+        includeDeleted = 'no',
     } = Object.fromEntries(searchParams.entries()) as ListQueryParams;
 
     const pageNum = Math.max(Number(page) || 1, 1);
@@ -52,12 +60,22 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
        Build match query
     ------------------------------------------------------------------ */
     const matchQuery: FilterQuery<ITourFAQ> = { 
-        deletedAt: null,
         tour: { $in: authorizedTourIds }
     };
 
+    // Soft-delete visibility
+    if (includeDeleted === 'no') {
+        matchQuery.deletedAt = null;
+    } else if (includeDeleted === 'only') {
+        matchQuery.deletedAt = { $ne: null };
+    }
+    // 'yes' → no deletedAt filter; returns all
+
+    // ── Status filter: UI uses 'rejected', DB stores 'denied' ──
     if (status) {
-        matchQuery.status = status;
+        // Map 'rejected' (UI vocab) → 'denied' (DB enum)
+        const dbStatus = status === 'rejected' ? MODERATION_STATUS.DENIED : status;
+        matchQuery.status = dbStatus;
     }
 
     /* ------------------------------------------------------------------
@@ -81,7 +99,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
         // Populate askedBy (Traveler)
         {
             $lookup: {
-                from: 'travelers',
+                from: getCollectionName(TravelerModel),
                 localField: 'askedBy',
                 foreignField: '_id',
                 as: 'askedBy',
@@ -93,7 +111,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
         // Populate answeredBy (User)
         {
             $lookup: {
-                from: 'users',
+                from: getCollectionName(UserModel),
                 localField: 'answeredBy',
                 foreignField: '_id',
                 as: 'answeredBy',
@@ -105,7 +123,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
         // Populate tour (Tour)
         {
             $lookup: {
-                from: 'tours',
+                from: getCollectionName(TourModel),
                 localField: 'tour',
                 foreignField: '_id',
                 as: 'tour',
@@ -137,6 +155,16 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
                     },
                 },
                 userVote: null,
+                // Expose the soft-delete timestamp so the UI can render a "Deleted" badge
+                deletedAt: { $ifNull: ['$deletedAt', null] },
+                // Translate DB 'denied' back to UI 'rejected'
+                status: {
+                    $cond: {
+                        if: { $eq: ['$status', MODERATION_STATUS.DENIED] },
+                        then: 'rejected',
+                        else: '$status',
+                    },
+                },
             },
         },
     ];

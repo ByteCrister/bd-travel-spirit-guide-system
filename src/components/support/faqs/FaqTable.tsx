@@ -26,6 +26,7 @@ import {
     XCircle,
     Clock,
     RefreshCw,
+    Trash2,
 } from 'lucide-react';
 import { FAQ } from '@/types/tour/faqs.types';
 import { useFAQStore } from '@/store/faq-store';
@@ -175,7 +176,12 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
                                         initial={{ opacity: 0, y: 4 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.025, duration: 0.2 }}
-                                        className="border-b border-[#1E2938]/5 transition-colors hover:bg-[#1E2938]/[0.025]"
+                                        className={[
+                                            'border-b border-[#1E2938]/5 transition-colors',
+                                            faq.deletedAt
+                                                ? 'bg-[#FF2157]/[0.03] hover:bg-[#FF2157]/[0.06]'
+                                                : 'hover:bg-[#1E2938]/[0.025]',
+                                        ].join(' ')}
                                     >
                                         {/* Order */}
                                         <TableCell className="py-3">
@@ -192,7 +198,7 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
                                                             parseInt(e.target.value, 10)
                                                         )
                                                     }
-                                                    disabled={updatingOrderId === faq._id}
+                                                    disabled={updatingOrderId === faq._id || !!faq.deletedAt}
                                                     aria-label={`Display order for FAQ: ${faq.question}`}
                                                 />
                                                 {updatingOrderId === faq._id && (
@@ -206,9 +212,22 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
 
                                         {/* Question + answer preview */}
                                         <TableCell className="max-w-xs py-3">
-                                            <p className="font-[family-name:var(--font-jetbrains-mono)] text-sm font-medium text-[#1E2938] line-clamp-2">
-                                                {faq.question}
-                                            </p>
+                                            <div className="flex flex-wrap items-center gap-1.5">
+                                                <p className="font-[family-name:var(--font-jetbrains-mono)] text-sm font-medium text-[#1E2938] line-clamp-2">
+                                                    {faq.question}
+                                                </p>
+                                                {faq.deletedAt && (
+                                                    <span
+                                                        className="inline-flex items-center gap-1 rounded-md bg-[#FF2157]/10
+                                                            px-1.5 py-0.5 font-[family-name:var(--font-jetbrains-mono)]
+                                                            text-[10px] font-semibold uppercase tracking-wide text-[#FF2157]"
+                                                        title={`Deleted at ${new Date(faq.deletedAt).toLocaleString()}`}
+                                                    >
+                                                        <Trash2 className="h-2.5 w-2.5" aria-hidden="true" />
+                                                        Deleted
+                                                    </span>
+                                                )}
+                                            </div>
                                             {faq.answer && (
                                                 <p className="mt-0.5 font-[family-name:var(--font-jetbrains-mono)] text-xs text-[#1E2938]/50 line-clamp-1">
                                                     {faq.answer}
@@ -237,25 +256,27 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
                                                     <StatusIcon className="h-3 w-3" aria-hidden="true" />
                                                     {cfg.label}
                                                 </span>
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <button
-                                                                type="button"
-                                                                className={nmIconBtn}
-                                                                onClick={() =>
-                                                                    handleStatusChange(faq._id, nextStatus)
-                                                                }
-                                                                aria-label={`Change status (currently ${faq.status})`}
-                                                            >
-                                                                <RefreshCw className="h-3 w-3" />
-                                                            </button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="font-[family-name:var(--font-jetbrains-mono)] text-xs">
-                                                            Cycle status
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
+                                                {!faq.deletedAt && (
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <button
+                                                                    type="button"
+                                                                    className={nmIconBtn}
+                                                                    onClick={() =>
+                                                                        handleStatusChange(faq._id, nextStatus)
+                                                                    }
+                                                                    aria-label={`Change status (currently ${faq.status})`}
+                                                                >
+                                                                    <RefreshCw className="h-3 w-3" />
+                                                                </button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent className="font-[family-name:var(--font-jetbrains-mono)] text-xs">
+                                                                Cycle status
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                )}
                                             </div>
                                         </TableCell>
 
@@ -264,7 +285,8 @@ export function FaqTable({ faqs, onRefresh }: FaqTableProps) {
                                             <Switch
                                                 checked={faq.isActive}
                                                 onCheckedChange={() => handleToggleActive(faq._id)}
-                                                className="data-[state=checked]:bg-[#006666]"
+                                                disabled={!!faq.deletedAt}
+                                                className="data-[state=checked]:bg-[#006666] disabled:opacity-40"
                                                 aria-label={`${faq.isActive ? 'Deactivate' : 'Activate'} FAQ`}
                                             />
                                         </TableCell>

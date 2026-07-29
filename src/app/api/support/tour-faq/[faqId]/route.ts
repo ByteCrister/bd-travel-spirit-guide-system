@@ -4,6 +4,7 @@ import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import ConnectDB from '@/config/db';
 import { TourFAQModel } from '@/models/tours/tourFAQ.model';
 import { getUserIdFromSession } from '@/lib/auth/session.auth';
+import { MODERATION_STATUS } from '@/constants/tour/tour.const';
 
 /* ------------------------------------------------------------------
    PUT /api/support/tour-faq/[faqId]
@@ -26,6 +27,10 @@ export const PUT = withErrorHandler(
         const body = await request.json();
         const { question, answer, status } = body;
 
+        // ── Status translation: UI uses 'rejected', DB stores 'denied' ──
+        const toDbStatus = (s: string | undefined) =>
+            s === 'rejected' ? MODERATION_STATUS.DENIED : s;
+
         const faq = await TourFAQModel.findById(faqId);
         if (!faq || faq.deletedAt) {
             throw new ApiError('FAQ not found', 404);
@@ -44,7 +49,7 @@ export const PUT = withErrorHandler(
                 updateData.answeredAt = new Date();
             }
         }
-        if (status !== undefined) updateData.status = status;
+        if (status !== undefined) updateData.status = toDbStatus(status);
 
         const updatedFAQ = await TourFAQModel.findByIdAndUpdate(
             faqId,
@@ -56,12 +61,16 @@ export const PUT = withErrorHandler(
             .populate('tour', '_id title slug')
             .lean();
 
-        // compute virtuals roughly for the frontend
+        // compute virtuals + translate status back to UI vocabulary
         if (updatedFAQ) {
             (updatedFAQ as any).likeCount = updatedFAQ.likes?.filter((l: any) => !l.deletedAt).length || 0;
             (updatedFAQ as any).dislikeCount = updatedFAQ.dislikes?.filter((d: any) => !d.deletedAt).length || 0;
             (updatedFAQ as any).isAnswered = Boolean(updatedFAQ.answer);
             (updatedFAQ as any).userVote = null;
+            // DB stores 'denied'; UI expects 'rejected'
+            if ((updatedFAQ as any).status === MODERATION_STATUS.DENIED) {
+                (updatedFAQ as any).status = 'rejected';
+            }
         }
 
         return {

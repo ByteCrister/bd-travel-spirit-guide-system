@@ -24,6 +24,7 @@ export default function TourFaqsManagementPage() {
         status: undefined,
         sortBy: 'order',
         sortOrder: 'asc',
+        includeDeleted: 'no',
     });
 
     const loadFAQs = useCallback(async () => {

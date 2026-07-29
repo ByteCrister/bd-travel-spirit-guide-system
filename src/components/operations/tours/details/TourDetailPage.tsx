@@ -21,6 +21,7 @@ import { Breadcrumbs } from "@/components/global/Breadcrumbs";
 import { LuCalendar } from "react-icons/lu";
 import TourBookingsPanel from "./TourBookingsPanel";
 import { cn } from "@/lib/utils";
+import { useParams } from "next/navigation";
 
 // ─── Neumorphism Design Tokens ─────────────────────────────────────────────────
 const NEU_SURFACE = "bg-[#E7E5E4]";
@@ -71,6 +72,8 @@ const tabs: Tab[] = [
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function TourDetailPage({ tourId }: TourDetailProps) {
+    const params = useParams();
+    const encodedTourId = (params?.tourId as string) || encodeURIComponent(encodeId(tourId ?? "-"));
     const [activeTab, setActiveTab] = useState<TabValue>("details");
 
     const { tourDetails, fetchTourDetail } = useTourDetailStore();
@@ -85,10 +88,10 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
             { label: "Tours", href: "/operations/tours" },
             {
                 label: tour?.title ?? "-",
-                href: `/operations/tours/${encodeURIComponent(encodeId(tour?.id ?? "-"))}`,
+                href: `/operations/tours/${encodedTourId}`,
             },
         ]);
-    }, [fetchTourDetail, tour?.id, tour?.title, tourId]);
+    }, [fetchTourDetail, tour?.title, tourId, encodedTourId]);
 
     const contentVariants: Variants = {
         hidden: { opacity: 0, y: 16, scale: 0.985 },
@@ -108,7 +111,7 @@ export default function TourDetailPage({ tourId }: TourDetailProps) {
                 <Breadcrumbs items={breadCrumbs} />
                 <div className="flex items-center gap-3">
                     <Link
-                        href={`/operations/tours/${encodeURIComponent(encodeId(tourId ?? "-"))}/history`}
+                        href={`/operations/tours/${encodedTourId}/history`}
                         className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-white border border-[#006666] text-[#006666] font-[family-name:var(--font-space-mono)] font-bold tracking-wide hover:bg-gray-50 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006666]/50"
                     >
                         <LayoutDashboard className="w-5 h-5" />

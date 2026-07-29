@@ -345,7 +345,7 @@ export const Step4PricingSchema = Yup.object().shape({
                         createNestedErrorMessage("Pricing", "Discounts", "Valid From", "must be at least 0 days from today"),
                         function (value) {
                             if (!value) return true;
-                            return new Date(value) >= minDateFromToday(0);
+                            return new Date(value) >= minDateFromToday(10);
                         }
                     )
                     .test(
@@ -432,7 +432,7 @@ export const Step4PricingSchema = Yup.object().shape({
                 createNestedErrorMessage("Pricing", "Operating Window", "Start Date", "must be at least 5 days from today"),
                 function (value) {
                     if (!value) return true;
-                    return new Date(value) >= minDateFromToday(1);
+                    return new Date(value) >= minDateFromToday(10);
                 }
             ),
         endDate: Yup.date()

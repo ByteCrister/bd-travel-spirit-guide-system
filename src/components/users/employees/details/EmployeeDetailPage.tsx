@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import {
   EmployeeDetailDTO,
   UpdateEmployeePayload,
@@ -135,6 +135,8 @@ const enums = DEFAULT_ENUMS;
 
 export default function EmployeeDetailPage({ employeeId }: { employeeId: string }) {
   const router = useRouter();
+  const params = useParams();
+  const encodedEmployeeId = (params?.employeeId as string) || encodeURIComponent(encodeId(employeeId));
   const { fetchEmployeeDetail, updateEmployee, softDeleteEmployee, restoreEmployee } =
     useEmployeeStore();
 
@@ -166,10 +168,10 @@ export default function EmployeeDetailPage({ employeeId }: { employeeId: string 
       { label: "Employees", href: "/users/employees" },
       {
         label: detail?.user.name ?? "Employee detail",
-        href: `/users/employees/${encodeURIComponent(encodeId(employeeId))}`,
+        href: `/users/employees/${encodedEmployeeId}`,
       },
     ],
-    [employeeId, detail?.user.name],
+    [encodedEmployeeId, detail?.user.name],
   );
 
   useEffect(() => {

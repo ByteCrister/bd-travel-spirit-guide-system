@@ -1,4 +1,4 @@
-﻿// components/faqs/FaqFilters.tsx
+// components/faqs/FaqFilters.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -53,6 +53,12 @@ const nm = {
     ].join(' '),
 } as const;
 
+const VISIBILITY_LABELS: Record<NonNullable<FAQFilterParams['includeDeleted']>, string> = {
+    no: 'Active only',
+    only: 'Deleted only',
+    yes: 'All (incl. deleted)',
+};
+
 export function FaqFilters({ filters, onFilterChange }: FaqFiltersProps) {
     const [searchInput, setSearchInput] = useState(filters.search || '');
 
@@ -77,12 +83,20 @@ export function FaqFilters({ filters, onFilterChange }: FaqFiltersProps) {
         });
     };
 
-    const clearAllFilters = () => {
-        setSearchInput('');
-        onFilterChange({ search: '', status: undefined, page: 1 });
+    const handleVisibilityChange = (value: string) => {
+        onFilterChange({
+            includeDeleted: value as FAQFilterParams['includeDeleted'],
+            page: 1,
+        });
     };
 
-    const hasActiveFilters = !!(filters.search || filters.status);
+    const clearAllFilters = () => {
+        setSearchInput('');
+        onFilterChange({ search: '', status: undefined, includeDeleted: 'no', page: 1 });
+    };
+
+    const currentVisibility = filters.includeDeleted ?? 'no';
+    const hasActiveFilters = !!(filters.search || filters.status || currentVisibility !== 'no');
 
     return (
         <div className={nm.card} role="search" aria-label="Filter FAQs">
@@ -123,8 +137,8 @@ export function FaqFilters({ filters, onFilterChange }: FaqFiltersProps) {
                 )}
             </div>
 
-            {/* Controls grid */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {/* Controls grid — 3 columns on md+ */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {/* Search field */}
                 <form onSubmit={handleSearchSubmit} className="relative" role="search">
                     <label htmlFor="faq-search" className="sr-only">Search FAQs by question or answer</label>
@@ -179,6 +193,27 @@ export function FaqFilters({ filters, onFilterChange }: FaqFiltersProps) {
                         ))}
                     </SelectContent>
                 </Select>
+
+                {/* Visibility select — controls soft-deleted FAQ inclusion */}
+                <Select value={currentVisibility} onValueChange={handleVisibilityChange}>
+                    <SelectTrigger
+                        className={`${nm.input} pr-10`}
+                        aria-label="Filter by visibility (include deleted)"
+                    >
+                        <SelectValue placeholder="Active only" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-0 bg-[#E7E5E4]">
+                        {(['no', 'only', 'yes'] as const).map((v) => (
+                            <SelectItem
+                                key={v}
+                                value={v}
+                                className="font-[family-name:var(--font-jetbrains-mono)] text-sm text-[#1E2938] focus:bg-[#006666]/10"
+                            >
+                                {VISIBILITY_LABELS[v]}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
 
             {/* Active filter badges */}
@@ -207,6 +242,22 @@ export function FaqFilters({ filters, onFilterChange }: FaqFiltersProps) {
                                 onClick={() => onFilterChange({ status: undefined, page: 1 })}
                                 className="ml-0.5 rounded-full p-0.5 hover:bg-black/10 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#006666]"
                                 aria-label={`Remove status filter: ${filters.status}`}
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                        </span>
+                    )}
+                    {currentVisibility !== 'no' && (
+                        <span className={`${nm.badge} border border-[#FF2157]/20`}>
+                            <span className="text-[#1E2938]/50">Visibility:</span>
+                            <span className={currentVisibility === 'only' ? 'text-[#FF2157]' : ''}>
+                                {VISIBILITY_LABELS[currentVisibility]}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => onFilterChange({ includeDeleted: 'no', page: 1 })}
+                                className="ml-0.5 rounded-full p-0.5 hover:bg-black/10 focus:outline-none focus-visible:ring-1 focus-visible:ring-[#006666]"
+                                aria-label="Remove visibility filter"
                             >
                                 <X className="h-3 w-3" />
                             </button>

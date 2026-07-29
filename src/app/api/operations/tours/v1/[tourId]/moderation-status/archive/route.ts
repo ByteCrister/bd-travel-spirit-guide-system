@@ -9,6 +9,7 @@ import { TOUR_STATUS } from "@/constants/tour/tour.const";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { resolveMongoId } from "@/lib/helpers/resolveMongoId";
 import VERIFY_USER_ROLE from "@/lib/auth/verify-user-role";
+import { USER_ROLE } from "@/constants/current-user/user.const";
 import ConnectDB from "@/config/db";
 import { AUDIT_ACTION } from "@/lib/audit/audit-logger";
 import { auditTourMutation } from "@/lib/audit/tour-audit";
@@ -36,7 +37,7 @@ const archiveTourHandler = async (
 
     await ConnectDB();
 
-    await VERIFY_USER_ROLE.ASSISTANT(userId);
+    await VERIFY_USER_ROLE.MULTIPLE(userId, [USER_ROLE.ASSISTANT, USER_ROLE.GUIDE]);
 
     // Perform the archive operation within a transaction
     const result = await withTransaction(async (session) => {

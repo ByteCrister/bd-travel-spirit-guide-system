@@ -7,6 +7,7 @@ import { TourFAQModel } from '@/models/tours/tourFAQ.model';
 import { getUserIdFromSession } from '@/lib/auth/session.auth';
 import { getAuthorizedTourIds } from '@/lib/helpers/get-authorized-tour-ids';
 import { ApiError } from '@/lib/helpers/withErrorHandler';
+import { MODERATION_STATUS } from '@/constants/tour/tour.const';
 
 export const GET = withErrorHandler(async () => {
     await ConnectDB();
@@ -23,13 +24,13 @@ export const GET = withErrorHandler(async () => {
                 _id: null,
                 totalFAQs: { $sum: 1 },
                 totalApproved: {
-                    $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] },
+                    $sum: { $cond: [{ $eq: ['$status', MODERATION_STATUS.APPROVED] }, 1, 0] },
                 },
                 totalPending: {
-                    $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] },
+                    $sum: { $cond: [{ $eq: ['$status', MODERATION_STATUS.PENDING] }, 1, 0] },
                 },
                 totalRejected: {
-                    $sum: { $cond: [{ $eq: ['$status', 'rejected'] }, 1, 0] },
+                    $sum: { $cond: [{ $eq: ['$status', MODERATION_STATUS.DENIED] }, 1, 0] },
                 },
                 // Count only non-soft-deleted likes / dislikes
                 totalLikes: {

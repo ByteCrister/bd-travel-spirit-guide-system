@@ -48,6 +48,8 @@ export interface FAQ {
     dislikeCount: number;
     isAnswered: boolean;
     userVote?: 'like' | 'dislike' | null;
+    /** Soft-delete timestamp; null means the FAQ is active */
+    deletedAt?: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -70,6 +72,13 @@ export interface FAQFilterParams {
     status?: 'pending' | 'approved' | 'rejected';
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    /**
+     * Controls whether soft-deleted FAQs are included:
+     * - 'no'   → active only (default)
+     * - 'only' → deleted only
+     * - 'yes'  → all (active + deleted)
+     */
+    includeDeleted?: 'yes' | 'no' | 'only';
 }
 
 export type FAQListApiResponse = ApiResponse<{
@@ -125,6 +134,7 @@ export type FAQActivationApiResponse = ApiResponse<FAQ>;
 export type FAQReorderApiResponse = ApiResponse<{
     tourId: string;
     faqs: FAQ[];
+    clampedOrder: number;
 }>;
 
 export type FAQReportsApiResponse = ApiResponse<{
