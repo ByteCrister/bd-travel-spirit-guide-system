@@ -1050,7 +1050,7 @@ export default function AddEmployeePage() {
                                                             {...field}
                                                             type="email"
                                                             disabled={showVerificationDialog}
-                                                            placeholder="email@example.com"
+                                                            placeholder="username@gmail.com"
                                                             className="rounded-xl"
                                                             style={{
                                                                 backgroundColor: '#E7E5E4',

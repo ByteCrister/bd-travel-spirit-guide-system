@@ -277,7 +277,7 @@ export default function JoinForgotSection() {
                                                     onChange={(e) =>
                                                         setJoin((s) => ({ ...s, email: e.target.value }))
                                                     }
-                                                    placeholder="you@example.com"
+                                                    placeholder="username@gmail.com"
                                                     disabled={isSubmitting}
                                                     aria-invalid={!!joinErrors.email}
                                                     aria-describedby={
@@ -400,7 +400,7 @@ export default function JoinForgotSection() {
                                                     onChange={(e) =>
                                                         setForgot((s) => ({ ...s, email: e.target.value }))
                                                     }
-                                                    placeholder="you@example.com"
+                                                    placeholder="username@gmail.com"
                                                     disabled={isSubmitting}
                                                     aria-invalid={!!forgotErrors.email}
                                                     aria-describedby={

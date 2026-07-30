@@ -201,7 +201,7 @@ export default function AddCardForm() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full p-2 border rounded-md"
-                                placeholder="test@example.com"
+                                placeholder="username@gmail.com"
                                 required
                             />
                         </div>
