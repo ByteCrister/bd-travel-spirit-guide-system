@@ -69,7 +69,8 @@ export function FaqManageModal({ open, onOpenChange, faq }: FaqManageModalProps)
             };
             loadReports();
         }
-    }, [open, faq, fetchFAQVotes, fetchFAQReports]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open, faq?._id]);
 
     useEffect(() => {
         if (faq && faqVotes[faq._id]) {

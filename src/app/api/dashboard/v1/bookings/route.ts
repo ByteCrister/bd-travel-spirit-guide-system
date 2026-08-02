@@ -160,8 +160,6 @@ async function getBookingsHandler(request: NextRequest): Promise<HandlerResult<B
         };
     });
 
-    console.log(JSON.stringify(summaries, null, 2));
-
     return { data: summaries };
 }
 

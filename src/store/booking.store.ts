@@ -22,8 +22,8 @@ import {
 // ============================================
 // API CONFIGURATION (relative paths – axios instance already prefixes with /api)
 // ============================================
-export const API_BOOKINGS_URL = '/mock/operations/bookings';
-// export const API_BOOKINGS_URL = "/operations/bookings/v1";
+// export const API_BOOKINGS_URL = '/mock/operations/bookings';
+export const API_BOOKINGS_URL = "/operations/bookings/v1";
 export const API_BOOKINGS_SUMMARY_URL = `${API_BOOKINGS_URL}/summary`;
 
 // ============================================

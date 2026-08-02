@@ -47,6 +47,7 @@ interface RawTravelerDoc {
 interface RawUserDoc {
   _id: mongoose.Types.ObjectId;
   email: string;
+  avatar?: mongoose.Types.ObjectId;
 }
 
 interface RawTourDoc {
@@ -120,15 +121,12 @@ function sanitizeAddress(
   };
 }
 
-async function resolveAvatarUrls(
-  travelers: Pick<RawTravelerDoc, "avatar" | "_id">[],
+async function resolveAssetUrls(
+  assetIds: mongoose.Types.ObjectId[],
 ): Promise<Map<string, string | undefined>> {
-  const avatarIds = travelers
-    .map((t) => t.avatar)
-    .filter((id): id is mongoose.Types.ObjectId => !!id);
-  if (avatarIds.length === 0) return new Map();
+  if (assetIds.length === 0) return new Map();
 
-  const assets = await AssetModel.find<AssetDoc>({ _id: { $in: avatarIds } })
+  const assets = await AssetModel.find<AssetDoc>({ _id: { $in: assetIds } })
     .select("file")
     .lean();
   const fileIds = assets
@@ -143,70 +141,41 @@ async function resolveAvatarUrls(
     assetFiles.map((f) => [f._id.toString(), f.publicUrl]),
   );
 
-  const avatarUrlMap = new Map<string, string | undefined>();
+  const assetUrlMap = new Map<string, string | undefined>();
   for (const asset of assets) {
     const url = asset.file ? fileUrlMap.get(asset.file.toString()) : undefined;
-    avatarUrlMap.set(asset._id.toString(), url);
+    assetUrlMap.set(asset._id.toString(), url);
   }
-  return avatarUrlMap;
+  return assetUrlMap;
 }
 
-// ---------- Populate traveler emails & avatars (no .populate<...> to avoid TS error) ----------
-function resolveTravelerId(travelerId: unknown): string {
-  if (typeof travelerId === "string") return travelerId;
-  if (travelerId instanceof mongoose.Types.ObjectId)
-    return travelerId.toString();
-  return String(travelerId);
-}
+// ---------- Populate traveler avatars & tour hero images ----------
+async function populateAssets(bookings: IBookingPopulated[]): Promise<void> {
+  const assetIdMap = new Map<string, mongoose.Types.ObjectId>();
 
-async function populateTravelers(bookings: IBookingPopulated[]): Promise<void> {
-  const travelerInfos = bookings.map((b) => ({
-    id: resolveTravelerId(b.traveler._id),
-    avatarId: b.traveler.avatar
-      ? new mongoose.Types.ObjectId(b.traveler.avatar)
-      : undefined,
-  }));
-  const travelerIds = travelerInfos.map(
-    (t) => new mongoose.Types.ObjectId(t.id),
-  );
-
-  // 1. Fetch traveler documents (lean, no populate)
-  const travelers = (await TravelerModel.find({
-    _id: { $in: travelerIds },
-  }).lean()) as ITraveler[];
-
-  // 2. Fetch user emails separately (avoids populate type issues)
-  const userIds = travelers
-    .map((t) => t.user)
-    .filter((id): id is mongoose.Types.ObjectId => !!id);
-  const users = await UserModel.find({ _id: { $in: userIds } })
-    .select("email")
-    .lean();
-  const userEmailMap = new Map(users.map((u) => [u._id.toString(), u.email]));
-
-  // 3. Map traveler ID → user email
-  const travelerEmailMap = new Map<string, string>();
-  for (const traveler of travelers) {
-    const email = userEmailMap.get(traveler.user.toString()) ?? "";
-    travelerEmailMap.set(resolveTravelerId(traveler._id), email);
+  for (const b of bookings) {
+    if (b.traveler.avatar) {
+      assetIdMap.set(`avatar_${b._id}`, new mongoose.Types.ObjectId(b.traveler.avatar));
+    }
+    if (b.tour.heroImage) {
+      assetIdMap.set(`hero_${b._id}`, new mongoose.Types.ObjectId(b.tour.heroImage));
+    }
   }
 
-  // 4. Fetch avatar URLs
-  const avatarIdMap = new Map<string, mongoose.Types.ObjectId>(
-    travelerInfos.filter((t) => t.avatarId).map((t) => [t.id, t.avatarId!]),
-  );
-  const uniqueAvatarIds = Array.from(avatarIdMap.values());
-  const avatarUrlMap = await resolveAvatarUrls(
-    uniqueAvatarIds.map((id) => ({ _id: id, avatar: id })),
-  );
+  const uniqueAssetIds = Array.from(assetIdMap.values());
+  if (uniqueAssetIds.length === 0) return;
 
-  // 5. Assign back to bookings
+  const assetUrlMap = await resolveAssetUrls(uniqueAssetIds);
+
   for (const booking of bookings) {
-    const travelerId = booking.traveler._id;
-    booking.traveler.email = travelerEmailMap.get(travelerId) ?? "";
-    const avatarObjectId = avatarIdMap.get(travelerId);
-    booking.traveler.avatar = avatarObjectId
-      ? avatarUrlMap.get(avatarObjectId.toString())
+    const avatarId = assetIdMap.get(`avatar_${booking._id}`);
+    booking.traveler.avatar = avatarId
+      ? assetUrlMap.get(avatarId.toString())
+      : undefined;
+
+    const heroId = assetIdMap.get(`hero_${booking._id}`);
+    booking.tour.heroImage = heroId
+      ? assetUrlMap.get(heroId.toString())
       : undefined;
   }
 }
@@ -447,8 +416,8 @@ async function getBookings(
         address: sanitizeAddress(item.travelerObj.address),
         isVerified: item.travelerObj.isVerified,
         accountStatus: item.travelerObj.accountStatus,
-        email: "", // filled by populateTravelers()
-        avatar: undefined, // filled by populateTravelers()
+        email: item.userObj.email,
+        avatar: item.travelerObj.avatar?.toString() || item.userObj.avatar?.toString(),
       },
       tour: {
         _id: item.tourObj._id.toString(),
@@ -468,8 +437,8 @@ async function getBookings(
   }
   const bookings: IBookingPopulated[] = bookingsRaw.map(toBookingPopulated);
 
-  // 7. Populate traveler emails and avatars
-  await populateTravelers(bookings);
+  // 7. Populate traveler avatars and tour heroImages
+  await populateAssets(bookings);
 
   // 8. Build pagination meta
   const totalPages = Math.ceil(total / limit);

@@ -29,6 +29,29 @@ const MUTED      = "#607080";
 const MONO       = "var(--font-jetbrains-mono), monospace";
 const BRAND      = "var(--font-space-mono), monospace";
 
+/** Section heading */
+const SectionLabel = ({ children }: { children: React.ReactNode }) => (
+    <div className="flex items-center gap-2 mb-3">
+        <div className="h-1 w-4 rounded-full" style={{ background: PRIMARY }} />
+        <span
+            className="text-xs font-bold uppercase tracking-widest"
+            style={{ color: MUTED, fontFamily: BRAND }}
+        >
+            {children}
+        </span>
+    </div>
+);
+
+/** Neumorphic card */
+const NeuCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+    <div
+        className={`rounded-2xl p-5 ${className}`}
+        style={{ background: S, boxShadow: SHADOW_OUT }}
+    >
+        {children}
+    </div>
+);
+
 interface Props {
     reviewId: ObjectIdStr;
     isOpen: boolean;
@@ -191,29 +214,6 @@ export default function ReviewDetailAccordion({
     const avatarSrc = detail?.userAvatar ?? undefined;
     const tourHero  = detail?.tourHeroImage ?? undefined;
     const tourSlug  = detail?.tourSlug ?? null;
-
-    /** Section heading */
-    const SectionLabel = ({ children }: { children: React.ReactNode }) => (
-        <div className="flex items-center gap-2 mb-3">
-            <div className="h-1 w-4 rounded-full" style={{ background: PRIMARY }} />
-            <span
-                className="text-xs font-bold uppercase tracking-widest"
-                style={{ color: MUTED, fontFamily: BRAND }}
-            >
-                {children}
-            </span>
-        </div>
-    );
-
-    /** Neumorphic card */
-    const NeuCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-        <div
-            className={`rounded-2xl p-5 ${className}`}
-            style={{ background: S, boxShadow: SHADOW_OUT }}
-        >
-            {children}
-        </div>
-    );
 
     return (
         <motion.div

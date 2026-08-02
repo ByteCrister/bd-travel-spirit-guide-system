@@ -345,7 +345,7 @@ export const Step4PricingSchema = Yup.object().shape({
                         createNestedErrorMessage("Pricing", "Discounts", "Valid From", "must be at least 0 days from today"),
                         function (value) {
                             if (!value) return true;
-                            return new Date(value) >= minDateFromToday(10);
+                            return new Date(value) >= minDateFromToday(0);
                         }
                     )
                     .test(
@@ -354,7 +354,7 @@ export const Step4PricingSchema = Yup.object().shape({
                         function (value) {
                             if (!value) return true;
                             
-                            const root = this.from && this.from[1] ? this.from[1].value : null;
+                            const root = this.from?.find(f => f.value && f.value.operatingWindow)?.value;
                             if (!root || !root.operatingWindow || !root.operatingWindow.startDate || !root.operatingWindow.endDate) return true;
                             
                             const start = new Date(root.operatingWindow.startDate);
@@ -396,7 +396,7 @@ export const Step4PricingSchema = Yup.object().shape({
                         function (value) {
                             if (!value) return true;
                             
-                            const root = this.from && this.from[1] ? this.from[1].value : null;
+                            const root = this.from?.find(f => f.value && f.value.operatingWindow)?.value;
                             if (!root || !root.operatingWindow || !root.operatingWindow.startDate || !root.operatingWindow.endDate) return true;
                             
                             const start = new Date(root.operatingWindow.startDate);
@@ -485,7 +485,7 @@ export const Step4PricingSchema = Yup.object().shape({
                 function (value) {
                     if (!value) return true;
                     
-                    const root = this.from && this.from[1] ? this.from[1].value : null;
+                    const root = this.from?.find(f => f.value && f.value.operatingWindow)?.value;
                     if (!root || !root.operatingWindow || !root.operatingWindow.endDate) return true;
                     
                     const endDate = new Date(root.operatingWindow.endDate);

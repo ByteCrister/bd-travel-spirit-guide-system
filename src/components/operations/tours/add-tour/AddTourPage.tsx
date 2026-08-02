@@ -1,7 +1,7 @@
 // /operations/tours/add-tour/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Formik, Form, FormikHelpers, FormikErrors } from 'formik';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -80,6 +80,47 @@ import { GUIDE_DEFAULT, GUIDE_DEFAULT_1 } from '@/data/tour-defaults';
 import toursData from '@/data/tours.json';
 // INITIAL_VALUES is now determined dynamically by state
 
+function getDynamicTourValues(baseTour: any): any {
+  if (!baseTour) return baseTour;
+  const newTour = JSON.parse(JSON.stringify(baseTour));
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const futureStart = new Date(today);
+  futureStart.setDate(today.getDate() + 15);
+  
+  const futureEnd = new Date(futureStart);
+  futureEnd.setDate(futureStart.getDate() + 5);
+
+  const futureDep = new Date(futureEnd);
+  futureDep.setDate(futureEnd.getDate() + 2);
+
+  if (newTour.operatingWindow) {
+    newTour.operatingWindow.startDate = futureStart.toISOString();
+    newTour.operatingWindow.endDate = futureEnd.toISOString();
+  }
+
+  if (newTour.departure) {
+    newTour.departure.date = futureDep.toISOString();
+  }
+
+  if (newTour.discounts && Array.isArray(newTour.discounts)) {
+    newTour.discounts.forEach((d: any) => {
+      const dStart = new Date(today);
+      dStart.setDate(today.getDate() + 2);
+      
+      const dEnd = new Date(today);
+      dEnd.setDate(today.getDate() + 10);
+      
+      d.validFrom = dStart.toISOString();
+      d.validUntil = dEnd.toISOString();
+    });
+  }
+
+  return newTour;
+}
+
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function getFirstErrorMessage<T>(errors: FormikErrors<T>): string | null {
   if (!errors || typeof errors !== "object") return null;
@@ -131,6 +172,11 @@ export default function AddTourPage() {
   const currentValidationSchema = validationSchemas[activeStep];
   const isLastStep = activeStep === STEPS.length - 1;
   const progressPct = ((activeStep + 1) / STEPS.length) * 100;
+
+  const initialValues = useMemo(() => {
+    const baseData = isDataLoaded ? (toursData as unknown as CreateTourDTO[])[tourIndex] : GUIDE_DEFAULT;
+    return getDynamicTourValues(baseData);
+  }, [isDataLoaded, tourIndex]);
 
   const handleNext = async (validateForm: () => Promise<FormikErrors<CreateTourDTO>>) => {
     const errors = await validateForm();
@@ -382,7 +428,7 @@ export default function AddTourPage() {
 
             {/* Formik */}
             <Formik
-              initialValues={isDataLoaded ? (toursData as unknown as CreateTourDTO[])[tourIndex] : GUIDE_DEFAULT}
+              initialValues={initialValues}
               validationSchema={currentValidationSchema}
               onSubmit={handleSubmit}
               validateOnMount={false}

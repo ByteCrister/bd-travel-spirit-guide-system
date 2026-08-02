@@ -160,6 +160,13 @@ async function searchTours(
             { title: { $regex: regex } },
             { summary: { $regex: regex } },
             { tags: { $regex: regex } },
+            { uniqueTourCode: { $regex: regex } },
+            { division: { $regex: regex } },
+            { district: { $regex: regex } },
+            { tourType: { $regex: regex } },
+            { "mainLocation.address.city": { $regex: regex } },
+            { "destinations.attractions.title": { $regex: regex } },
+            { "itinerary.title": { $regex: regex } },
         ],
     })
         .select("_id title")

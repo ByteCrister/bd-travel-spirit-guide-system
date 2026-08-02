@@ -110,34 +110,37 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
                 </motion.div>
             )}
 
-            {/* ── Column header ── */}
-            <div
-                className="sticky top-0 z-20"
-                style={{ background: S, borderBottom: "1px solid #d1cfce" }}
-            >
-                <div
-                    className="grid grid-cols-[100px_minmax(300px,1fr)_180px_160px_160px_140px_80px] gap-3 px-5 py-3 text-xs font-bold uppercase tracking-widest"
-                    style={{ color: MUTED, fontFamily: BRAND }}
-                >
-                    <div>Rating</div>
-                    <div>Review</div>
-                    <div className="flex items-center gap-1">
-                        <FaMapMarkerAlt className="w-3 h-3" /> Tour
+            {/* ── Scrollable Body Area ── */}
+            <div className="overflow-x-auto">
+                <div className="min-w-[1040px]">
+                    {/* ── Column header ── */}
+                    <div
+                        className="sticky top-0 z-20"
+                        style={{ background: S, borderBottom: "1px solid #d1cfce" }}
+                    >
+                        <div
+                            className="grid grid-cols-[100px_minmax(300px,1fr)_180px_160px_160px_140px_80px] gap-3 px-5 py-3 text-xs font-bold uppercase tracking-widest"
+                            style={{ color: MUTED, fontFamily: BRAND }}
+                        >
+                            <div>Rating</div>
+                            <div>Review</div>
+                            <div className="flex items-center gap-1">
+                                <FaMapMarkerAlt className="w-3 h-3" /> Tour
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <FaUserCircle className="w-3 h-3" /> User
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <FaClock className="w-3 h-3" /> Date
+                            </div>
+                            <div>Status</div>
+                            <div className="text-center">Actions</div>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <FaUserCircle className="w-3 h-3" /> User
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <FaClock className="w-3 h-3" /> Date
-                    </div>
-                    <div>Status</div>
-                    <div className="text-center">Actions</div>
-                </div>
-            </div>
 
-            {/* ── Body ── */}
-            <div role="rowgroup">
-                {isLoading ? (
+                    {/* ── Body ── */}
+                    <div role="rowgroup">
+                        {isLoading ? (
                     <div>
                         {[...Array(limit)].map((_, idx) => (
                             <div
@@ -228,6 +231,8 @@ function ReviewsTable({ entry, page, limit, onFirstRowRef }: Props): JSX.Element
                         </div>
                     </motion.div>
                 )}
+            </div>
+            </div>
             </div>
 
             {/* ── Footer summary ── */}

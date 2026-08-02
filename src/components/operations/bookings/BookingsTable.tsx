@@ -1,6 +1,6 @@
-﻿'use client';
+'use client';
 
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     MapPin, Users, Calendar, ArrowUpDown,
@@ -14,7 +14,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { IBookingPopulated } from '@/types/tour/booking.types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -200,6 +200,11 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                         <SectionHeader icon={MapPin} label="Tour Details" accentColor="text-[#00A63D]" />
                     </AccordionTrigger>
                     <AccordionContent className="px-5 pb-4 pt-1">
+                        {booking.tour.heroImage && (
+                            <div className="mb-4 w-full h-32 rounded-xl overflow-hidden bg-[#E7E5E4] relative shadow-sm border border-[#1E2938]/5">
+                                <img src={booking.tour.heroImage} alt={booking.tour.title} className="object-cover w-full h-full" />
+                            </div>
+                        )}
                         <Field label="Title" value={<span className="font-medium text-[#1E2938]/80 text-right">{booking.tour.title}</span>} />
                         {booking.tour.summary && (
                             <Field label="Summary" value={<span className="line-clamp-2 text-[#1E2938]/50">{booking.tour.summary}</span>} />
@@ -225,6 +230,7 @@ function BookingAccordionDetail({ booking }: { booking: IBookingPopulated }) {
                             '',
                         )}>
                             <Avatar className="w-9 h-9 rounded-xl shrink-0 ">
+                                <AvatarImage src={booking.traveler.avatar} alt={booking.traveler.name} />
                                 <AvatarFallback className="bg-[#006666]/10 text-[#006666] text-xs font-bold rounded-xl">
                                     {booking.traveler.name?.charAt(0).toUpperCase()}
                                 </AvatarFallback>
@@ -360,7 +366,7 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                             : bookings.length === 0
                                 ? <EmptyState />
                                 : bookings.map((booking, idx) => (
-                                    <>
+                                    <Fragment key={booking._id}>
                                         <motion.tr
                                             key={booking._id}
                                             initial={{ opacity: 0, y: 4 }}
@@ -418,6 +424,7 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                         'w-7 h-7 rounded-lg shrink-0',
                                                         '',
                                                     )}>
+                                                        <AvatarImage src={booking.traveler.avatar} alt={booking.traveler.name} />
                                                         <AvatarFallback className="bg-[#006666]/10 text-[#006666] text-[10px] font-bold rounded-lg">
                                                             {booking.traveler.name?.charAt(0).toUpperCase()}
                                                         </AvatarFallback>
@@ -546,7 +553,7 @@ export function BookingsTable({ bookings, isLoading, onViewDetail }: BookingsTab
                                                 </motion.tr>
                                             )}
                                         </AnimatePresence>
-                                    </>
+                                    </Fragment>
                                 ))
                         }
                     </tbody>
