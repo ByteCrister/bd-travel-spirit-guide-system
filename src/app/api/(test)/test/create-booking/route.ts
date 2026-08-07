@@ -9,6 +9,11 @@ import { chargeStripePaymentAccount, recordSettlementTransaction } from "@/lib/p
 import BookingModel, { IBooking } from "@/models/tours/booking.model";
 import { TOUR_DISCOUNT_TYPE, TOUR_DISCOUNT, PAYMENT_METHOD } from "@/constants/tour/tour.const";
 import { withTransaction } from "@/lib/helpers/withTransaction";
+import { GuideSystemNotificationModel } from "@/models/notifications/guide-system-notification.model";
+import {
+    GUIDE_SYSTEM_NOTIFICATION_TYPE,
+    GUIDE_SYSTEM_NOTIFICATION_PRIORITY,
+} from "@/constants/notifications/guide-system-notification.const";
 
 export async function POST(req: NextRequest) {
     try {
@@ -21,10 +26,14 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing required fields: userId, seats, tourId" }, { status: 400 });
         }
 
-        // 1. Fetch Tour
-        const tour = await TourModel.findById(tourId);
+        // 1. Fetch Tour (with companyId so we can scope the notification to the owning guide)
+        const tour = await TourModel.findById(tourId).select("basePrice discounts uniqueTourCode companyId").lean();
         if (!tour) {
             return NextResponse.json({ error: "Tour not found" }, { status: 404 });
+        }
+
+        if (!tour.companyId) {
+            return NextResponse.json({ error: "Tour has no owning guide (companyId)" }, { status: 400 });
         }
 
         const traveler = await TravelerModel.findOne({ user: new Types.ObjectId(userId) });
@@ -38,13 +47,12 @@ export async function POST(req: NextRequest) {
         let appliedDiscount = undefined;
 
         if (tour.discounts && tour.discounts.length > 0) {
-            // Find an active FIXED discount
-            const activeDiscounts = tour.discounts.filter(d => 
+            const activeDiscounts = tour.discounts.filter(d =>
                 d.discount === TOUR_DISCOUNT.FIXED &&
-                (!d.validFrom || d.validFrom <= new Date()) && 
+                (!d.validFrom || d.validFrom <= new Date()) &&
                 (!d.validUntil || d.validUntil >= new Date())
             );
-            
+
             if (activeDiscounts.length > 0) {
                 const d = activeDiscounts[0];
                 if (d.type === TOUR_DISCOUNT_TYPE.PERCENTAGE) {
@@ -62,8 +70,8 @@ export async function POST(req: NextRequest) {
 
         const finalPricePerSeat = Math.max(0, basePrice - discountValue);
         const totalAmount = finalPricePerSeat * seats;
-        
-        // Stripe requires amount in cents (or smallest currency unit). BDT has 100 poisha per Taka.
+
+        // Stripe requires amount in cents. BDT has 100 poisha per Taka.
         const amountCents = Math.round(totalAmount * 100);
 
         // 3. Find Traveler Payment Account
@@ -90,9 +98,9 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Admin block account not found" }, { status: 404 });
         }
 
-        // 5. Perform Transaction & Booking in a session
+        // 5. Perform Transaction, Booking & Notification inside a single atomic session
         const result = await withTransaction(async (session) => {
-            // Create booking in pending state first
+            // Create booking in pending state
             let booking = await BookingModel.createBooking(
                 traveler._id as Types.ObjectId,
                 new Types.ObjectId(tourId),
@@ -104,7 +112,7 @@ export async function POST(req: NextRequest) {
                 { session }
             );
 
-            // Charge the traveler
+            // Charge the traveler via Stripe
             const chargeResult = await chargeStripePaymentAccount({
                 paymentAccountId: travelerAccount._id as Types.ObjectId,
                 amountCents,
@@ -113,7 +121,7 @@ export async function POST(req: NextRequest) {
                 session
             });
 
-            // Record in Admin Block Account
+            // Record settlement in Admin Block Account ledger
             await recordSettlementTransaction({
                 paymentAccountId: adminAccount._id as Types.ObjectId,
                 amountCents,
@@ -123,7 +131,7 @@ export async function POST(req: NextRequest) {
                 session
             });
 
-            // Confirm Booking
+            // Confirm the booking and mark payment as paid
             booking = await BookingModel.confirmBooking(
                 booking._id as Types.ObjectId,
                 {
@@ -134,6 +142,20 @@ export async function POST(req: NextRequest) {
                     }
                 }
             ) as IBooking;
+
+            // 6. Fire a guide-scoped notification for the new confirmed booking
+            await GuideSystemNotificationModel.create(
+                [{
+                    type: GUIDE_SYSTEM_NOTIFICATION_TYPE.NEW_BOOKING,
+                    title: "New Booking Received",
+                    message: `Booking ${booking.bookingReference} has been confirmed. ${seats} seat(s) booked. Total paid: ${totalAmount} BDT.`,
+                    priority: GUIDE_SYSTEM_NOTIFICATION_PRIORITY.MEDIUM,
+                    relatedModel: "Booking",
+                    relatedId: booking._id as Types.ObjectId,
+                    guide: new Types.ObjectId(tour.companyId as Types.ObjectId),
+                }],
+                { session }
+            );
 
             return booking;
         });
@@ -148,4 +170,4 @@ export async function POST(req: NextRequest) {
         const errorMessage = error instanceof Error ? error.message : "Internal Server Error";
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
-}   
+}

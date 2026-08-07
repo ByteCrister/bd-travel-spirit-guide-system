@@ -349,6 +349,7 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
                     priority: GUIDE_SYSTEM_NOTIFICATION_PRIORITY.HIGH,
                     relatedModel: "ResetPasswordRequest",
                     relatedId: doc._id,
+                    guide: employee.companyId,
                 }],
                 { session }
             );
