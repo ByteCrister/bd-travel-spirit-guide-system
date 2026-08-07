@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Types } from "mongoose";
 import ConnectDB from "@/config/db";
 import TourModel from "@/models/tours/tour.model";
+import { TravelerModel } from "@/models/travelers/traveler.model";
 import StripePaymentAccountModel from "@/models/payments/payment-account.model";
 import { PAYMENT_OWNER_TYPE, PAYMENT_PURPOSE } from "@/constants/payment/payment.const";
 import { chargeStripePaymentAccount, recordSettlementTransaction } from "@/lib/payments/stripe-charge.service";
@@ -24,6 +25,11 @@ export async function POST(req: NextRequest) {
         const tour = await TourModel.findById(tourId);
         if (!tour) {
             return NextResponse.json({ error: "Tour not found" }, { status: 404 });
+        }
+
+        const traveler = await TravelerModel.findOne({ user: new Types.ObjectId(userId) });
+        if (!traveler) {
+            return NextResponse.json({ error: "Traveler not found for this user" }, { status: 404 });
         }
 
         // 2. Calculate Price
@@ -88,7 +94,7 @@ export async function POST(req: NextRequest) {
         const result = await withTransaction(async (session) => {
             // Create booking in pending state first
             let booking = await BookingModel.createBooking(
-                new Types.ObjectId(userId),
+                traveler._id as Types.ObjectId,
                 new Types.ObjectId(tourId),
                 {
                     totalParticipants: seats,
