@@ -11,6 +11,7 @@ import GuideModel from '@/models/guide/guide.model';
 import TourModel, { ITour } from '@/models/tours/tour.model';
 import { TourSummary } from '@/types/dashboard/dashboard.type';
 import { withErrorHandler, ApiError, HandlerResult } from '@/lib/helpers/withErrorHandler';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 // Allowed status values (must match TOUR_STATUS enum)
 const allowedStatusValues: Set<string> = new Set(Object.values(TOUR_STATUS));
@@ -103,37 +104,48 @@ async function getToursHandler(request: NextRequest): Promise<HandlerResult<Tour
         }
     }
 
-    // 5. Execute query with projection
-    const tours = await TourModel.find(filter)
-        .select({
-            _id: 1,
-            title: 1,
-            slug: 1,
-            status: 1,
-            uniqueTourCode: 1,
-            basePrice: 1,
-            createdAt: 1,
-            updatedAt: 1,
-        })
-        .lean()
-        .sort({ createdAt: -1 });
+    // Build base filter (no date) for fallback
+    const baseFilter: FilterQuery<ITour> = {
+        companyId,
+        deletedAt: null,
+    };
+    if (tourStatusParam) {
+        baseFilter.status = tourStatusParam as TourStatus;
+    }
 
-    // 6. Transform to TourSummary (dates are already Date objects)
-    const summaries: TourSummary[] = tours.map((tour) => ({
-        _id: tour._id.toString(),
-        title: tour.title,
-        slug: tour.slug,
-        status: tour.status as TourStatus,
-        uniqueTourCode: tour.uniqueTourCode,
-        basePrice: {
-            amount: tour.basePrice.amount,
-            currency: tour.basePrice.currency as Currency,
-        },
-        createdAt: tour.createdAt,
-        updatedAt: tour.updatedAt,
-    }));
+    type TourQueryResult = {
+        _id: Types.ObjectId;
+        title: string;
+        slug: string;
+        status: string;
+        uniqueTourCode: string;
+        basePrice: { amount: number; currency: string };
+        createdAt: Date;
+        updatedAt: Date;
+    };
 
-    return { data: summaries };
+    const toSummaries = (tours: TourQueryResult[]) =>
+        tours.map((tour) => ({
+            _id: tour._id.toString(),
+            title: tour.title,
+            slug: tour.slug,
+            status: tour.status as TourStatus,
+            uniqueTourCode: tour.uniqueTourCode,
+            basePrice: {
+                amount: tour.basePrice.amount,
+                currency: tour.basePrice.currency as Currency,
+            },
+            createdAt: tour.createdAt,
+            updatedAt: tour.updatedAt,
+        }));
+
+    const { data: summaries, isInitialData } = await queryWithFallback(
+        async () => toSummaries(await TourModel.find(filter).select({ _id: 1, title: 1, slug: 1, status: 1, uniqueTourCode: 1, basePrice: 1, createdAt: 1, updatedAt: 1 }).lean().sort({ createdAt: -1 })),
+        async () => toSummaries(await TourModel.find(baseFilter).select({ _id: 1, title: 1, slug: 1, status: 1, uniqueTourCode: 1, basePrice: 1, createdAt: 1, updatedAt: 1 }).lean().sort({ createdAt: -1 })),
+        (r) => r.length === 0,
+    );
+
+    return { data: summaries, isInitialData };
 }
 
 // Export GET handler wrapped with error handling

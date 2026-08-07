@@ -13,6 +13,7 @@ import { Currency } from '@/constants/tour/tour.const';
 import ConnectDB from '@/config/db';
 import { withErrorHandler, ApiError, HandlerResult } from '@/lib/helpers/withErrorHandler';
 import { RefundSummary } from '@/types/dashboard/dashboard.type';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 // Type for a booking with populated tour (only currency needed)
 type PopulatedBooking = {
@@ -116,32 +117,45 @@ async function getRefundsHandler(request: NextRequest): Promise<HandlerResult<Re
         if (toDate) filter['cancellation.cancelledAt'].$lte = toDate;
     }
 
-    // 7. Fetch bookings with tour populated (to get currency)
-    const bookings = (await BookingModel.find(filter)
-        .populate<{ tour: { basePrice: { currency: Currency } } }>({
-            path: 'tour',
-            select: 'basePrice.currency',
-        })
-        .lean()) as unknown as PopulatedBooking[];
+    // Base filter (no date) for fallback
+    const baseFallbackFilter: FilterQuery<IBooking> = {
+        tour: { $in: tourIds },
+        deletedAt: null,
+        cancellation: { $exists: true, $ne: null },
+        'cancellation.refundAmount': { $exists: true, $ne: null },
+    };
 
-    // 8. Transform to RefundSummary[]
-    const summaries: RefundSummary[] = bookings.map(booking => {
-        const currency = booking.tour?.basePrice?.currency || 'BDT';
-        const refundAmount = booking.cancellation.refundAmount ?? 0;
-        const refundStatus = booking.cancellation.refundStatus ?? BOOKING_PAYMENT_STATUS.PENDING;
+    const fetchAndMap = async (f: FilterQuery<IBooking>): Promise<RefundSummary[]> => {
+        const bookings = (await BookingModel.find(f)
+            .populate<{ tour: { basePrice: { currency: Currency } } }>({
+                path: 'tour',
+                select: 'basePrice.currency',
+            })
+            .lean()) as unknown as PopulatedBooking[];
 
-        return {
-            _id: booking._id.toString(),
-            booking: booking.bookingReference,
-            amount: refundAmount,
-            currency,
-            status: refundStatus,
-            requestedAt: booking.cancellation.cancelledAt,
-            processedAt: undefined, // no dedicated field in schema; could be derived from payment history if needed
-        };
-    });
+        return bookings.map(booking => {
+            const currency = booking.tour?.basePrice?.currency || 'BDT';
+            const refundAmount = booking.cancellation.refundAmount ?? 0;
+            const refundStatus = booking.cancellation.refundStatus ?? BOOKING_PAYMENT_STATUS.PENDING;
+            return {
+                _id: booking._id.toString(),
+                booking: booking.bookingReference,
+                amount: refundAmount,
+                currency,
+                status: refundStatus,
+                requestedAt: booking.cancellation.cancelledAt,
+                processedAt: undefined,
+            };
+        });
+    };
 
-    return { data: summaries };
+    const { data: summaries, isInitialData } = await queryWithFallback(
+        () => fetchAndMap(filter),
+        () => fetchAndMap(baseFallbackFilter),
+        (r) => r.length === 0,
+    );
+
+    return { data: summaries, isInitialData };
 }
 
 export const GET = withErrorHandler(getRefundsHandler);

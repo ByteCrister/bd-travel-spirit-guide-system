@@ -34,15 +34,22 @@ export type HandlerResult<T> = {
 
     /** Optional HTTP status code (defaults to 200 if not provided) */
     status?: number;
+
+    /**
+     * When true, the data is a fallback (date-range had no results so we
+     * returned the most recent available data for this company).
+     * Consumers can use this to show an "initial / demo data" notice.
+     */
+    isInitialData?: boolean;
 };
 
 /**
  * Higher-order function that wraps an async API handler with
  * consistent error handling and response formatting.
  *
- * - On success: returns `{ success: true, data }` with the given status.
+ * - On success: returns `{ data, isInitialData? }` with the given status.
  * - On failure: catches errors, logs them, and returns
- *   `{ success: false, error }` with the appropriate status.
+ *   `{ error }` with the appropriate status.
  *
  * @template T - The type of the data payload returned on success.
  * @template Args - The argument types accepted by the handler function.
@@ -52,12 +59,15 @@ export type HandlerResult<T> = {
  */
 export function withErrorHandler<T, Args extends unknown[]>(
     fn: (...args: Args) => Promise<HandlerResult<T>>
-): (...args: Args) => Promise<NextResponse<{ data: T } | { error: string }>> {
+): (...args: Args) => Promise<NextResponse<{ data: T; isInitialData?: boolean } | { error: string }>> {
     return async (...args: Args) => {
         try {
-            const { data, status = 200 } = await fn(...args);
+            const { data, status = 200, isInitialData } = await fn(...args);
 
-            return NextResponse.json({ data }, { status });
+            return NextResponse.json(
+                isInitialData ? { data, isInitialData: true } : { data },
+                { status }
+            );
         } catch (err: unknown) {
             let message = "Internal Server Error";
             let status = 500;

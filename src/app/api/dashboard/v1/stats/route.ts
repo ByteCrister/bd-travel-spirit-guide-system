@@ -27,6 +27,7 @@ import type { EmployeeStatus } from '@/constants/employee/employee.const';
 import type { ReportStatus } from '@/constants/tour/report.const';
 import { ClientSession, Types } from 'mongoose';
 import { NextRequest } from 'next/server';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 interface DashboardStatsQuery {
     statsDateRangeFrom: string;
@@ -387,48 +388,51 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
     const toDate = new Date(query.statsDateRangeTo);
     toDate.setHours(23, 59, 59, 999);
 
-    const bundle = await withTransaction(async (session) => {
-        const [
-            totalTours,
-            bookingStats,
-            pendingReports,
-            averageRating,
-            activeEmployees,
-            bookingsForCharts,
-            reviewsForCharts,
-        ] = await Promise.all([
-            getTourStats(guideId, fromDate, toDate, query.tourStatus, session),
-            getBookingStats(guideId, fromDate, toDate, query.bookingStatus, session),
-            getPendingReportsCount(guideId, fromDate, toDate, query.reportStatus, session),
-            getAverageRating(guideId, fromDate, toDate, session),
-            getActiveEmployeesInFilteredPool(
-                guideId,
-                fromDate,
-                toDate,
-                query.employeeStatus,
-                session,
-            ),
-            getBookingsForCharts(guideId, fromDate, toDate, session),
-            getReviewsForCharts(guideId, fromDate, toDate, session),
-        ]);
+    const buildBundle = async (from: Date, to: Date): Promise<DashboardStatsBundle> =>
+        withTransaction(async (session) => {
+            const [
+                totalTours,
+                bookingStats,
+                pendingReports,
+                averageRating,
+                activeEmployees,
+                bookingsForCharts,
+                reviewsForCharts,
+            ] = await Promise.all([
+                getTourStats(guideId, from, to, query.tourStatus, session),
+                getBookingStats(guideId, from, to, query.bookingStatus, session),
+                getPendingReportsCount(guideId, from, to, query.reportStatus, session),
+                getAverageRating(guideId, from, to, session),
+                getActiveEmployeesInFilteredPool(guideId, from, to, query.employeeStatus, session),
+                getBookingsForCharts(guideId, from, to, session),
+                getReviewsForCharts(guideId, from, to, session),
+            ]);
 
-        const stats: DashboardStats = {
-            totalTours,
-            totalBookings: bookingStats.total,
-            totalRevenue: bookingStats.revenue,
-            pendingReports,
-            averageRating,
-            activeEmployees,
-        };
+            const stats: DashboardStats = {
+                totalTours,
+                totalBookings: bookingStats.total,
+                totalRevenue: bookingStats.revenue,
+                pendingReports,
+                averageRating,
+                activeEmployees,
+            };
 
-        const payload: DashboardStatsBundle = {
-            stats,
-            bookingsForCharts,
-            reviewsForCharts,
-        };
+            return { stats, bookingsForCharts, reviewsForCharts };
+        });
 
-        return payload;
-    });
+    // Use a wide fallback window (epoch → now) when the date range yields all zeros
+    const epochStart = new Date(0);
+    const fallbackEnd = new Date();
+    fallbackEnd.setHours(23, 59, 59, 999);
 
-    return { data: bundle, status: 200 };
+    const { data: bundle, isInitialData } = await queryWithFallback(
+        () => buildBundle(fromDate, toDate),
+        () => buildBundle(epochStart, fallbackEnd),
+        (b) =>
+            b.stats.totalTours === 0 &&
+            b.stats.totalBookings === 0 &&
+            b.stats.activeEmployees === 0,
+    );
+
+    return { data: bundle, status: 200, isInitialData };
 });

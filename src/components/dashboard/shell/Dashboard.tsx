@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/popover';
 import { CalendarIcon, ChevronDown } from 'lucide-react';
 import { Breadcrumbs } from "@/components/global/Breadcrumbs";
+import { InitialDataBanner } from '@/components/dashboard/shell/InitialDataBanner';
 
 const brand = {
     primary: '#006666',
@@ -82,6 +83,7 @@ export default function Dashboard() {
         transactionsHasMore,
         isLoadingTransactions,
         isExporting,
+        isInitialData,
         setActiveTab,
         setSectionDateRange,
         setFilter,
@@ -179,6 +181,8 @@ export default function Dashboard() {
                 ]}
                 className="mb-4"
             />
+
+            <InitialDataBanner visible={isInitialData} />
 
             <DashboardPageHeader
                 exportWindow={filters.globalDateRange}

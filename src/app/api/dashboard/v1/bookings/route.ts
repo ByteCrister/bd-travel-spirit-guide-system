@@ -13,6 +13,7 @@ import { Currency } from '@/constants/tour/tour.const';
 import { BookingStatus, BOOKING_STATUS } from '@/constants/tour/tour-booking.const';
 import { withErrorHandler, ApiError, HandlerResult } from '@/lib/helpers/withErrorHandler';
 import { BookingSummary } from '@/types/dashboard/dashboard.type';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 // Set of allowed booking statuses (as strings for validation)
 const allowedBookingStatuses: Set<string> = new Set(Object.values(BOOKING_STATUS));
@@ -117,50 +118,61 @@ async function getBookingsHandler(request: NextRequest): Promise<HandlerResult<B
         }
     }
 
-    // 7. Fetch bookings with population
-    const bookings = await BookingModel.find(bookingFilter)
-        .populate<{ traveler: { _id: Types.ObjectId; name: string; user?: { email: string } } }>({
-            path: 'traveler',
-            select: 'name user',
-            populate: {
-                path: 'user',
-                select: 'email'
-            }
-        })
-        .populate<{ tour: { _id: Types.ObjectId; title: string } }>({
-            path: 'tour',
-            select: 'title',
-        })
-        .lean();
+    // Base filter (no date) for fallback
+    const baseFallbackFilter: FilterQuery<IBooking> = {
+        tour: { $in: tourIds },
+        deletedAt: null,
+    };
+    if (bookingStatusParam) {
+        baseFallbackFilter.status = bookingStatusParam as BookingStatus;
+    }
 
-    // 8. Transform to BookingSummary[]
-    const summaries: BookingSummary[] = bookings.map((booking) => {
-        const traveler = booking.traveler;
-        const tour = booking.tour;
-        const currency = tourCurrencyMap.get(tour?._id?.toString() ?? '') || 'BDT';
+    const fetchAndMap = async (f: FilterQuery<IBooking>): Promise<BookingSummary[]> => {
+        const bookings = await BookingModel.find(f)
+            .populate<{ traveler: { _id: Types.ObjectId; name: string; user?: { email: string } } }>({
+                path: 'traveler',
+                select: 'name user',
+                populate: { path: 'user', select: 'email' }
+            })
+            .populate<{ tour: { _id: Types.ObjectId; title: string } }>({
+                path: 'tour',
+                select: 'title',
+            })
+            .lean();
 
-        return {
-            _id: booking._id.toString(),
-            bookingReference: booking.bookingReference,
-            traveler: {
-                _id: traveler?._id?.toString() ?? '',
-                name: traveler?.name ?? 'Unknown',
-                email: traveler?.user?.email ?? '',
-            },
-            tour: {
-                _id: tour?._id?.toString() ?? '',
-                title: tour?.title ?? 'Unknown Tour',
-            },
-            totalParticipants: booking.totalParticipants,
-            totalPaid: booking.totalPaid,
-            currency,
-            status: booking.status,
-            paymentStatus: booking.payment.status,
-            bookedAt: booking.bookedAt,
-        };
-    });
+        return bookings.map((booking) => {
+            const traveler = booking.traveler;
+            const tour = booking.tour;
+            const currency = tourCurrencyMap.get(tour?._id?.toString() ?? '') || 'BDT';
+            return {
+                _id: booking._id.toString(),
+                bookingReference: booking.bookingReference,
+                traveler: {
+                    _id: traveler?._id?.toString() ?? '',
+                    name: traveler?.name ?? 'Unknown',
+                    email: traveler?.user?.email ?? '',
+                },
+                tour: {
+                    _id: tour?._id?.toString() ?? '',
+                    title: tour?.title ?? 'Unknown Tour',
+                },
+                totalParticipants: booking.totalParticipants,
+                totalPaid: booking.totalPaid,
+                currency,
+                status: booking.status,
+                paymentStatus: booking.payment.status,
+                bookedAt: booking.bookedAt,
+            };
+        });
+    };
 
-    return { data: summaries };
+    const { data: summaries, isInitialData } = await queryWithFallback(
+        () => fetchAndMap(bookingFilter),
+        () => fetchAndMap(baseFallbackFilter),
+        (r) => r.length === 0,
+    );
+
+    return { data: summaries, isInitialData };
 }
 
 export const GET = withErrorHandler(getBookingsHandler);

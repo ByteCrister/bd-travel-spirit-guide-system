@@ -16,6 +16,7 @@ import { TRANSACTION_STATUS, type TransactionStatus } from '@/constants/payment/
 import { BOOKING_PAYMENT_STATUS, type BookingPaymentStatus } from '@/constants/tour/tour-booking.const';
 import { ApiError, withErrorHandler } from '@/lib/helpers/withErrorHandler';
 import type { ApiPaginatedResponse, Transaction } from '@/types/dashboard/dashboard.type';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -171,47 +172,50 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
         return { data: empty, status: 200 };
     }
 
-    const baseFilter: Record<string, unknown> = {
-        paymentAccountId: { $in: accountIds },
-        createdAt: { $gte: from, $lte: to },
+    const fetchPage = async (dateFrom: Date, dateTo: Date): Promise<ApiPaginatedResponse<Transaction>> => {
+        const baseFilter: Record<string, unknown> = {
+            paymentAccountId: { $in: accountIds },
+            createdAt: { $gte: dateFrom, $lte: dateTo },
+        };
+
+        const statusParam = request.nextUrl.searchParams.get('status');
+        if (statusParam && Object.values(TRANSACTION_STATUS).includes(statusParam as TRANSACTION_STATUS)) {
+            baseFilter.status = statusParam;
+        }
+
+        const total = await TransactionModel.countDocuments(baseFilter);
+
+        const query: Record<string, unknown> = { ...baseFilter };
+        if (cursor) {
+            query._id = { $lt: new Types.ObjectId(cursor) };
+        }
+
+        const rawDocsPlus: TxLean[] = await TransactionModel.find(query)
+            .sort({ createdAt: -1, _id: -1 })
+            .limit(limit + 1)
+            .select('_id stripePaymentIntentId amount currency status description createdAt updatedAt')
+            .lean();
+
+        const hasNextPage = rawDocsPlus.length > limit;
+        const rawDocs = hasNextPage ? rawDocsPlus.slice(0, limit) : rawDocsPlus;
+        const transactions: Transaction[] = rawDocs.map(mapDocToTransaction);
+        const nextCursor =
+            hasNextPage && transactions.length > 0
+                ? transactions[transactions.length - 1]._id
+                : undefined;
+
+        return { data: transactions, total, page: 1, limit, hasNextPage, nextCursor };
     };
 
-    const statusParam = request.nextUrl.searchParams.get('status');
-    if (statusParam && Object.values(TRANSACTION_STATUS).includes(statusParam as TRANSACTION_STATUS)) {
-        baseFilter.status = statusParam;
-    }
+    const epochStart = new Date(0);
+    const fallbackEnd = new Date();
+    fallbackEnd.setHours(23, 59, 59, 999);
 
-    const total = await TransactionModel.countDocuments(baseFilter);
+    const { data: payload, isInitialData } = await queryWithFallback(
+        () => fetchPage(from, to),
+        () => fetchPage(epochStart, fallbackEnd),
+        (p) => p.data.length === 0,
+    );
 
-    const query: Record<string, unknown> = { ...baseFilter };
-    if (cursor) {
-        query._id = { $lt: new Types.ObjectId(cursor) };
-    }
-
-    const rawDocsPlus: TxLean[] = await TransactionModel.find(query)
-        .sort({ createdAt: -1, _id: -1 })
-        .limit(limit + 1)
-        .select('_id stripePaymentIntentId amount currency status description createdAt updatedAt')
-        .lean();
-
-    const hasNextPage = rawDocsPlus.length > limit;
-    const rawDocs = hasNextPage ? rawDocsPlus.slice(0, limit) : rawDocsPlus;
-
-    const transactions: Transaction[] = rawDocs.map(mapDocToTransaction);
-
-    const nextCursor =
-        hasNextPage && transactions.length > 0
-            ? transactions[transactions.length - 1]._id
-            : undefined;
-
-    const payload: ApiPaginatedResponse<Transaction> = {
-        data: transactions,
-        total,
-        page: 1,
-        limit,
-        hasNextPage,
-        nextCursor,
-    };
-
-    return { data: payload, status: 200 };
+    return { data: payload, status: 200, isInitialData };
 });

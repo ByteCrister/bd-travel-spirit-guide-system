@@ -72,6 +72,13 @@ export interface DashboardStoreState {
     isExporting: boolean;
 
     lastFetchedTimestamps: Record<string, number>;
+
+    /**
+     * True when the most recent API fetch returned fallback data — i.e. no
+     * records were found in the selected date range and the API returned the
+     * most recent available data for this company instead.
+     */
+    isInitialData: boolean;
 }
 
 export interface DashboardStoreActions {

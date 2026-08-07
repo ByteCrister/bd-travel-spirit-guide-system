@@ -13,6 +13,7 @@ import { ModerationStatus } from '@/constants/tour/tour.const';
 import ConnectDB from '@/config/db';
 import { withErrorHandler, ApiError, HandlerResult } from '@/lib/helpers/withErrorHandler';
 import { FAQSummary } from '@/types/dashboard/dashboard.type';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 // Type for a FAQ document after .lean() and populate('tour')
 type PopulatedFAQ = {
@@ -112,59 +113,56 @@ async function getFaqsHandler(request: NextRequest): Promise<HandlerResult<FAQSu
         if (toDate) filter.createdAt.$lte = toDate;
     }
 
-    // 7. Fetch FAQs with tour population (without embedded likes/dislikes arrays)
-    const faqs = (await TourFAQModel.find(filter)
-        .populate('tour', 'title')
-        .lean()) as unknown as PopulatedFAQ[];
+    // Base filter (no date) for fallback
+    const baseFallbackFilter: FilterQuery<ITourFAQ> = {
+        tour: { $in: tourIds },
+        deletedAt: null,
+    };
 
-    if (!faqs.length) {
-        return { data: [] };
-    }
+    const fetchAndMap = async (f: FilterQuery<ITourFAQ>): Promise<FAQSummary[]> => {
+        const faqs = (await TourFAQModel.find(f)
+            .populate('tour', 'title')
+            .lean()) as unknown as PopulatedFAQ[];
 
-    // 8. Get aggregated vote counts from TourFAQVoteModel
-    const faqIds = faqs.map(faq => faq._id);
-    const voteAggregation = await TourFAQVoteModel.aggregate([
-        { $match: { faqId: { $in: faqIds } } },
-        {
-            $group: {
-                _id: { faqId: '$faqId', type: '$type' },
-                count: { $sum: 1 },
-            },
-        },
-    ]);
+        if (!faqs.length) return [];
 
-    // Build a map: faqId -> { likeCount, dislikeCount }
-    const voteCounts = new Map<string, { likeCount: number; dislikeCount: number }>();
-    for (const item of voteAggregation) {
-        const faqIdStr = item._id.faqId.toString();
-        const existing = voteCounts.get(faqIdStr) ?? { likeCount: 0, dislikeCount: 0 };
-        if (item._id.type === 'like') {
-            existing.likeCount = item.count;
-        } else if (item._id.type === 'dislike') {
-            existing.dislikeCount = item.count;
+        const faqIds = faqs.map(faq => faq._id);
+        const voteAggregation = await TourFAQVoteModel.aggregate([
+            { $match: { faqId: { $in: faqIds } } },
+            { $group: { _id: { faqId: '$faqId', type: '$type' }, count: { $sum: 1 } } },
+        ]);
+
+        const voteCounts = new Map<string, { likeCount: number; dislikeCount: number }>();
+        for (const item of voteAggregation) {
+            const faqIdStr = item._id.faqId.toString();
+            const existing = voteCounts.get(faqIdStr) ?? { likeCount: 0, dislikeCount: 0 };
+            if (item._id.type === 'like') existing.likeCount = item.count;
+            else if (item._id.type === 'dislike') existing.dislikeCount = item.count;
+            voteCounts.set(faqIdStr, existing);
         }
-        voteCounts.set(faqIdStr, existing);
-    }
 
-    // 9. Transform to FAQSummary[]
-    const summaries: FAQSummary[] = faqs.map(faq => {
-        const counts = voteCounts.get(faq._id.toString()) ?? { likeCount: 0, dislikeCount: 0 };
-        return {
-            _id: faq._id.toString(),
-            tour: {
-                _id: faq.tour._id.toString(),
-                title: faq.tour.title,
-            },
-            question: faq.question,
-            answer: faq.answer,
-            status: faq.status as ModerationStatus,
-            likeCount: counts.likeCount,
-            dislikeCount: counts.dislikeCount,
-            createdAt: faq.createdAt,
-        };
-    });
+        return faqs.map(faq => {
+            const counts = voteCounts.get(faq._id.toString()) ?? { likeCount: 0, dislikeCount: 0 };
+            return {
+                _id: faq._id.toString(),
+                tour: { _id: faq.tour._id.toString(), title: faq.tour.title },
+                question: faq.question,
+                answer: faq.answer,
+                status: faq.status as ModerationStatus,
+                likeCount: counts.likeCount,
+                dislikeCount: counts.dislikeCount,
+                createdAt: faq.createdAt,
+            };
+        });
+    };
 
-    return { data: summaries };
+    const { data: summaries, isInitialData } = await queryWithFallback(
+        () => fetchAndMap(filter),
+        () => fetchAndMap(baseFallbackFilter),
+        (r) => r.length === 0,
+    );
+
+    return { data: summaries, isInitialData };
 }
 
 export const GET = withErrorHandler(getFaqsHandler);

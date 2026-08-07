@@ -11,6 +11,7 @@ import { TOUR_STATUS } from '@/constants/tour/tour.const';
 import ConnectDB from '@/config/db';
 import { withErrorHandler, ApiError, HandlerResult } from '@/lib/helpers/withErrorHandler';
 import { RunningTourInfo } from '@/types/dashboard/dashboard.type';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 async function getRunningToursHandler(request: NextRequest): Promise<HandlerResult<RunningTourInfo[]>> {
     // 1. Authenticate and validate user ID
@@ -74,48 +75,55 @@ async function getRunningToursHandler(request: NextRequest): Promise<HandlerResu
         toDate.setHours(23, 59, 59, 999);
     }
 
-    // 5. Fetch tours for this company: active, not soft-deleted, and have at least one departure
-    const filter: FilterQuery<ITour> = {
+    // 5. Base filter (no date) for fallback
+    const baseFilter: FilterQuery<ITour> = {
         companyId,
         deletedAt: null,
         status: TOUR_STATUS.ACTIVE,
         departure: { $exists: true, $ne: null },
     };
 
-    const tours = await TourModel.find(filter)
-        .select('_id slug title departure')
-        .lean();
+    type RunningTourQueryResult = {
+        _id: Types.ObjectId;
+        slug: string;
+        title: string;
+        departure?: {
+            date: Date;
+            seatsTotal?: number;
+            seatsBooked?: number;
+        };
+    };
 
-    // 6. Compute RunningTourInfo for each tour
-    const runningTours: RunningTourInfo[] = [];
+    const buildRunningTours = (tours: RunningTourQueryResult[], from: Date | null, to: Date | null): RunningTourInfo[] => {
+        const result: RunningTourInfo[] = [];
+        for (const tour of tours) {
+            const dep = tour.departure;
+            if (!dep) continue;
+            const depDate = new Date(dep.date);
+            if (from && depDate < from) continue;
+            if (to && depDate > to) continue;
+            result.push({
+                tourId: tour._id.toString(),
+                slug: tour.slug,
+                title: tour.title,
+                totalSeats: dep.seatsTotal ?? 0,
+                currentBookings: dep.seatsBooked ?? 0,
+                windowStart: depDate,
+                windowEnd: depDate,
+            });
+        }
+        return result;
+    };
 
-    for (const tour of tours) {
-        // Filter departure by date range if provided
-        const dep = tour.departure;
-        if (!dep) continue;
-        
-        const depDate = new Date(dep.date);
-        
-        if (fromDate && depDate < fromDate) continue;
-        if (toDate && depDate > toDate) continue;
+    const allTours = (await TourModel.find(baseFilter).select('_id slug title departure').lean()) as unknown as RunningTourQueryResult[];
 
-        let totalSeats = dep.seatsTotal ?? 0;
-        let currentBookings = dep.seatsBooked ?? 0;
-        let windowStart: Date = depDate;
-        let windowEnd: Date = depDate;
+    const { data: runningTours, isInitialData } = await queryWithFallback(
+        async () => buildRunningTours(allTours, fromDate, toDate),
+        async () => buildRunningTours(allTours, null, null),
+        (r) => r.length === 0,
+    );
 
-        runningTours.push({
-            tourId: tour._id.toString(),
-            slug: tour.slug,
-            title: tour.title,
-            totalSeats,
-            currentBookings,
-            windowStart,
-            windowEnd,
-        });
-    }
-
-    return { data: runningTours };
+    return { data: runningTours, isInitialData };
 }
 
 export const GET = withErrorHandler(getRunningToursHandler);

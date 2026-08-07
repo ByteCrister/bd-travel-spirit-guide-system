@@ -11,6 +11,7 @@ import ConnectDB from '@/config/db';
 import { ReviewSummary } from '@/types/dashboard/dashboard.type';
 import { withErrorHandler, ApiError, HandlerResult } from '@/lib/helpers/withErrorHandler';
 import { IReview, ReviewModel } from '@/models/tours/review.model';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 // Helper type for populated review after .lean()
 type PopulatedReview = {
@@ -108,38 +109,50 @@ async function getReviewsHandler(request: NextRequest): Promise<HandlerResult<Re
         }
     }
 
-    // 7. Fetch reviews with population
-    const reviews = (await ReviewModel.find(reviewFilter)
-        .populate<{ tour: { _id: Types.ObjectId; title: string } }>({
-            path: 'tour',
-            select: 'title',
-        })
-        .populate<{ user: { _id: Types.ObjectId; name: string; avatar?: Types.ObjectId } }>({
-            path: 'user',
-            select: 'name avatar',
-        })
-        .sort({ createdAt: -1 })
-        .lean()) as unknown as PopulatedReview[];  // Cast to our explicit type (safe because we control the shape)
+    // Base filter (no date) for fallback
+    const baseFallbackFilter: FilterQuery<IReview> = {
+        tour: { $in: tourIds },
+        deletedAt: null,
+    };
 
-    // 8. Transform to ReviewSummary[]
-    const summaries: ReviewSummary[] = reviews.map((review) => ({
-        _id: review._id.toString(),
-        tour: {
-            _id: review.tour?._id?.toString() ?? '',
-            title: review.tour?.title ?? 'Unknown Tour',
-        },
-        user: {
-            _id: review.user?._id?.toString() ?? '',
-            name: review.user?.name ?? 'Anonymous',
-            avatar: review.user?.avatar?.toString(),
-        },
-        rating: review.rating,
-        comment: review.comment,
-        isApproved: review.isApproved,
-        createdAt: review.createdAt,
-    }));
+    const fetchAndMap = async (f: FilterQuery<IReview>): Promise<ReviewSummary[]> => {
+        const reviews = (await ReviewModel.find(f)
+            .populate<{ tour: { _id: Types.ObjectId; title: string } }>({
+                path: 'tour',
+                select: 'title',
+            })
+            .populate<{ user: { _id: Types.ObjectId; name: string; avatar?: Types.ObjectId } }>({
+                path: 'user',
+                select: 'name avatar',
+            })
+            .sort({ createdAt: -1 })
+            .lean()) as unknown as PopulatedReview[];
 
-    return { data: summaries };
+        return reviews.map((review) => ({
+            _id: review._id.toString(),
+            tour: {
+                _id: review.tour?._id?.toString() ?? '',
+                title: review.tour?.title ?? 'Unknown Tour',
+            },
+            user: {
+                _id: review.user?._id?.toString() ?? '',
+                name: review.user?.name ?? 'Anonymous',
+                avatar: review.user?.avatar?.toString(),
+            },
+            rating: review.rating,
+            comment: review.comment,
+            isApproved: review.isApproved,
+            createdAt: review.createdAt,
+        }));
+    };
+
+    const { data: summaries, isInitialData } = await queryWithFallback(
+        () => fetchAndMap(reviewFilter),
+        () => fetchAndMap(baseFallbackFilter),
+        (r) => r.length === 0,
+    );
+
+    return { data: summaries, isInitialData };
 }
 
 export const GET = withErrorHandler(getReviewsHandler);

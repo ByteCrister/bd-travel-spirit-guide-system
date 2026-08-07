@@ -11,6 +11,7 @@ import { Currency } from '@/constants/tour/tour.const';
 import ConnectDB from '@/config/db';
 import { withErrorHandler, ApiError, HandlerResult } from '@/lib/helpers/withErrorHandler';
 import { EmployeeSummary } from '@/types/dashboard/dashboard.type';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 // Allowed status values derived from enum
 const allowedStatuses: Set<string> = new Set(Object.values(EMPLOYEE_STATUS));
@@ -97,31 +98,46 @@ async function getEmployeesHandler(request: NextRequest): Promise<HandlerResult<
         }
     }
 
-    // 6. Fetch employees with user population
-    const employees = await EmployeeModel.find(filter)
-        .populate<{ user: { _id: Types.ObjectId; name: string; email: string } }>({
-            path: 'user',
-            select: 'name email',
-        })
-        .select('status employmentType salary currency dateOfJoining')
-        .lean();
+    // Base filter (no date) for fallback
+    const baseFallbackFilter: FilterQuery<IEmployee> = {
+        companyId,
+        deletedAt: null,
+    };
+    if (employeeStatusParam) {
+        baseFallbackFilter.status = employeeStatusParam as EmployeeStatus;
+    }
 
-    // 7. Transform to EmployeeSummary[]
-    const summaries: EmployeeSummary[] = employees.map((emp) => ({
-        _id: emp._id.toString(),
-        user: {
-            _id: emp.user._id.toString(),
-            name: emp.user.name,
-            email: emp.user.email,
-        },
-        status: emp.status as EmployeeStatus,
-        employmentType: emp.employmentType,
-        salary: emp.salary,
-        currency: emp.currency as Currency,
-        dateOfJoining: emp.dateOfJoining,
-    }));
+    const fetchAndMap = async (f: FilterQuery<IEmployee>): Promise<EmployeeSummary[]> => {
+        const employees = await EmployeeModel.find(f)
+            .populate<{ user: { _id: Types.ObjectId; name: string; email: string } }>({
+                path: 'user',
+                select: 'name email',
+            })
+            .select('status employmentType salary currency dateOfJoining')
+            .lean();
 
-    return { data: summaries };
+        return employees.map((emp) => ({
+            _id: emp._id.toString(),
+            user: {
+                _id: emp.user._id.toString(),
+                name: emp.user.name,
+                email: emp.user.email,
+            },
+            status: emp.status as EmployeeStatus,
+            employmentType: emp.employmentType,
+            salary: emp.salary,
+            currency: emp.currency as Currency,
+            dateOfJoining: emp.dateOfJoining,
+        }));
+    };
+
+    const { data: summaries, isInitialData } = await queryWithFallback(
+        () => fetchAndMap(filter),
+        () => fetchAndMap(baseFallbackFilter),
+        (r) => r.length === 0,
+    );
+
+    return { data: summaries, isInitialData };
 }
 
 export const GET = withErrorHandler(getEmployeesHandler);

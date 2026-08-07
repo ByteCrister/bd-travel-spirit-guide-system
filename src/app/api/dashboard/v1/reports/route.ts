@@ -12,6 +12,7 @@ import { ReportModel, IReport } from '@/models/tours/report.model';
 import { ReportSummary } from '@/types/dashboard/dashboard.type';
 import { withErrorHandler, ApiError, HandlerResult } from '@/lib/helpers/withErrorHandler';
 import ConnectDB from '@/config/db';
+import { queryWithFallback } from '@/lib/helpers/dashboard-fallback';
 
 // Helper type for populated report after .lean()
 type PopulatedReport = {
@@ -127,38 +128,52 @@ async function getReportsHandler(request: NextRequest): Promise<HandlerResult<Re
         }
     }
 
-    // 7. Fetch reports with population
-    const reports = (await ReportModel.find(reportFilter)
-        .populate<{ reporter: { _id: Types.ObjectId; name: string } }>({
-            path: 'reporter',
-            select: 'name',
-        })
-        .populate<{ tour: { _id: Types.ObjectId; title: string } }>({
-            path: 'tour',
-            select: 'title',
-        })
-        .sort({ createdAt: -1 })
-        .lean()) as unknown as PopulatedReport[];  // Cast through unknown to resolve FlattenMaps conflict
+    // Base filter (no date) for fallback
+    const baseFallbackFilter: FilterQuery<IReport> = {
+        tour: { $in: tourIds },
+    };
+    if (reportStatusParam) {
+        baseFallbackFilter.status = reportStatusParam as ReportStatus;
+    }
 
-    // 8. Transform to ReportSummary[]
-    const summaries: ReportSummary[] = reports.map((report) => ({
-        _id: report._id.toString(),
-        reporter: {
-            _id: report.reporter?._id?.toString() ?? '',
-            name: report.reporter?.name ?? 'Anonymous',
-        },
-        tour: {
-            _id: report.tour?._id?.toString() ?? '',
-            title: report.tour?.title ?? 'Unknown Tour',
-        },
-        reason: report.reason,
-        message: report.message,
-        status: report.status,
-        priority: report.priority,
-        createdAt: report.createdAt,
-    }));
+    const fetchAndMap = async (f: FilterQuery<IReport>): Promise<ReportSummary[]> => {
+        const reports = (await ReportModel.find(f)
+            .populate<{ reporter: { _id: Types.ObjectId; name: string } }>({
+                path: 'reporter',
+                select: 'name',
+            })
+            .populate<{ tour: { _id: Types.ObjectId; title: string } }>({
+                path: 'tour',
+                select: 'title',
+            })
+            .sort({ createdAt: -1 })
+            .lean()) as unknown as PopulatedReport[];
 
-    return { data: summaries };
+        return reports.map((report) => ({
+            _id: report._id.toString(),
+            reporter: {
+                _id: report.reporter?._id?.toString() ?? '',
+                name: report.reporter?.name ?? 'Anonymous',
+            },
+            tour: {
+                _id: report.tour?._id?.toString() ?? '',
+                title: report.tour?.title ?? 'Unknown Tour',
+            },
+            reason: report.reason,
+            message: report.message,
+            status: report.status,
+            priority: report.priority,
+            createdAt: report.createdAt,
+        }));
+    };
+
+    const { data: summaries, isInitialData } = await queryWithFallback(
+        () => fetchAndMap(reportFilter),
+        () => fetchAndMap(baseFallbackFilter),
+        (r) => r.length === 0,
+    );
+
+    return { data: summaries, isInitialData };
 }
 
 export const GET = withErrorHandler(getReportsHandler);

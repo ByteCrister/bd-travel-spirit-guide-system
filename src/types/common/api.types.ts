@@ -16,4 +16,10 @@ export type ApiResponse<T> = {
 
     /** Error message describing why the API call failed (present only if `success` is false) */
     error?: string;
-};
+
+    /**
+     * When true, the API returned fallback data (no records found in the
+     * requested date range — showing the most recent available data instead).
+     */
+    isInitialData?: boolean;
+};

@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Separator } from "../ui/separator";
 import { FaChartLine, FaUsersCog, FaUserShield, FaGoogle } from "react-icons/fa";
-import { Loader2 } from "lucide-react"; // Import shadcn loader
+import { Loader2, Info } from "lucide-react"; // Import shadcn loader
 import { useMemo, useState } from "react";
 import api from "@/utils/axios/axios";
 import { signIn } from "next-auth/react";
@@ -18,6 +18,9 @@ import { showToast } from "@/components/global/showToast";
 import { USER_ROLE } from "@/constants/current-user/user.const";
 // Types
 export type AdminRole = USER_ROLE.GUIDE | USER_ROLE.ASSISTANT;
+
+const READY_ONLY_EMAIL=`${process.env.NEXT_PUBLIC_READY_ONLY_EMAIL}`;
+const READY_ONLY_PSSWORD=`${process.env.NEXT_PUBLIC_READY_ONLY_PSSWORD}`;
 
 const errorMap: Record<string, string> = {
     EMAIL_AND_PASS_REQUIRED: "Email and password required.",
@@ -38,7 +41,7 @@ const URLS = {
 export type JoinFormState = {
     email: string;
     password: string;
-};
+};  
 
 export type ForgotFormState = {
     email: string;
@@ -50,8 +53,8 @@ export default function JoinForgotSection() {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const [join, setJoin] = useState<JoinFormState>({
-        email: "",
-        password: "",
+        email: READY_ONLY_EMAIL || "",
+        password: READY_ONLY_PSSWORD || "",
     });
     const [joinErrors, setJoinErrors] = useState<Record<string, string>>({});
 
@@ -163,6 +166,13 @@ export default function JoinForgotSection() {
 
     const isJoin = activeForm === "join";
 
+    const isReadOnlyCredentials = Boolean(
+        READY_ONLY_EMAIL && 
+        READY_ONLY_PSSWORD &&
+        join.email === READY_ONLY_EMAIL && 
+        join.password === READY_ONLY_PSSWORD
+    );
+
     return (
         <section
             id="join-section"
@@ -267,6 +277,15 @@ export default function JoinForgotSection() {
                                             className="space-y-6"
                                             aria-label="Join form"
                                         >
+                                            {isReadOnlyCredentials && (
+                                                <div className="flex items-start gap-2 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800 border border-emerald-100">
+                                                    <Info className="h-4 w-4 mt-0.5 shrink-0 text-emerald-600" />
+                                                    <p>
+                                                        Using pre-filled read-only demo credentials.
+                                                    </p>
+                                                </div>
+                                            )}
+
                                             {/* Email */}
                                             <div className="space-y-2">
                                                 <Label htmlFor="join-email">Email</Label>

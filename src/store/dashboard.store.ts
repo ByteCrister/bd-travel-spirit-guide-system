@@ -162,6 +162,7 @@ const initialState: DashboardStoreState = {
   isLoadingTransactions: false,
   isExporting: false,
   lastFetchedTimestamps: {},
+  isInitialData: false,
 };
 
 function assertRangeNotFuture(range: DateRange): boolean {
@@ -221,6 +222,7 @@ export const useDashboardStore = create<DashboardStore>()(
             chartBookings: bundle.bookingsForCharts ?? [],
             chartReviews: bundle.reviewsForCharts ?? [],
             isLoadingStats: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -335,6 +337,7 @@ export const useDashboardStore = create<DashboardStore>()(
           set({
             toursData,
             isLoadingTours: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -373,6 +376,7 @@ export const useDashboardStore = create<DashboardStore>()(
           set({
             reviewsData,
             isLoadingReviews: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -414,6 +418,7 @@ export const useDashboardStore = create<DashboardStore>()(
           set({
             bookingsData,
             isLoadingBookings: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -455,6 +460,7 @@ export const useDashboardStore = create<DashboardStore>()(
           set({
             reportsData,
             isLoadingReports: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -496,6 +502,7 @@ export const useDashboardStore = create<DashboardStore>()(
           set({
             employeesData,
             isLoadingEmployees: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -534,6 +541,7 @@ export const useDashboardStore = create<DashboardStore>()(
           set({
             runningToursData,
             isLoadingRunningTours: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -572,6 +580,7 @@ export const useDashboardStore = create<DashboardStore>()(
           set({
             faqsData,
             isLoadingFaqs: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -610,6 +619,7 @@ export const useDashboardStore = create<DashboardStore>()(
           set({
             refundsData,
             isLoadingRefunds: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -660,6 +670,7 @@ export const useDashboardStore = create<DashboardStore>()(
             transactionsNextCursor: nextCursor ?? null,
             transactionsHasMore: hasNextPage,
             isLoadingTransactions: false,
+            isInitialData: response.data.isInitialData ?? false,
             lastFetchedTimestamps: {
               ...get().lastFetchedTimestamps,
               [CACHE_KEY]: now,
@@ -768,6 +779,7 @@ export const useDashboardStore = create<DashboardStore>()(
         set({
           filters: buildDefaultFilters(),
           lastFetchedTimestamps: {},
+          isInitialData: false,
         });
         void get().fetchInitialDashboard(true);
       },
