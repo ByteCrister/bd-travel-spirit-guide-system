@@ -38,7 +38,6 @@ export default function LoadingDashboard({
             role="status"
             aria-label={ariaLabel}
             className={`${center ? "min-h-screen flex items-center justify-center" : "inline-flex"} ${className}`}
-            style={{ background: center ? surface : undefined }}
         >
             {/* Neumorphic card shell */}
             <div
