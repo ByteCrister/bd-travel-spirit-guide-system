@@ -9,7 +9,6 @@ import {
 import ConnectDB from "@/config/db";
 import paymentAccountModel from "@/models/payments/payment-account.model";
 import { withTransaction } from "@/lib/helpers/withTransaction";
-import GuideModel from "@/models/guide/guide.model";
 import { getUserIdFromSession } from "@/lib/auth/session.auth";
 import { ApiError, HandlerResult } from "@/lib/helpers/withErrorHandler";
 import { USER_ROLE } from "@/constants/current-user/user.const";
@@ -102,16 +101,7 @@ export default async function GetPaymentAccountsHandler(
     //    validateUser will throw ApiError if role mismatch or user not found
     await validateUser(userId, USER_ROLE.GUIDE, { returnUser: false });
 
-    // 3. Find the Guide document associated with this user
-    const guide = await GuideModel.findOne({ "owner.user": userId })
-        .select("_id")
-        .lean();
-    if (!guide) {
-        throw new ApiError("Guide profile not found", 404);
-    }
-    const companyId = guide._id.toString();
-
-    // 4. Parse pagination parameters
+    // 3. Parse pagination parameters
     const url = new URL(req.url);
     const page = Math.max(1, Number(url.searchParams.get("page") ?? 1));
     const pageSize = Math.max(
@@ -120,10 +110,10 @@ export default async function GetPaymentAccountsHandler(
     );
     const skip = (page - 1) * pageSize;
 
-    // 5. Build filter – only payment accounts owned by this guide (company)
+    // 4. Build filter – only payment accounts owned by this guide (company)
     const filter = {
         ownerType: PAYMENT_OWNER_TYPE.GUIDE,
-        ownerId: companyId,
+        ownerId: userId,
         $or: [
             { isDeleted: false },
             { isDeleted: { $exists: false } },
@@ -131,7 +121,7 @@ export default async function GetPaymentAccountsHandler(
         ],
     };
 
-    // 6. Execute query (withTransaction optional but safe for reads)
+    // 5. Execute query (withTransaction optional but safe for reads)
     const { itemsRaw, total } = await withTransaction(async () => {
         const itemsRaw = await paymentAccountModel
             .find(filter)
